@@ -1,0 +1,19 @@
+name: "\U0001F50D C++ Lint CI"
+
+on:
+  push:
+    branches: [main, "release/*"]
+    tags: ["v*"]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  cpp-lint:
+    uses: N3b3x/hf-general-ci-tools/.github/workflows/ru-cpp-lint.yml@main
+    with:
+      clang_version: "20"
+      clang_format_config: "_config/.clang-format"
+      clang_tidy_config: "_config/.clang-tidy"
+      extensions: "c,cpp,cc,cxx,h,hpp"
+      ignore: "build|.git|third_party|vendor|lib/core/|docs/|_config/|_site/|examples/esp32/scripts/|examples/esp32/build/"

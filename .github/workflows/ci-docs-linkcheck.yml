@@ -1,0 +1,16 @@
+name: "\U0001F517 Docs Link Check CI"
+
+on:
+  push:
+    branches: [main, "release/*"]
+    tags: ["v*"]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  linkcheck:
+    uses: N3b3x/hf-general-ci-tools/.github/workflows/ru-docs-linkcheck.yml@main
+    with:
+      paths: "docs/** *.md **/*.md"
+      config_file: "_config/lychee.toml"

@@ -79,6 +79,12 @@ public:
     [[nodiscard]] bool EnsureInitialized() noexcept;
     [[nodiscard]] bool IsInitialized() const noexcept { return initialized_.load(std::memory_order_acquire); }
 
+    /**
+     * @brief Release all ADC resources and reset to uninitialized state.
+     * @return true on success
+     */
+    bool Deinitialize() noexcept;
+
     //==========================================================================
     // CHANNEL ACCESS
     //==========================================================================

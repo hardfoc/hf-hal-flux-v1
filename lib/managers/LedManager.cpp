@@ -188,6 +188,7 @@ LedError LedManager::StartAnimation(LedAnimation animation, const LedColor& colo
 LedError LedManager::StopAnimation() noexcept {
     std::lock_guard<RtosMutex> lock(mutex_);
     if (current_animation_ == LedAnimation::OFF) return LedError::SUCCESS;
+    if (!led_strip_) return LedError::NOT_INITIALIZED;
 
     led_strip_->setPixel(0, 0);
     led_strip_->show();

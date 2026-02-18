@@ -1,0 +1,12 @@
+name: "\U0001F4E6 Release"
+
+on:
+  push:
+    tags: ["v*"]
+
+jobs:
+  release:
+    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/ru-release-with-artifacts.yml@main
+    with:
+      build_workflow: "esp32-examples-build-ci.yml"
+      artifact_pattern: "fw-.*"

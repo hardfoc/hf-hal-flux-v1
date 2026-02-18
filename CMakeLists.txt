@@ -117,7 +117,6 @@ set(HF_HAL_INC_DIRS
     "${HF_HAL_ROOT}/lib/core/hf-core-utils/hf-utils-rtos-wrap/include"
     "${HF_HAL_ROOT}/lib/core/hf-core-utils/hf-utils-general/include"
     "${HF_HAL_ROOT}/lib/core/hf-core-utils/hf-utils-canopen/include"
-    "${HF_HAL_ROOT}/lib/core/hf-core-utils/hf-utils-thread-safe/include"
 
     # External drivers
     "${HF_HAL_ROOT}/lib/core/hf-core-drivers/external/hf-max22200-driver/inc"
@@ -134,31 +133,15 @@ idf_component_register(
     SRCS          ${HF_HAL_SRCS}
     INCLUDE_DIRS  ${HF_HAL_INC_DIRS}
 
-    REQUIRES
+    # PRIV_REQUIRES: Minimal set of verified ESP-IDF 5.5 components
+    PRIV_REQUIRES
         driver
         freertos
-        hf-ws2812-rmt-driver
         nvs_flash
         esp_timer
-        esp_system
-        esp_common
-        esp_rom
-        esp_hw_support
         hal
         soc
         log
-        esp_adc
-        esp_driver_spi
-        esp_driver_i2c
-        esp_driver_gpio
-
-    PRIV_REQUIRES
-        hal
-        esp_timer
-        esp_adc
-        esp_driver_spi
-        esp_driver_i2c
-        esp_driver_gpio
 )
 
 #==============================================================================

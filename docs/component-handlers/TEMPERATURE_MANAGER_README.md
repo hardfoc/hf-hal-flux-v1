@@ -1,0 +1,80 @@
+# TemperatureManager - Temperature Monitoring System
+
+<div align="center">
+
+![Component](https://img.shields.io/badge/component-TemperatureManager-blue.svg)
+![Thread Safe](https://img.shields.io/badge/thread--safe-yes-green.svg)
+![Hardware](https://img.shields.io/badge/hardware-ESP32--C6%20%7C%20NTC-orange.svg)
+
+**Multi-sensor temperature monitoring for the HardFOC Flux platform**
+
+</div>
+
+## 📋 Overview
+
+The `TemperatureManager` is a singleton that provides unified temperature readings from the ESP32-C6 internal sensor and an external 10 kΩ NTC thermistor. Both sensors are accessed through a consistent `BaseTemperature` interface.
+
+### Key Features
+
+- **🌡️ ESP32 Internal Sensor**: On-die temperature for thermal protection
+- **🔌 NTC Thermistor**: 10 kΩ NTC for ambient/board temperature
+- **🏷️ String-Based API**: Access sensors by name or functional enum
+- **📈 Trend Analysis**: Temperature history and trend monitoring
+- **🚨 Safety Alerts**: Over-temperature protection thresholds
+- **🔒 Thread-Safe**: Concurrent access from multiple RTOS tasks
+
+## 🏗️ Architecture
+
+```
+┌──────────────────────────────────┐
+│       TemperatureManager          │  ← Singleton
+├──────────────────────────────────┤
+│  std::array<TempEntry, kMax>      │  ← Fixed-size sensor registry
+│  BaseTemperature* esp32_temp_     │  ← Non-owning typed pointer
+│  BaseTemperature* ntc_temp_       │  ← Non-owning typed pointer
+├──────────────────────────────────┤
+│  EspTemperature  │  NtcTempHandler │  ← Hardware drivers
+│  (void* storage) │  (void* storage)│  ← Opaque owning storage
+└──────────────────────────────────┘
+```
+
+## 📡 Temperature Sources
+
+| Source | Type | Range | Use Case |
+|--------|------|-------|----------|
+| **ESP32-C6 Internal** | On-die | -10°C to 80°C | MCU thermal protection |
+| **NTC Thermistor** | 10 kΩ NTC | -40°C to 125°C | Board/ambient monitoring |
+
+## 🔧 API Reference
+
+### Initialization
+
+```cpp
+auto& temp = TemperatureManager::GetInstance();
+bool ok = temp.EnsureInitialized();
+```
+
+### Reading Temperatures
+
+```cpp
+// By name
+float board_temp = temp.ReadTemperature("TEMP_NTC");
+float mcu_temp = temp.ReadTemperature("TEMP_ESP32_INTERNAL");
+
+// By functional enum
+float t = temp.ReadTemperature(HfFunctionalTempSensor::kNtc);
+```
+
+### Diagnostics
+
+```cpp
+auto diag = temp.GetSystemDiagnostics();
+temp.DumpStatistics();
+```
+
+## ⚠️ Notes
+
+- Sensor drivers are allocated once at init via `new (std::nothrow)` into `void*` storage — singleton lifetime
+- `BaseTemperature*` typed pointers are non-owning aliases into the opaque storage
+- The NTC thermistor uses `NtcTemperatureHandler` which reads through `AdcManager`
+- No `Deinitialize()` method — sensors are active for the lifetime of the application

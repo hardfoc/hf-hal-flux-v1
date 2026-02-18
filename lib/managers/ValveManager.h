@@ -287,8 +287,18 @@ public:
     // INITIALIZATION
     //==========================================================================
 
-    [[nodiscard]] hf_valve_err_t EnsureInitialized() noexcept;
+    /**
+     * @brief Ensure the valve manager system is initialized.
+     * @return true if initialization successful, false otherwise
+     */
+    [[nodiscard]] bool EnsureInitialized() noexcept;
     [[nodiscard]] bool IsInitialized() const noexcept { return initialized_.load(std::memory_order_acquire); }
+
+    /**
+     * @brief Release all valve driver resources and reset to uninitialized state.
+     * @return true on success
+     */
+    bool Deinitialize() noexcept;
 
     //==========================================================================
     // CHANNEL ENABLE / DISABLE (unified for both drivers)

@@ -38,6 +38,50 @@ class BaseCan;
 #include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/utils/RtosMutex.h"
 
 //==============================================================================
+// COMM CHANNELS ERROR CODES
+//==============================================================================
+
+/**
+ * @brief Communication channels manager error codes for consistent error reporting.
+ *
+ * Manager-layer errors for communication bus lifecycle and device operations.
+ * Covers SPI, I2C, and CAN bus management failures.
+ */
+enum class CommError : uint8_t {
+    SUCCESS = 0,
+    NOT_INITIALIZED,
+    INITIALIZATION_FAILED,
+    BUS_NOT_AVAILABLE,
+    DEVICE_NOT_FOUND,
+    INVALID_BUS_INDEX,
+    INVALID_DEVICE_INDEX,
+    DEVICE_ALREADY_EXISTS,
+    DEVICE_CREATION_FAILED,
+    COMMUNICATION_FAILED,
+    INVALID_PARAMETER,
+    MUTEX_LOCK_FAILED
+};
+
+/** @brief Convert CommError to string for debugging. */
+constexpr const char* CommErrorToString(CommError error) noexcept {
+    switch (error) {
+        case CommError::SUCCESS:                return "Success";
+        case CommError::NOT_INITIALIZED:        return "Not initialized";
+        case CommError::INITIALIZATION_FAILED:  return "Initialization failed";
+        case CommError::BUS_NOT_AVAILABLE:      return "Bus not available";
+        case CommError::DEVICE_NOT_FOUND:       return "Device not found";
+        case CommError::INVALID_BUS_INDEX:      return "Invalid bus index";
+        case CommError::INVALID_DEVICE_INDEX:   return "Invalid device index";
+        case CommError::DEVICE_ALREADY_EXISTS:  return "Device already exists";
+        case CommError::DEVICE_CREATION_FAILED: return "Device creation failed";
+        case CommError::COMMUNICATION_FAILED:   return "Communication failed";
+        case CommError::INVALID_PARAMETER:      return "Invalid parameter";
+        case CommError::MUTEX_LOCK_FAILED:      return "Mutex lock failed";
+        default:                                return "Unknown error";
+    }
+}
+
+//==============================================================================
 // SPI DEVICE IDENTIFIERS
 //==============================================================================
 
@@ -81,6 +125,12 @@ public:
 
     bool EnsureInitialized() noexcept;
     [[nodiscard]] bool IsInitialized() const noexcept { return initialized_.load(std::memory_order_acquire); }
+
+    /**
+     * @brief Release all bus resources and reset to uninitialized state.
+     * @return true on success
+     */
+    bool Deinitialize() noexcept;
 
     //==========================================================================
     // SPI ACCESSORS

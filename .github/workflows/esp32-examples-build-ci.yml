@@ -1,0 +1,54 @@
+name: "\U0001F680 ESP32 Examples Build CI"
+
+on:
+  push:
+    branches: [main, develop, "release/*", "feature/*", "bugfix/*"]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+    inputs:
+      clean_build:
+        description: "Clean build (no cache)"
+        default: false
+        type: boolean
+
+env:
+  PROJECT_DIR: examples/esp32
+  TOOLS_DIR: examples/esp32/scripts
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    outputs:
+      project_dir: ${{ steps.vars.outputs.project_dir }}
+      tools_dir: ${{ steps.vars.outputs.tools_dir }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set paths
+        id: vars
+        run: |
+          echo "project_dir=${{ env.PROJECT_DIR }}" >> "$GITHUB_OUTPUT"
+          echo "tools_dir=${{ env.TOOLS_DIR }}" >> "$GITHUB_OUTPUT"
+
+      - name: Validate configuration
+        run: |
+          cd ${{ steps.vars.outputs.tools_dir }}
+          python3 generate_matrix.py --validate --verbose
+
+      - name: Generate build matrix
+        id: matrix
+        run: |
+          cd ${{ steps.vars.outputs.tools_dir }}
+          MATRIX=$(python3 generate_matrix.py)
+          echo "matrix=${MATRIX}" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: validate
+    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/ru-build.yml@main
+    with:
+      project_dir: ${{ needs.validate.outputs.project_dir }}
+      project_tools_dir: ${{ needs.validate.outputs.tools_dir }}
+      clean_build: ${{ github.event.inputs.clean_build == 'true' }}

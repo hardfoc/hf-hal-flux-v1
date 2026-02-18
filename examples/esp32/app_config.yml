@@ -1,0 +1,38 @@
+version: "1.0"
+metadata:
+  project: "ESP32 Flux HAL Examples"
+  default_app: "flux_api_test"
+  target: "esp32c6"
+  idf_versions: ["release/v5.5", "release/v5.4"]
+  build_types: [["Debug", "Release"], ["Debug"]]
+
+apps:
+  flux_api_test:
+    source_file: "flux_api_test.cpp"
+    category: "system"
+    ci_enabled: true
+  valve_cycling_test:
+    source_file: "valve_cycling_test.cpp"
+    category: "component"
+    ci_enabled: true
+  gpio_adc_test:
+    source_file: "gpio_adc_test.cpp"
+    category: "component"
+    ci_enabled: true
+  led_temp_test:
+    source_file: "led_temp_test.cpp"
+    category: "component"
+    ci_enabled: true
+
+build_config:
+  build_types:
+    Debug:
+      optimization: "-O0"
+      debug_level: "-g3"
+      defines: ["DEBUG"]
+    Release:
+      optimization: "-O2"
+      debug_level: "-g0"
+      defines: ["NDEBUG"]
+  build_directory_pattern: "build-app-{app_type}-type-{build_type}-target-{target}-idf-{idf_version}"
+  project_name_pattern: "esp32_flux_{app_type}_app"

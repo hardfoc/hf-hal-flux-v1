@@ -165,6 +165,22 @@ bool CommChannelsManager::Initialize() noexcept {
                               can_bus_valid_ ? "OK" : "FAIL",
                               i2c_bus_valid_ ? "OK" : "FAIL");
 
+    // If SPI failed (hard requirement), clean up any non-critical allocations
+    if (!spi_bus_valid_) {
+        if (can_bus_storage_) {
+            delete static_cast<EspCan*>(can_bus_storage_);
+            can_bus_storage_ = nullptr;
+            can_bus_ = nullptr;
+            can_bus_valid_ = false;
+        }
+        if (i2c_bus_storage_) {
+            delete static_cast<EspI2cBus*>(i2c_bus_storage_);
+            i2c_bus_storage_ = nullptr;
+            i2c_bus_ = nullptr;
+            i2c_bus_valid_ = false;
+        }
+    }
+
     return spi_bus_valid_; // SPI is the only hard requirement
 }
 
@@ -212,4 +228,42 @@ void CommChannelsManager::DumpStatistics() const noexcept {
     log.Info(TAG, "  I2C bus: %s", i2c_bus_valid_ ? "OK" : "NOT CONFIGURED");
     log.Info(TAG, "  CAN bus: %s", can_bus_valid_ ? "OK" : "NOT CONFIGURED");
     log.Info(TAG, "=== End Flux CommChannels Statistics ===");
+}
+
+//==============================================================================
+// DEINITIALIZE
+//==============================================================================
+
+bool CommChannelsManager::Deinitialize() noexcept {
+    MutexLockGuard lock(mutex_);
+    if (!initialized_.load(std::memory_order_acquire)) return true;
+
+    Logger::GetInstance().Info(TAG, "Deinitializing Flux CommChannels manager");
+
+    // Delete SPI bus
+    if (spi_bus_storage_) {
+        delete static_cast<EspSpiBus*>(spi_bus_storage_);
+        spi_bus_storage_ = nullptr;
+        spi_bus_ = nullptr;
+        spi_bus_valid_ = false;
+    }
+
+    // Delete I2C bus
+    if (i2c_bus_storage_) {
+        delete static_cast<EspI2cBus*>(i2c_bus_storage_);
+        i2c_bus_storage_ = nullptr;
+        i2c_bus_ = nullptr;
+        i2c_bus_valid_ = false;
+    }
+
+    // Delete CAN bus
+    if (can_bus_storage_) {
+        delete static_cast<EspCan*>(can_bus_storage_);
+        can_bus_storage_ = nullptr;
+        can_bus_ = nullptr;
+        can_bus_valid_ = false;
+    }
+
+    initialized_.store(false, std::memory_order_release);
+    return true;
 }

@@ -48,6 +48,8 @@ bool AdcManager::Initialize() noexcept {
 
     if (!adc1->Initialize()) {
         Logger::GetInstance().Error(TAG, "Failed to initialize EspAdc unit 0");
+        delete adc1;
+        esp_adc_storage_ = nullptr;
         return false;
     }
 
@@ -201,4 +203,33 @@ void AdcManager::DumpStatistics() const noexcept {
                  e.access_count, e.error_count);
     }
     log.Info(TAG, "=== End Flux ADC Manager Statistics ===");
+}
+
+//==============================================================================
+// DEINITIALIZE
+//==============================================================================
+
+bool AdcManager::Deinitialize() noexcept {
+    MutexLockGuard lock(mutex_);
+    if (!initialized_.load(std::memory_order_acquire)) return true;
+
+    Logger::GetInstance().Info(TAG, "Deinitializing Flux ADC manager");
+
+    // Clear all entries
+    for (size_t i = 0; i < registered_count_; ++i) {
+        entries_[i].driver = nullptr;
+        entries_[i].registered = false;
+        entries_[i].access_count = 0;
+        entries_[i].error_count = 0;
+    }
+    registered_count_ = 0;
+
+    // Delete the EspAdc instance
+    if (esp_adc_storage_) {
+        delete static_cast<EspAdc*>(esp_adc_storage_);
+        esp_adc_storage_ = nullptr;
+    }
+
+    initialized_.store(false, std::memory_order_release);
+    return true;
 }

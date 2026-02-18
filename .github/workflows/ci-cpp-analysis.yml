@@ -1,0 +1,17 @@
+name: "\U0001F50D C++ Analysis CI"
+
+on:
+  push:
+    branches: [main, "release/*"]
+    tags: ["v*"]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  cppcheck:
+    uses: N3b3x/hf-general-ci-tools/.github/workflows/ru-cpp-analysis.yml@main
+    with:
+      paths: "lib/managers lib/api"
+      std: "c++20"
+      enable: "warning,style,performance,portability,information"

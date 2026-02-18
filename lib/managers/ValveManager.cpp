@@ -32,19 +32,19 @@ ValveManager::ValveManager() noexcept {
 // INITIALIZATION
 //==============================================================================
 
-hf_valve_err_t ValveManager::EnsureInitialized() noexcept {
+bool ValveManager::EnsureInitialized() noexcept {
     if (initialized_.load(std::memory_order_acquire)) {
-        return hf_valve_err_t::VALVE_SUCCESS;
+        return true;
     }
     MutexLockGuard lock(mutex_);
     if (initialized_.load(std::memory_order_acquire)) {
-        return hf_valve_err_t::VALVE_SUCCESS;
+        return true;
     }
     auto result = Initialize();
     if (HfValveErrOk(result)) {
         initialized_.store(true, std::memory_order_release);
     }
-    return result;
+    return HfValveErrOk(result);
 }
 
 hf_valve_err_t ValveManager::Initialize() noexcept {
@@ -121,6 +121,8 @@ bool ValveManager::InitializeMax22200() noexcept {
 
     if (!handler->Initialize(board_cfg)) {
         Logger::GetInstance().Error(TAG, "MAX22200 driver initialization failed");
+        delete handler;
+        max22200_storage_ = nullptr;
         max22200_ = nullptr;
         return false;
     }
@@ -170,6 +172,8 @@ bool ValveManager::InitializeTle92466() noexcept {
 
     if (!handler->Initialize()) {
         Logger::GetInstance().Error(TAG, "TLE92466ED driver initialization failed");
+        delete handler;
+        tle92466_storage_ = nullptr;
         tle92466_ = nullptr;
         return false;
     }
@@ -650,4 +654,42 @@ void ValveManager::DumpStatistics() const noexcept {
     if (tle92466_valid_) tle92466_->DumpDiagnostics();
 
     log.Info(TAG, "=== End Flux Valve Manager Statistics ===");
+}
+
+//==============================================================================
+// DEINITIALIZE
+//==============================================================================
+
+bool ValveManager::Deinitialize() noexcept {
+    MutexLockGuard lock(mutex_);
+    if (!initialized_.load(std::memory_order_acquire)) return true;
+
+    Logger::GetInstance().Info(TAG, "Deinitializing Flux Valve manager");
+
+    // Reset channel states
+    for (auto& state : channel_states_) {
+        state.enabled = false;
+        state.configured = false;
+        state.activation_count = 0;
+        state.error_count = 0;
+    }
+
+    // Delete MAX22200 handler
+    if (max22200_storage_) {
+        delete static_cast<Max22200Handler*>(max22200_storage_);
+        max22200_storage_ = nullptr;
+        max22200_ = nullptr;
+        max22200_valid_ = false;
+    }
+
+    // Delete TLE92466ED handler
+    if (tle92466_storage_) {
+        delete static_cast<Tle92466edHandler*>(tle92466_storage_);
+        tle92466_storage_ = nullptr;
+        tle92466_ = nullptr;
+        tle92466_valid_ = false;
+    }
+
+    initialized_.store(false, std::memory_order_release);
+    return true;
 }

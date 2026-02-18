@@ -1,0 +1,16 @@
+timeout = 30
+max_retries = 3
+max_redirects = 10
+user_agent = "lychee/0.21.0"
+accept = ["200", "429", "403"]
+exclude_all_private = true
+
+exclude = [
+  '^https://www\.gnu\.org/licenses/gpl-3\.0/?$',
+  '^https?://(www\.)?gnu\.org/licenses/.*',
+  '^https?://img\.shields\.io/badge/License-.*',
+  '^https://github\.com/hardfoc/hf-hal-flux-v1/actions/workflows/.*',
+  '^https://hardfoc\.github\.io/hf-hal-flux-v1/.*',
+  '^https://github\.com/hardfoc/hf-core-drivers.*',
+  '^https://github\.com/hardfoc/hf-core-utils.*',
+]

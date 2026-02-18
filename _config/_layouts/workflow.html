@@ -1,0 +1,75 @@
+---
+layout: default
+---
+<div class="workflow-header">
+  <h1 class="workflow-title">{{ page.title }}</h1>
+
+  <div class="workflow-badges">
+    {% if page.github_actions %}
+    <span class="badge badge-green">GitHub Actions</span>
+    {% endif %}
+    {% if page.reusable_workflow %}
+    <span class="badge badge-blue">Reusable Workflow</span>
+    {% endif %}
+    {% if page.workflow_type %}
+    <span class="badge badge-purple">{{ page.workflow_type }}</span>
+    {% endif %}
+  </div>
+
+  {% if page.description %}
+  <p class="workflow-description">{{ page.description }}</p>
+  {% endif %}
+</div>
+
+{{ content }}
+
+<div class="workflow-footer">
+  <h3>Quick Links</h3>
+  <ul>
+    <li><a href="{{ site.baseurl }}/">Documentation Home</a></li>
+    <li><a href="{{ site.baseurl }}/docs/development/ARCHITECTURE_GUIDELINES">Architecture Guidelines</a></li>
+    <li><a href="{{ site.baseurl }}/docs/development/CODING_STANDARDS">Coding Standards</a></li>
+  </ul>
+</div>
+
+<style>
+  .workflow-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--color-border-default, #e1e4e8);
+  }
+  .workflow-badges {
+    margin: 0.5rem 0 1rem;
+  }
+  .badge {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: white;
+    margin-right: 0.5rem;
+  }
+  .badge-green  { background-color: #28a745; }
+  .badge-blue   { background-color: #0366d6; }
+  .badge-purple { background-color: #6f42c1; }
+  .workflow-description {
+    font-size: 1.1rem;
+    color: var(--color-fg-muted, #586069);
+  }
+  .workflow-footer {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--color-border-default, #e1e4e8);
+  }
+  .workflow-footer ul {
+    list-style: none;
+    padding-left: 0;
+  }
+  .workflow-footer li {
+    margin-bottom: 0.3rem;
+  }
+  .workflow-footer a {
+    font-weight: 500;
+  }
+</style>

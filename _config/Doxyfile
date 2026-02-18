@@ -1,0 +1,88 @@
+# Doxyfile — HardFOC Flux V1 HAL API Documentation
+# ───────────────────────────────────────────────────────────────────────────────
+# Generates HTML + class/call graphs for the HAL-level API and managers.
+# The core/ submodule (handlers, drivers, utils) is excluded — its own Doxyfile
+# is maintained upstream in hf-core.
+# ───────────────────────────────────────────────────────────────────────────────
+
+#---------------------------------------------------------------------------
+# Project metadata
+#---------------------------------------------------------------------------
+PROJECT_NAME           = "HardFOC Flux V1 HAL"
+PROJECT_BRIEF          = "Unified HAL API for the HardFOC Flux valve-control platform (ESP32-C6)"
+PROJECT_NUMBER         =
+PROJECT_LOGO           =
+OUTPUT_DIRECTORY       = docs/_doxygen
+
+#---------------------------------------------------------------------------
+# Input paths
+#---------------------------------------------------------------------------
+INPUT                  = lib/api \
+                         lib/managers \
+                         examples/esp32/main \
+                         examples \
+                         README.md
+
+FILE_PATTERNS          = *.c *.cpp *.h *.hpp *.md
+RECURSIVE              = YES
+USE_MDFILE_AS_MAINPAGE = README.md
+FILTER_PATTERNS        = *.md="sed -e '/^---$/,/^---$/d'"
+
+EXCLUDE                = *build* *cmake-build-* *managed_components* *__pycache__* *.pyc
+EXCLUDE_PATTERNS       = */build/* */cmake-build-*/* */.git/* */managed_components/* */__pycache__/* \
+                         */lib/core/* */examples/esp32/scripts/*
+
+#---------------------------------------------------------------------------
+# Extraction
+#---------------------------------------------------------------------------
+EXTRACT_ALL            = YES
+EXTRACT_PRIVATE        = YES
+EXTRACT_STATIC         = YES
+EXTRACT_ANON_NSPACES   = YES
+FULL_PATH_NAMES        = NO
+BUILTIN_STL_SUPPORT    = YES
+TYPEDEF_HIDES_STRUCT   = YES
+SORT_MEMBER_DOCS       = YES
+
+#---------------------------------------------------------------------------
+# Warnings
+#---------------------------------------------------------------------------
+GENERATE_TODOLIST      = YES
+GENERATE_BUGLIST       = YES
+GENERATE_DEPRECATEDLIST = YES
+WARN_IF_UNDOCUMENTED   = YES
+WARN_IF_DOC_ERROR      = YES
+WARN_NO_PARAMDOC       = NO
+WARN_AS_ERROR          = NO
+
+#---------------------------------------------------------------------------
+# HTML output
+#---------------------------------------------------------------------------
+GENERATE_HTML          = YES
+GENERATE_TREEVIEW      = YES
+PAGE_OUTLINE_PANEL     = NO
+HTML_COPY_CLIPBOARD    = NO
+SEARCHENGINE           = YES
+HTML_EXTRA_STYLESHEET  = _config/doxygen-extensions/doxygen-awesome-css/doxygen-awesome.css
+
+#---------------------------------------------------------------------------
+# Graphs (requires Graphviz / dot)
+#---------------------------------------------------------------------------
+HAVE_DOT               = YES
+CALL_GRAPH             = YES
+CALLER_GRAPH           = YES
+CLASS_GRAPH            = YES
+COLLABORATION_GRAPH    = YES
+INCLUDE_GRAPH          = YES
+INCLUDED_BY_GRAPH      = YES
+DOT_IMAGE_FORMAT       = svg
+DOT_TRANSPARENT        = YES
+
+#---------------------------------------------------------------------------
+# Disabled output formats
+#---------------------------------------------------------------------------
+GENERATE_LATEX         = NO
+GENERATE_RTF           = NO
+GENERATE_MAN           = NO
+GENERATE_XML           = NO
+GENERATE_DOCBOOK       = NO

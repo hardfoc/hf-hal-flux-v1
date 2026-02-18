@@ -1,3 +1,9 @@
 [submodule "lib/core"]
 	path = lib/core
 	url = https://github.com/hardfoc/hf-core.git
+[submodule "examples/esp32/scripts"]
+	path = examples/esp32/scripts
+	url = https://github.com/N3b3x/hf-espidf-project-tools.git
+[submodule "_config/doxygen-extensions/doxygen-awesome-css"]
+	path = _config/doxygen-extensions/doxygen-awesome-css
+	url = https://github.com/jothepro/doxygen-awesome-css.git

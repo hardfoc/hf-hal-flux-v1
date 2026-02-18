@@ -142,8 +142,7 @@ bool Flux::InitializeGpio() noexcept {
 }
 
 bool Flux::InitializeValves() noexcept {
-    auto result = valves_ref_.EnsureInitialized();
-    bool ok = HfValveErrOk(result);
+    bool ok = valves_ref_.EnsureInitialized();
     valves_initialized_ = ok;
     if (!ok && failed_components_count_ < kMaxFailedComponents)
         failed_components_[failed_components_count_++] = "ValveManager";

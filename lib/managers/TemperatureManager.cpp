@@ -61,6 +61,8 @@ bool TemperatureManager::InitializeEsp32Internal() noexcept {
 
     if (!sensor->Initialize()) {
         Logger::GetInstance().Error(TAG, "EspTemperature initialization failed");
+        delete sensor;
+        esp32_temp_storage_ = nullptr;
         return false;
     }
 
@@ -114,6 +116,8 @@ bool TemperatureManager::InitializeNtcThermistor() noexcept {
 
     if (!handler->Initialize()) {
         Logger::GetInstance().Error(TAG, "NTC handler initialization failed");
+        delete handler;
+        ntc_handler_storage_ = nullptr;
         return false;
     }
 
@@ -254,4 +258,40 @@ void TemperatureManager::DumpStatistics() const noexcept {
                  e.read_count, e.error_count);
     }
     log.Info(TAG, "=== End Flux Temperature Manager Statistics ===");
+}
+
+//==============================================================================
+// DEINITIALIZE
+//==============================================================================
+
+bool TemperatureManager::Deinitialize() noexcept {
+    MutexLockGuard lock(mutex_);
+    if (!initialized_.load(std::memory_order_acquire)) return true;
+
+    Logger::GetInstance().Info(TAG, "Deinitializing Flux Temperature manager");
+
+    // Clear all entries
+    for (size_t i = 0; i < registered_count_; ++i) {
+        entries_[i].registered = false;
+        entries_[i].read_count = 0;
+        entries_[i].error_count = 0;
+    }
+    registered_count_ = 0;
+
+    // Delete NTC handler
+    if (ntc_handler_storage_) {
+        delete static_cast<NtcTemperatureHandler*>(ntc_handler_storage_);
+        ntc_handler_storage_ = nullptr;
+        ntc_temp_ = nullptr;
+    }
+
+    // Delete ESP32 temperature sensor
+    if (esp32_temp_storage_) {
+        delete static_cast<EspTemperature*>(esp32_temp_storage_);
+        esp32_temp_storage_ = nullptr;
+        esp32_temp_ = nullptr;
+    }
+
+    initialized_.store(false, std::memory_order_release);
+    return true;
 }

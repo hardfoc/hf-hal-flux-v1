@@ -69,6 +69,12 @@ public:
     [[nodiscard]] bool EnsureInitialized() noexcept;
     [[nodiscard]] bool IsInitialized() const noexcept { return initialized_.load(std::memory_order_acquire); }
 
+    /**
+     * @brief Reset GPIO manager to uninitialized state.
+     * @return true on success
+     */
+    bool Deinitialize() noexcept;
+
     //==========================================================================
     // GPIO ACCESS — by string name
     //==========================================================================

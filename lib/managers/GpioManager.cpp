@@ -117,12 +117,14 @@ size_t GpioManager::FindByName(std::string_view name) const noexcept {
 }
 
 BaseGpio* GpioManager::Get(std::string_view name) noexcept {
+    if (!initialized_.load(std::memory_order_acquire)) return nullptr;
     size_t idx = FindByName(name);
     if (idx == kInvalidIndex) return nullptr;
     return &entries_[idx].driver;
 }
 
 BaseGpio* GpioManager::Get(HfFunctionalGpioPin pin) noexcept {
+    if (!initialized_.load(std::memory_order_acquire)) return nullptr;
     size_t idx = static_cast<size_t>(pin);
     if (idx >= kMaxEntries || !entries_[idx].registered) return nullptr;
     return &entries_[idx].driver;
@@ -219,4 +221,26 @@ void GpioManager::DumpStatistics() const noexcept {
         }
     }
     log.Info(TAG, "=== End Flux GPIO Statistics ===");
+}
+
+//==============================================================================
+// DEINITIALIZE
+//==============================================================================
+
+bool GpioManager::Deinitialize() noexcept {
+    MutexLockGuard lock(mutex_);
+    if (!initialized_.load(std::memory_order_acquire)) return true;
+
+    Logger::GetInstance().Info(TAG, "Deinitializing Flux GPIO manager");
+
+    // Clear all entries (drivers are by-value, no heap to free)
+    for (size_t i = 0; i < HF_GPIO_MAPPING_SIZE; ++i) {
+        entries_[i].registered = false;
+        entries_[i].access_count = 0;
+        entries_[i].error_count = 0;
+    }
+    registered_count_ = 0;
+
+    initialized_.store(false, std::memory_order_release);
+    return true;
 }

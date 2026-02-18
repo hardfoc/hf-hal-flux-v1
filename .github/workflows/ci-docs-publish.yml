@@ -1,0 +1,26 @@
+name: "\U0001F4D6 Docs Publish"
+
+on:
+  push:
+    branches: [main, "release/*"]
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+# Allow only one deployment at a time
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    uses: N3b3x/hf-general-ci-tools/.github/workflows/ru-docs-publish.yml@main
+    with:
+      doxygen_config: "_config/Doxyfile"
+      jekyll_config: "_config/_config.yml"
+      jekyll_layouts_dir: "_config/_layouts"
+      jekyll_includes_dir: "_config/_includes"

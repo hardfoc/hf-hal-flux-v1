@@ -37,5 +37,101 @@
 *.out
 *.app
 
-# debug information files
+# Debug information files
 *.dwo
+
+# Build directories (ESP-IDF and general)
+**/build/
+**/build_*/
+**/build*/
+/build/
+build/
+examples/esp32/build*/
+examples/esp32/**/build*/
+
+# ESP-IDF specific
+# sdkconfig and sdkconfig.defaults should be tracked (contain important ESP32 configuration)
+# Only ignore backup files
+**/sdkconfig.old
+**/partition_table.csv
+**/*.elf
+**/*.bin
+**/*.map
+**/*.hex
+**/*.img
+**/*.ota
+
+# CMake and Make build folders
+CMakeFiles/
+**/CMakeFiles/
+CMakeCache.txt
+**/CMakeCache.txt
+cmake_install.cmake
+**/cmake_install.cmake
+Makefile
+**/Makefile
+
+# Dependencies
+**/dependencies.lock
+
+# Documentation output
+**/docs/html/
+**/docs/doxygen/
+docs/doxygen/
+docs/html/
+
+# VSCode user-specific files (keep .vscode/ but ignore user files)
+.vscode/settings.json.user
+.vscode/*.backup
+
+# IDE settings
+.idea/
+.vscode/
+.cursor/
+*.swp
+*.swo
+*~
+
+# Python
+.venv/
+**/venv/
+**/.venv/
+__pycache__/
+**/__pycache__/
+*.pyc
+.python_env/
+
+# Cache
+**/.cache/
+.cache/
+
+# Compile commands
+**/compile_commands.json
+compile_commands.json
+
+# Log files
+**/logs/
+**/*.log
+logs/
+
+# CI/CD
+ci_build_path/
+actionlint*
+**/actionlint*
+
+# Node modules
+**/node_modules/
+node_modules/
+package-lock.json
+package*.json
+
+# OS files
+.DS_Store
+**/.DS_Store
+*.DS_Store
+Thumbs.db
+**/Thumbs.db
+
+# Backup files
+**/*.bak*
+*.bak

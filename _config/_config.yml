@@ -1,0 +1,133 @@
+---
+title: "HardFOC Flux V1 HAL (hf-hal-flux-v1)"
+description: >
+  Unified HAL API for the HardFOC Flux valve-control platform.
+  Manages 6 subsystems: comms, GPIO, valves, ADC, LEDs, temperature.
+baseurl: "/hf-hal-flux-v1"
+url: "https://hardfoc.github.io"
+
+author:
+  name: "hardfoc"
+  url: "https://github.com/hardfoc"
+
+# ── Theme & Plugins ──────────────────────────────────────────────────────────
+layouts_dir: _config/_layouts
+includes_dir: _config/_includes
+
+remote_theme: just-the-docs/just-the-docs
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-seo-tag
+  - jekyll-remote-theme
+  - jekyll-redirect-from
+  - jekyll-optional-front-matter
+
+# ── Markdown ─────────────────────────────────────────────────────────────────
+markdown: kramdown
+highlighter: rouge
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+  syntax_highlighter_opts:
+    css_class: highlight
+    span:
+      line_numbers: false
+    block:
+      line_numbers: true
+      start_line: 1
+
+timezone: UTC
+encoding: utf-8
+lang: en
+
+# ── Navigation & Search ─────────────────────────────────────────────────────
+nav_next_prev: true
+search_enabled: true
+search:
+  heading_level: 3
+  previews: 5
+  preview_words_before: 10
+  preview_words_after: 15
+  tokenizer_separator: "/[\\s/]+/"
+  rel_url: true
+  button: true
+
+nav_enabled: true
+heading_anchors: true
+breadcrumbs: true
+
+toc:
+  min_level: 2
+  max_level: 4
+
+# ── Callouts ─────────────────────────────────────────────────────────────────
+callouts:
+  note: blue
+  warning: yellow
+  tip: green
+  important: red
+
+# ── Colour scheme ────────────────────────────────────────────────────────────
+color_scheme: dark
+toggle_color_scheme: true
+toggle_auto_mode: true
+
+# ── Auxiliary links ──────────────────────────────────────────────────────────
+aux_links:
+  "GitHub": "https://github.com/hardfoc/hf-hal-flux-v1"
+  "Issues": "https://github.com/hardfoc/hf-hal-flux-v1/issues"
+aux_links_new_tab: true
+
+# ── Footer ───────────────────────────────────────────────────────────────────
+footer_content: >
+  Built with Just the Docs &bull; GPL v3 &bull;
+  <a href="https://github.com/hardfoc/hf-hal-flux-v1">View on GitHub</a>
+
+# ── Just-the-Docs extras ────────────────────────────────────────────────────
+just_the_docs:
+  nav_fold: true
+  nav_external_links:
+    - title: "HF-Core Docs"
+      url: "https://hardfoc.github.io/hf-core"
+      hide_icon: false
+    - title: "HF-Vortex Docs"
+      url: "https://hardfoc.github.io/hf-hal-vortex-v1"
+      hide_icon: false
+
+# ── Exclude / Include ───────────────────────────────────────────────────────
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor
+  - .git
+  - .github
+  - .sass-cache
+  - .jekyll-cache
+  - .jekyll-metadata
+  - examples/esp32/scripts/
+  - examples/esp32/build/
+  - lib/core/
+  - _config/doxygen-extensions/
+
+include:
+  - _pages
+  - README.md
+  - LICENSE
+  - assets/
+
+# ── SEO ──────────────────────────────────────────────────────────────────────
+seo:
+  type: SoftwareApplication
+  name: "HardFOC Flux V1 HAL"
+
+# ── HTML compression ────────────────────────────────────────────────────────
+compress_html:
+  clippings: all
+  comments: all
+  endings: all
+  startings:
+    - html
+    - head
+    - body

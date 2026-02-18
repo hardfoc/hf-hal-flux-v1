@@ -1,0 +1,16 @@
+name: "\U0001F4DD Markdown Lint CI"
+
+on:
+  push:
+    branches: [main, "release/*"]
+    tags: ["v*"]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  markdownlint:
+    uses: N3b3x/hf-general-ci-tools/.github/workflows/ru-markdown-lint.yml@main
+    with:
+      globs: "docs/** *.md **/*.md"
+      config_file: "_config/.markdownlint.json"
