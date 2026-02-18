@@ -31,6 +31,48 @@
 #include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/utils/RtosMutex.h"
 
 //==============================================================================
+// TEMPERATURE ERROR CODES
+//==============================================================================
+
+/**
+ * @brief Temperature manager error codes for consistent error reporting.
+ *
+ * Manager-layer errors that are sensor-family agnostic. Driver-level errors
+ * (hf_temp_err_t) are translated into this common manager error domain.
+ */
+enum class TemperatureError : uint8_t {
+    SUCCESS = 0,
+    NOT_INITIALIZED,
+    INITIALIZATION_FAILED,
+    SENSOR_NOT_FOUND,
+    SENSOR_NOT_AVAILABLE,
+    READ_FAILED,
+    INVALID_PARAMETER,
+    NO_SENSORS_AVAILABLE,
+    ALLOCATION_FAILED,
+    DEPENDENCY_NOT_READY,
+    MUTEX_LOCK_FAILED
+};
+
+/** @brief Convert TemperatureError to string for debugging. */
+constexpr const char* TemperatureErrorToString(TemperatureError error) noexcept {
+    switch (error) {
+        case TemperatureError::SUCCESS:               return "Success";
+        case TemperatureError::NOT_INITIALIZED:       return "Not initialized";
+        case TemperatureError::INITIALIZATION_FAILED: return "Initialization failed";
+        case TemperatureError::SENSOR_NOT_FOUND:      return "Sensor not found";
+        case TemperatureError::SENSOR_NOT_AVAILABLE:  return "Sensor not available";
+        case TemperatureError::READ_FAILED:           return "Read failed";
+        case TemperatureError::INVALID_PARAMETER:     return "Invalid parameter";
+        case TemperatureError::NO_SENSORS_AVAILABLE:  return "No sensors available";
+        case TemperatureError::ALLOCATION_FAILED:     return "Allocation failed";
+        case TemperatureError::DEPENDENCY_NOT_READY:  return "Dependency not ready";
+        case TemperatureError::MUTEX_LOCK_FAILED:     return "Mutex lock failed";
+        default:                                      return "Unknown error";
+    }
+}
+
+//==============================================================================
 // SENSOR TYPE ENUM
 //==============================================================================
 

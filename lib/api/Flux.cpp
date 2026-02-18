@@ -12,7 +12,6 @@
 #include "managers/CommChannelsManager.h"
 #include "managers/GpioManager.h"
 #include "managers/ValveManager.h"
-#include "errors/HfValveError.h"
 #include "managers/AdcManager.h"
 #include "managers/LedManager.h"
 #include "managers/TemperatureManager.h"

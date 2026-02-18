@@ -19,8 +19,8 @@
 #ifndef FLUX_LED_MANAGER_H_
 #define FLUX_LED_MANAGER_H_
 
-#include "core/hf-core-drivers/external/hf-ws2812-rmt-driver/include/ws2812_cpp.hpp"
-#include "core/hf-core-drivers/external/hf-ws2812-rmt-driver/include/ws2812_effects.hpp"
+#include "core/hf-core-drivers/external/hf-ws2812-rmt-driver/inc/ws2812_cpp.hpp"
+#include "core/hf-core-drivers/external/hf-ws2812-rmt-driver/inc/ws2812_effects.hpp"
 #include "handlers/logger/Logger.h"
 #include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/utils/RtosMutex.h"
 #include "core/hf-core-drivers/internal/hf-pincfg/src/hf_functional_pin_config_flux_v1.hpp"

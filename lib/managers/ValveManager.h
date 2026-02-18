@@ -39,9 +39,128 @@
 #include <string_view>
 
 #include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/utils/RtosMutex.h"
-#include "errors/HfValveError.h"
 #include "handlers/max22200/Max22200Handler.h"
 #include "handlers/tle92466ed/Tle92466edHandler.h"
+
+//==============================================================================
+// VALVE ERROR CODES
+//==============================================================================
+
+/**
+ * @ingroup valve
+ * @brief Unified valve error codes for the HardFOC Flux V1 platform.
+ *
+ * Captures errors from two driver ICs (MAX22200 and TLE92466ED) plus
+ * handler-level and manager-level errors through a single enumeration.
+ */
+enum class hf_valve_err_t : uint8_t {
+    // Success
+    VALVE_SUCCESS                   = 0,
+
+    // General errors
+    VALVE_ERR_NOT_INITIALIZED       = 1,
+    VALVE_ERR_DRIVER_NOT_AVAILABLE  = 2,
+    VALVE_ERR_INVALID_CHANNEL       = 3,
+    VALVE_ERR_CHANNEL_TYPE_MISMATCH = 4,
+    VALVE_ERR_INVALID_PARAMETER     = 5,
+    VALVE_ERR_NULL_POINTER          = 6,
+
+    // Communication errors (SPI layer)
+    VALVE_ERR_SPI_BUS_ERROR         = 10,
+    VALVE_ERR_SPI_TIMEOUT           = 11,
+    VALVE_ERR_SPI_TRANSFER_FAILED   = 12,
+    VALVE_ERR_SPI_CRC_ERROR         = 13,
+    VALVE_ERR_SPI_FRAME_ERROR       = 14,
+
+    // Driver-level errors
+    VALVE_ERR_HARDWARE_FAULT        = 20,
+    VALVE_ERR_DEVICE_NOT_RESPONDING = 21,
+    VALVE_ERR_WRONG_DEVICE_ID       = 22,
+    VALVE_ERR_REGISTER_ERROR        = 23,
+    VALVE_ERR_CONFIGURATION_ERROR   = 24,
+    VALVE_ERR_WRONG_MODE            = 25,
+    VALVE_ERR_WRITE_TO_READ_ONLY    = 26,
+    VALVE_ERR_TIMEOUT               = 27,
+
+    // Manager-level errors
+    VALVE_ERR_MUTEX_TIMEOUT         = 30,
+    VALVE_ERR_DEPENDENCY_NOT_READY  = 31,
+
+    // Catch-all
+    VALVE_ERR_UNKNOWN               = 255
+};
+
+/** @brief Convert hf_valve_err_t to human-readable description string. */
+constexpr const char* HfValveErrToString(hf_valve_err_t err) noexcept {
+    switch (err) {
+        case hf_valve_err_t::VALVE_SUCCESS:                   return "Success";
+        case hf_valve_err_t::VALVE_ERR_NOT_INITIALIZED:       return "Manager not initialized";
+        case hf_valve_err_t::VALVE_ERR_DRIVER_NOT_AVAILABLE:  return "Driver IC not available";
+        case hf_valve_err_t::VALVE_ERR_INVALID_CHANNEL:       return "Invalid channel for operation";
+        case hf_valve_err_t::VALVE_ERR_CHANNEL_TYPE_MISMATCH: return "Channel type mismatch (sol/prop)";
+        case hf_valve_err_t::VALVE_ERR_INVALID_PARAMETER:     return "Invalid parameter value";
+        case hf_valve_err_t::VALVE_ERR_NULL_POINTER:          return "Null handler/driver pointer";
+        case hf_valve_err_t::VALVE_ERR_SPI_BUS_ERROR:         return "SPI bus communication error";
+        case hf_valve_err_t::VALVE_ERR_SPI_TIMEOUT:           return "SPI transfer timeout";
+        case hf_valve_err_t::VALVE_ERR_SPI_TRANSFER_FAILED:   return "SPI data transfer failed";
+        case hf_valve_err_t::VALVE_ERR_SPI_CRC_ERROR:         return "SPI CRC mismatch";
+        case hf_valve_err_t::VALVE_ERR_SPI_FRAME_ERROR:       return "SPI frame error from device";
+        case hf_valve_err_t::VALVE_ERR_HARDWARE_FAULT:        return "Hardware fault detected";
+        case hf_valve_err_t::VALVE_ERR_DEVICE_NOT_RESPONDING: return "Device not responding";
+        case hf_valve_err_t::VALVE_ERR_WRONG_DEVICE_ID:       return "Wrong device ID";
+        case hf_valve_err_t::VALVE_ERR_REGISTER_ERROR:        return "Register read/write error";
+        case hf_valve_err_t::VALVE_ERR_CONFIGURATION_ERROR:   return "Configuration failed";
+        case hf_valve_err_t::VALVE_ERR_WRONG_MODE:            return "Operation not allowed in mode";
+        case hf_valve_err_t::VALVE_ERR_WRITE_TO_READ_ONLY:    return "Write to read-only register";
+        case hf_valve_err_t::VALVE_ERR_TIMEOUT:               return "Operation timeout";
+        case hf_valve_err_t::VALVE_ERR_MUTEX_TIMEOUT:         return "Mutex acquisition timeout";
+        case hf_valve_err_t::VALVE_ERR_DEPENDENCY_NOT_READY:  return "Required dependency not ready";
+        case hf_valve_err_t::VALVE_ERR_UNKNOWN:               return "Unknown error";
+        default:                                              return "Unknown valve error";
+    }
+}
+
+/** @brief Check if a valve error indicates success. */
+constexpr bool HfValveErrOk(hf_valve_err_t err) noexcept {
+    return err == hf_valve_err_t::VALVE_SUCCESS;
+}
+
+// ─── Driver Error Mappings ──────────────────────────────────────────────────
+
+/** @brief Map TLE92466ED DriverError → hf_valve_err_t. */
+constexpr hf_valve_err_t TleDriverErrorToValveError(tle92466ed::DriverError e) noexcept {
+    switch (e) {
+        case tle92466ed::DriverError::None:              return hf_valve_err_t::VALVE_SUCCESS;
+        case tle92466ed::DriverError::NotInitialized:    return hf_valve_err_t::VALVE_ERR_NOT_INITIALIZED;
+        case tle92466ed::DriverError::HardwareError:     return hf_valve_err_t::VALVE_ERR_HARDWARE_FAULT;
+        case tle92466ed::DriverError::InvalidChannel:    return hf_valve_err_t::VALVE_ERR_INVALID_CHANNEL;
+        case tle92466ed::DriverError::InvalidParameter:  return hf_valve_err_t::VALVE_ERR_INVALID_PARAMETER;
+        case tle92466ed::DriverError::DeviceNotResponding: return hf_valve_err_t::VALVE_ERR_DEVICE_NOT_RESPONDING;
+        case tle92466ed::DriverError::WrongDeviceID:     return hf_valve_err_t::VALVE_ERR_WRONG_DEVICE_ID;
+        case tle92466ed::DriverError::RegisterError:     return hf_valve_err_t::VALVE_ERR_REGISTER_ERROR;
+        case tle92466ed::DriverError::CRCError:          return hf_valve_err_t::VALVE_ERR_SPI_CRC_ERROR;
+        case tle92466ed::DriverError::FaultDetected:     return hf_valve_err_t::VALVE_ERR_HARDWARE_FAULT;
+        case tle92466ed::DriverError::ConfigurationError: return hf_valve_err_t::VALVE_ERR_CONFIGURATION_ERROR;
+        case tle92466ed::DriverError::TimeoutError:      return hf_valve_err_t::VALVE_ERR_TIMEOUT;
+        case tle92466ed::DriverError::WrongMode:         return hf_valve_err_t::VALVE_ERR_WRONG_MODE;
+        case tle92466ed::DriverError::SPIFrameError:     return hf_valve_err_t::VALVE_ERR_SPI_FRAME_ERROR;
+        case tle92466ed::DriverError::WriteToReadOnly:   return hf_valve_err_t::VALVE_ERR_WRITE_TO_READ_ONLY;
+        default:                                         return hf_valve_err_t::VALVE_ERR_UNKNOWN;
+    }
+}
+
+/** @brief Map MAX22200 DriverStatus → hf_valve_err_t. */
+constexpr hf_valve_err_t MaxDriverStatusToValveError(max22200::DriverStatus s) noexcept {
+    switch (s) {
+        case max22200::DriverStatus::OK:                  return hf_valve_err_t::VALVE_SUCCESS;
+        case max22200::DriverStatus::INITIALIZATION_ERROR: return hf_valve_err_t::VALVE_ERR_NOT_INITIALIZED;
+        case max22200::DriverStatus::COMMUNICATION_ERROR: return hf_valve_err_t::VALVE_ERR_SPI_BUS_ERROR;
+        case max22200::DriverStatus::INVALID_PARAMETER:   return hf_valve_err_t::VALVE_ERR_INVALID_PARAMETER;
+        case max22200::DriverStatus::HARDWARE_FAULT:      return hf_valve_err_t::VALVE_ERR_HARDWARE_FAULT;
+        case max22200::DriverStatus::TIMEOUT:             return hf_valve_err_t::VALVE_ERR_TIMEOUT;
+        default:                                          return hf_valve_err_t::VALVE_ERR_UNKNOWN;
+    }
+}
 
 //==============================================================================
 // VALVE CHANNEL IDENTIFIERS

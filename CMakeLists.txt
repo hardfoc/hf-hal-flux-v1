@@ -123,7 +123,7 @@ set(HF_HAL_INC_DIRS
     "${HF_HAL_ROOT}/lib/core/hf-core-drivers/external/hf-max22200-driver/inc"
     "${HF_HAL_ROOT}/lib/core/hf-core-drivers/external/hf-tle92466ed-driver/inc"
     "${HF_HAL_ROOT}/lib/core/hf-core-drivers/external/hf-ntc-thermistor-driver/include"
-    "${HF_HAL_ROOT}/lib/core/hf-core-drivers/external/hf-ws2812-rmt-driver/include"
+    "${HF_HAL_ROOT}/lib/core/hf-core-drivers/external/hf-ws2812-rmt-driver/inc"
 )
 
 #==============================================================================
