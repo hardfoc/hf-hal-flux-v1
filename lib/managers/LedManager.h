@@ -100,6 +100,7 @@ struct LedColor {
     uint8_t green;
     uint8_t blue;
 
+    constexpr LedColor() noexcept : red(0), green(0), blue(0) {}
     constexpr LedColor(uint8_t r, uint8_t g, uint8_t b) noexcept : red(r), green(g), blue(b) {}
 
     [[nodiscard]] constexpr uint32_t ToRgb() const noexcept {
