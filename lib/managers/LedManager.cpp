@@ -9,9 +9,7 @@
 
 #include "LedManager.h"
 
-extern "C" {
-#include "esp_timer.h"
-}
+#include "core/hf-core-utils/hf-utils-rtos-wrap/include/OsUtility.h"
 
 #include <cmath>
 
@@ -333,5 +331,5 @@ void LedManager::UpdateLastError(LedError error_code) noexcept {
 }
 
 uint64_t LedManager::GetSystemUptimeMs() const noexcept {
-    return static_cast<uint64_t>(esp_timer_get_time() / 1000);
+    return static_cast<uint64_t>(os_get_elapsed_time_msec());
 }

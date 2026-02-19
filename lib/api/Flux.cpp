@@ -16,9 +16,7 @@
 #include "managers/LedManager.h"
 #include "managers/TemperatureManager.h"
 
-extern "C" {
-#include "esp_timer.h"
-}
+#include "core/hf-core-utils/hf-utils-rtos-wrap/include/OsUtility.h"
 
 static constexpr const char* TAG = "Flux";
 
@@ -55,11 +53,11 @@ bool Flux::EnsureInitialized() noexcept {
     if (initialized_) return true;
 
     Logger::GetInstance().Info(TAG, "Starting Flux API initialization");
-    initialization_start_time_ = static_cast<uint64_t>(esp_timer_get_time() / 1000);
+    initialization_start_time_ = static_cast<uint64_t>(os_get_elapsed_time_msec());
 
     bool success = InitializeAllComponents();
 
-    initialization_end_time_ = static_cast<uint64_t>(esp_timer_get_time() / 1000);
+    initialization_end_time_ = static_cast<uint64_t>(os_get_elapsed_time_msec());
 
     if (success) {
         initialized_ = true;
@@ -191,7 +189,7 @@ std::array<bool, 6> Flux::GetComponentInitializationStatus() const noexcept {
 }
 
 uint64_t Flux::GetSystemUptimeMs() const noexcept {
-    return static_cast<uint64_t>(esp_timer_get_time() / 1000);
+    return static_cast<uint64_t>(os_get_elapsed_time_msec());
 }
 
 uint64_t Flux::GetInitializationTimeMs() const noexcept {
