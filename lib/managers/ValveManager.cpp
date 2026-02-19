@@ -12,6 +12,7 @@
 #include "GpioManager.h"
 #include "handlers/logger/Logger.h"
 #include "core/hf-core-drivers/internal/hf-pincfg/src/hf_functional_pin_config_flux_v1.hpp"
+#include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/utils/memory_utils.h"
 
 static constexpr const char* TAG = "FluxValve";
 
@@ -105,23 +106,19 @@ bool ValveManager::InitializeMax22200() noexcept {
         fault_gpio->SetDirection(hf_gpio_direction_t::HF_GPIO_DIRECTION_INPUT);
     }
 
-    // Create handler
-    auto* handler = new (std::nothrow) Max22200Handler(*spi, *enable_gpio, *cmd_gpio, fault_gpio);
-    if (!handler) {
+    // Create handler via unique_ptr (singleton lifetime, no fragmentation risk)
+    max22200_ = hf::utils::make_unique_nothrow<Max22200Handler>(*spi, *enable_gpio, *cmd_gpio, fault_gpio);
+    if (!max22200_) {
         Logger::GetInstance().Error(TAG, "Failed to allocate MAX22200 handler");
         return false;
     }
-    max22200_storage_ = handler;
-    max22200_ = handler;
 
     // Configure board settings
     max22200::BoardConfig board_cfg(15.0f, false); // 15kΩ RREF, HFS=0 → IFS=1000mA
 
-    if (handler->Initialize(board_cfg) != max22200::DriverStatus::OK) {
+    if (max22200_->Initialize(board_cfg) != max22200::DriverStatus::OK) {
         Logger::GetInstance().Error(TAG, "MAX22200 driver initialization failed");
-        delete handler;
-        max22200_storage_ = nullptr;
-        max22200_ = nullptr;
+        max22200_.reset();
         return false;
     }
 
@@ -159,25 +156,21 @@ bool ValveManager::InitializeTle92466() noexcept {
         fault_gpio->SetDirection(hf_gpio_direction_t::HF_GPIO_DIRECTION_INPUT);
     }
 
-    // Create handler
-    auto* handler = new (std::nothrow) Tle92466edHandler(*spi, *resn_gpio, *en_gpio, fault_gpio);
-    if (!handler) {
+    // Create handler via unique_ptr (singleton lifetime, no fragmentation risk)
+    tle92466_ = hf::utils::make_unique_nothrow<Tle92466edHandler>(*spi, *resn_gpio, *en_gpio, fault_gpio);
+    if (!tle92466_) {
         Logger::GetInstance().Error(TAG, "Failed to allocate TLE92466ED handler");
         return false;
     }
-    tle92466_storage_ = handler;
-    tle92466_ = handler;
 
-    if (!handler->Initialize()) {
+    if (!tle92466_->Initialize()) {
         Logger::GetInstance().Error(TAG, "TLE92466ED driver initialization failed");
-        delete handler;
-        tle92466_storage_ = nullptr;
-        tle92466_ = nullptr;
+        tle92466_.reset();
         return false;
     }
 
     // Enter mission mode for normal operation
-    if (!handler->EnterMissionMode()) {
+    if (!tle92466_->EnterMissionMode()) {
         Logger::GetInstance().Warn(TAG, "TLE92466ED failed to enter mission mode");
     }
 
@@ -586,11 +579,11 @@ ValveChannel ValveManager::FindChannel(std::string_view name) const noexcept {
 //==============================================================================
 
 Max22200Handler* ValveManager::GetMax22200Handler() noexcept {
-    return max22200_valid_ ? max22200_ : nullptr;
+    return max22200_valid_ ? max22200_.get() : nullptr;
 }
 
 Tle92466edHandler* ValveManager::GetTle92466Handler() noexcept {
-    return tle92466_valid_ ? tle92466_ : nullptr;
+    return tle92466_valid_ ? tle92466_.get() : nullptr;
 }
 
 //==============================================================================
@@ -672,21 +665,13 @@ bool ValveManager::Deinitialize() noexcept {
         state.error_count = 0;
     }
 
-    // Delete MAX22200 handler
-    if (max22200_storage_) {
-        delete static_cast<Max22200Handler*>(max22200_storage_);
-        max22200_storage_ = nullptr;
-        max22200_ = nullptr;
-        max22200_valid_ = false;
-    }
+    // Release MAX22200 handler
+    max22200_.reset();
+    max22200_valid_ = false;
 
-    // Delete TLE92466ED handler
-    if (tle92466_storage_) {
-        delete static_cast<Tle92466edHandler*>(tle92466_storage_);
-        tle92466_storage_ = nullptr;
-        tle92466_ = nullptr;
-        tle92466_valid_ = false;
-    }
+    // Release TLE92466ED handler
+    tle92466_.reset();
+    tle92466_valid_ = false;
 
     initialized_.store(false, std::memory_order_release);
     return true;

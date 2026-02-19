@@ -20,6 +20,7 @@
 #include <array>
 #include <atomic>
 #include <cstdint>
+#include <memory>
 #include <string_view>
 
 #include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/base/BaseAdc.h"
@@ -29,7 +30,7 @@
 
 //==============================================================================
 // ADC ENTRY — struct is stack-allocated; EspAdc driver owned by singleton via
-//              raw new (heap-allocated, one per unit)
+//              unique_ptr (heap-allocated, one per unit)
 //==============================================================================
 
 /**
@@ -143,7 +144,8 @@ private:
     [[nodiscard]] size_t FindByName(std::string_view name) const noexcept;
 
     //==========================================================================
-    // STORAGE — entries are fixed-size in static storage; EspAdc is heap-allocated
+    // STORAGE — entries are fixed-size in static storage; EspAdc is
+    //           heap-allocated via unique_ptr (singleton lifetime)
     //==========================================================================
 
     static constexpr size_t kMaxChannels =
@@ -153,9 +155,9 @@ private:
     std::array<AdcEntry, kMaxChannels> entries_{};
     size_t registered_count_{0};
 
-    // EspAdc instances — only ADC1 used on ESP32-C6
-    // Heap-allocated once via raw new; singleton lives forever.
-    void* esp_adc_storage_{nullptr};
+    // EspAdc instance — only ADC1 used on ESP32-C6
+    // Heap-allocated once via unique_ptr; singleton lives forever.
+    std::unique_ptr<EspAdc> esp_adc_;
 
     std::atomic<bool> initialized_{false};
     mutable RtosMutex mutex_;

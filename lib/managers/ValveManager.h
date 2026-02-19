@@ -36,6 +36,7 @@
 #include <array>
 #include <atomic>
 #include <cstdint>
+#include <memory>
 #include <string_view>
 
 #include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/utils/RtosMutex.h"
@@ -458,20 +459,14 @@ private:
 
 
     //==========================================================================
-    // HANDLER INSTANCES — heap-allocated, owned by singleton (raw new)
+    // HANDLER INSTANCES — owned via unique_ptr (heap-allocated, singleton lifetime)
     //==========================================================================
 
-    // MAX22200 handler state
-    Max22200Handler* max22200_{nullptr};
+    std::unique_ptr<Max22200Handler> max22200_;
     bool max22200_valid_{false};
 
-    // TLE92466ED handler state
-    Tle92466edHandler* tle92466_{nullptr};
+    std::unique_ptr<Tle92466edHandler> tle92466_;
     bool tle92466_valid_{false};
-
-    // Owning storage — allocated once, singleton lives forever
-    void* max22200_storage_{nullptr};
-    void* tle92466_storage_{nullptr};
 
     //==========================================================================
     // CHANNEL STATE — fixed-size, stack-allocated

@@ -12,10 +12,14 @@
 #include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/mcu/esp32/EspSpi.h"
 #include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/mcu/esp32/EspI2c.h"
 #include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/mcu/esp32/EspCan.h"
+#include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/utils/memory_utils.h"
 #include "core/hf-core-drivers/internal/hf-pincfg/src/hf_functional_pin_config_flux_v1.hpp"
 #include "handlers/logger/Logger.h"
 
 static constexpr const char* TAG = "FluxComm";
+
+// Destructor defined here where EspSpiBus, EspI2cBus, EspCan are complete types
+CommChannelsManager::~CommChannelsManager() = default;
 
 //==============================================================================
 // SINGLETON
@@ -68,10 +72,8 @@ bool CommChannelsManager::Initialize() noexcept {
             spi_cfg.timeout_ms  = 1000;
             spi_cfg.use_iomux   = true;
 
-            auto* bus = new (std::nothrow) EspSpiBus(spi_cfg);
-            if (bus && bus->Initialize()) {
-                spi_bus_storage_ = bus;
-                spi_bus_       = bus;
+            spi_bus_ = hf::utils::make_unique_nothrow<EspSpiBus>(spi_cfg);
+            if (spi_bus_ && spi_bus_->Initialize()) {
                 spi_bus_valid_ = true;
 
                 // Device 0: MAX22200 — SPI Mode 0, 10 MHz
@@ -81,7 +83,7 @@ bool CommChannelsManager::Initialize() noexcept {
                     dev_cfg.cs_pin          = cs_max_map->physical_pin;
                     dev_cfg.clock_speed_hz  = 10'000'000;
                     dev_cfg.mode            = hf_spi_mode_t::HF_SPI_MODE_0;
-                    int idx = bus->CreateDevice(dev_cfg);
+                    int idx = spi_bus_->CreateDevice(dev_cfg);
                     spi_device_indices_[static_cast<uint8_t>(SpiDeviceId::MAX22200_SOLENOID_DRIVER)] = idx;
                     Logger::GetInstance().Info(TAG, "MAX22200 SPI device added (CS=GPIO%d, idx=%d)",
                                               cs_max_map->physical_pin, idx);
@@ -94,14 +96,14 @@ bool CommChannelsManager::Initialize() noexcept {
                     dev_cfg.cs_pin          = cs_tle_map->physical_pin;
                     dev_cfg.clock_speed_hz  = 5'000'000;
                     dev_cfg.mode            = hf_spi_mode_t::HF_SPI_MODE_1;
-                    int idx = bus->CreateDevice(dev_cfg);
+                    int idx = spi_bus_->CreateDevice(dev_cfg);
                     spi_device_indices_[static_cast<uint8_t>(SpiDeviceId::TLE92466_LOWSIDE_DRIVER)] = idx;
                     Logger::GetInstance().Info(TAG, "TLE92466ED SPI device added (CS=GPIO%d, idx=%d)",
                                               cs_tle_map->physical_pin, idx);
                 }
             } else {
                 Logger::GetInstance().Error(TAG, "SPI bus initialization failed");
-                delete bus;
+                spi_bus_.reset();
             }
         } else {
             Logger::GetInstance().Error(TAG, "SPI pin mapping missing");
@@ -121,10 +123,8 @@ bool CommChannelsManager::Initialize() noexcept {
             can_cfg.rx_pin    = rx_map->physical_pin;
             can_cfg.baud_rate = 500000; // 500 kbps standard
 
-            auto* can = new (std::nothrow) EspCan(can_cfg);
-            if (can) {
-                can_bus_storage_ = can;
-                can_bus_         = can;
+            can_bus_ = hf::utils::make_unique_nothrow<EspCan>(can_cfg);
+            if (can_bus_) {
                 can_bus_valid_   = true;
                 Logger::GetInstance().Info(TAG, "CAN bus configured (TX=GPIO%d, RX=GPIO%d, 500kbps)",
                                           tx_map->physical_pin, rx_map->physical_pin);
@@ -145,16 +145,14 @@ bool CommChannelsManager::Initialize() noexcept {
             i2c_cfg.sda_io_num = static_cast<hf_pin_num_t>(sda_map->physical_pin);
             i2c_cfg.scl_io_num = static_cast<hf_pin_num_t>(scl_map->physical_pin);
 
-            auto* i2c = new (std::nothrow) EspI2cBus(i2c_cfg);
-            if (i2c && i2c->Initialize()) {
-                i2c_bus_storage_ = i2c;
-                i2c_bus_         = i2c;
+            i2c_bus_ = hf::utils::make_unique_nothrow<EspI2cBus>(i2c_cfg);
+            if (i2c_bus_ && i2c_bus_->Initialize()) {
                 i2c_bus_valid_   = true;
                 Logger::GetInstance().Info(TAG, "I2C bus configured (SDA=GPIO%d, SCL=GPIO%d, 400kHz)",
                                           sda_map->physical_pin, scl_map->physical_pin);
             } else {
                 Logger::GetInstance().Warn(TAG, "I2C bus init failed — non-critical for Flux V1");
-                delete i2c;
+                i2c_bus_.reset();
             }
         }
     }
@@ -166,18 +164,10 @@ bool CommChannelsManager::Initialize() noexcept {
 
     // If SPI failed (hard requirement), clean up any non-critical allocations
     if (!spi_bus_valid_) {
-        if (can_bus_storage_) {
-            delete static_cast<EspCan*>(can_bus_storage_);
-            can_bus_storage_ = nullptr;
-            can_bus_ = nullptr;
-            can_bus_valid_ = false;
-        }
-        if (i2c_bus_storage_) {
-            delete static_cast<EspI2cBus*>(i2c_bus_storage_);
-            i2c_bus_storage_ = nullptr;
-            i2c_bus_ = nullptr;
-            i2c_bus_valid_ = false;
-        }
+        can_bus_.reset();
+        can_bus_valid_ = false;
+        i2c_bus_.reset();
+        i2c_bus_valid_ = false;
     }
 
     return spi_bus_valid_; // SPI is the only hard requirement
@@ -205,12 +195,12 @@ BaseSpi* CommChannelsManager::GetSpiDevice(uint8_t device_index) noexcept {
 
 EspI2cBus* CommChannelsManager::GetI2cBus() noexcept {
     if (!initialized_.load(std::memory_order_acquire) || !i2c_bus_valid_) return nullptr;
-    return i2c_bus_;
+    return i2c_bus_.get();
 }
 
 BaseCan* CommChannelsManager::GetCanBus() noexcept {
     if (!initialized_.load(std::memory_order_acquire) || !can_bus_valid_) return nullptr;
-    return can_bus_;
+    return can_bus_.get();
 }
 
 //==============================================================================
@@ -239,29 +229,17 @@ bool CommChannelsManager::Deinitialize() noexcept {
 
     Logger::GetInstance().Info(TAG, "Deinitializing Flux CommChannels manager");
 
-    // Delete SPI bus
-    if (spi_bus_storage_) {
-        delete static_cast<EspSpiBus*>(spi_bus_storage_);
-        spi_bus_storage_ = nullptr;
-        spi_bus_ = nullptr;
-        spi_bus_valid_ = false;
-    }
+    // Release SPI bus
+    spi_bus_.reset();
+    spi_bus_valid_ = false;
 
-    // Delete I2C bus
-    if (i2c_bus_storage_) {
-        delete static_cast<EspI2cBus*>(i2c_bus_storage_);
-        i2c_bus_storage_ = nullptr;
-        i2c_bus_ = nullptr;
-        i2c_bus_valid_ = false;
-    }
+    // Release I2C bus
+    i2c_bus_.reset();
+    i2c_bus_valid_ = false;
 
-    // Delete CAN bus
-    if (can_bus_storage_) {
-        delete static_cast<EspCan*>(can_bus_storage_);
-        can_bus_storage_ = nullptr;
-        can_bus_ = nullptr;
-        can_bus_valid_ = false;
-    }
+    // Release CAN bus
+    can_bus_.reset();
+    can_bus_valid_ = false;
 
     initialized_.store(false, std::memory_order_release);
     return true;

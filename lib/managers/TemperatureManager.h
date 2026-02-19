@@ -10,7 +10,7 @@
  *
  *          Stack-friendly design: fixed-size array of TempEntry structs,
  *          no heap vectors or unordered_maps. Sensor driver instances are
- *          individually heap-allocated (raw new, singleton lifetime).
+ *          individually heap-allocated via unique_ptr (singleton lifetime).
  *
  * @author HardFOC Team
  * @date 2026
@@ -23,6 +23,7 @@
 #include <array>
 #include <atomic>
 #include <cstdint>
+#include <memory>
 #include <string_view>
 
 #include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/base/BaseTemperature.h"
@@ -92,7 +93,7 @@ constexpr const char* FluxTempSensorTypeToString(FluxTempSensorType type) noexce
 }
 
 //==============================================================================
-// TEMPERATURE ENTRY — stack-allocated metadata (drivers stored separately on heap)
+// TEMPERATURE ENTRY — stack-allocated metadata (drivers owned via unique_ptr)
 //==============================================================================
 
 struct TempEntry {
@@ -212,12 +213,9 @@ private:
     std::array<TempEntry, kMaxSensors> entries_{};
     size_t registered_count_{0};
 
-    // Sensor driver instances (allocated once, singleton lives forever)
-    void* esp32_temp_storage_{nullptr};   ///< EspTemperature*
-    void* ntc_handler_storage_{nullptr};  ///< NtcTemperatureHandler*
-
-    BaseTemperature* esp32_temp_{nullptr};
-    BaseTemperature* ntc_temp_{nullptr};
+    // Sensor driver instances — heap-allocated via unique_ptr (singleton lifetime)
+    std::unique_ptr<EspTemperature> esp32_temp_;
+    std::unique_ptr<NtcTemperatureHandler> ntc_handler_;
 
     std::atomic<bool> initialized_{false};
     mutable RtosMutex mutex_;

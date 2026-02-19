@@ -10,6 +10,7 @@
 #include "TemperatureManager.h"
 #include "AdcManager.h"
 #include "core/hf-core-drivers/internal/hf-pincfg/src/hf_functional_pin_config_flux_v1.hpp"
+#include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/utils/memory_utils.h"
 
 #include <algorithm>
 #include <cmath>
@@ -51,21 +52,17 @@ bool TemperatureManager::Initialize() noexcept {
 }
 
 bool TemperatureManager::InitializeEsp32Internal() noexcept {
-    auto* sensor = new (std::nothrow) EspTemperature();
-    if (!sensor) {
+    esp32_temp_ = hf::utils::make_unique_nothrow<EspTemperature>();
+    if (!esp32_temp_) {
         Logger::GetInstance().Error(TAG, "Failed to allocate EspTemperature");
         return false;
     }
-    esp32_temp_storage_ = sensor;
 
-    if (!sensor->EnsureInitialized()) {
+    if (!esp32_temp_->EnsureInitialized()) {
         Logger::GetInstance().Error(TAG, "EspTemperature initialization failed");
-        delete sensor;
-        esp32_temp_storage_ = nullptr;
+        esp32_temp_.reset();
         return false;
     }
-
-    esp32_temp_ = sensor;
 
     auto& entry = entries_[registered_count_++];
     entry.name = "ESP32_INTERNAL";
@@ -104,21 +101,17 @@ bool TemperatureManager::InitializeNtcThermistor() noexcept {
     ntc_cfg.beta_value                         = 3950.0f;
     ntc_cfg.reference_voltage                  = 3.3f;
 
-    auto* handler = new (std::nothrow) NtcTemperatureHandler(adc_driver, ntc_cfg);
-    if (!handler) {
+    ntc_handler_ = hf::utils::make_unique_nothrow<NtcTemperatureHandler>(adc_driver, ntc_cfg);
+    if (!ntc_handler_) {
         Logger::GetInstance().Error(TAG, "Failed to allocate NTC handler");
         return false;
     }
-    ntc_handler_storage_ = handler;
 
-    if (!handler->EnsureInitialized()) {
+    if (!ntc_handler_->EnsureInitialized()) {
         Logger::GetInstance().Error(TAG, "NTC handler initialization failed");
-        delete handler;
-        ntc_handler_storage_ = nullptr;
+        ntc_handler_.reset();
         return false;
     }
-
-    ntc_temp_ = handler;
 
     auto& entry = entries_[registered_count_++];
     entry.name = "NTC_THERMISTOR";
@@ -161,8 +154,8 @@ bool TemperatureManager::ReadTemperatureCelsius(std::string_view name, float& te
     BaseTemperature* sensor = nullptr;
 
     switch (entry.sensor_type) {
-        case FluxTempSensorType::ESP32_INTERNAL: sensor = esp32_temp_; break;
-        case FluxTempSensorType::NTC_THERMISTOR: sensor = ntc_temp_; break;
+        case FluxTempSensorType::ESP32_INTERNAL: sensor = esp32_temp_.get(); break;
+        case FluxTempSensorType::NTC_THERMISTOR: sensor = ntc_handler_.get(); break;
         default: return false;
     }
     if (!sensor) return false;
@@ -275,19 +268,11 @@ bool TemperatureManager::Deinitialize() noexcept {
     }
     registered_count_ = 0;
 
-    // Delete NTC handler
-    if (ntc_handler_storage_) {
-        delete static_cast<NtcTemperatureHandler*>(ntc_handler_storage_);
-        ntc_handler_storage_ = nullptr;
-        ntc_temp_ = nullptr;
-    }
+    // Release NTC handler
+    ntc_handler_.reset();
 
-    // Delete ESP32 temperature sensor
-    if (esp32_temp_storage_) {
-        delete static_cast<EspTemperature*>(esp32_temp_storage_);
-        esp32_temp_storage_ = nullptr;
-        esp32_temp_ = nullptr;
-    }
+    // Release ESP32 temperature sensor
+    esp32_temp_.reset();
 
     initialized_.store(false, std::memory_order_release);
     return true;

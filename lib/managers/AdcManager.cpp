@@ -9,7 +9,7 @@
 
 #include "AdcManager.h"
 #include "handlers/logger/Logger.h"
-#include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/mcu/esp32/EspAdc.h"
+#include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/utils/memory_utils.h"
 
 static constexpr const char* TAG = "FluxAdc";
 
@@ -41,17 +41,15 @@ bool AdcManager::Initialize() noexcept {
     // Create one EspAdc for ADC1 (ESP32-C6 only has ADC1 usable)
     hf_adc_unit_config_t adc_cfg{};
     adc_cfg.unit_id = 0;  // ADC1
-    auto* adc1 = new (std::nothrow) EspAdc(adc_cfg);
-    if (!adc1) {
+    esp_adc_ = hf::utils::make_unique_nothrow<EspAdc>(adc_cfg);
+    if (!esp_adc_) {
         Logger::GetInstance().Error(TAG, "Failed to allocate EspAdc unit 0");
         return false;
     }
-    esp_adc_storage_ = adc1;
 
-    if (!adc1->Initialize()) {
+    if (!esp_adc_->Initialize()) {
         Logger::GetInstance().Error(TAG, "Failed to initialize EspAdc unit 0");
-        delete adc1;
-        esp_adc_storage_ = nullptr;
+        esp_adc_.reset();
         return false;
     }
 
@@ -71,12 +69,12 @@ bool AdcManager::Initialize() noexcept {
         entry.adc_unit = mapping.adc_unit;
         entry.hw_channel = mapping.physical_channel;
         entry.voltage_divider = mapping.voltage_divider;
-        entry.driver = adc1;   // All channels go through ADC1
+        entry.driver = esp_adc_.get();   // All channels go through ADC1
         entry.registered = true;
         ++registered_count_;
 
         // Configure the channel on the EspAdc driver
-        adc1->ConfigureChannel(mapping.physical_channel, hf_adc_atten_t::ATTEN_DB_12);
+        esp_adc_->ConfigureChannel(mapping.physical_channel, hf_adc_atten_t::ATTEN_DB_12);
 
         Logger::GetInstance().Info(TAG, "  Registered ADC: %.*s (unit=%u ch=%u div=%.1f)",
                                   static_cast<int>(entry.name.size()), entry.name.data(),
@@ -226,11 +224,8 @@ bool AdcManager::Deinitialize() noexcept {
     }
     registered_count_ = 0;
 
-    // Delete the EspAdc instance
-    if (esp_adc_storage_) {
-        delete static_cast<EspAdc*>(esp_adc_storage_);
-        esp_adc_storage_ = nullptr;
-    }
+    // Release the EspAdc instance
+    esp_adc_.reset();
 
     initialized_.store(false, std::memory_order_release);
     return true;
