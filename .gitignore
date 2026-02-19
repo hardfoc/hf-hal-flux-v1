@@ -135,3 +135,6 @@ Thumbs.db
 # Backup files
 **/*.bak*
 *.bak
+
+# Changelogs (maintained locally, not tracked)
+CHANGELOG.md
