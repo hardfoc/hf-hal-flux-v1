@@ -10,7 +10,6 @@
 #include "TemperatureManager.h"
 #include "AdcManager.h"
 #include "core/hf-core-drivers/internal/hf-pincfg/src/hf_functional_pin_config_flux_v1.hpp"
-#include "core/hf-core-utils/hf-utils-rtos-wrap/include/OsAbstraction.h"
 
 #include <algorithm>
 #include <cmath>
@@ -59,7 +58,7 @@ bool TemperatureManager::InitializeEsp32Internal() noexcept {
     }
     esp32_temp_storage_ = sensor;
 
-    if (!sensor->Initialize()) {
+    if (!sensor->EnsureInitialized()) {
         Logger::GetInstance().Error(TAG, "EspTemperature initialization failed");
         delete sensor;
         esp32_temp_storage_ = nullptr;
@@ -100,21 +99,19 @@ bool TemperatureManager::InitializeNtcThermistor() noexcept {
 
     // NTC handler config: 10k NTC, 10k pullup, 3.3V, B=3950
     ntc_temp_handler_config_t ntc_cfg = NTC_TEMP_HANDLER_CONFIG_DEFAULT();
-    ntc_cfg.ntc_resistance_nominal = 10000;
-    ntc_cfg.series_resistance      = 10000;
-    ntc_cfg.beta_coefficient       = 3950;
-    ntc_cfg.reference_temperature  = 25.0f;
-    ntc_cfg.supply_voltage_mv      = 3300;
-    ntc_cfg.adc_resolution_bits    = 12;
+    ntc_cfg.adc_channel                       = mapping->physical_channel;
+    ntc_cfg.voltage_divider_series_resistance  = 10000.0f;
+    ntc_cfg.beta_value                         = 3950.0f;
+    ntc_cfg.reference_voltage                  = 3.3f;
 
-    auto* handler = new (std::nothrow) NtcTemperatureHandler(*adc_driver, mapping->channel, ntc_cfg);
+    auto* handler = new (std::nothrow) NtcTemperatureHandler(adc_driver, ntc_cfg);
     if (!handler) {
         Logger::GetInstance().Error(TAG, "Failed to allocate NTC handler");
         return false;
     }
     ntc_handler_storage_ = handler;
 
-    if (!handler->Initialize()) {
+    if (!handler->EnsureInitialized()) {
         Logger::GetInstance().Error(TAG, "NTC handler initialization failed");
         delete handler;
         ntc_handler_storage_ = nullptr;
@@ -128,7 +125,7 @@ bool TemperatureManager::InitializeNtcThermistor() noexcept {
     entry.sensor_type = FluxTempSensorType::NTC_THERMISTOR;
     entry.registered = true;
 
-    Logger::GetInstance().Info(TAG, "  Registered NTC thermistor (ADC ch=%u)", mapping->channel);
+    Logger::GetInstance().Info(TAG, "  Registered NTC thermistor (ADC ch=%u)", mapping->physical_channel);
     return true;
 }
 
@@ -170,7 +167,7 @@ bool TemperatureManager::ReadTemperatureCelsius(std::string_view name, float& te
     }
     if (!sensor) return false;
 
-    hf_temp_err_t err = sensor->ReadTemperatureCelsiusImpl(&temperature_c);
+    hf_temp_err_t err = sensor->ReadTemperatureCelsius(&temperature_c);
     if (err == hf_temp_err_t::TEMP_SUCCESS) {
         entry.last_reading_celsius = temperature_c;
         entry.read_count++;

@@ -22,6 +22,7 @@ set(HF_CORE_ENABLE_TLE92466ED     ON)   # SPI solenoid driver (valves)
 set(HF_CORE_ENABLE_NTC_THERMISTOR ON)   # ADC temperature sensor
 set(HF_CORE_ENABLE_WS2812         ON)   # RMT LED strip
 set(HF_CORE_ENABLE_LOGGER         ON)   # Logging system
+set(HF_CORE_ENABLE_CAN            ON)   # CAN (TWAI) bus interface
 
 # ── Optional Utilities ────────────────────────────────────────────────────
 set(HF_CORE_ENABLE_UTILS_CANOPEN  ON)   # CANopen protocol helpers

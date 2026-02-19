@@ -12,6 +12,8 @@
  */
 
 #include "api/Flux.h"
+#include "managers/GpioManager.h"
+#include "managers/AdcManager.h"
 #include "TestFramework.h"
 
 #include "freertos/FreeRTOS.h"

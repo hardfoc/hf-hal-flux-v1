@@ -21,6 +21,12 @@
  */
 
 #include "api/Flux.h"
+#include "managers/CommChannelsManager.h"
+#include "managers/GpioManager.h"
+#include "managers/ValveManager.h"
+#include "managers/AdcManager.h"
+#include "managers/LedManager.h"
+#include "managers/TemperatureManager.h"
 #include "TestFramework.h"
 
 #include "freertos/FreeRTOS.h"

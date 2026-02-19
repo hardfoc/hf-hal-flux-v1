@@ -60,7 +60,7 @@ bool CommChannelsManager::Initialize() noexcept {
 
         if (miso_map && mosi_map && sck_map) {
             hf_spi_bus_config_t spi_cfg = {};
-            spi_cfg.host      = static_cast<hf_spi_host_device_t>(1); // SPI2_HOST
+            spi_cfg.host      = static_cast<hf_host_id_t>(1); // SPI2_HOST
             spi_cfg.miso_pin  = miso_map->physical_pin;
             spi_cfg.mosi_pin  = mosi_map->physical_pin;
             spi_cfg.sclk_pin  = sck_map->physical_pin;
@@ -81,7 +81,7 @@ bool CommChannelsManager::Initialize() noexcept {
                     dev_cfg.cs_pin          = cs_max_map->physical_pin;
                     dev_cfg.clock_speed_hz  = 10'000'000;
                     dev_cfg.mode            = hf_spi_mode_t::HF_SPI_MODE_0;
-                    int idx = bus->AddDevice(dev_cfg);
+                    int idx = bus->CreateDevice(dev_cfg);
                     spi_device_indices_[static_cast<uint8_t>(SpiDeviceId::MAX22200_SOLENOID_DRIVER)] = idx;
                     Logger::GetInstance().Info(TAG, "MAX22200 SPI device added (CS=GPIO%d, idx=%d)",
                                               cs_max_map->physical_pin, idx);
@@ -94,7 +94,7 @@ bool CommChannelsManager::Initialize() noexcept {
                     dev_cfg.cs_pin          = cs_tle_map->physical_pin;
                     dev_cfg.clock_speed_hz  = 5'000'000;
                     dev_cfg.mode            = hf_spi_mode_t::HF_SPI_MODE_1;
-                    int idx = bus->AddDevice(dev_cfg);
+                    int idx = bus->CreateDevice(dev_cfg);
                     spi_device_indices_[static_cast<uint8_t>(SpiDeviceId::TLE92466_LOWSIDE_DRIVER)] = idx;
                     Logger::GetInstance().Info(TAG, "TLE92466ED SPI device added (CS=GPIO%d, idx=%d)",
                                               cs_tle_map->physical_pin, idx);
@@ -116,7 +116,7 @@ bool CommChannelsManager::Initialize() noexcept {
         auto* rx_map = GetGpioMapping(HfFunctionalGpioPin::TWAI_RX);
 
         if (tx_map && rx_map) {
-            hf_can_config_t can_cfg = {};
+            hf_esp_can_config_t can_cfg = {};
             can_cfg.tx_pin    = tx_map->physical_pin;
             can_cfg.rx_pin    = rx_map->physical_pin;
             can_cfg.baud_rate = 500000; // 500 kbps standard
@@ -140,11 +140,10 @@ bool CommChannelsManager::Initialize() noexcept {
         auto* scl_map = GetGpioMapping(HfFunctionalGpioPin::I2C_SCL);
 
         if (sda_map && scl_map) {
-            hf_i2c_bus_config_t i2c_cfg = {};
-            i2c_cfg.port     = 0;
-            i2c_cfg.sda_pin  = sda_map->physical_pin;
-            i2c_cfg.scl_pin  = scl_map->physical_pin;
-            i2c_cfg.speed_hz = 400000; // 400 kHz
+            hf_i2c_master_bus_config_t i2c_cfg = {};
+            i2c_cfg.i2c_port   = I2C_NUM_0;
+            i2c_cfg.sda_io_num = static_cast<hf_pin_num_t>(sda_map->physical_pin);
+            i2c_cfg.scl_io_num = static_cast<hf_pin_num_t>(scl_map->physical_pin);
 
             auto* i2c = new (std::nothrow) EspI2cBus(i2c_cfg);
             if (i2c && i2c->Initialize()) {
@@ -204,7 +203,7 @@ BaseSpi* CommChannelsManager::GetSpiDevice(uint8_t device_index) noexcept {
 // I2C / CAN ACCESSORS
 //==============================================================================
 
-BaseI2c* CommChannelsManager::GetI2cBus() noexcept {
+EspI2cBus* CommChannelsManager::GetI2cBus() noexcept {
     if (!initialized_.load(std::memory_order_acquire) || !i2c_bus_valid_) return nullptr;
     return i2c_bus_;
 }

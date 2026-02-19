@@ -17,6 +17,7 @@
  */
 
 #include "api/Flux.h"
+#include "managers/ValveManager.h"
 #include "TestFramework.h"
 
 #include "freertos/FreeRTOS.h"

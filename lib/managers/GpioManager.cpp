@@ -62,31 +62,30 @@ bool GpioManager::Initialize() noexcept {
         entry.functional_pin = static_cast<HfFunctionalGpioPin>(i);
 
         // Configure the EspGpio driver from the mapping data
-        hf_gpio_config_t gpio_cfg = {};
-        gpio_cfg.pin_number = mapping.physical_pin;
-        gpio_cfg.direction  = hf_gpio_direction_t::HF_GPIO_DIRECTION_OUTPUT;
+        hf_gpio_direction_t direction = hf_gpio_direction_t::HF_GPIO_DIRECTION_OUTPUT;
 
+        hf_gpio_pull_mode_t pull_mode;
         if (mapping.has_pull) {
-            gpio_cfg.pull_mode = mapping.pull_is_up
-                ? hf_gpio_pull_mode_t::HF_GPIO_PULL_UP
-                : hf_gpio_pull_mode_t::HF_GPIO_PULL_DOWN;
+            pull_mode = mapping.pull_is_up
+                ? hf_gpio_pull_mode_t::HF_GPIO_PULL_MODE_UP
+                : hf_gpio_pull_mode_t::HF_GPIO_PULL_MODE_DOWN;
         } else {
-            gpio_cfg.pull_mode = hf_gpio_pull_mode_t::HF_GPIO_FLOATING;
+            pull_mode = hf_gpio_pull_mode_t::HF_GPIO_PULL_MODE_FLOATING;
         }
 
-        gpio_cfg.output_mode = mapping.is_push_pull
-            ? hf_gpio_output_mode_t::HF_GPIO_PUSH_PULL
-            : hf_gpio_output_mode_t::HF_GPIO_OPEN_DRAIN;
+        hf_gpio_output_mode_t output_mode = mapping.is_push_pull
+            ? hf_gpio_output_mode_t::HF_GPIO_OUTPUT_MODE_PUSH_PULL
+            : hf_gpio_output_mode_t::HF_GPIO_OUTPUT_MODE_OPEN_DRAIN;
 
-        entry.driver = EspGpio(gpio_cfg);
+        hf_gpio_active_state_t active_state = mapping.is_inverted
+            ? hf_gpio_active_state_t::HF_GPIO_ACTIVE_LOW
+            : hf_gpio_active_state_t::HF_GPIO_ACTIVE_HIGH;
 
-        if (mapping.is_inverted) {
-            entry.driver.SetActiveState(hf_gpio_active_state_t::HF_GPIO_ACTIVE_LOW);
-        } else {
-            entry.driver.SetActiveState(hf_gpio_active_state_t::HF_GPIO_ACTIVE_HIGH);
-        }
+        entry.driver = std::make_unique<EspGpio>(
+            static_cast<hf_pin_num_t>(mapping.physical_pin),
+            direction, active_state, output_mode, pull_mode);
 
-        if (entry.driver.EnsureInitialized()) {
+        if (entry.driver->EnsureInitialized()) {
             entry.registered = true;
             ++registered_count_;
             Logger::GetInstance().Info(TAG, "Registered GPIO: %.*s (GPIO%d)",
@@ -120,14 +119,14 @@ BaseGpio* GpioManager::Get(std::string_view name) noexcept {
     if (!initialized_.load(std::memory_order_acquire)) return nullptr;
     size_t idx = FindByName(name);
     if (idx == kInvalidIndex) return nullptr;
-    return &entries_[idx].driver;
+    return entries_[idx].driver.get();
 }
 
 BaseGpio* GpioManager::Get(HfFunctionalGpioPin pin) noexcept {
     if (!initialized_.load(std::memory_order_acquire)) return nullptr;
     size_t idx = static_cast<size_t>(pin);
     if (idx >= kMaxEntries || !entries_[idx].registered) return nullptr;
-    return &entries_[idx].driver;
+    return entries_[idx].driver.get();
 }
 
 bool GpioManager::Contains(std::string_view name) const noexcept {
@@ -144,37 +143,37 @@ size_t GpioManager::Size() const noexcept {
 
 hf_gpio_err_t GpioManager::Set(std::string_view name, bool value) noexcept {
     auto* gpio = Get(name);
-    if (!gpio) return hf_gpio_err_t::GPIO_ERROR_NOT_FOUND;
+    if (!gpio) return hf_gpio_err_t::GPIO_ERR_PIN_NOT_FOUND;
     return value ? gpio->SetActive() : gpio->SetInactive();
 }
 
 hf_gpio_err_t GpioManager::SetActive(std::string_view name) noexcept {
     auto* gpio = Get(name);
-    if (!gpio) return hf_gpio_err_t::GPIO_ERROR_NOT_FOUND;
+    if (!gpio) return hf_gpio_err_t::GPIO_ERR_PIN_NOT_FOUND;
     return gpio->SetActive();
 }
 
 hf_gpio_err_t GpioManager::SetInactive(std::string_view name) noexcept {
     auto* gpio = Get(name);
-    if (!gpio) return hf_gpio_err_t::GPIO_ERROR_NOT_FOUND;
+    if (!gpio) return hf_gpio_err_t::GPIO_ERR_PIN_NOT_FOUND;
     return gpio->SetInactive();
 }
 
 hf_gpio_err_t GpioManager::Read(std::string_view name, bool& state) noexcept {
     auto* gpio = Get(name);
-    if (!gpio) return hf_gpio_err_t::GPIO_ERROR_NOT_FOUND;
-    return gpio->Read(state);
+    if (!gpio) return hf_gpio_err_t::GPIO_ERR_PIN_NOT_FOUND;
+    return gpio->IsActive(state);
 }
 
 hf_gpio_err_t GpioManager::Toggle(std::string_view name) noexcept {
     auto* gpio = Get(name);
-    if (!gpio) return hf_gpio_err_t::GPIO_ERROR_NOT_FOUND;
+    if (!gpio) return hf_gpio_err_t::GPIO_ERR_PIN_NOT_FOUND;
     return gpio->Toggle();
 }
 
 hf_gpio_err_t GpioManager::IsActive(std::string_view name, bool& active) noexcept {
     auto* gpio = Get(name);
-    if (!gpio) return hf_gpio_err_t::GPIO_ERROR_NOT_FOUND;
+    if (!gpio) return hf_gpio_err_t::GPIO_ERR_PIN_NOT_FOUND;
     return gpio->IsActive(active);
 }
 
@@ -184,19 +183,19 @@ hf_gpio_err_t GpioManager::IsActive(std::string_view name, bool& active) noexcep
 
 hf_gpio_err_t GpioManager::SetDirection(std::string_view name, hf_gpio_direction_t direction) noexcept {
     auto* gpio = Get(name);
-    if (!gpio) return hf_gpio_err_t::GPIO_ERROR_NOT_FOUND;
+    if (!gpio) return hf_gpio_err_t::GPIO_ERR_PIN_NOT_FOUND;
     return gpio->SetDirection(direction);
 }
 
 hf_gpio_err_t GpioManager::SetPullMode(std::string_view name, hf_gpio_pull_mode_t pull_mode) noexcept {
     auto* gpio = Get(name);
-    if (!gpio) return hf_gpio_err_t::GPIO_ERROR_NOT_FOUND;
+    if (!gpio) return hf_gpio_err_t::GPIO_ERR_PIN_NOT_FOUND;
     return gpio->SetPullMode(pull_mode);
 }
 
 hf_gpio_err_t GpioManager::SetOutputMode(std::string_view name, hf_gpio_output_mode_t mode) noexcept {
     auto* gpio = Get(name);
-    if (!gpio) return hf_gpio_err_t::GPIO_ERROR_NOT_FOUND;
+    if (!gpio) return hf_gpio_err_t::GPIO_ERR_PIN_NOT_FOUND;
     return gpio->SetOutputMode(mode);
 }
 
@@ -233,8 +232,9 @@ bool GpioManager::Deinitialize() noexcept {
 
     Logger::GetInstance().Info(TAG, "Deinitializing Flux GPIO manager");
 
-    // Clear all entries (drivers are by-value, no heap to free)
+    // Clear all entries
     for (size_t i = 0; i < HF_GPIO_MAPPING_SIZE; ++i) {
+        entries_[i].driver.reset();
         entries_[i].registered = false;
         entries_[i].access_count = 0;
         entries_[i].error_count = 0;

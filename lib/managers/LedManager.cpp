@@ -8,7 +8,10 @@
  */
 
 #include "LedManager.h"
-#include "core/hf-core-utils/hf-utils-rtos-wrap/include/OsAbstraction.h"
+
+extern "C" {
+#include "esp_timer.h"
+}
 
 #include <cmath>
 
@@ -69,14 +72,14 @@ LedError LedManager::GetSystemDiagnostics(LedSystemDiagnostics& d) const noexcep
 
 LedError LedManager::SetColor(const LedColor& color, uint32_t led_index) noexcept {
     if (!EnsureInitialized()) { UpdateLastError(LedError::NOT_INITIALIZED); return LedError::NOT_INITIALIZED; }
-    if (led_index >= NUM_LEDS) { UpdateLastError(LedError::INVALID_PARAMETER); return LedError::INVALID_PARAMETER; }
+    if (led_index >= kNumLeds) { UpdateLastError(LedError::INVALID_PARAMETER); return LedError::INVALID_PARAMETER; }
 
     std::lock_guard<RtosMutex> lock(mutex_);
 
     if (current_animation_ != LedAnimation::OFF) StopAnimation();
 
-    led_strip_->setPixel(led_index, color.ToRgb());
-    esp_err_t result = led_strip_->show();
+    led_strip_->SetPixel(led_index, color.ToRgb());
+    esp_err_t result = led_strip_->Show();
     if (result != ESP_OK) {
         UpdateLastError(LedError::HARDWARE_ERROR);
         UpdateStatistics(false);
@@ -101,8 +104,8 @@ LedError LedManager::TurnOff() noexcept {
     std::lock_guard<RtosMutex> lock(mutex_);
     if (current_animation_ != LedAnimation::OFF) StopAnimation();
 
-    led_strip_->setPixel(0, 0);
-    esp_err_t result = led_strip_->show();
+    led_strip_->SetPixel(0, 0);
+    esp_err_t result = led_strip_->Show();
     if (result != ESP_OK) {
         UpdateLastError(LedError::HARDWARE_ERROR);
         UpdateStatistics(false);
@@ -131,9 +134,9 @@ LedError LedManager::SetBrightnessPercent(uint8_t brightness_percent) noexcept {
 
     std::lock_guard<RtosMutex> lock(mutex_);
     uint8_t raw = PercentToRaw(brightness_percent);
-    led_strip_->setBrightness(raw);
+    led_strip_->SetBrightness(raw);
     current_brightness_ = raw;
-    esp_err_t result = led_strip_->show();
+    esp_err_t result = led_strip_->Show();
     return (result == ESP_OK) ? (UpdateStatistics(true), LedError::SUCCESS)
                               : (UpdateStatistics(false), LedError::HARDWARE_ERROR);
 }
@@ -142,9 +145,9 @@ LedError LedManager::SetBrightnessRaw(uint8_t brightness_raw) noexcept {
     if (!EnsureInitialized()) return LedError::NOT_INITIALIZED;
 
     std::lock_guard<RtosMutex> lock(mutex_);
-    led_strip_->setBrightness(brightness_raw);
+    led_strip_->SetBrightness(brightness_raw);
     current_brightness_ = brightness_raw;
-    esp_err_t result = led_strip_->show();
+    esp_err_t result = led_strip_->Show();
     return (result == ESP_OK) ? (UpdateStatistics(true), LedError::SUCCESS)
                               : (UpdateStatistics(false), LedError::HARDWARE_ERROR);
 }
@@ -190,8 +193,8 @@ LedError LedManager::StopAnimation() noexcept {
     if (current_animation_ == LedAnimation::OFF) return LedError::SUCCESS;
     if (!led_strip_) return LedError::NOT_INITIALIZED;
 
-    led_strip_->setPixel(0, 0);
-    led_strip_->show();
+    led_strip_->SetPixel(0, 0);
+    led_strip_->Show();
     current_animation_ = LedAnimation::OFF;
     current_color_ = LedColors::BLACK;
     animation_step_ = 0;
@@ -233,7 +236,7 @@ void LedManager::DumpStatistics() const noexcept {
     auto& log = Logger::GetInstance();
     log.Info(TAG, "=== Flux LED Manager Statistics ===");
     log.Info(TAG, "  Init: %s  GPIO: %d  LEDs: %u",
-             is_initialized_.load() ? "YES" : "NO", current_led_gpio_, NUM_LEDS);
+             is_initialized_.load() ? "YES" : "NO", current_led_gpio_, kNumLeds);
     log.Info(TAG, "  Animation: %s  Color: 0x%06X  Brightness: %u",
              LedAnimationToString(current_animation_), current_color_.ToRgb(), current_brightness_);
     log.Info(TAG, "  Ops total/ok/fail: %u/%u/%u  Cycles: %u",
@@ -253,7 +256,7 @@ bool LedManager::Initialize() noexcept {
     current_led_gpio_ = led_gpio;
 
     led_strip_ = std::make_unique<WS2812Strip>(
-        led_gpio, DEFAULT_RMT_CHANNEL, NUM_LEDS, LedType::RGB,
+        led_gpio, DEFAULT_RMT_CHANNEL, kNumLeds, LedType::RGB,
         14, 52, 52, 52, 255);
 
     if (!led_strip_) {
@@ -261,21 +264,21 @@ bool LedManager::Initialize() noexcept {
         return false;
     }
 
-    esp_err_t result = led_strip_->begin();
+    esp_err_t result = led_strip_->Begin();
     if (result != ESP_OK) {
         Logger::GetInstance().Error(TAG, "Failed to init WS2812: %s", esp_err_to_name(result));
         return false;
     }
 
-    led_animator_ = std::make_unique<WS2812Animator>(*led_strip_, NUM_LEDS);
+    led_animator_ = std::make_unique<WS2812Animator>(*led_strip_, kNumLeds);
     if (!led_animator_) {
         Logger::GetInstance().Error(TAG, "Failed to create WS2812 animator");
         return false;
     }
 
     // Start dark
-    led_strip_->setPixel(0, 0);
-    led_strip_->show();
+    led_strip_->SetPixel(0, 0);
+    led_strip_->Show();
 
     system_start_time_ = GetSystemUptimeMs();
     is_initialized_.store(true, std::memory_order_release);
@@ -293,21 +296,21 @@ LedError LedManager::UpdateAnimationStep() noexcept {
         case LedAnimation::STATUS_ERROR:
         case LedAnimation::STATUS_CALIBRATE: {
             bool on = (animation_step_ / (BLINK_SPEED / ANIMATION_UPDATE_INTERVAL)) % 2 == 0;
-            led_strip_->setPixel(0, on ? current_color_.ToRgb() : 0);
-            if (led_strip_->show() != ESP_OK) return LedError::ANIMATION_FAILED;
+            led_strip_->SetPixel(0, on ? current_color_.ToRgb() : 0);
+            if (led_strip_->Show() != ESP_OK) return LedError::ANIMATION_FAILED;
             break;
         }
         case LedAnimation::BREATH:
         case LedAnimation::STATUS_BOOT: {
             uint8_t pct = static_cast<uint8_t>(50 + 50 * std::sin(animation_step_ * BREATH_SPEED * 0.01f));
-            led_strip_->setBrightness(PercentToRaw(pct));
-            led_strip_->setPixel(0, current_color_.ToRgb());
-            if (led_strip_->show() != ESP_OK) return LedError::ANIMATION_FAILED;
+            led_strip_->SetBrightness(PercentToRaw(pct));
+            led_strip_->SetPixel(0, current_color_.ToRgb());
+            if (led_strip_->Show() != ESP_OK) return LedError::ANIMATION_FAILED;
             break;
         }
         case LedAnimation::RAINBOW: {
-            led_strip_->setPixel(0, ColorWheel(animation_step_ % 256));
-            if (led_strip_->show() != ESP_OK) return LedError::ANIMATION_FAILED;
+            led_strip_->SetPixel(0, ColorWheel(animation_step_ % 256));
+            if (led_strip_->Show() != ESP_OK) return LedError::ANIMATION_FAILED;
             break;
         }
         case LedAnimation::SOLID:
@@ -330,5 +333,5 @@ void LedManager::UpdateLastError(LedError error_code) noexcept {
 }
 
 uint64_t LedManager::GetSystemUptimeMs() const noexcept {
-    return OsAbstraction::GetTimeMs();
+    return static_cast<uint64_t>(esp_timer_get_time() / 1000);
 }

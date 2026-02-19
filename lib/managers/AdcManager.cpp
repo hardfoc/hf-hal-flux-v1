@@ -39,7 +39,9 @@ bool AdcManager::Initialize() noexcept {
     Logger::GetInstance().Info(TAG, "Initializing Flux ADC manager");
 
     // Create one EspAdc for ADC1 (ESP32-C6 only has ADC1 usable)
-    auto* adc1 = new (std::nothrow) EspAdc(0, 3.3f);  // unit 0 = ADC1
+    hf_adc_unit_config_t adc_cfg{};
+    adc_cfg.unit_id = 0;  // ADC1
+    auto* adc1 = new (std::nothrow) EspAdc(adc_cfg);
     if (!adc1) {
         Logger::GetInstance().Error(TAG, "Failed to allocate EspAdc unit 0");
         return false;
@@ -67,14 +69,14 @@ bool AdcManager::Initialize() noexcept {
         entry.functional_channel = fc;
         entry.name = to_string(fc);
         entry.adc_unit = mapping.adc_unit;
-        entry.hw_channel = mapping.channel;
+        entry.hw_channel = mapping.physical_channel;
         entry.voltage_divider = mapping.voltage_divider;
         entry.driver = adc1;   // All channels go through ADC1
         entry.registered = true;
         ++registered_count_;
 
         // Configure the channel on the EspAdc driver
-        adc1->ConfigureChannel(mapping.channel);
+        adc1->ConfigureChannel(mapping.physical_channel, hf_adc_atten_t::ATTEN_DB_12);
 
         Logger::GetInstance().Info(TAG, "  Registered ADC: %.*s (unit=%u ch=%u div=%.1f)",
                                   static_cast<int>(entry.name.size()), entry.name.data(),
@@ -141,7 +143,7 @@ hf_adc_err_t AdcManager::ReadVoltage(std::string_view name, float& voltage, uint
     MutexLockGuard lock(mutex_);
 
     float raw_voltage = 0.0f;
-    hf_adc_err_t err = entry.driver->ReadVoltage(entry.hw_channel, raw_voltage, samples, 0);
+    hf_adc_err_t err = entry.driver->ReadChannelV(entry.hw_channel, raw_voltage, samples, 0);
     if (err == hf_adc_err_t::ADC_SUCCESS) {
         voltage = raw_voltage * entry.voltage_divider;
         entry.access_count++;
@@ -162,7 +164,7 @@ hf_adc_err_t AdcManager::ReadRaw(std::string_view name, uint32_t& raw_count, uin
     auto& entry = entries_[idx];
     MutexLockGuard lock(mutex_);
 
-    hf_adc_err_t err = entry.driver->ReadRaw(entry.hw_channel, raw_count, samples, 0);
+    hf_adc_err_t err = entry.driver->ReadChannelCount(entry.hw_channel, raw_count, samples, 0);
     if (err == hf_adc_err_t::ADC_SUCCESS) {
         entry.access_count++;
     } else {

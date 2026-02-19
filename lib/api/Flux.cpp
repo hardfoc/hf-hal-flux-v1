@@ -16,7 +16,9 @@
 #include "managers/LedManager.h"
 #include "managers/TemperatureManager.h"
 
-#include "core/hf-core-utils/hf-utils-rtos-wrap/include/OsAbstraction.h"
+extern "C" {
+#include "esp_timer.h"
+}
 
 static constexpr const char* TAG = "Flux";
 
@@ -34,19 +36,12 @@ Flux& Flux::GetInstance() noexcept {
 //==============================================================================
 
 Flux::Flux() noexcept
-    : comms_ref_(CommChannelsManager::GetInstance()),
-      gpio_ref_(GpioManager::GetInstance()),
-      valves_ref_(ValveManager::GetInstance()),
-      adc_ref_(AdcManager::GetInstance()),
-      leds_ref_(LedManager::GetInstance()),
-      temp_ref_(TemperatureManager::GetInstance()),
-      // Public references
-      comms(comms_ref_),
-      gpio(gpio_ref_),
-      valves(valves_ref_),
-      adc(adc_ref_),
-      leds(leds_ref_),
-      temp(temp_ref_) {
+    : comms(CommChannelsManager::GetInstance()),
+      gpio(GpioManager::GetInstance()),
+      valves(ValveManager::GetInstance()),
+      adc(AdcManager::GetInstance()),
+      leds(LedManager::GetInstance()),
+      temp(TemperatureManager::GetInstance()) {
 
     Logger::GetInstance().Initialize();
     Logger::GetInstance().Info(TAG, "Flux API singleton created (%s)", FLUX_HAL_VERSION_STRING);
@@ -60,11 +55,11 @@ bool Flux::EnsureInitialized() noexcept {
     if (initialized_) return true;
 
     Logger::GetInstance().Info(TAG, "Starting Flux API initialization");
-    initialization_start_time_ = OsAbstraction::GetTimeMs();
+    initialization_start_time_ = static_cast<uint64_t>(esp_timer_get_time() / 1000);
 
     bool success = InitializeAllComponents();
 
-    initialization_end_time_ = OsAbstraction::GetTimeMs();
+    initialization_end_time_ = static_cast<uint64_t>(esp_timer_get_time() / 1000);
 
     if (success) {
         initialized_ = true;
@@ -126,7 +121,7 @@ bool Flux::InitializeAllComponents() noexcept {
 }
 
 bool Flux::InitializeComms() noexcept {
-    bool ok = comms_ref_.EnsureInitialized();
+    bool ok = comms.EnsureInitialized();
     comms_initialized_ = ok;
     if (!ok && failed_components_count_ < kMaxFailedComponents)
         failed_components_[failed_components_count_++] = "CommChannelsManager";
@@ -134,7 +129,7 @@ bool Flux::InitializeComms() noexcept {
 }
 
 bool Flux::InitializeGpio() noexcept {
-    bool ok = gpio_ref_.EnsureInitialized();
+    bool ok = gpio.EnsureInitialized();
     gpio_initialized_ = ok;
     if (!ok && failed_components_count_ < kMaxFailedComponents)
         failed_components_[failed_components_count_++] = "GpioManager";
@@ -142,7 +137,7 @@ bool Flux::InitializeGpio() noexcept {
 }
 
 bool Flux::InitializeValves() noexcept {
-    bool ok = valves_ref_.EnsureInitialized();
+    bool ok = valves.EnsureInitialized();
     valves_initialized_ = ok;
     if (!ok && failed_components_count_ < kMaxFailedComponents)
         failed_components_[failed_components_count_++] = "ValveManager";
@@ -150,7 +145,7 @@ bool Flux::InitializeValves() noexcept {
 }
 
 bool Flux::InitializeAdc() noexcept {
-    bool ok = adc_ref_.EnsureInitialized();
+    bool ok = adc.EnsureInitialized();
     adc_initialized_ = ok;
     if (!ok && failed_components_count_ < kMaxFailedComponents)
         failed_components_[failed_components_count_++] = "AdcManager";
@@ -158,7 +153,7 @@ bool Flux::InitializeAdc() noexcept {
 }
 
 bool Flux::InitializeLeds() noexcept {
-    bool ok = leds_ref_.EnsureInitialized();
+    bool ok = leds.EnsureInitialized();
     leds_initialized_ = ok;
     if (!ok && failed_components_count_ < kMaxFailedComponents)
         failed_components_[failed_components_count_++] = "LedManager";
@@ -166,7 +161,7 @@ bool Flux::InitializeLeds() noexcept {
 }
 
 bool Flux::InitializeTemperature() noexcept {
-    bool ok = temp_ref_.EnsureInitialized();
+    bool ok = temp.EnsureInitialized();
     temp_initialized_ = ok;
     if (!ok && failed_components_count_ < kMaxFailedComponents)
         failed_components_[failed_components_count_++] = "TemperatureManager";
@@ -196,7 +191,7 @@ std::array<bool, 6> Flux::GetComponentInitializationStatus() const noexcept {
 }
 
 uint64_t Flux::GetSystemUptimeMs() const noexcept {
-    return OsAbstraction::GetTimeMs();
+    return static_cast<uint64_t>(esp_timer_get_time() / 1000);
 }
 
 uint64_t Flux::GetInitializationTimeMs() const noexcept {
@@ -217,12 +212,12 @@ void Flux::DumpSystemStatistics() const noexcept {
     Logger::GetInstance().Info(TAG, "Uptime: %llu ms  Init time: %llu ms",
                               GetSystemUptimeMs(), GetInitializationTimeMs());
 
-    comms_ref_.DumpStatistics();
-    gpio_ref_.DumpStatistics();
-    valves_ref_.DumpStatistics();
-    adc_ref_.DumpStatistics();
-    leds_ref_.DumpStatistics();
-    temp_ref_.DumpStatistics();
+    comms.DumpStatistics();
+    gpio.DumpStatistics();
+    valves.DumpStatistics();
+    adc.DumpStatistics();
+    leds.DumpStatistics();
+    temp.DumpStatistics();
 
     Logger::GetInstance().Info(TAG, "=== End Flux System Statistics ===");
 }

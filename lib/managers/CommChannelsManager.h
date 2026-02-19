@@ -147,7 +147,7 @@ public:
     //==========================================================================
 
     /** @brief Get the primary I2C bus. Returns nullptr if not initialized. */
-    BaseI2c* GetI2cBus() noexcept;
+    EspI2cBus* GetI2cBus() noexcept;
 
     //==========================================================================
     // CAN ACCESSOR

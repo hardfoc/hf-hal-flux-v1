@@ -115,11 +115,9 @@ bool ValveManager::InitializeMax22200() noexcept {
     max22200_ = handler;
 
     // Configure board settings
-    max22200::BoardConfig board_cfg{};
-    board_cfg.external_ref_resistor_ohms = 15000; // 15kΩ RREF
-    board_cfg.full_scale_current_ma      = 1000;  // 1A IFS
+    max22200::BoardConfig board_cfg(15.0f, false); // 15kΩ RREF, HFS=0 → IFS=1000mA
 
-    if (!handler->Initialize(board_cfg)) {
+    if (handler->Initialize(board_cfg) != max22200::DriverStatus::OK) {
         Logger::GetInstance().Error(TAG, "MAX22200 driver initialization failed");
         delete handler;
         max22200_storage_ = nullptr;
@@ -237,7 +235,7 @@ hf_valve_err_t ValveManager::EnableChannel(ValveChannel channel) noexcept {
         Logger::GetInstance().Error(TAG, "EnableChannel(%.*s) failed: %s",
             static_cast<int>(kValveChannelMap[static_cast<uint8_t>(channel)].name.size()),
             kValveChannelMap[static_cast<uint8_t>(channel)].name.data(),
-            HfValveErrName(result));
+            HfValveErrToString(result));
     }
     return result;
 }
@@ -271,7 +269,7 @@ hf_valve_err_t ValveManager::DisableChannel(ValveChannel channel) noexcept {
         Logger::GetInstance().Error(TAG, "DisableChannel(%.*s) failed: %s",
             static_cast<int>(kValveChannelMap[static_cast<uint8_t>(channel)].name.size()),
             kValveChannelMap[static_cast<uint8_t>(channel)].name.data(),
-            HfValveErrName(result));
+            HfValveErrToString(result));
     }
     return result;
 }
@@ -454,7 +452,7 @@ hf_valve_err_t ValveManager::ConfigureProportionalPwm(ValveChannel channel,
     MutexLockGuard lock(mutex_);
     auto result = driver->ConfigurePwmPeriod(
         static_cast<tle92466ed::Channel>(hw_ch), period_us);
-    if (result.ok()) {
+    if (result.has_value()) {
         channel_states_[static_cast<uint8_t>(channel)].pwm_frequency_hz = frequency_hz;
         return hf_valve_err_t::VALVE_SUCCESS;
     }
@@ -494,7 +492,7 @@ hf_valve_err_t ValveManager::ConfigureProportionalDither(ValveChannel channel,
     MutexLockGuard lock(mutex_);
     auto result = driver->ConfigureDither(
         static_cast<tle92466ed::Channel>(hw_ch), amplitude_ma, frequency_hz);
-    if (result.ok()) {
+    if (result.has_value()) {
         auto& state = channel_states_[static_cast<uint8_t>(channel)];
         state.dither_amplitude_ma = amplitude_ma;
         state.dither_frequency_hz = frequency_hz;

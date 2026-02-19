@@ -21,6 +21,7 @@
 #include <array>
 #include <atomic>
 #include <cstdint>
+#include <memory>
 #include <string_view>
 
 #include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/base/BaseGpio.h"
@@ -39,14 +40,14 @@
  * No heap allocation, no shared_ptr. The pin count is known at compile time.
  */
 struct GpioEntry {
-    EspGpio driver;                     ///< ESP32 GPIO driver instance (stack-allocated)
+    std::unique_ptr<EspGpio> driver; ///< ESP32 GPIO driver instance (heap-allocated)
     HfFunctionalGpioPin functional_pin; ///< Functional pin enum value
     bool registered{false};             ///< Whether this entry has been registered
     uint32_t access_count{0};           ///< Number of times accessed
     uint32_t error_count{0};            ///< Number of errors
 
     GpioEntry() noexcept
-        : driver(), functional_pin(HfFunctionalGpioPin::HF_FUNCTIONAL_GPIO_COUNT) {}
+        : driver(nullptr), functional_pin(HfFunctionalGpioPin::HF_FUNCTIONAL_GPIO_COUNT) {}
 };
 
 //==============================================================================

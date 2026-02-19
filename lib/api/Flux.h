@@ -171,13 +171,6 @@ private:
     const char* failed_components_[kMaxFailedComponents]{};
     size_t failed_components_count_{0};
 
-    // Private references to singletons
-    CommChannelsManager& comms_ref_;
-    GpioManager&         gpio_ref_;
-    ValveManager&        valves_ref_;
-    AdcManager&          adc_ref_;
-    LedManager&          leds_ref_;
-    TemperatureManager&  temp_ref_;
 };
 
 //==============================================================================

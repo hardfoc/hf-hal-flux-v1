@@ -212,7 +212,7 @@ public:
     [[nodiscard]] static uint32_t ColorWheel(uint8_t position) noexcept;
     void DumpStatistics() const noexcept;
     [[nodiscard]] gpio_num_t GetCurrentGpioPin() const noexcept { return current_led_gpio_; }
-    [[nodiscard]] uint32_t GetLedCount() const noexcept { return NUM_LEDS; }
+    [[nodiscard]] uint32_t GetLedCount() const noexcept { return kNumLeds; }
 
 private:
     LedManager() noexcept = default;
@@ -242,7 +242,7 @@ private:
     //==========================================================================
 
     static constexpr int    DEFAULT_RMT_CHANNEL         = 0;
-    static constexpr uint32_t NUM_LEDS                  = 1;
+    static constexpr uint32_t kNumLeds                  = 1;
     static constexpr uint8_t  DEFAULT_MAX_BRIGHTNESS    = 255;
     static constexpr uint32_t ANIMATION_UPDATE_INTERVAL = 50;   // ms
     static constexpr uint32_t BREATH_SPEED              = 5;
