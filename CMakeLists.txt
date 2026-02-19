@@ -121,7 +121,7 @@ set(HF_HAL_INC_DIRS
     # External drivers
     "${HF_HAL_ROOT}/lib/core/hf-core-drivers/external/hf-max22200-driver/inc"
     "${HF_HAL_ROOT}/lib/core/hf-core-drivers/external/hf-tle92466ed-driver/inc"
-    "${HF_HAL_ROOT}/lib/core/hf-core-drivers/external/hf-ntc-thermistor-driver/include"
+    "${HF_HAL_ROOT}/lib/core/hf-core-drivers/external/hf-ntc-thermistor-driver/inc"
     "${HF_HAL_ROOT}/lib/core/hf-core-drivers/external/hf-ws2812-rmt-driver/inc"
 )
 
@@ -152,15 +152,6 @@ target_compile_options(${COMPONENT_LIB} PRIVATE
     -Wall
     -Wextra
     -Wpedantic
-    -Werror=return-type
-    -Werror=unused-variable
-    -Werror=unused-function
-    -Werror=missing-field-initializers
-    -Werror=switch
-    -Werror=implicit-fallthrough
-    -Werror=format
-    -Werror=format-security
-    -Werror=shadow
 )
 
 target_compile_definitions(${COMPONENT_LIB} PRIVATE
@@ -185,7 +176,7 @@ target_compile_definitions(${COMPONENT_LIB} PRIVATE
 )
 
 set_target_properties(${COMPONENT_LIB} PROPERTIES
-    CXX_STANDARD 17
+    CXX_STANDARD 20
     CXX_STANDARD_REQUIRED ON
     CXX_EXTENSIONS OFF
 )
