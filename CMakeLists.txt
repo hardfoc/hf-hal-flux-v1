@@ -16,6 +16,10 @@ list(APPEND EXTRA_COMPONENT_DIRS "${HF_HAL_ROOT}/lib/api")
 # 1. CORE FEATURE CONFIGURATION — Enable only what Flux needs
 #==============================================================================
 
+# ── Platform Selection ────────────────────────────────────────────────────
+set(HF_CORE_MCU   "ESP32")              # MCU family (ESP32, STM32 future)
+set(HF_CORE_RTOS  "FREERTOS")           # RTOS (FREERTOS, THREADX future)
+
 # ── External Drivers + Handlers ───────────────────────────────────────────
 set(HF_CORE_ENABLE_MAX22200       ON)   # SPI high-side switch (valves)
 set(HF_CORE_ENABLE_TLE92466ED     ON)   # SPI solenoid driver (valves)

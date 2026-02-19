@@ -20,7 +20,7 @@
  *
  * Design principles (lessons from Vortex):
  *  - All channel descriptors are stack-allocated in fixed-size arrays.
- *  - Handler instances are owned by value where possible.
+ *  - Handler instances are heap-allocated (raw new, singleton lifetime).
  *  - No heap allocation for channel lookup — O(1) index-based access.
  *  - String lookups use linear scan over a small constexpr table.
  *  - Thread-safe via RtosMutex on state-changing operations.
@@ -458,7 +458,7 @@ private:
 
 
     //==========================================================================
-    // HANDLER INSTANCES — stack-owned through composition
+    // HANDLER INSTANCES — heap-allocated, owned by singleton (raw new)
     //==========================================================================
 
     // MAX22200 handler state

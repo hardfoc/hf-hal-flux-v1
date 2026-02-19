@@ -30,14 +30,17 @@
 #include "core/hf-core-drivers/internal/hf-pincfg/src/hf_functional_pin_config_flux_v1.hpp"
 
 //==============================================================================
-// GPIO ENTRY — stack-allocated, owns an EspGpio instance directly
+// GPIO ENTRY — owns an EspGpio instance via unique_ptr (heap-allocated)
 //==============================================================================
 
 /**
  * @brief A single GPIO entry in the fixed-size registry.
  *
- * Owns an EspGpio instance by value (stack allocation inside the singleton).
- * No heap allocation, no shared_ptr. The pin count is known at compile time.
+ * Owns an EspGpio instance via unique_ptr (heap-allocated, unique ownership).
+ * No shared_ptr. The GpioEntry structs themselves live in a fixed-size
+ * std::array inside the singleton (static storage). EspGpio is polymorphic
+ * and non-movable, so unique_ptr is needed for the driver instance.
+ * The pin count is known at compile time.
  */
 struct GpioEntry {
     std::unique_ptr<EspGpio> driver; ///< ESP32 GPIO driver instance (heap-allocated)

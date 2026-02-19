@@ -28,7 +28,8 @@
 #include "core/hf-core-drivers/internal/hf-pincfg/src/hf_functional_pin_config_flux_v1.hpp"
 
 //==============================================================================
-// ADC ENTRY — stack-allocated, owning an EspAdc by pointer (one per unit)
+// ADC ENTRY — struct is stack-allocated; EspAdc driver owned by singleton via
+//              raw new (heap-allocated, one per unit)
 //==============================================================================
 
 /**
@@ -142,7 +143,7 @@ private:
     [[nodiscard]] size_t FindByName(std::string_view name) const noexcept;
 
     //==========================================================================
-    // STORAGE — fixed-size, stack-allocated
+    // STORAGE — entries are fixed-size in static storage; EspAdc is heap-allocated
     //==========================================================================
 
     static constexpr size_t kMaxChannels =
@@ -153,7 +154,7 @@ private:
     size_t registered_count_{0};
 
     // EspAdc instances — only ADC1 used on ESP32-C6
-    // Allocated once; singleton lives forever.
+    // Heap-allocated once via raw new; singleton lives forever.
     void* esp_adc_storage_{nullptr};
 
     std::atomic<bool> initialized_{false};

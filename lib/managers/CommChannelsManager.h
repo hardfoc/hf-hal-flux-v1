@@ -9,7 +9,8 @@
  *          And I2C/CAN for future expansion.
  *
  *          Stack-based where possible: fixed-size arrays for known compile-time
- *          device counts, no heap vectors for bus/device lists.
+ *          device counts, no heap vectors for bus/device lists. Bus objects
+ *          are individually heap-allocated (raw new, singleton lifetime).
  *
  * @author HardFOC Team
  * @date 2026
@@ -169,7 +170,7 @@ private:
     bool Initialize() noexcept;
 
     //==========================================================================
-    // HARDWARE RESOURCES — all stack-friendly (unique_ptr to ESP-IDF objects)
+    // HARDWARE RESOURCES — heap-allocated via raw new (singleton lifetime)
     //==========================================================================
 
     static constexpr uint8_t kSpiDeviceCount = static_cast<uint8_t>(SpiDeviceId::DEVICE_COUNT);

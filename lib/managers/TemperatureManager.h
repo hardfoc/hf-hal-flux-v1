@@ -9,7 +9,8 @@
  *          No TMC9660 temperature sensor (Flux has no motor controller).
  *
  *          Stack-friendly design: fixed-size array of TempEntry structs,
- *          no heap vectors or unordered_maps.
+ *          no heap vectors or unordered_maps. Sensor driver instances are
+ *          individually heap-allocated (raw new, singleton lifetime).
  *
  * @author HardFOC Team
  * @date 2026
@@ -91,7 +92,7 @@ constexpr const char* FluxTempSensorTypeToString(FluxTempSensorType type) noexce
 }
 
 //==============================================================================
-// TEMPERATURE ENTRY — stack-allocated
+// TEMPERATURE ENTRY — stack-allocated metadata (drivers stored separately on heap)
 //==============================================================================
 
 struct TempEntry {
