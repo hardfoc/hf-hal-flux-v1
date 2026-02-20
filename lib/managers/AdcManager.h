@@ -25,7 +25,7 @@
 
 #include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/base/BaseAdc.h"
 #include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/mcu/esp32/EspAdc.h"
-#include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/utils/RtosMutex.h"
+#include "RtosMutex.h"
 #include "core/hf-core-drivers/internal/hf-pincfg/src/hf_functional_pin_config_flux_v1.hpp"
 
 //==============================================================================

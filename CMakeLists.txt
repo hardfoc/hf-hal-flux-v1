@@ -176,13 +176,19 @@ target_compile_definitions(${COMPONENT_LIB} PUBLIC
     CONFIG_WS2812_LED_RMT_TX_CHANNEL=0
 )
 
-# HAL-specific compile definitions (merged with core feature definitions)
-target_compile_definitions(${COMPONENT_LIB} PRIVATE
-    # Core feature definitions (from build settings)
+# Core feature definitions — PUBLIC because downstream code (e.g. main/)
+# includes core headers that use these in preprocessor guards.
+target_compile_definitions(${COMPONENT_LIB} PUBLIC
     ${HF_CORE_COMPILE_DEFINITIONS}
-    # HAL identity
+)
+
+# HAL-specific compile definitions (PRIVATE to this component)
+target_compile_definitions(${COMPONENT_LIB} PRIVATE
+    # HAL identity + board selection (drives pin config selector in core/)
     HARDFOC_HAL=1
     HARDFOC_FLUX_V1=1
+    HARDFOC_BOARD_FLUX_V1=1
+    HARDFOC_BOARD_SELECTED=1
     # HAL component flags
     HARDFOC_COMPONENT_HANDLER=1
     HARDFOC_GPIO_MANAGER=1
@@ -199,6 +205,29 @@ target_compile_definitions(${COMPONENT_LIB} PRIVATE
     HARDFOC_FLUX_API=1
     HARDFOC_DRIVER_HANDLERS=1
 )
+
+# MCU target auto-detection from IDF sdkconfig (required by McuSelect.h)
+if(CONFIG_IDF_TARGET_ESP32)
+    target_compile_definitions(${COMPONENT_LIB} PUBLIC
+        HF_TARGET_MCU_ESP32=1 HF_MCU_ESP32=1 HF_MCU_FAMILY_ESP32=1 HF_THREAD_SAFE=1 ESP32=1)
+elseif(CONFIG_IDF_TARGET_ESP32S3)
+    target_compile_definitions(${COMPONENT_LIB} PUBLIC
+        HF_TARGET_MCU_ESP32S3=1 HF_MCU_ESP32S3=1 HF_MCU_FAMILY_ESP32=1 HF_THREAD_SAFE=1 ESP32S3=1)
+elseif(CONFIG_IDF_TARGET_ESP32C6)
+    target_compile_definitions(${COMPONENT_LIB} PUBLIC
+        HF_TARGET_MCU_ESP32C6=1 HF_MCU_ESP32C6=1 HF_MCU_FAMILY_ESP32=1 HF_THREAD_SAFE=1 ESP32C6=1)
+elseif(CONFIG_IDF_TARGET_ESP32S2)
+    target_compile_definitions(${COMPONENT_LIB} PUBLIC
+        HF_TARGET_MCU_ESP32S2=1 HF_MCU_ESP32S2=1 HF_MCU_FAMILY_ESP32=1 HF_THREAD_SAFE=1 ESP32S2=1)
+elseif(CONFIG_IDF_TARGET_ESP32C3)
+    target_compile_definitions(${COMPONENT_LIB} PUBLIC
+        HF_TARGET_MCU_ESP32C3=1 HF_MCU_ESP32C3=1 HF_MCU_FAMILY_ESP32=1 HF_THREAD_SAFE=1 ESP32C3=1)
+elseif(CONFIG_IDF_TARGET_ESP32H2)
+    target_compile_definitions(${COMPONENT_LIB} PUBLIC
+        HF_TARGET_MCU_ESP32H2=1 HF_MCU_ESP32H2=1 HF_MCU_FAMILY_ESP32=1 HF_THREAD_SAFE=1 ESP32H2=1)
+else()
+    message(WARNING "[hf-hal-flux] Unknown IDF target — McuSelect.h may fail. Set HF_TARGET_MCU_* manually.")
+endif()
 
 # GNU++20 for Flux HAL (GNU extensions required because ESP-IDF HAL headers
 # use typeof/statement-expressions that require -std=gnu++20 not -std=c++20)

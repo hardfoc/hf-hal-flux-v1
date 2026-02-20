@@ -39,7 +39,7 @@
 #include <memory>
 #include <string_view>
 
-#include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/utils/RtosMutex.h"
+#include "RtosMutex.h"
 #include "handlers/max22200/Max22200Handler.h"
 #include "handlers/tle92466ed/Tle92466edHandler.h"
 

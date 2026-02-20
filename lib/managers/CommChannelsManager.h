@@ -37,7 +37,7 @@ class BaseCan;
 #include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/base/BaseSpi.h"
 #include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/base/BaseI2c.h"
 #include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/base/BaseCan.h"
-#include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/utils/RtosMutex.h"
+#include "RtosMutex.h"
 
 //==============================================================================
 // COMM CHANNELS ERROR CODES

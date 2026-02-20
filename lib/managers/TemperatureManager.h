@@ -30,7 +30,7 @@
 #include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/mcu/esp32/EspTemperature.h"
 #include "handlers/ntc/NtcTemperatureHandler.h"
 #include "handlers/logger/Logger.h"
-#include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/utils/RtosMutex.h"
+#include "RtosMutex.h"
 
 //==============================================================================
 // TEMPERATURE ERROR CODES
