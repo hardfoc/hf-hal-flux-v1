@@ -1,13 +1,13 @@
 ## IDF Component Manager Manifest File
 ## https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/tools/idf-component-manager.html
 version: "1.0.0"
-description: "HardFOC Flux V1 - ESP32-C6 HAL for valve control (MAX22200 solenoid + TLE92466ED proportional)"
+description: "HardFOC Flux V1 - ESP32-S3 HAL for valve control (MAX22200 solenoid + TLE92466ED proportional)"
 url: "https://github.com/HardFOC/hf-hal-flux-v1"
 repository: "https://github.com/HardFOC/hf-all-hals"
 documentation: "https://github.com/HardFOC/hf-all-hals/blob/main/hf-hal-flux-v1/README.md"
 issues: "https://github.com/HardFOC/hf-all-hals/issues"
 targets:
-  - esp32c6
+  - esp32s3
 tags:
   - hal
   - hardfoc

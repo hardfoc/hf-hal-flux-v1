@@ -1,6 +1,6 @@
 /**
  * @file valve_cycling_test.cpp
- * @brief Valve manager focused cycling test for ESP32-C6
+ * @brief Valve manager focused cycling test for ESP32-S3
  *
  * Deep-dive testing of ValveManager:
  *   - Solenoid channel enable/disable cycling (MAX22200)

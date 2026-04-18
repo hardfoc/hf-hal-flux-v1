@@ -198,6 +198,42 @@ uint64_t Flux::GetInitializationTimeMs() const noexcept {
     return (s && e && e >= s) ? (e - s) : 0;
 }
 
+bool Flux::CollectManagerHealth(ManagerHealthSnapshot& snapshot) noexcept {
+    if (!initialized_) return false;
+
+    snapshot = ManagerHealthSnapshot{};
+    snapshot.count = 6;
+    snapshot.all_healthy = true;
+    snapshot.managers_with_errors = 0;
+
+    auto addEntry = [&](size_t idx, const char* name, bool init, uint8_t err) {
+        snapshot.entries[idx].name = name;
+        snapshot.entries[idx].initialized = init;
+        snapshot.entries[idx].last_error_code = err;
+        snapshot.entries[idx].has_error = (err != 0);
+        if (err != 0) {
+            snapshot.all_healthy = false;
+            ++snapshot.managers_with_errors;
+        }
+        if (!init) {
+            snapshot.all_healthy = false;
+        }
+    };
+
+    // 1. CommChannelsManager — direct GetLastError()
+    addEntry(0, "CommChannels", comms_initialized_.load(),
+             static_cast<uint8_t>(comms.GetLastError()));
+
+    // 2-6: No public error accessors yet; report initialized status only
+    addEntry(1, "GPIO",        gpio_initialized_.load(),    0);
+    addEntry(2, "Valves",      valves_initialized_.load(),  0);
+    addEntry(3, "ADC",         adc_initialized_.load(),     0);
+    addEntry(4, "LEDs",        leds_initialized_.load(),    0);
+    addEntry(5, "Temperature", temp_initialized_.load(),    0);
+
+    return true;
+}
+
 void Flux::DumpSystemStatistics() const noexcept {
     if (!initialized_) {
         Logger::GetInstance().Warn(TAG, "Not initialized — cannot dump stats");
@@ -223,19 +259,28 @@ void Flux::DumpSystemStatistics() const noexcept {
 bool Flux::PerformHealthCheck() noexcept {
     if (!initialized_) return false;
 
-    bool healthy = comms_initialized_ && gpio_initialized_ && valves_initialized_ &&
-                   adc_initialized_ && leds_initialized_ && temp_initialized_;
+    // Collect per-manager error health
+    ManagerHealthSnapshot health{};
+    CollectManagerHealth(health);
 
-    Logger::GetInstance().Info(TAG, "Health: %s  Comms=%s GPIO=%s Valves=%s ADC=%s LEDs=%s Temp=%s",
-        healthy ? "OK" : "DEGRADED",
-        comms_initialized_  ? "OK" : "FAIL",
-        gpio_initialized_   ? "OK" : "FAIL",
-        valves_initialized_ ? "OK" : "FAIL",
-        adc_initialized_    ? "OK" : "FAIL",
-        leds_initialized_   ? "OK" : "FAIL",
-        temp_initialized_   ? "OK" : "FAIL");
+    // Log per-manager status with error codes
+    for (size_t i = 0; i < health.count; ++i) {
+        const auto& e = health.entries[i];
+        if (!e.initialized) {
+            Logger::GetInstance().Error(TAG, "  %s: NOT INITIALIZED", e.name);
+        } else if (e.has_error) {
+            Logger::GetInstance().Warn(TAG, "  %s: ERROR (code %u)", e.name,
+                                      static_cast<unsigned>(e.last_error_code));
+        } else {
+            Logger::GetInstance().Info(TAG, "  %s: OK", e.name);
+        }
+    }
 
-    return healthy;
+    Logger::GetInstance().Info(TAG, "Health: %s (%zu/%zu managers healthy)",
+        health.all_healthy ? "OK" : "DEGRADED",
+        health.count - health.managers_with_errors, health.count);
+
+    return health.all_healthy;
 }
 
 const char* Flux::GetSystemVersion() const noexcept {

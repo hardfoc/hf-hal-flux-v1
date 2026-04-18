@@ -26,7 +26,7 @@ set(HF_CORE_ENABLE_TLE92466ED     ON)   # SPI solenoid driver (valves)
 set(HF_CORE_ENABLE_NTC_THERMISTOR ON)   # ADC temperature sensor
 set(HF_CORE_ENABLE_WS2812         ON)   # RMT LED strip
 set(HF_CORE_ENABLE_LOGGER         ON)   # Logging system
-set(HF_CORE_ENABLE_CAN            ON)   # CAN (TWAI) bus interface
+set(HF_CORE_ENABLE_CAN            ON)   # CAN/TWAI bus (CommChannelsManager)
 
 # ── Optional Utilities ────────────────────────────────────────────────────
 set(HF_CORE_ENABLE_UTILS_CANOPEN  ON)   # CANopen protocol helpers
@@ -77,11 +77,19 @@ set(HF_HAL_INC_DIRS
 # 4. COMPONENT REGISTRATION
 #==============================================================================
 
-idf_component_register(
-    SRCS          ${HF_HAL_SRCS}
-    INCLUDE_DIRS  ${HF_HAL_INC_DIRS}
-    REQUIRES      ${HF_CORE_IDF_REQUIRES}
-)
+if(COMMAND idf_component_register)
+    # ESP-IDF build — register as an IDF component
+    idf_component_register(
+        SRCS          ${HF_HAL_SRCS}
+        INCLUDE_DIRS  ${HF_HAL_INC_DIRS}
+        REQUIRES      ${HF_CORE_IDF_REQUIRES}
+    )
+else()
+    # Non-IDF build (host testing, CI, standalone CMake)
+    add_library(hf-hal-flux STATIC ${HF_HAL_SRCS})
+    target_include_directories(hf-hal-flux PUBLIC ${HF_HAL_INC_DIRS})
+    set(COMPONENT_LIB hf-hal-flux)
+endif()
 
 #==============================================================================
 # 5. COMPILE OPTIONS AND DEFINITIONS
@@ -118,7 +126,7 @@ target_compile_options(${COMPONENT_LIB} PRIVATE
     -Werror=memset-transposed-args
     -Werror=mismatched-dealloc
     -Werror=mismatched-new-delete
-    -Werror=missing-include-dirs
+    -Wno-error=missing-include-dirs
     -Werror=multichar
     -Werror=multistatement-macros
     -Werror=narrowing

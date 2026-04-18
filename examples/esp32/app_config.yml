@@ -2,7 +2,7 @@ version: "1.0"
 metadata:
   project: "ESP32 Flux HAL Examples"
   default_app: "flux_api_test"
-  target: "esp32c6"
+  target: "esp32s3"
   idf_versions: ["release/v5.5", "release/v5.4"]
   build_types: [["Debug", "Release"], ["Debug"]]
 
@@ -23,6 +23,34 @@ apps:
     source_file: "led_temp_test.cpp"
     category: "component"
     ci_enabled: true
+  adc_manager_example:
+    source_file: "AdcManagerExample.cpp"
+    category: "example"
+    ci_enabled: false
+  comm_channels_example:
+    source_file: "CommChannelsManagerExample.cpp"
+    category: "example"
+    ci_enabled: false
+  flux_api_example:
+    source_file: "FluxApiExample.cpp"
+    category: "example"
+    ci_enabled: false
+  gpio_manager_example:
+    source_file: "GpioManagerExample.cpp"
+    category: "example"
+    ci_enabled: false
+  led_manager_example:
+    source_file: "LedManagerExample.cpp"
+    category: "example"
+    ci_enabled: false
+  temperature_example:
+    source_file: "TemperatureManagerExample.cpp"
+    category: "example"
+    ci_enabled: false
+  valve_manager_example:
+    source_file: "ValveManagerExample.cpp"
+    category: "example"
+    ci_enabled: false
 
 build_config:
   build_types:

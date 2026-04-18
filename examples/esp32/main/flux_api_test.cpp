@@ -1,6 +1,6 @@
 /**
  * @file flux_api_test.cpp
- * @brief Comprehensive Flux HAL API test suite for ESP32-C6 (noexcept)
+ * @brief Comprehensive Flux HAL API test suite for ESP32-S3 (noexcept)
  *
  * This file exercises every public surface of the Flux singleton:
  *   - Full initialization sequence via EnsureInitialized()
@@ -111,9 +111,40 @@ static bool test_perform_health_check() noexcept {
   return true;
 }
 
+static bool test_collect_manager_health() noexcept {
+  auto& flux = FLUX_API;
+  flux.EnsureInitialized();
+
+  ManagerHealthSnapshot health{};
+  bool ok = flux.CollectManagerHealth(health);
+  if (!ok) return false;
+
+  // Should report 6 managers for Flux
+  if (health.count != 6) return false;
+
+  // Every entry should have a non-null name
+  for (size_t i = 0; i < health.count; ++i) {
+    if (health.entries[i].name == nullptr) return false;
+  }
+  return true;
+}
+
 //=============================================================================
 // COMMS TESTS
 //=============================================================================
+
+static bool test_comms_get_last_error() noexcept {
+  auto& comms = FLUX_API.comms;
+  [[maybe_unused]] CommError err = comms.GetLastError();
+  return true;
+}
+
+static bool test_comms_system_diagnostics() noexcept {
+  auto& comms = FLUX_API.comms;
+  CommSystemDiagnostics diag{};
+  [[maybe_unused]] auto err = comms.GetSystemDiagnostics(diag);
+  return true;
+}
 
 static bool test_comms_spi_available() noexcept {
   auto& comms = FLUX_API.comms;
@@ -281,10 +312,13 @@ extern "C" void app_main(void) {
     RUN_TEST(test_get_system_diagnostics);
     RUN_TEST(test_component_init_status);
     RUN_TEST(test_perform_health_check);
+    RUN_TEST(test_collect_manager_health);
   );
 
   // ── Comms ───────────────────────────────────────────────────────────────
   RUN_TEST_SECTION_IF_ENABLED(ENABLE_COMMS_TESTS, "COMMUNICATION CHANNELS",
+    RUN_TEST(test_comms_get_last_error);
+    RUN_TEST(test_comms_system_diagnostics);
     RUN_TEST(test_comms_spi_available);
   );
 

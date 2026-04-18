@@ -84,6 +84,23 @@ constexpr const char* CommErrorToString(CommError error) noexcept {
 }
 
 //==============================================================================
+// COMM CHANNELS DIAGNOSTICS
+//==============================================================================
+
+/**
+ * @brief System-level diagnostics snapshot for communication channels.
+ */
+struct CommSystemDiagnostics {
+    bool system_healthy;
+    bool system_initialized;
+    bool spi_bus_valid;
+    bool i2c_bus_valid;
+    bool can_bus_valid;
+    uint8_t spi_device_count;       ///< Number of SPI devices with valid indices
+    CommError last_error;
+};
+
+//==============================================================================
 // SPI DEVICE IDENTIFIERS
 //==============================================================================
 
@@ -127,6 +144,19 @@ public:
 
     bool EnsureInitialized() noexcept;
     [[nodiscard]] bool IsInitialized() const noexcept { return initialized_.load(std::memory_order_acquire); }
+
+    /**
+     * @brief Get the most recent error code.
+     * @return Last CommError set by any API call
+     */
+    [[nodiscard]] CommError GetLastError() const noexcept { return last_error_.load(std::memory_order_acquire); }
+
+    /**
+     * @brief Fill a diagnostics snapshot with current system state.
+     * @param diagnostics Output structure to populate
+     * @return CommError::SUCCESS on success, CommError::NOT_INITIALIZED if not init
+     */
+    [[nodiscard]] CommError GetSystemDiagnostics(CommSystemDiagnostics& diagnostics) const noexcept;
 
     /**
      * @brief Release all bus resources and reset to uninitialized state.
@@ -190,7 +220,12 @@ private:
     bool can_bus_valid_{false};
 
     std::atomic<bool> initialized_{false};
+    std::atomic<CommError> last_error_{CommError::SUCCESS};
     mutable RtosMutex mutex_;
+
+    void UpdateLastError(CommError error) noexcept {
+        last_error_.store(error, std::memory_order_release);
+    }
 };
 
 #endif // FLUX_COMM_CHANNELS_MANAGER_H_

@@ -85,6 +85,50 @@ struct FluxSystemDiagnostics {
 };
 
 //==============================================================================
+// MANAGER HEALTH SNAPSHOT
+//==============================================================================
+
+/**
+ * @brief Per-manager health entry for unified error aggregation
+ */
+struct ManagerHealthEntry {
+    const char* name;           ///< Manager name (string literal)
+    bool initialized;           ///< Whether manager is initialized
+    bool has_error;             ///< Whether last error is non-zero
+    uint8_t last_error_code;    ///< Last error code (0 = success, enum-specific otherwise)
+
+    ManagerHealthEntry() noexcept
+        : name(nullptr), initialized(false), has_error(false), last_error_code(0) {}
+};
+
+/**
+ * @brief Aggregated health snapshot across all Flux managers
+ *
+ * @details Provides a unified view of errors across all component managers.
+ *          Error codes are cast to uint8_t; interpretation requires knowledge
+ *          of the originating manager's error enum.
+ *
+ * Supported error sources per manager:
+ *   CommChannels  — CommError via GetLastError()
+ *   GPIO          — init-status only (no public error accessor)
+ *   Valves        — init-status only (no public error accessor)
+ *   ADC           — init-status only (no public error accessor)
+ *   LEDs          — init-status only (no public error accessor)
+ *   Temperature   — init-status only (no public error accessor)
+ */
+struct ManagerHealthSnapshot {
+    static constexpr size_t kMaxManagers = 6;
+
+    ManagerHealthEntry entries[kMaxManagers];    ///< Per-manager entries
+    size_t count;                                ///< Number of populated entries
+    size_t managers_with_errors;                 ///< Count of managers reporting errors
+    bool all_healthy;                            ///< True if no errors and all initialized
+
+    ManagerHealthSnapshot() noexcept
+        : entries{}, count(0), managers_with_errors(0), all_healthy(true) {}
+};
+
+//==============================================================================
 // FLUX API CLASS
 //==============================================================================
 
@@ -115,6 +159,14 @@ public:
 
     [[nodiscard]] bool GetSystemDiagnostics(FluxSystemDiagnostics& diagnostics) const noexcept;
     [[nodiscard]] std::array<bool, 6> GetComponentInitializationStatus() const noexcept;
+
+    /**
+     * @brief Collect per-manager error health into a unified snapshot
+     * @param snapshot Reference to snapshot structure to fill
+     * @return true if snapshot collected successfully, false if not initialized
+     * @note Error codes are manager-specific uint8_t values (0 = success)
+     */
+    [[nodiscard]] bool CollectManagerHealth(ManagerHealthSnapshot& snapshot) noexcept;
 
     //==========================================================================
     // COMPONENT ACCESS (public references to singletons)

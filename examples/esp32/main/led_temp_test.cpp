@@ -1,6 +1,6 @@
 /**
  * @file led_temp_test.cpp
- * @brief LED & Temperature focused test for Flux ESP32-C6
+ * @brief LED & Temperature focused test for Flux ESP32-S3
  *
  * Deep-dive testing of LedManager and TemperatureManager on Flux:
  *   - LED status, color, brightness, animation
