@@ -12,18 +12,19 @@
 
 The HardFOC Flux HAL follows the same development standards as the Vortex HAL. The authoritative development guides live in the **[hf-hal-vortex-v1 docs/development/](https://github.com/hardfoc/hf-hal-vortex-v1/tree/main/docs/development)** directory and apply equally to both HALs.
 
-## 📚 Shared Development Guides
+## 📚 Development Guides
 
 | Guide | Description |
 |-------|-------------|
-| **Architecture Guidelines** | HAL layer architecture, singleton patterns, init flow |
-| **Coding Standards** | Naming conventions, formatting, comment style |
-| **Embedded Coding Standards** | ESP32 / FreeRTOS specific practices |
+| **[Architecture Guidelines](ARCHITECTURE_GUIDELINES.md)** | HAL layer architecture, singleton patterns, init flow |
+| **[Coding Standards](CODING_STANDARDS.md)** | Naming conventions, formatting, comment style |
+| **[Embedded Coding Standards](EMBEDDED_CODING_STANDARDS.md)** | ESP32 / FreeRTOS specific practices |
+| **[CMake Build Contract](CMAKE_BUILD_CONTRACT.md)** | 3-layer CMake architecture for all drivers |
+| **[Testing Requirements](TESTING_REQUIREMENTS.md)** | On-target test framework, coverage expectations |
 | **BaseInterface Reference** | `BaseGpio`, `BaseAdc`, `BaseTemperature` contracts |
 | **Component Manifest Guide** | `idf_component.yml` structure and versioning |
 | **Documentation Standards** | README templates, Doxygen annotations |
 | **Performance Optimization** | String lookups vs cached access patterns |
-| **Testing Requirements** | On-target test framework, coverage expectations |
 
 ## 🔧 Flux-Specific Conventions
 

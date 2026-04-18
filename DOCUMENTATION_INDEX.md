@@ -203,7 +203,11 @@ Doxygen API docs and Jekyll site are configured under `_config/`:
 ## 🛠️ Development and Contributing
 
 ### Development Guidelines
-- Follow the coding standards established in the [HardFOC Vortex docs](https://hardfoc.github.io/hf-hal-vortex-v1)
+- **[📝 Coding Standards](docs/development/CODING_STANDARDS.md)** — Code style and conventions
+- **[🏗️ Architecture Guidelines](docs/development/ARCHITECTURE_GUIDELINES.md)** — System design principles
+- **[🔧 CMake Build Contract](docs/development/CMAKE_BUILD_CONTRACT.md)** — Build system rules and targets
+- **[🧪 Testing Requirements](docs/development/TESTING_REQUIREMENTS.md)** — Test coverage and quality
+- **[⚡ Embedded Coding Standards](docs/development/EMBEDDED_CODING_STANDARDS.md)** — Embedded-specific best practices
 - All managers return `bool` from `EnsureInitialized()`
 - Use `CommError` enum for communication failures in `CommChannelsManager`
 - Thread-safe access via RTOS mutexes in all handlers

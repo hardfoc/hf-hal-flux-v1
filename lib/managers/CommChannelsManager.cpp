@@ -56,7 +56,8 @@ bool CommChannelsManager::Initialize() noexcept {
     Logger::GetInstance().Info(TAG, "Initializing Flux V1 communication channels");
 
     //==========================================================================
-    // SPI BUS (SPI2_HOST) — shared by MAX22200 and TLE92466ED
+    // SPI BUS (SPI3_HOST) — shared by MAX22200 and TLE92466ED
+    // Note: GPIO35-38 use SPI3_HOST via GPIO matrix (SPI3 has no IOMUX pins)
     //==========================================================================
     {
         auto* miso_map = GetGpioMapping(HfFunctionalGpioPin::SPI2_MISO);
@@ -65,13 +66,13 @@ bool CommChannelsManager::Initialize() noexcept {
 
         if (miso_map && mosi_map && sck_map) {
             hf_spi_bus_config_t spi_cfg = {};
-            spi_cfg.host      = static_cast<hf_host_id_t>(1); // SPI2_HOST
+            spi_cfg.host      = static_cast<hf_host_id_t>(2); // SPI3_HOST (GPIO matrix, no IOMUX)
             spi_cfg.miso_pin  = miso_map->physical_pin;
             spi_cfg.mosi_pin  = mosi_map->physical_pin;
             spi_cfg.sclk_pin  = sck_map->physical_pin;
             spi_cfg.dma_channel = 0;   // auto-select
             spi_cfg.timeout_ms  = 1000;
-            spi_cfg.use_iomux   = true;
+            spi_cfg.use_iomux   = false; // GPIO matrix for SPI3
 
             spi_bus_ = hf::utils::make_unique_nothrow<EspSpiBus>(spi_cfg);
             if (spi_bus_ && spi_bus_->Initialize()) {
@@ -112,7 +113,8 @@ bool CommChannelsManager::Initialize() noexcept {
     }
 
     //==========================================================================
-    // SPI3 BUS (SPI3_HOST) — dedicated bus for ADS7952 external ADC
+    // SPI2 BUS (SPI2_HOST) — dedicated bus for ADS7952 external ADC
+    // Note: GPIO10-13 are native IOMUX pins for SPI2_HOST on ESP32-S3
     //==========================================================================
 #ifdef HARDFOC_ADS7952_SUPPORT
     {
@@ -122,13 +124,13 @@ bool CommChannelsManager::Initialize() noexcept {
 
         if (miso_map && mosi_map && sck_map) {
             hf_spi_bus_config_t spi3_cfg = {};
-            spi3_cfg.host      = static_cast<hf_host_id_t>(2); // SPI3_HOST
+            spi3_cfg.host      = static_cast<hf_host_id_t>(1); // SPI2_HOST (GPIO10-13 are native IOMUX)
             spi3_cfg.miso_pin  = miso_map->physical_pin;
             spi3_cfg.mosi_pin  = mosi_map->physical_pin;
             spi3_cfg.sclk_pin  = sck_map->physical_pin;
             spi3_cfg.dma_channel = 0;   // auto-select
             spi3_cfg.timeout_ms  = 1000;
-            spi3_cfg.use_iomux   = false;
+            spi3_cfg.use_iomux   = true; // Native IOMUX for SPI2 on GPIO10-13
 
             spi3_bus_ = hf::utils::make_unique_nothrow<EspSpiBus>(spi3_cfg);
             if (spi3_bus_ && spi3_bus_->Initialize()) {
