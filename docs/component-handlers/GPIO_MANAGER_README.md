@@ -75,6 +75,30 @@ gpio.Set(HfFunctionalGpioPin::kValveEnable, true);
 bool fault = gpio.Read(HfFunctionalGpioPin::kFaultN);
 ```
 
+## 🚨 Error Codes
+
+### `hf_gpio_err_t` Error Code Reference
+
+| Category | Codes | Description |
+|----------|-------|-------------|
+| **General** | `GPIO_SUCCESS` (0) | Operation completed successfully |
+| | `GPIO_ERR_FAILURE` (1) | General failure |
+| | `GPIO_ERR_NOT_INITIALIZED` (2) | Not initialized |
+| **Parameter** | `GPIO_ERR_INVALID_PARAMETER` (4) | Invalid parameter |
+| | `GPIO_ERR_NULL_POINTER` (5) | Null pointer |
+| **Pin** | `GPIO_ERR_INVALID_PIN` (7) | Invalid pin |
+| | `GPIO_ERR_PIN_NOT_FOUND` (8) | Pin not found |
+| | `GPIO_ERR_PIN_NOT_CONFIGURED` (9) | Pin not configured |
+| | `GPIO_ERR_DIRECTION_MISMATCH` (24) | Direction mismatch |
+| **Hardware** | `GPIO_ERR_HARDWARE_FAULT` (13) | Hardware fault |
+| | `GPIO_ERR_READ_FAILURE` (22) | Read failure |
+| | `GPIO_ERR_WRITE_FAILURE` (23) | Write failure |
+| **System** | `GPIO_ERR_TIMEOUT` (16) | Timeout |
+| | `GPIO_ERR_DRIVER_ERROR` (34) | Driver error |
+| | `GPIO_ERR_UNKNOWN` (38) | Unknown error |
+
+> Full enum: see `hf_gpio_err_t` in `BaseGpio.h` (39 values covering pin, interrupt, and system errors).
+
 ## ⚠️ Notes
 
 - All `GpioEntry` structs including their `EspGpio` driver are stack-allocated — zero heap usage

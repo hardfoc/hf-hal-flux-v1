@@ -18,7 +18,7 @@ description: |
   valve control, sensor management, and communication interface. Provides
   unified APIs for MAX22200 solenoid drivers, TLE92466ED proportional valve
   drivers, ADS7952 ADC, NTC thermistor monitoring, WS2812 LED control, and
-  full ESP32-C6 integration with RTOS support.
+  full ESP32-S3 integration with RTOS support.
 
 # ─── External Links ───────────────────────────────────────────────────────────
 url: "https://github.com/hardfoc/hf-hal-flux-v1"
@@ -51,12 +51,12 @@ tags:
   - "adc"               # ADC functionality
   - "rtos"              # RTOS integration
   - "flux-v1"           # Flux V1 platform
-  - "esp32c6"           # ESP32-C6 target
+  - "esp32s3"           # ESP32-S3 target
   - "embedded"          # Embedded systems
 
 # ─── Supported Targets ───────────────────────────────────────────────────────
 targets:
-  - esp32c6             # Primary target - HardFOC Flux V1 platform
+  - esp32s3             # Primary target - HardFOC Flux V1 platform
 
 # ─── Dependencies ────────────────────────────────────────────────────────────
 dependencies:
@@ -127,7 +127,7 @@ files:
 #
 #  2. Managers (lib/managers/)
 #     - CommChannelsManager: SPI, I2C, CAN interfaces
-#     - GpioManager: ESP32-C6 GPIO management
+#     - GpioManager: ESP32-S3 GPIO management
 #     - ValveManager: MAX22200 solenoid + TLE92466ED proportional control
 #     - AdcManager: ESP32 internal + ADS7952 external ADC
 #     - LedManager: WS2812 LED control

@@ -84,24 +84,38 @@ valves.DumpStatistics();
 
 ```cpp
 hf_valve_err_t err = valves.SetChannel(0, true);
-if (err != HF_VALVE_OK) {
-    // Error codes map to underlying driver errors
-    // HF_VALVE_ERR_NOT_INITIALIZED, HF_VALVE_ERR_INVALID_CHANNEL,
-    // HF_VALVE_ERR_DRIVER_FAULT, HF_VALVE_ERR_COMM_FAILURE, etc.
+if (err != hf_valve_err_t::VALVE_SUCCESS) {
+    // See error table below
 }
 ```
 
 ## 🔢 Error Codes (`hf_valve_err_t`)
 
-| Code | Meaning |
-|------|---------|
-| `HF_VALVE_OK` | Success |
-| `HF_VALVE_ERR_NOT_INITIALIZED` | Manager not initialized |
-| `HF_VALVE_ERR_INVALID_CHANNEL` | Channel index out of range |
-| `HF_VALVE_ERR_DRIVER_FAULT` | Driver IC reported a fault |
-| `HF_VALVE_ERR_COMM_FAILURE` | SPI communication error |
-| `HF_VALVE_ERR_OVERCURRENT` | Over-current detected |
-| `HF_VALVE_ERR_OVERTEMP` | Over-temperature shutdown |
+| Category | Code | Value | Description |
+|----------|------|-------|-------------|
+| **General** | `VALVE_SUCCESS` | 0 | Success |
+| | `VALVE_ERR_NOT_INITIALIZED` | 1 | Manager not initialized |
+| | `VALVE_ERR_DRIVER_NOT_AVAILABLE` | 2 | Driver not available |
+| | `VALVE_ERR_INVALID_CHANNEL` | 3 | Channel index out of range |
+| | `VALVE_ERR_CHANNEL_TYPE_MISMATCH` | 4 | Channel type mismatch |
+| | `VALVE_ERR_INVALID_PARAMETER` | 5 | Invalid parameter |
+| | `VALVE_ERR_NULL_POINTER` | 6 | Null pointer |
+| **SPI** | `VALVE_ERR_SPI_BUS_ERROR` | 10 | SPI bus error |
+| | `VALVE_ERR_SPI_TIMEOUT` | 11 | SPI timeout |
+| | `VALVE_ERR_SPI_TRANSFER_FAILED` | 12 | SPI transfer failed |
+| | `VALVE_ERR_SPI_CRC_ERROR` | 13 | SPI CRC error |
+| | `VALVE_ERR_SPI_FRAME_ERROR` | 14 | SPI frame error |
+| **Driver** | `VALVE_ERR_HARDWARE_FAULT` | 20 | Hardware fault |
+| | `VALVE_ERR_DEVICE_NOT_RESPONDING` | 21 | Device not responding |
+| | `VALVE_ERR_WRONG_DEVICE_ID` | 22 | Wrong device ID |
+| | `VALVE_ERR_REGISTER_ERROR` | 23 | Register error |
+| | `VALVE_ERR_CONFIGURATION_ERROR` | 24 | Configuration error |
+| | `VALVE_ERR_WRONG_MODE` | 25 | Wrong mode |
+| | `VALVE_ERR_WRITE_TO_READ_ONLY` | 26 | Write to read-only register |
+| | `VALVE_ERR_TIMEOUT` | 27 | Timeout |
+| **Manager** | `VALVE_ERR_MUTEX_TIMEOUT` | 30 | Mutex timeout |
+| | `VALVE_ERR_DEPENDENCY_NOT_READY` | 31 | Dependency not ready |
+| | `VALVE_ERR_UNKNOWN` | 255 | Unknown error |
 
 ## ⚠️ Notes
 

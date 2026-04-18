@@ -72,6 +72,24 @@ auto diag = temp.GetSystemDiagnostics();
 temp.DumpStatistics();
 ```
 
+## 🚨 Error Codes
+
+### TemperatureError Reference
+
+| Code | Value | Description |
+|------|-------|-------------|
+| `SUCCESS` | 0 | Operation completed successfully |
+| `NOT_INITIALIZED` | 1 | Manager not yet initialised |
+| `INITIALIZATION_FAILED` | 2 | Sensor initialisation failed |
+| `SENSOR_NOT_FOUND` | 3 | Named sensor does not exist in registry |
+| `SENSOR_NOT_AVAILABLE` | 4 | Sensor exists but is unavailable |
+| `READ_FAILED` | 5 | Driver-level read returned an error |
+| `INVALID_PARAMETER` | 6 | Null pointer or out-of-range argument |
+| `NO_SENSORS_AVAILABLE` | 7 | No sensors were registered at init |
+| `ALLOCATION_FAILED` | 8 | Heap allocation for a sensor driver failed |
+| `DEPENDENCY_NOT_READY` | 9 | Required dependency not initialised |
+| `MUTEX_LOCK_FAILED` | 10 | RTOS mutex acquire timed out |
+
 ## ⚠️ Notes
 
 - Sensor drivers are allocated once at init via `new (std::nothrow)` into `void*` storage — singleton lifetime
