@@ -106,11 +106,13 @@ struct CommSystemDiagnostics {
 
 /**
  * @brief SPI device identifiers for the Flux V1 board.
- * @details The order matches the CS pin configuration in the CommChannelsManager.
+ * @details SPI2 bus: MAX22200 + TLE92466ED (shared bus, valves)
+ *          SPI3 bus: ADS7952 ADC devices (dedicated bus, external ADC)
  */
 enum class SpiDeviceId : uint8_t {
-    MAX22200_SOLENOID_DRIVER = 0,   ///< MAX22200 octal solenoid driver (SPI Mode 0)
-    TLE92466_LOWSIDE_DRIVER = 1,    ///< TLE92466ED six-channel driver (SPI Mode 1)
+    MAX22200_SOLENOID_DRIVER = 0,   ///< MAX22200 octal solenoid driver (SPI2, Mode 0)
+    TLE92466_LOWSIDE_DRIVER = 1,    ///< TLE92466ED six-channel driver (SPI2, Mode 1)
+    ADS7952_ADC_0 = 2,              ///< ADS7952 12-ch ADC device 0 (SPI3, Mode 0)
     DEVICE_COUNT                     ///< Sentinel — total number of SPI devices
 };
 
@@ -206,10 +208,18 @@ private:
 
     static constexpr uint8_t kSpiDeviceCount = static_cast<uint8_t>(SpiDeviceId::DEVICE_COUNT);
 
-    // SPI bus + device indices (populated by EspSpiBus)
+    // SPI2 bus (valve drivers: MAX22200 + TLE92466ED)
     std::unique_ptr<EspSpiBus> spi_bus_;
-    std::array<int, kSpiDeviceCount> spi_device_indices_{};
     bool spi_bus_valid_{false};
+
+    // SPI3 bus (ADS7952 external ADC — dedicated bus)
+    std::unique_ptr<EspSpiBus> spi3_bus_;
+    bool spi3_bus_valid_{false};
+
+    // Device indices: tracks device across both buses
+    std::array<int, kSpiDeviceCount> spi_device_indices_{};
+    // Which bus owns each device (0=spi_bus_, 1=spi3_bus_)
+    std::array<uint8_t, kSpiDeviceCount> spi_device_bus_{};
 
     // I2C bus placeholder for future expansion
     std::unique_ptr<EspI2cBus> i2c_bus_;
@@ -226,6 +236,9 @@ private:
     void UpdateLastError(CommError error) noexcept {
         last_error_.store(error, std::memory_order_release);
     }
+
+    /** @brief Resolve the bus pointer for a device index. */
+    EspSpiBus* GetBusForDevice(uint8_t device_index) noexcept;
 };
 
 #endif // FLUX_COMM_CHANNELS_MANAGER_H_

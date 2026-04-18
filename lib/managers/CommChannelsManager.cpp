@@ -32,6 +32,7 @@ CommChannelsManager& CommChannelsManager::GetInstance() noexcept {
 
 CommChannelsManager::CommChannelsManager() noexcept {
     spi_device_indices_.fill(-1);
+    spi_device_bus_.fill(0);
 }
 
 //==============================================================================
@@ -111,6 +112,52 @@ bool CommChannelsManager::Initialize() noexcept {
     }
 
     //==========================================================================
+    // SPI3 BUS (SPI3_HOST) — dedicated bus for ADS7952 external ADC
+    //==========================================================================
+#ifdef HARDFOC_ADS7952_SUPPORT
+    {
+        auto* miso_map = GetGpioMapping(HfFunctionalGpioPin::SPI3_MISO);
+        auto* mosi_map = GetGpioMapping(HfFunctionalGpioPin::SPI3_MOSI);
+        auto* sck_map  = GetGpioMapping(HfFunctionalGpioPin::SPI3_SCK);
+
+        if (miso_map && mosi_map && sck_map) {
+            hf_spi_bus_config_t spi3_cfg = {};
+            spi3_cfg.host      = static_cast<hf_host_id_t>(2); // SPI3_HOST
+            spi3_cfg.miso_pin  = miso_map->physical_pin;
+            spi3_cfg.mosi_pin  = mosi_map->physical_pin;
+            spi3_cfg.sclk_pin  = sck_map->physical_pin;
+            spi3_cfg.dma_channel = 0;   // auto-select
+            spi3_cfg.timeout_ms  = 1000;
+            spi3_cfg.use_iomux   = false;
+
+            spi3_bus_ = hf::utils::make_unique_nothrow<EspSpiBus>(spi3_cfg);
+            if (spi3_bus_ && spi3_bus_->Initialize()) {
+                spi3_bus_valid_ = true;
+
+                // Device 0: ADS7952 — SPI Mode 0, 20 MHz (ADS7952 supports up to 20 MHz)
+                auto* cs_adc_map = GetGpioMapping(HfFunctionalGpioPin::SPI3_CS_ADS7952_0);
+                if (cs_adc_map) {
+                    hf_spi_device_config_t dev_cfg = {};
+                    dev_cfg.cs_pin          = cs_adc_map->physical_pin;
+                    dev_cfg.clock_speed_hz  = 20'000'000;
+                    dev_cfg.mode            = hf_spi_mode_t::HF_SPI_MODE_0;
+                    int idx = spi3_bus_->CreateDevice(dev_cfg);
+                    spi_device_indices_[static_cast<uint8_t>(SpiDeviceId::ADS7952_ADC_0)] = idx;
+                    spi_device_bus_[static_cast<uint8_t>(SpiDeviceId::ADS7952_ADC_0)] = 1; // SPI3
+                    Logger::GetInstance().Info(TAG, "ADS7952 SPI device added (CS=GPIO%d, idx=%d, SPI3)",
+                                              cs_adc_map->physical_pin, idx);
+                }
+            } else {
+                Logger::GetInstance().Warn(TAG, "SPI3 bus initialization failed — ADS7952 unavailable");
+                spi3_bus_.reset();
+            }
+        } else {
+            Logger::GetInstance().Warn(TAG, "SPI3 pin mapping missing — ADS7952 unavailable");
+        }
+    }
+#endif // HARDFOC_ADS7952_SUPPORT
+
+    //==========================================================================
     // CAN (TWAI) BUS — for valve network communication
     //==========================================================================
     {
@@ -182,11 +229,22 @@ BaseSpi* CommChannelsManager::GetSpiDevice(SpiDeviceId device_id) noexcept {
 }
 
 BaseSpi* CommChannelsManager::GetSpiDevice(uint8_t device_index) noexcept {
-    if (!initialized_.load(std::memory_order_acquire) || !spi_bus_valid_) return nullptr;
+    if (!initialized_.load(std::memory_order_acquire)) return nullptr;
     if (device_index >= kSpiDeviceCount) return nullptr;
     int idx = spi_device_indices_[device_index];
     if (idx < 0) return nullptr;
-    return spi_bus_->GetDevice(idx);
+
+    EspSpiBus* bus = GetBusForDevice(device_index);
+    if (!bus) return nullptr;
+    return bus->GetDevice(idx);
+}
+
+EspSpiBus* CommChannelsManager::GetBusForDevice(uint8_t device_index) noexcept {
+    if (device_index >= kSpiDeviceCount) return nullptr;
+    uint8_t bus_id = spi_device_bus_[device_index];
+    if (bus_id == 0) return spi_bus_valid_ ? spi_bus_.get() : nullptr;
+    if (bus_id == 1) return spi3_bus_valid_ ? spi3_bus_.get() : nullptr;
+    return nullptr;
 }
 
 //==============================================================================
@@ -255,6 +313,10 @@ bool CommChannelsManager::Deinitialize() noexcept {
     // Release SPI bus
     spi_bus_.reset();
     spi_bus_valid_ = false;
+
+    // Release SPI3 bus (ADS7952)
+    spi3_bus_.reset();
+    spi3_bus_valid_ = false;
 
     // Release I2C bus
     i2c_bus_.reset();

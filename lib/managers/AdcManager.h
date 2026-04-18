@@ -28,6 +28,11 @@
 #include "RtosMutex.h"
 #include "core/hf-core-drivers/internal/hf-pincfg/src/hf_functional_pin_config_flux_v1.hpp"
 
+// Forward declaration for ADS7952 handler (conditionally compiled)
+#ifdef HARDFOC_ADS7952_SUPPORT
+class Ads7952Handler;
+#endif
+
 //==============================================================================
 // ADC ENTRY — struct is stack-allocated; EspAdc driver owned by singleton via
 //              unique_ptr (heap-allocated, one per unit)
@@ -109,7 +114,7 @@ public:
 
     /**
      * @brief Read voltage from a channel by name (already divided if divider > 1).
-     * @param name       Channel name
+     * @param name       Channel name (linear string search — use enum overload in tight loops)
      * @param voltage    Output: voltage at the input, if divider == 1, or bus voltage
      * @param samples    Number of samples to average (default 1)
      * @return ADC error code
@@ -118,13 +123,33 @@ public:
                                            uint8_t samples = 1) noexcept;
 
     /**
+     * @brief Read voltage from a channel by enum — O(1) lookup, preferred for real-time paths.
+     * @param channel    Functional ADC channel enum
+     * @param voltage    Output: voltage at the input, if divider == 1, or bus voltage
+     * @param samples    Number of samples to average (default 1)
+     * @return ADC error code
+     */
+    [[nodiscard]] hf_adc_err_t ReadVoltage(HfFunctionalAdcChannel channel, float& voltage,
+                                           uint8_t samples = 1) noexcept;
+
+    /**
      * @brief Read raw ADC count from a channel by name.
-     * @param name       Channel name
+     * @param name       Channel name (linear string search — use enum overload in tight loops)
      * @param raw_count  Output: raw ADC count
      * @param samples    Number of samples to average (default 1)
      * @return ADC error code
      */
     [[nodiscard]] hf_adc_err_t ReadRaw(std::string_view name, uint32_t& raw_count,
+                                       uint8_t samples = 1) noexcept;
+
+    /**
+     * @brief Read raw ADC count from a channel by enum — O(1) lookup, preferred for real-time paths.
+     * @param channel    Functional ADC channel enum
+     * @param raw_count  Output: raw ADC count
+     * @param samples    Number of samples to average (default 1)
+     * @return ADC error code
+     */
+    [[nodiscard]] hf_adc_err_t ReadRaw(HfFunctionalAdcChannel channel, uint32_t& raw_count,
                                        uint8_t samples = 1) noexcept;
 
     //==========================================================================
@@ -140,8 +165,15 @@ private:
 
     bool Initialize() noexcept;
 
-    /** @brief Find entry index by string name. Returns kInvalidIndex if not found. */
+    /** @brief Find entry index by string name. Returns kInvalidIndex if not found. O(N) linear scan. */
     [[nodiscard]] size_t FindByName(std::string_view name) const noexcept;
+
+    /** @brief Find entry index by functional enum. Returns kInvalidIndex if not found. O(1) direct index. */
+    [[nodiscard]] size_t FindByEnum(HfFunctionalAdcChannel channel) const noexcept;
+
+    /** @brief Read from an entry by index — shared implementation for both name and enum overloads. */
+    [[nodiscard]] hf_adc_err_t ReadVoltageByIndex(size_t idx, float& voltage, uint8_t samples) noexcept;
+    [[nodiscard]] hf_adc_err_t ReadRawByIndex(size_t idx, uint32_t& raw_count, uint8_t samples) noexcept;
 
     //==========================================================================
     // STORAGE — entries are fixed-size in static storage; EspAdc is
@@ -153,11 +185,21 @@ private:
     static constexpr size_t kInvalidIndex = SIZE_MAX;
 
     std::array<AdcEntry, kMaxChannels> entries_{};
+    std::array<size_t, kMaxChannels> enum_to_index_{}; ///< O(1) enum → entries index lookup
     size_t registered_count_{0};
 
     // EspAdc instance — only ADC1 used on ESP32-C6
     // Heap-allocated once via unique_ptr; singleton lives forever.
     std::unique_ptr<EspAdc> esp_adc_;
+
+    // ADS7952 external ADC handler(s) — conditionally compiled
+    // Supports array of devices on same SPI bus with different CS pins.
+    // Currently 1 device on board, designed for expansion.
+#ifdef HARDFOC_ADS7952_SUPPORT
+    static constexpr size_t kMaxAds7952Devices = 4;
+    std::array<std::unique_ptr<Ads7952Handler>, kMaxAds7952Devices> ads7952_handlers_{};
+    size_t ads7952_device_count_{0};
+#endif
 
     std::atomic<bool> initialized_{false};
     mutable RtosMutex mutex_;

@@ -138,3 +138,7 @@ Thumbs.db
 
 # Changelogs (maintained locally, not tracked)
 CHANGELOG.md
+
+# Local bench tests (machine-specific, not for GitHub)
+examples/wh_valve_pressure_control.cpp
+examples/esp32/main/wh_valve_pressure_control.cpp

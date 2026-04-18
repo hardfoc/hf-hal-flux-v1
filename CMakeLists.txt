@@ -27,6 +27,7 @@ set(HF_CORE_ENABLE_NTC_THERMISTOR ON)   # ADC temperature sensor
 set(HF_CORE_ENABLE_WS2812         ON)   # RMT LED strip
 set(HF_CORE_ENABLE_LOGGER         ON)   # Logging system
 set(HF_CORE_ENABLE_CAN            ON)   # CAN/TWAI bus (CommChannelsManager)
+set(HF_CORE_ENABLE_ADS7952        ON)   # SPI 12-ch ADC (ADS7952)
 
 # ── Optional Utilities ────────────────────────────────────────────────────
 set(HF_CORE_ENABLE_UTILS_CANOPEN  ON)   # CANopen protocol helpers
@@ -209,6 +210,7 @@ target_compile_definitions(${COMPONENT_LIB} PRIVATE
     HARDFOC_TLE92466_SUPPORT=1
     HARDFOC_NTC_THERMISTOR_SUPPORT=1
     HARDFOC_WS2812_SUPPORT=1
+    HARDFOC_ADS7952_SUPPORT=1
     HARDFOC_PLATFORM_MAPPING=1
     HARDFOC_FLUX_API=1
     HARDFOC_DRIVER_HANDLERS=1

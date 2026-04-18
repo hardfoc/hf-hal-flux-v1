@@ -51,6 +51,10 @@ apps:
     source_file: "ValveManagerExample.cpp"
     category: "example"
     ci_enabled: false
+  ads7952_example:
+    source_file: "Ads7952Example.cpp"
+    category: "example"
+    ci_enabled: false
 
 build_config:
   build_types:
