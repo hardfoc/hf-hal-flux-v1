@@ -10,6 +10,7 @@
 #include "AdcManager.h"
 #include "handlers/logger/Logger.h"
 #include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/utils/memory_utils.h"
+#include "core/hf-core-utils/hf-utils-rtos-wrap/include/OsUtility.h"
 
 #ifdef HARDFOC_ADS7952_SUPPORT
 #include "Ads7952Handler.h"
@@ -42,6 +43,8 @@ bool AdcManager::EnsureInitialized() noexcept {
 
 bool AdcManager::Initialize() noexcept {
     Logger::GetInstance().Info(TAG, "Initializing Flux ADC manager");
+
+    init_time_ms_ = os_get_elapsed_time_msec();
 
     // Initialize enum-to-index lookup table to invalid
     enum_to_index_.fill(kInvalidIndex);
@@ -282,17 +285,25 @@ hf_adc_err_t AdcManager::ReadRaw(HfFunctionalAdcChannel channel, uint32_t& raw_c
 //==============================================================================
 
 hf_adc_err_t AdcManager::GetSystemDiagnostics(AdcSystemDiagnostics& diag) const noexcept {
-    diag.total_channels = static_cast<uint8_t>(kMaxChannels);
-    diag.registered_channels = static_cast<uint8_t>(registered_count_);
-    diag.total_reads = 0;
-    diag.total_errors = 0;
+    diag = {};
+    diag.total_channels_registered = static_cast<uint32_t>(registered_count_);
 
     for (size_t i = 0; i < registered_count_; ++i) {
-        diag.total_reads  += entries_[i].access_count;
-        diag.total_errors += entries_[i].error_count;
+        if (entries_[i].registered) {
+            diag.successful_operations += entries_[i].access_count;
+            diag.failed_operations     += entries_[i].error_count;
+
+            // Chip index: 0 = ESP32 internal, 1 = external (ADS7952)
+            uint8_t chip_idx = (entries_[i].driver == esp_adc_.get()) ? 0 : 1;
+            if (chip_idx < std::size(diag.channels_by_chip)) {
+                diag.channels_by_chip[chip_idx]++;
+            }
+        }
     }
+    diag.total_operations = diag.successful_operations + diag.failed_operations;
     diag.last_error = last_error_.load(std::memory_order_acquire);
-    diag.system_healthy = (diag.registered_channels > 0) && (diag.total_errors == 0);
+    diag.system_uptime_ms = (init_time_ms_ > 0) ? (os_get_elapsed_time_msec() - init_time_ms_) : 0;
+    diag.system_healthy = (diag.total_channels_registered > 0) && (diag.failed_operations == 0);
     return hf_adc_err_t::ADC_SUCCESS;
 }
 

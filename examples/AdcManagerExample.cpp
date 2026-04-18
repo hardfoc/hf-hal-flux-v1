@@ -191,10 +191,11 @@ static void example_diagnostics() {
     AdcSystemDiagnostics diag{};
     if (adc.GetSystemDiagnostics(diag) == hf_adc_err_t::ADC_SUCCESS) {
         ESP_LOGI(TAG, "System healthy:      %s", diag.system_healthy ? "YES" : "NO");
-        ESP_LOGI(TAG, "Total channels:      %u", diag.total_channels);
-        ESP_LOGI(TAG, "Registered channels: %u", diag.registered_channels);
-        ESP_LOGI(TAG, "Total reads:         %lu", static_cast<unsigned long>(diag.total_reads));
-        ESP_LOGI(TAG, "Total errors:        %lu", static_cast<unsigned long>(diag.total_errors));
+        ESP_LOGI(TAG, "Channels registered: %lu", static_cast<unsigned long>(diag.total_channels_registered));
+        ESP_LOGI(TAG, "Total operations:    %lu", static_cast<unsigned long>(diag.total_operations));
+        ESP_LOGI(TAG, "Successful reads:    %lu", static_cast<unsigned long>(diag.successful_operations));
+        ESP_LOGI(TAG, "Failed reads:        %lu", static_cast<unsigned long>(diag.failed_operations));
+        ESP_LOGI(TAG, "Uptime (ms):         %llu", static_cast<unsigned long long>(diag.system_uptime_ms));
     }
 
     // Full statistics dump

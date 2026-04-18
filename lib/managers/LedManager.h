@@ -13,7 +13,7 @@
  *
  * @author HardFOC Team
  * @date 2026
- * @version 2.0
+ * @version 1.0
  */
 
 #ifndef FLUX_LED_MANAGER_H_

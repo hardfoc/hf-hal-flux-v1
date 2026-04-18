@@ -56,15 +56,19 @@ struct AdcEntry {
 };
 
 /**
- * @brief ADC system diagnostics.
+ * @brief ADC system diagnostics (cross-HAL compatible format).
  */
 struct AdcSystemDiagnostics {
-    bool system_healthy;            ///< True when all registered channels are operational
-    uint8_t total_channels;         ///< Maximum number of ADC channels available
-    uint8_t registered_channels;    ///< Number of channels currently registered
-    uint32_t total_reads;           ///< Cumulative successful read count across all channels
-    uint32_t total_errors;          ///< Cumulative error count across all channels
-    hf_adc_err_t last_error;        ///< Most recent error code from any operation
+    bool system_healthy{false};                 ///< True when all registered channels are operational
+    uint32_t total_channels_registered{0};      ///< Number of channels currently registered
+    uint32_t channels_by_chip[2]{};             ///< [0]=ESP32 internal, [1]=external (ADS7952 etc.)
+    uint32_t total_operations{0};               ///< Cumulative read attempts across all channels
+    uint32_t successful_operations{0};          ///< Cumulative successful reads
+    uint32_t failed_operations{0};              ///< Cumulative failed reads
+    uint32_t communication_errors{0};           ///< Errors attributed to bus communication failures
+    uint32_t hardware_errors{0};                ///< Errors attributed to hardware faults
+    uint64_t system_uptime_ms{0};               ///< Milliseconds since ADC subsystem initialisation
+    hf_adc_err_t last_error{hf_adc_err_t::ADC_SUCCESS}; ///< Most recent error code from any operation
 };
 
 //==============================================================================
@@ -112,7 +116,7 @@ public:
      * @brief Release all ADC resources and reset to uninitialized state.
      * @return true on success
      */
-    bool Deinitialize() noexcept;
+    [[nodiscard]] bool Deinitialize() noexcept;
 
     //==========================================================================
     // CHANNEL ACCESS
@@ -190,6 +194,40 @@ public:
                                        uint8_t samples = 1) noexcept;
 
     //==========================================================================
+    // CROSS-HAL API ALIASES — ReadChannelV (Vortex-compatible)
+    //==========================================================================
+
+    /**
+     * @brief Read voltage from a channel by name (Vortex-compatible alias for ReadVoltage).
+     * @param name               Channel name
+     * @param voltage            Output: voltage reading
+     * @param numOfSamplesToAvg  Number of samples to average (default 1)
+     * @param timeBetweenSamples Time between samples in ms (default 0, unused on Flux)
+     * @return ADC error code
+     */
+    [[nodiscard]] hf_adc_err_t ReadChannelV(std::string_view name, float& voltage,
+                                            uint8_t numOfSamplesToAvg = 1,
+                                            uint32_t timeBetweenSamples = 0) noexcept {
+        (void)timeBetweenSamples;
+        return ReadVoltage(name, voltage, numOfSamplesToAvg);
+    }
+
+    /**
+     * @brief Read voltage from a channel by enum (Vortex-compatible alias for ReadChannelV).
+     * @param channel            Functional ADC channel enum
+     * @param voltage            Output: voltage reading
+     * @param numOfSamplesToAvg  Number of samples to average (default 1)
+     * @param timeBetweenSamples Time between samples in ms (default 0, unused on Flux)
+     * @return ADC error code
+     */
+    [[nodiscard]] hf_adc_err_t ReadChannelV(HfFunctionalAdcChannel channel, float& voltage,
+                                            uint8_t numOfSamplesToAvg = 1,
+                                            uint32_t timeBetweenSamples = 0) noexcept {
+        (void)timeBetweenSamples;
+        return ReadVoltage(channel, voltage, numOfSamplesToAvg);
+    }
+
+    //==========================================================================
     // DIAGNOSTICS
     //==========================================================================
 
@@ -237,6 +275,7 @@ private:
     std::array<AdcEntry, kMaxChannels> entries_{};
     std::array<size_t, kMaxChannels> enum_to_index_{}; ///< O(1) enum → entries index lookup
     size_t registered_count_{0};
+    uint64_t init_time_ms_{0};  ///< Timestamp (ms) when Initialize() completed
 
     // EspAdc instance — only ADC1 used on ESP32-C6
     // Heap-allocated once via unique_ptr; singleton lives forever.

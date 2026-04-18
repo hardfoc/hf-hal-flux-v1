@@ -161,7 +161,7 @@ The `LedColors` namespace provides: `BLACK`, `RED`, `GREEN`, `BLUE`, `YELLOW`, `
 ## See Also
 
 - [GpioManager Documentation](GPIO_MANAGER_README.md)
-- [LedManagerExample.cpp](../../examples/LedManagerExample.cpp)
+- [LedManagerExample.cpp](../../examples/esp32/main/LedManagerExample.cpp)
 
 ---
 
