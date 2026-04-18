@@ -155,77 +155,51 @@ public:
 
     /**
      * @brief Read voltage from a channel by name (already divided if divider > 1).
-     * @param name       Channel name (linear string search — use enum overload in tight loops)
-     * @param voltage    Output: voltage at the input, if divider == 1, or bus voltage
-     * @param samples    Number of samples to average (default 1)
+     * @param name                Channel name (linear string search — use enum overload in tight loops)
+     * @param voltage             Output: voltage at the input, if divider == 1, or bus voltage
+     * @param samples             Number of samples to average (default 1)
+     * @param timeBetweenSamples  Delay in ms between consecutive samples (default 0)
      * @return ADC error code
      */
     [[nodiscard]] hf_adc_err_t ReadVoltage(std::string_view name, float& voltage,
-                                           uint8_t samples = 1) noexcept;
+                                           uint8_t samples = 1,
+                                           uint16_t timeBetweenSamples = 0) noexcept;
 
     /**
      * @brief Read voltage from a channel by enum — O(1) lookup, preferred for real-time paths.
-     * @param channel    Functional ADC channel enum
-     * @param voltage    Output: voltage at the input, if divider == 1, or bus voltage
-     * @param samples    Number of samples to average (default 1)
+     * @param channel             Functional ADC channel enum
+     * @param voltage             Output: voltage at the input, if divider == 1, or bus voltage
+     * @param samples             Number of samples to average (default 1)
+     * @param timeBetweenSamples  Delay in ms between consecutive samples (default 0)
      * @return ADC error code
      */
     [[nodiscard]] hf_adc_err_t ReadVoltage(HfFunctionalAdcChannel channel, float& voltage,
-                                           uint8_t samples = 1) noexcept;
+                                           uint8_t samples = 1,
+                                           uint16_t timeBetweenSamples = 0) noexcept;
 
     /**
      * @brief Read raw ADC count from a channel by name.
-     * @param name       Channel name (linear string search — use enum overload in tight loops)
-     * @param raw_count  Output: raw ADC count
-     * @param samples    Number of samples to average (default 1)
+     * @param name                Channel name (linear string search — use enum overload in tight loops)
+     * @param raw_count           Output: raw ADC count
+     * @param samples             Number of samples to average (default 1)
+     * @param timeBetweenSamples  Delay in ms between consecutive samples (default 0)
      * @return ADC error code
      */
     [[nodiscard]] hf_adc_err_t ReadRaw(std::string_view name, uint32_t& raw_count,
-                                       uint8_t samples = 1) noexcept;
+                                       uint8_t samples = 1,
+                                       uint16_t timeBetweenSamples = 0) noexcept;
 
     /**
      * @brief Read raw ADC count from a channel by enum — O(1) lookup, preferred for real-time paths.
-     * @param channel    Functional ADC channel enum
-     * @param raw_count  Output: raw ADC count
-     * @param samples    Number of samples to average (default 1)
+     * @param channel             Functional ADC channel enum
+     * @param raw_count           Output: raw ADC count
+     * @param samples             Number of samples to average (default 1)
+     * @param timeBetweenSamples  Delay in ms between consecutive samples (default 0)
      * @return ADC error code
      */
     [[nodiscard]] hf_adc_err_t ReadRaw(HfFunctionalAdcChannel channel, uint32_t& raw_count,
-                                       uint8_t samples = 1) noexcept;
-
-    //==========================================================================
-    // CROSS-HAL API ALIASES — ReadChannelV (Vortex-compatible)
-    //==========================================================================
-
-    /**
-     * @brief Read voltage from a channel by name (Vortex-compatible alias for ReadVoltage).
-     * @param name               Channel name
-     * @param voltage            Output: voltage reading
-     * @param numOfSamplesToAvg  Number of samples to average (default 1)
-     * @param timeBetweenSamples Time between samples in ms (default 0, unused on Flux)
-     * @return ADC error code
-     */
-    [[nodiscard]] hf_adc_err_t ReadChannelV(std::string_view name, float& voltage,
-                                            uint8_t numOfSamplesToAvg = 1,
-                                            uint32_t timeBetweenSamples = 0) noexcept {
-        (void)timeBetweenSamples;
-        return ReadVoltage(name, voltage, numOfSamplesToAvg);
-    }
-
-    /**
-     * @brief Read voltage from a channel by enum (Vortex-compatible alias for ReadChannelV).
-     * @param channel            Functional ADC channel enum
-     * @param voltage            Output: voltage reading
-     * @param numOfSamplesToAvg  Number of samples to average (default 1)
-     * @param timeBetweenSamples Time between samples in ms (default 0, unused on Flux)
-     * @return ADC error code
-     */
-    [[nodiscard]] hf_adc_err_t ReadChannelV(HfFunctionalAdcChannel channel, float& voltage,
-                                            uint8_t numOfSamplesToAvg = 1,
-                                            uint32_t timeBetweenSamples = 0) noexcept {
-        (void)timeBetweenSamples;
-        return ReadVoltage(channel, voltage, numOfSamplesToAvg);
-    }
+                                       uint8_t samples = 1,
+                                       uint16_t timeBetweenSamples = 0) noexcept;
 
     //==========================================================================
     // DIAGNOSTICS
@@ -260,8 +234,8 @@ private:
     [[nodiscard]] size_t FindByEnum(HfFunctionalAdcChannel channel) const noexcept;
 
     /** @brief Read from an entry by index — shared implementation for both name and enum overloads. */
-    [[nodiscard]] hf_adc_err_t ReadVoltageByIndex(size_t idx, float& voltage, uint8_t samples) noexcept;
-    [[nodiscard]] hf_adc_err_t ReadRawByIndex(size_t idx, uint32_t& raw_count, uint8_t samples) noexcept;
+    [[nodiscard]] hf_adc_err_t ReadVoltageByIndex(size_t idx, float& voltage, uint8_t samples, uint16_t timeBetweenSamples) noexcept;
+    [[nodiscard]] hf_adc_err_t ReadRawByIndex(size_t idx, uint32_t& raw_count, uint8_t samples, uint16_t timeBetweenSamples) noexcept;
 
     //==========================================================================
     // STORAGE — entries are fixed-size in static storage; EspAdc is

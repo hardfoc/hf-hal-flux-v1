@@ -208,12 +208,12 @@ size_t AdcManager::Size() const noexcept {
 // READING OPERATIONS
 //==============================================================================
 
-hf_adc_err_t AdcManager::ReadVoltageByIndex(size_t idx, float& voltage, uint8_t samples) noexcept {
+hf_adc_err_t AdcManager::ReadVoltageByIndex(size_t idx, float& voltage, uint8_t samples, uint16_t timeBetweenSamples) noexcept {
     auto& entry = entries_[idx];
     MutexLockGuard lock(mutex_);
 
     float raw_voltage = 0.0f;
-    hf_adc_err_t err = entry.driver->ReadChannelV(entry.hw_channel, raw_voltage, samples, 0);
+    hf_adc_err_t err = entry.driver->ReadChannelV(entry.hw_channel, raw_voltage, samples, timeBetweenSamples);
     if (err == hf_adc_err_t::ADC_SUCCESS) {
         voltage = raw_voltage * entry.voltage_divider;
         entry.access_count++;
@@ -223,11 +223,11 @@ hf_adc_err_t AdcManager::ReadVoltageByIndex(size_t idx, float& voltage, uint8_t 
     return err;
 }
 
-hf_adc_err_t AdcManager::ReadRawByIndex(size_t idx, uint32_t& raw_count, uint8_t samples) noexcept {
+hf_adc_err_t AdcManager::ReadRawByIndex(size_t idx, uint32_t& raw_count, uint8_t samples, uint16_t timeBetweenSamples) noexcept {
     auto& entry = entries_[idx];
     MutexLockGuard lock(mutex_);
 
-    hf_adc_err_t err = entry.driver->ReadChannelCount(entry.hw_channel, raw_count, samples, 0);
+    hf_adc_err_t err = entry.driver->ReadChannelCount(entry.hw_channel, raw_count, samples, timeBetweenSamples);
     if (err == hf_adc_err_t::ADC_SUCCESS) {
         entry.access_count++;
     } else {
@@ -236,7 +236,7 @@ hf_adc_err_t AdcManager::ReadRawByIndex(size_t idx, uint32_t& raw_count, uint8_t
     return err;
 }
 
-hf_adc_err_t AdcManager::ReadVoltage(std::string_view name, float& voltage, uint8_t samples) noexcept {
+hf_adc_err_t AdcManager::ReadVoltage(std::string_view name, float& voltage, uint8_t samples, uint16_t timeBetweenSamples) noexcept {
     if (!initialized_.load(std::memory_order_acquire))
         return hf_adc_err_t::ADC_ERR_NOT_INITIALIZED;
 
@@ -244,10 +244,10 @@ hf_adc_err_t AdcManager::ReadVoltage(std::string_view name, float& voltage, uint
     if (idx == kInvalidIndex)
         return hf_adc_err_t::ADC_ERR_INVALID_CHANNEL;
 
-    return ReadVoltageByIndex(idx, voltage, samples);
+    return ReadVoltageByIndex(idx, voltage, samples, timeBetweenSamples);
 }
 
-hf_adc_err_t AdcManager::ReadVoltage(HfFunctionalAdcChannel channel, float& voltage, uint8_t samples) noexcept {
+hf_adc_err_t AdcManager::ReadVoltage(HfFunctionalAdcChannel channel, float& voltage, uint8_t samples, uint16_t timeBetweenSamples) noexcept {
     if (!initialized_.load(std::memory_order_acquire))
         return hf_adc_err_t::ADC_ERR_NOT_INITIALIZED;
 
@@ -255,10 +255,10 @@ hf_adc_err_t AdcManager::ReadVoltage(HfFunctionalAdcChannel channel, float& volt
     if (idx == kInvalidIndex)
         return hf_adc_err_t::ADC_ERR_INVALID_CHANNEL;
 
-    return ReadVoltageByIndex(idx, voltage, samples);
+    return ReadVoltageByIndex(idx, voltage, samples, timeBetweenSamples);
 }
 
-hf_adc_err_t AdcManager::ReadRaw(std::string_view name, uint32_t& raw_count, uint8_t samples) noexcept {
+hf_adc_err_t AdcManager::ReadRaw(std::string_view name, uint32_t& raw_count, uint8_t samples, uint16_t timeBetweenSamples) noexcept {
     if (!initialized_.load(std::memory_order_acquire))
         return hf_adc_err_t::ADC_ERR_NOT_INITIALIZED;
 
@@ -266,10 +266,10 @@ hf_adc_err_t AdcManager::ReadRaw(std::string_view name, uint32_t& raw_count, uin
     if (idx == kInvalidIndex)
         return hf_adc_err_t::ADC_ERR_INVALID_CHANNEL;
 
-    return ReadRawByIndex(idx, raw_count, samples);
+    return ReadRawByIndex(idx, raw_count, samples, timeBetweenSamples);
 }
 
-hf_adc_err_t AdcManager::ReadRaw(HfFunctionalAdcChannel channel, uint32_t& raw_count, uint8_t samples) noexcept {
+hf_adc_err_t AdcManager::ReadRaw(HfFunctionalAdcChannel channel, uint32_t& raw_count, uint8_t samples, uint16_t timeBetweenSamples) noexcept {
     if (!initialized_.load(std::memory_order_acquire))
         return hf_adc_err_t::ADC_ERR_NOT_INITIALIZED;
 
@@ -277,7 +277,7 @@ hf_adc_err_t AdcManager::ReadRaw(HfFunctionalAdcChannel channel, uint32_t& raw_c
     if (idx == kInvalidIndex)
         return hf_adc_err_t::ADC_ERR_INVALID_CHANNEL;
 
-    return ReadRawByIndex(idx, raw_count, samples);
+    return ReadRawByIndex(idx, raw_count, samples, timeBetweenSamples);
 }
 
 //==============================================================================
