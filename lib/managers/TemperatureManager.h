@@ -127,17 +127,22 @@ struct TempEntry {
 //==============================================================================
 
 /**
- * @brief Temperature subsystem diagnostics snapshot.
+ * @brief Temperature subsystem diagnostics snapshot (cross-HAL compatible format).
  */
 struct TempSystemDiagnostics {
-    bool system_healthy;               ///< True when all registered sensors are responsive
-    uint8_t total_sensors;             ///< Maximum sensor slots available
-    uint8_t registered_sensors;        ///< Number of sensors currently registered
-    uint32_t total_reads;              ///< Cumulative read count across all sensors
-    uint32_t total_errors;             ///< Cumulative error count across all sensors
-    float esp32_temp_celsius;          ///< Latest ESP32 internal temperature in °C
-    float ntc_temp_celsius;            ///< Latest NTC thermistor temperature in °C
-    TemperatureError last_error;       ///< Most recent error code from any operation
+    bool system_healthy;                    ///< True when all registered sensors are responsive
+    uint32_t total_sensors_registered;      ///< Number of sensors currently registered
+    uint32_t sensors_by_type[8];            ///< Count of sensors per FluxTempSensorType index
+    uint32_t total_operations;              ///< Cumulative read attempts across all sensors
+    uint32_t successful_operations;         ///< Cumulative successful reads
+    uint32_t failed_operations;             ///< Cumulative failed reads
+    uint32_t communication_errors;          ///< Errors attributed to bus communication failures
+    uint32_t hardware_errors;               ///< Errors attributed to hardware faults
+    uint64_t system_uptime_ms;              ///< Milliseconds since temperature subsystem init
+    TemperatureError last_error;            ///< Most recent error code from any operation
+    float system_min_temp_celsius;          ///< Minimum temperature across all sensors (°C)
+    float system_max_temp_celsius;          ///< Maximum temperature across all sensors (°C)
+    float system_avg_temp_celsius;          ///< Average temperature across all sensors (°C)
 };
 
 //==============================================================================
@@ -186,7 +191,7 @@ public:
      * @brief Release all temperature sensor resources and reset to uninitialized state.
      * @return true on success
      */
-    bool Deinitialize() noexcept;
+    [[nodiscard]] bool Deinitialize() noexcept;
 
     /**
      * @brief Get the most recent error code.
@@ -284,6 +289,7 @@ private:
 
     std::array<TempEntry, kMaxSensors> entries_{};
     size_t registered_count_{0};
+    uint64_t init_time_ms_{0};  ///< Timestamp (ms) when Initialize() completed
 
     // Sensor driver instances — heap-allocated via unique_ptr (singleton lifetime)
     std::unique_ptr<EspTemperature> esp32_temp_;

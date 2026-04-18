@@ -11,6 +11,7 @@
 #include "AdcManager.h"
 #include "core/hf-core-drivers/internal/hf-pincfg/src/hf_functional_pin_config_flux_v1.hpp"
 #include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/utils/memory_utils.h"
+#include "core/hf-core-utils/hf-utils-rtos-wrap/include/OsUtility.h"
 
 #include <algorithm>
 #include <cmath>
@@ -41,6 +42,8 @@ bool TemperatureManager::EnsureInitialized() noexcept {
 
 bool TemperatureManager::Initialize() noexcept {
     Logger::GetInstance().Info(TAG, "Initializing Flux temperature manager");
+
+    init_time_ms_ = os_get_elapsed_time_msec();
 
     bool esp_ok = InitializeEsp32Internal();
     bool ntc_ok = InitializeNtcThermistor();
@@ -234,20 +237,46 @@ TemperatureError TemperatureManager::GetSystemTemperatureStats(float& min_c, flo
 //==============================================================================
 
 TemperatureError TemperatureManager::GetSystemDiagnostics(TempSystemDiagnostics& diag) const noexcept {
-    diag.total_sensors = static_cast<uint8_t>(kMaxSensors);
-    diag.registered_sensors = static_cast<uint8_t>(registered_count_);
-    diag.total_reads = 0;
-    diag.total_errors = 0;
-    diag.esp32_temp_celsius = 0.0f;
-    diag.ntc_temp_celsius = 0.0f;
+    diag = {};
+    diag.total_sensors_registered = static_cast<uint32_t>(registered_count_);
+    diag.system_min_temp_celsius = 200.0f;
+    diag.system_max_temp_celsius = -100.0f;
+    diag.system_avg_temp_celsius = 0.0f;
+
+    float sum = 0.0f;
+    uint32_t valid = 0;
 
     for (size_t i = 0; i < registered_count_; ++i) {
-        diag.total_reads  += entries_[i].read_count;
-        diag.total_errors += entries_[i].error_count;
+        const auto& e = entries_[i];
+        diag.successful_operations += e.read_count;
+        diag.failed_operations     += e.error_count;
+
+        uint8_t type_idx = static_cast<uint8_t>(e.sensor_type);
+        if (type_idx < std::size(diag.sensors_by_type)) {
+            diag.sensors_by_type[type_idx]++;
+        }
+
+        if (e.read_count > 0) {
+            sum += e.last_reading_celsius;
+            if (e.last_reading_celsius < diag.system_min_temp_celsius)
+                diag.system_min_temp_celsius = e.last_reading_celsius;
+            if (e.last_reading_celsius > diag.system_max_temp_celsius)
+                diag.system_max_temp_celsius = e.last_reading_celsius;
+            ++valid;
+        }
     }
 
+    if (valid > 0) {
+        diag.system_avg_temp_celsius = sum / static_cast<float>(valid);
+    } else {
+        diag.system_min_temp_celsius = 0.0f;
+        diag.system_max_temp_celsius = 0.0f;
+    }
+
+    diag.total_operations = diag.successful_operations + diag.failed_operations;
+    diag.system_uptime_ms = (init_time_ms_ > 0) ? (os_get_elapsed_time_msec() - init_time_ms_) : 0;
     diag.last_error = last_error_.load(std::memory_order_acquire);
-    diag.system_healthy = (diag.registered_sensors > 0) && (diag.total_errors == 0);
+    diag.system_healthy = (diag.failed_operations == 0) && (registered_count_ > 0);
     return TemperatureError::SUCCESS;
 }
 

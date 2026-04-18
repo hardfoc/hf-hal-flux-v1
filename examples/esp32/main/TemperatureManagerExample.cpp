@@ -224,12 +224,14 @@ static void example_diagnostics() {
     TempSystemDiagnostics diag{};
     if (temp.GetSystemDiagnostics(diag) == TemperatureError::SUCCESS) {
         ESP_LOGI(TAG, "System healthy:      %s", diag.system_healthy ? "YES" : "NO");
-        ESP_LOGI(TAG, "Total sensors:       %u", diag.total_sensors);
-        ESP_LOGI(TAG, "Registered sensors:  %u", diag.registered_sensors);
-        ESP_LOGI(TAG, "Total reads:         %lu", static_cast<unsigned long>(diag.total_reads));
-        ESP_LOGI(TAG, "Total errors:        %lu", static_cast<unsigned long>(diag.total_errors));
-        ESP_LOGI(TAG, "ESP32 temp:          %.1f C", static_cast<double>(diag.esp32_temp_celsius));
-        ESP_LOGI(TAG, "NTC temp:            %.1f C", static_cast<double>(diag.ntc_temp_celsius));
+        ESP_LOGI(TAG, "Sensors registered:  %lu", static_cast<unsigned long>(diag.total_sensors_registered));
+        ESP_LOGI(TAG, "Total operations:    %lu", static_cast<unsigned long>(diag.total_operations));
+        ESP_LOGI(TAG, "Successful reads:    %lu", static_cast<unsigned long>(diag.successful_operations));
+        ESP_LOGI(TAG, "Failed reads:        %lu", static_cast<unsigned long>(diag.failed_operations));
+        ESP_LOGI(TAG, "Min temp:            %.1f C", static_cast<double>(diag.system_min_temp_celsius));
+        ESP_LOGI(TAG, "Max temp:            %.1f C", static_cast<double>(diag.system_max_temp_celsius));
+        ESP_LOGI(TAG, "Avg temp:            %.1f C", static_cast<double>(diag.system_avg_temp_celsius));
+        ESP_LOGI(TAG, "Uptime (ms):         %llu", static_cast<unsigned long long>(diag.system_uptime_ms));
     }
 
     // Full stats dump

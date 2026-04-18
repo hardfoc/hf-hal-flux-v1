@@ -112,7 +112,7 @@ public:
      * @brief Reset GPIO manager to uninitialized state.
      * @return true on success
      */
-    bool Deinitialize() noexcept;
+    [[nodiscard]] bool Deinitialize() noexcept;
 
     /**
      * @brief Get the most recent error code.
@@ -279,6 +279,7 @@ private:
 
     std::array<GpioEntry, kMaxEntries> entries_{};
     size_t registered_count_{0};
+    uint64_t init_time_ms_{0};  ///< Timestamp (ms) when Initialize() completed
 
     uint32_t total_ops_{0};
     uint32_t successful_ops_{0};

@@ -9,6 +9,7 @@
 
 #include "GpioManager.h"
 #include "handlers/logger/Logger.h"
+#include "core/hf-core-utils/hf-utils-rtos-wrap/include/OsUtility.h"
 
 static constexpr const char* TAG = "FluxGpio";
 
@@ -41,6 +42,7 @@ bool GpioManager::EnsureInitialized() noexcept {
 bool GpioManager::Initialize() noexcept {
     Logger::GetInstance().Info(TAG, "Initializing Flux GPIO manager");
 
+    init_time_ms_ = os_get_elapsed_time_msec();
     registered_count_ = 0;
 
     // Iterate through all pins defined in the pin config
@@ -142,39 +144,62 @@ size_t GpioManager::Size() const noexcept {
 //==============================================================================
 
 hf_gpio_err_t GpioManager::Set(std::string_view name, bool value) noexcept {
-    auto* gpio = Get(name);
-    if (!gpio) return hf_gpio_err_t::GPIO_ERR_PIN_NOT_FOUND;
-    return value ? gpio->SetActive() : gpio->SetInactive();
+    size_t idx = FindByName(name);
+    if (idx == kInvalidIndex) { ++failed_ops_; return hf_gpio_err_t::GPIO_ERR_PIN_NOT_FOUND; }
+    auto& e = entries_[idx];
+    hf_gpio_err_t r = value ? e.driver->SetActive() : e.driver->SetInactive();
+    ++total_ops_;
+    if (r == hf_gpio_err_t::GPIO_SUCCESS) { ++successful_ops_; ++e.access_count; }
+    else { ++failed_ops_; ++e.error_count; last_error_ = r; }
+    return r;
 }
 
 hf_gpio_err_t GpioManager::SetActive(std::string_view name) noexcept {
-    auto* gpio = Get(name);
-    if (!gpio) return hf_gpio_err_t::GPIO_ERR_PIN_NOT_FOUND;
-    return gpio->SetActive();
+    size_t idx = FindByName(name);
+    if (idx == kInvalidIndex) { ++failed_ops_; return hf_gpio_err_t::GPIO_ERR_PIN_NOT_FOUND; }
+    auto& e = entries_[idx];
+    hf_gpio_err_t r = e.driver->SetActive();
+    ++total_ops_;
+    if (r == hf_gpio_err_t::GPIO_SUCCESS) { ++successful_ops_; ++e.access_count; }
+    else { ++failed_ops_; ++e.error_count; last_error_ = r; }
+    return r;
 }
 
 hf_gpio_err_t GpioManager::SetInactive(std::string_view name) noexcept {
-    auto* gpio = Get(name);
-    if (!gpio) return hf_gpio_err_t::GPIO_ERR_PIN_NOT_FOUND;
-    return gpio->SetInactive();
+    size_t idx = FindByName(name);
+    if (idx == kInvalidIndex) { ++failed_ops_; return hf_gpio_err_t::GPIO_ERR_PIN_NOT_FOUND; }
+    auto& e = entries_[idx];
+    hf_gpio_err_t r = e.driver->SetInactive();
+    ++total_ops_;
+    if (r == hf_gpio_err_t::GPIO_SUCCESS) { ++successful_ops_; ++e.access_count; }
+    else { ++failed_ops_; ++e.error_count; last_error_ = r; }
+    return r;
 }
 
 hf_gpio_err_t GpioManager::Read(std::string_view name, bool& state) noexcept {
-    auto* gpio = Get(name);
-    if (!gpio) return hf_gpio_err_t::GPIO_ERR_PIN_NOT_FOUND;
-    return gpio->IsActive(state);
+    size_t idx = FindByName(name);
+    if (idx == kInvalidIndex) { ++failed_ops_; return hf_gpio_err_t::GPIO_ERR_PIN_NOT_FOUND; }
+    auto& e = entries_[idx];
+    hf_gpio_err_t r = e.driver->IsActive(state);
+    ++total_ops_;
+    if (r == hf_gpio_err_t::GPIO_SUCCESS) { ++successful_ops_; ++e.access_count; }
+    else { ++failed_ops_; ++e.error_count; last_error_ = r; }
+    return r;
 }
 
 hf_gpio_err_t GpioManager::Toggle(std::string_view name) noexcept {
-    auto* gpio = Get(name);
-    if (!gpio) return hf_gpio_err_t::GPIO_ERR_PIN_NOT_FOUND;
-    return gpio->Toggle();
+    size_t idx = FindByName(name);
+    if (idx == kInvalidIndex) { ++failed_ops_; return hf_gpio_err_t::GPIO_ERR_PIN_NOT_FOUND; }
+    auto& e = entries_[idx];
+    hf_gpio_err_t r = e.driver->Toggle();
+    ++total_ops_;
+    if (r == hf_gpio_err_t::GPIO_SUCCESS) { ++successful_ops_; ++e.access_count; }
+    else { ++failed_ops_; ++e.error_count; last_error_ = r; }
+    return r;
 }
 
 hf_gpio_err_t GpioManager::IsActive(std::string_view name, bool& active) noexcept {
-    auto* gpio = Get(name);
-    if (!gpio) return hf_gpio_err_t::GPIO_ERR_PIN_NOT_FOUND;
-    return gpio->IsActive(active);
+    return Read(name, active);
 }
 
 //==============================================================================
@@ -209,7 +234,7 @@ hf_gpio_err_t GpioManager::GetSystemDiagnostics(GpioSystemDiagnostics& diag) con
     diag.total_operations = total_ops_;
     diag.successful_operations = successful_ops_;
     diag.failed_operations = failed_ops_;
-    diag.system_uptime_ms = 0;  // Populated by caller if needed
+    diag.system_uptime_ms = (init_time_ms_ > 0) ? (os_get_elapsed_time_msec() - init_time_ms_) : 0;
     diag.last_error = last_error_;
     return hf_gpio_err_t::GPIO_SUCCESS;
 }
@@ -251,6 +276,10 @@ bool GpioManager::Deinitialize() noexcept {
         entries_[i].error_count = 0;
     }
     registered_count_ = 0;
+    total_ops_ = 0;
+    successful_ops_ = 0;
+    failed_ops_ = 0;
+    last_error_ = hf_gpio_err_t::GPIO_SUCCESS;
 
     initialized_.store(false, std::memory_order_release);
     return true;
