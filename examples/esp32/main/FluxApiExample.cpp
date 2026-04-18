@@ -246,7 +246,7 @@ static void phase_valve_operation() {
 
     // Show valve diagnostics
     ValveSystemDiagnostics vdiag{};
-    if (valves.GetSystemDiagnostics(vdiag)) {
+    if (valves.GetSystemDiagnostics(vdiag) == hf_valve_err_t::VALVE_SUCCESS) {
         ESP_LOGI(TAG, "Valve stats: %u configured, %u active, %lu activations, %lu errors",
                  vdiag.configured_channels, vdiag.active_channels,
                  static_cast<unsigned long>(vdiag.total_activations),

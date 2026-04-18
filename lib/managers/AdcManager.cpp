@@ -281,7 +281,7 @@ hf_adc_err_t AdcManager::ReadRaw(HfFunctionalAdcChannel channel, uint32_t& raw_c
 // DIAGNOSTICS
 //==============================================================================
 
-bool AdcManager::GetSystemDiagnostics(FluxAdcDiagnostics& diag) const noexcept {
+hf_adc_err_t AdcManager::GetSystemDiagnostics(AdcSystemDiagnostics& diag) const noexcept {
     diag.total_channels = static_cast<uint8_t>(kMaxChannels);
     diag.registered_channels = static_cast<uint8_t>(registered_count_);
     diag.total_reads = 0;
@@ -291,8 +291,9 @@ bool AdcManager::GetSystemDiagnostics(FluxAdcDiagnostics& diag) const noexcept {
         diag.total_reads  += entries_[i].access_count;
         diag.total_errors += entries_[i].error_count;
     }
+    diag.last_error = last_error_.load(std::memory_order_acquire);
     diag.system_healthy = (diag.registered_channels > 0) && (diag.total_errors == 0);
-    return true;
+    return hf_adc_err_t::ADC_SUCCESS;
 }
 
 void AdcManager::DumpStatistics() const noexcept {

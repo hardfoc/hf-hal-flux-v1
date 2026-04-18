@@ -98,14 +98,14 @@ static bool test_temp_rapid_read_stress() noexcept {
 static bool test_temp_esp32_range_sanity() noexcept {
   float celsius = -999.0f;
   auto ok = TEMP().ReadTemperatureCelsius("ESP32_INTERNAL", celsius);
-  if (ok && (celsius < -40.0f || celsius > 125.0f)) {
+  if (ok == TemperatureError::SUCCESS && (celsius < -40.0f || celsius > 125.0f)) {
     return false;
   }
   return true;
 }
 
 static bool test_temp_diagnostics() noexcept {
-  FluxTempDiagnostics diag{};
+  TempSystemDiagnostics diag{};
   [[maybe_unused]] auto ok = TEMP().GetSystemDiagnostics(diag);
   return true;
 }

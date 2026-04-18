@@ -54,15 +54,43 @@ struct GpioEntry {
 };
 
 //==============================================================================
+// GPIO SYSTEM DIAGNOSTICS
+//==============================================================================
+
+/** @brief System-level GPIO diagnostics snapshot. */
+struct GpioSystemDiagnostics {
+    bool system_healthy;               ///< true when manager is initialised and operational.
+    uint32_t total_pins_registered;    ///< Number of GPIO pins currently registered.
+    uint32_t total_operations;         ///< Lifetime count of read/write/toggle calls.
+    uint32_t successful_operations;    ///< Calls that returned GPIO_SUCCESS.
+    uint32_t failed_operations;        ///< Calls that returned an error.
+    uint64_t system_uptime_ms;         ///< Milliseconds since manager initialisation.
+    hf_gpio_err_t last_error;          ///< Most recent error code.
+};
+
+//==============================================================================
 // GPIO MANAGER
 //==============================================================================
 
+/**
+ * @class GpioManager
+ * @brief Singleton that manages all ESP32 GPIO pins defined in the X-MACRO pin config.
+ *
+ * @details Registers GPIO and USER category pins, provides name-based and
+ *          enum-based access to the underlying BaseGpio drivers, and offers
+ *          high-level Set/Read/Toggle/Interrupt operations routed by pin name.
+ *          Thread-safe via RtosMutex.
+ */
 class GpioManager {
 public:
     //==========================================================================
     // SINGLETON AND LIFECYCLE
     //==========================================================================
 
+    /**
+     * @brief Access the singleton instance (Meyers singleton, thread-safe).
+     * @return Reference to the sole GpioManager instance.
+     */
     static GpioManager& GetInstance() noexcept;
 
     GpioManager(const GpioManager&) = delete;
@@ -70,7 +98,14 @@ public:
     GpioManager(GpioManager&&) = delete;
     GpioManager& operator=(GpioManager&&) = delete;
 
+    /**
+     * @brief Register all GPIO pins and initialise drivers (idempotent).
+     * @return true on success or if already initialised.
+     */
     [[nodiscard]] bool EnsureInitialized() noexcept;
+
+    /** @brief Check whether the manager is initialised.
+     *  @return true if ready. */
     [[nodiscard]] bool IsInitialized() const noexcept { return initialized_.load(std::memory_order_acquire); }
 
     /**
@@ -78,6 +113,12 @@ public:
      * @return true on success
      */
     bool Deinitialize() noexcept;
+
+    /**
+     * @brief Get the most recent error code.
+     * @return Last hf_gpio_err_t set by any API call
+     */
+    [[nodiscard]] hf_gpio_err_t GetLastError() const noexcept { return last_error_; }
 
     //==========================================================================
     // GPIO ACCESS — by string name
@@ -99,25 +140,128 @@ public:
     // BASIC GPIO OPERATIONS — string-based routing
     //==========================================================================
 
+    /**
+     * @brief Set a GPIO output to high (true) or low (false).
+     * @param name   Pin name from pincfg.
+     * @param value  true = active/high, false = inactive/low.
+     * @return GPIO_SUCCESS on success.
+     */
     [[nodiscard]] hf_gpio_err_t Set(std::string_view name, bool value) noexcept;
+
+    /**
+     * @brief Drive a pin to its active state.
+     * @param name  Pin name from pincfg.
+     * @return GPIO_SUCCESS on success.
+     */
     [[nodiscard]] hf_gpio_err_t SetActive(std::string_view name) noexcept;
+
+    /**
+     * @brief Drive a pin to its inactive state.
+     * @param name  Pin name from pincfg.
+     * @return GPIO_SUCCESS on success.
+     */
     [[nodiscard]] hf_gpio_err_t SetInactive(std::string_view name) noexcept;
+
+    /**
+     * @brief Read the current digital level of a pin.
+     * @param      name   Pin name from pincfg.
+     * @param[out] state  true = high, false = low.
+     * @return GPIO_SUCCESS on success.
+     */
     [[nodiscard]] hf_gpio_err_t Read(std::string_view name, bool& state) noexcept;
+
+    /**
+     * @brief Toggle pin output between high and low.
+     * @param name  Pin name from pincfg.
+     * @return GPIO_SUCCESS on success.
+     */
     [[nodiscard]] hf_gpio_err_t Toggle(std::string_view name) noexcept;
+
+    /**
+     * @brief Check whether a pin is currently in its active state.
+     * @param      name    Pin name from pincfg.
+     * @param[out] active  true if pin is active.
+     * @return GPIO_SUCCESS on success.
+     */
     [[nodiscard]] hf_gpio_err_t IsActive(std::string_view name, bool& active) noexcept;
 
     //==========================================================================
     // PIN CONFIGURATION
     //==========================================================================
 
+    /**
+     * @brief Change pin direction (input / output / open-drain).
+     * @param name       Pin name from pincfg.
+     * @param direction  Desired direction.
+     * @return GPIO_SUCCESS on success.
+     */
     [[nodiscard]] hf_gpio_err_t SetDirection(std::string_view name, hf_gpio_direction_t direction) noexcept;
+
+    /**
+     * @brief Configure internal pull-up / pull-down resistors.
+     * @param name       Pin name from pincfg.
+     * @param pull_mode  Desired pull mode.
+     * @return GPIO_SUCCESS on success.
+     */
     [[nodiscard]] hf_gpio_err_t SetPullMode(std::string_view name, hf_gpio_pull_mode_t pull_mode) noexcept;
+
+    /**
+     * @brief Configure output driver mode (push-pull or open-drain).
+     * @param name  Pin name from pincfg.
+     * @param mode  Desired output mode.
+     * @return GPIO_SUCCESS on success.
+     */
     [[nodiscard]] hf_gpio_err_t SetOutputMode(std::string_view name, hf_gpio_output_mode_t mode) noexcept;
+
+    //==========================================================================
+    // INTERRUPT SUPPORT — forwarded to underlying BaseGpio driver
+    //==========================================================================
+
+    /**
+     * @brief Configure interrupt on a named GPIO pin.
+     * @param name      Pin name from pincfg
+     * @param trigger   Interrupt trigger edge/level
+     * @param callback  Function called on interrupt (keep minimal — ISR context)
+     * @param user_data Optional user data passed to callback
+     * @return GPIO error code
+     */
+    [[nodiscard]] hf_gpio_err_t ConfigureInterrupt(std::string_view name,
+                                                   hf_gpio_interrupt_trigger_t trigger,
+                                                   InterruptCallback callback,
+                                                   void* user_data = nullptr) noexcept;
+    /**
+     * @brief Enable a previously configured interrupt on a named pin.
+     * @param name  Pin name from pincfg.
+     * @return GPIO_SUCCESS on success.
+     */
+    [[nodiscard]] hf_gpio_err_t EnableInterrupt(std::string_view name) noexcept;
+
+    /**
+     * @brief Disable the interrupt on a named pin.
+     * @param name  Pin name from pincfg.
+     * @return GPIO_SUCCESS on success.
+     */
+    [[nodiscard]] hf_gpio_err_t DisableInterrupt(std::string_view name) noexcept;
+
+    /**
+     * @brief Check whether a pin's underlying driver supports interrupts.
+     * @param name  Pin name from pincfg.
+     * @return true if interrupts are supported.
+     */
+    [[nodiscard]] bool SupportsInterrupts(std::string_view name) const noexcept;
 
     //==========================================================================
     // DIAGNOSTICS
     //==========================================================================
 
+    /**
+     * @brief Populate a diagnostics snapshot.
+     * @param[out] diagnostics  Struct filled with current counters and state.
+     * @return GPIO_SUCCESS on success.
+     */
+    [[nodiscard]] hf_gpio_err_t GetSystemDiagnostics(GpioSystemDiagnostics& diagnostics) const noexcept;
+
+    /** @brief Log current GPIO state and statistics to the console. */
     void DumpStatistics() const noexcept;
 
 private:
@@ -136,6 +280,11 @@ private:
     std::array<GpioEntry, kMaxEntries> entries_{};
     size_t registered_count_{0};
 
+    uint32_t total_ops_{0};
+    uint32_t successful_ops_{0};
+    uint32_t failed_ops_{0};
+    hf_gpio_err_t last_error_{hf_gpio_err_t::GPIO_SUCCESS};
+
     std::atomic<bool> initialized_{false};
     mutable RtosMutex mutex_;
 };
@@ -144,6 +293,10 @@ private:
 // CONVENIENCE
 //==============================================================================
 
+/**
+ * @brief Convenience accessor — equivalent to GpioManager::GetInstance().
+ * @return Reference to the singleton GpioManager.
+ */
 [[nodiscard]] inline GpioManager& GetGpioManager() noexcept {
     return GpioManager::GetInstance();
 }

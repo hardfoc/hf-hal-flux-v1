@@ -590,7 +590,7 @@ Tle92466edHandler* ValveManager::GetTle92466Handler() noexcept {
 // DIAGNOSTICS
 //==============================================================================
 
-bool ValveManager::GetSystemDiagnostics(ValveSystemDiagnostics& diag) const noexcept {
+hf_valve_err_t ValveManager::GetSystemDiagnostics(ValveSystemDiagnostics& diag) const noexcept {
     diag.max22200_initialized  = max22200_valid_;
     diag.tle92466_initialized  = tle92466_valid_;
     diag.total_channels        = static_cast<uint8_t>(ValveChannel::CHANNEL_COUNT);
@@ -607,7 +607,7 @@ bool ValveManager::GetSystemDiagnostics(ValveSystemDiagnostics& diag) const noex
     }
 
     diag.system_healthy = (max22200_valid_ || tle92466_valid_) && (diag.total_errors == 0);
-    return true;
+    return hf_valve_err_t::VALVE_SUCCESS;
 }
 
 void ValveManager::DumpStatistics() const noexcept {

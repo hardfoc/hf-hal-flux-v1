@@ -316,7 +316,7 @@ static void example_diagnostics() {
     auto& valves = FLUX_API.valves;
 
     ValveSystemDiagnostics diag{};
-    if (valves.GetSystemDiagnostics(diag)) {
+    if (valves.GetSystemDiagnostics(diag) == hf_valve_err_t::VALVE_SUCCESS) {
         ESP_LOGI(TAG, "System healthy:        %s", diag.system_healthy ? "YES" : "NO");
         ESP_LOGI(TAG, "MAX22200 initialized:  %s", diag.max22200_initialized ? "YES" : "NO");
         ESP_LOGI(TAG, "TLE92466 initialized:  %s", diag.tle92466_initialized ? "YES" : "NO");

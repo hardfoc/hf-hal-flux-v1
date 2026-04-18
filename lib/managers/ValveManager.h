@@ -91,7 +91,11 @@ enum class hf_valve_err_t : uint8_t {
     VALVE_ERR_UNKNOWN               = 255
 };
 
-/** @brief Convert hf_valve_err_t to human-readable description string. */
+/**
+ * @brief Convert hf_valve_err_t to a human-readable description string.
+ * @param err Error code to convert.
+ * @return Null-terminated string representation.
+ */
 constexpr const char* HfValveErrToString(hf_valve_err_t err) noexcept {
     switch (err) {
         case hf_valve_err_t::VALVE_SUCCESS:                   return "Success";
@@ -121,14 +125,22 @@ constexpr const char* HfValveErrToString(hf_valve_err_t err) noexcept {
     }
 }
 
-/** @brief Check if a valve error indicates success. */
+/**
+ * @brief Check if a valve error code indicates success.
+ * @param err Error code to test.
+ * @return true if err == VALVE_SUCCESS.
+ */
 constexpr bool HfValveErrOk(hf_valve_err_t err) noexcept {
     return err == hf_valve_err_t::VALVE_SUCCESS;
 }
 
 // ─── Driver Error Mappings ──────────────────────────────────────────────────
 
-/** @brief Map TLE92466ED DriverError → hf_valve_err_t. */
+/**
+ * @brief Map TLE92466ED DriverError to the unified hf_valve_err_t domain.
+ * @param e TLE92466ED driver error.
+ * @return Corresponding hf_valve_err_t.
+ */
 constexpr hf_valve_err_t TleDriverErrorToValveError(tle92466ed::DriverError e) noexcept {
     switch (e) {
         case tle92466ed::DriverError::None:              return hf_valve_err_t::VALVE_SUCCESS;
@@ -150,7 +162,11 @@ constexpr hf_valve_err_t TleDriverErrorToValveError(tle92466ed::DriverError e) n
     }
 }
 
-/** @brief Map MAX22200 DriverStatus → hf_valve_err_t. */
+/**
+ * @brief Map MAX22200 DriverStatus to the unified hf_valve_err_t domain.
+ * @param s MAX22200 driver status.
+ * @return Corresponding hf_valve_err_t.
+ */
 constexpr hf_valve_err_t MaxDriverStatusToValveError(max22200::DriverStatus s) noexcept {
     switch (s) {
         case max22200::DriverStatus::OK:                  return hf_valve_err_t::VALVE_SUCCESS;
@@ -224,6 +240,7 @@ static constexpr ValveChannelInfo kValveChannelMap[] = {
     { ValveChannel::PROP_CH5, ValveDriverType::TLE92466, 5, "PROP_CH5" },
 };
 
+/** @brief Total number of valve channels defined in the mapping table. */
 static constexpr size_t kValveChannelCount = sizeof(kValveChannelMap) / sizeof(kValveChannelMap[0]);
 
 //==============================================================================
@@ -249,14 +266,14 @@ struct ValveChannelState {
  * @brief Diagnostics snapshot for the entire valve subsystem.
  */
 struct ValveSystemDiagnostics {
-    bool system_healthy;
-    bool max22200_initialized;
-    bool tle92466_initialized;
-    uint8_t total_channels;
-    uint8_t configured_channels;
-    uint8_t active_channels;
-    uint32_t total_activations;
-    uint32_t total_errors;
+    bool system_healthy;            ///< True when both driver ICs are operational
+    bool max22200_initialized;      ///< MAX22200 handler initialised and ready
+    bool tle92466_initialized;      ///< TLE92466ED handler initialised and ready
+    uint8_t total_channels;         ///< Total channel slots in the mapping table
+    uint8_t configured_channels;    ///< Number of channels that have been configured
+    uint8_t active_channels;        ///< Number of channels currently enabled
+    uint32_t total_activations;     ///< Cumulative enable-event count across all channels
+    uint32_t total_errors;          ///< Cumulative error count across all channels
 };
 
 //==============================================================================
@@ -277,6 +294,7 @@ public:
     // SINGLETON
     //==========================================================================
 
+    /** @brief Return the singleton ValveManager instance. */
     static ValveManager& GetInstance() noexcept;
 
     ValveManager(const ValveManager&) = delete;
@@ -293,6 +311,11 @@ public:
      * @return true if initialization successful, false otherwise
      */
     [[nodiscard]] bool EnsureInitialized() noexcept;
+
+    /**
+     * @brief Check whether the valve subsystem has been initialised.
+     * @return true if initialised.
+     */
     [[nodiscard]] bool IsInitialized() const noexcept { return initialized_.load(std::memory_order_acquire); }
 
     /**
@@ -305,19 +328,38 @@ public:
     // CHANNEL ENABLE / DISABLE (unified for both drivers)
     //==========================================================================
 
-    /** @brief Enable a valve channel output. */
+    /**
+     * @brief Enable a valve channel output.
+     * @param channel Valve channel to enable.
+     * @return VALVE_SUCCESS on success.
+     */
     [[nodiscard]] hf_valve_err_t EnableChannel(ValveChannel channel) noexcept;
 
-    /** @brief Disable a valve channel output. */
+    /**
+     * @brief Disable a valve channel output.
+     * @param channel Valve channel to disable.
+     * @return VALVE_SUCCESS on success.
+     */
     [[nodiscard]] hf_valve_err_t DisableChannel(ValveChannel channel) noexcept;
 
-    /** @brief Enable multiple channels by bitmask (lower 8 bits → MAX22200, upper 6 → TLE). */
+    /**
+     * @brief Enable multiple channels by bitmask.
+     * @param mask Lower 8 bits → MAX22200 channels, upper 6 bits → TLE92466ED.
+     * @return VALVE_SUCCESS on success.
+     */
     [[nodiscard]] hf_valve_err_t EnableChannelsMask(uint16_t mask) noexcept;
 
-    /** @brief Disable all channels on both drivers. */
+    /**
+     * @brief Disable all channels on both drivers.
+     * @return VALVE_SUCCESS on success.
+     */
     [[nodiscard]] hf_valve_err_t DisableAllChannels() noexcept;
 
-    /** @brief Check if a channel is currently enabled. */
+    /**
+     * @brief Check if a channel is currently enabled.
+     * @param channel Valve channel to query.
+     * @return true if the channel output is active.
+     */
     [[nodiscard]] bool IsChannelEnabled(ValveChannel channel) const noexcept;
 
     //==========================================================================
@@ -396,52 +438,103 @@ public:
     // STATUS & FAULT MANAGEMENT
     //==========================================================================
 
-    /** @brief Check if any driver reports a fault. */
+    /**
+     * @brief Check if any driver reports a fault.
+     * @return true if a fault is active on either driver.
+     */
     [[nodiscard]] bool HasFault() noexcept;
 
-    /** @brief Clear faults on both drivers. */
+    /**
+     * @brief Clear faults on both drivers.
+     * @return VALVE_SUCCESS on success.
+     */
     [[nodiscard]] hf_valve_err_t ClearAllFaults() noexcept;
 
-    /** @brief Check for MAX22200-specific faults. */
+    /**
+     * @brief Check for MAX22200-specific faults.
+     * @return true if a solenoid-driver fault is active.
+     */
     [[nodiscard]] bool HasSolenoidFault() noexcept;
 
-    /** @brief Check for TLE92466ED-specific faults. */
+    /**
+     * @brief Check for TLE92466ED-specific faults.
+     * @return true if a proportional-driver fault is active.
+     */
     [[nodiscard]] bool HasProportionalFault() noexcept;
 
-    /** @brief Get MAX22200 fault status. */
+    /**
+     * @brief Retrieve the MAX22200 fault status.
+     * @param[out] faults Fault status structure to fill.
+     * @return VALVE_SUCCESS on success.
+     */
     [[nodiscard]] hf_valve_err_t GetSolenoidFaults(max22200::FaultStatus& faults) noexcept;
 
-    /** @brief Get TLE92466ED fault report. */
+    /**
+     * @brief Retrieve the TLE92466ED fault report.
+     * @param[out] report Fault report structure to fill.
+     * @return VALVE_SUCCESS on success.
+     */
     [[nodiscard]] hf_valve_err_t GetProportionalFaults(tle92466ed::FaultReport& report) noexcept;
 
     //==========================================================================
     // CHANNEL INFORMATION
     //==========================================================================
 
-    /** @brief Get channel state by enum. */
+    /**
+     * @brief Get channel runtime state by enum.
+     * @param channel Valve channel to query.
+     * @return Pointer to ValveChannelState, or nullptr if invalid.
+     */
     [[nodiscard]] const ValveChannelState* GetChannelState(ValveChannel channel) const noexcept;
 
-    /** @brief Get channel info by string name. */
+    /**
+     * @brief Get channel info (driver type, hw channel, name) by string name.
+     * @param name Human-readable channel name (e.g. "SOL_CH0").
+     * @return Pointer to ValveChannelInfo, or nullptr if not found.
+     */
     [[nodiscard]] const ValveChannelInfo* GetChannelInfo(std::string_view name) const noexcept;
 
-    /** @brief Find a channel enum by name. Returns CHANNEL_COUNT if not found. */
+    /**
+     * @brief Find a channel enum by name.
+     * @param name Channel name to look up.
+     * @return Matching ValveChannel, or CHANNEL_COUNT if not found.
+     */
     [[nodiscard]] ValveChannel FindChannel(std::string_view name) const noexcept;
 
     //==========================================================================
     // DIRECT DRIVER ACCESS (for advanced use)
     //==========================================================================
 
-    /** @brief Get the MAX22200 handler (for advanced solenoid operations). */
+    /**
+     * @brief Get the MAX22200 handler for advanced solenoid operations.
+     * @return Pointer to Max22200Handler, or nullptr if not initialised.
+     */
     [[nodiscard]] Max22200Handler* GetMax22200Handler() noexcept;
 
-    /** @brief Get the TLE92466ED handler (for advanced proportional operations). */
+    /**
+     * @brief Get the TLE92466ED handler for advanced proportional operations.
+     * @return Pointer to Tle92466edHandler, or nullptr if not initialised.
+     */
     [[nodiscard]] Tle92466edHandler* GetTle92466Handler() noexcept;
 
     //==========================================================================
     // DIAGNOSTICS
     //==========================================================================
 
-    [[nodiscard]] bool GetSystemDiagnostics(ValveSystemDiagnostics& diag) const noexcept;
+    /**
+     * @brief Get the most recent error code from any valve operation.
+     * @return Last hf_valve_err_t set by any API call
+     */
+    [[nodiscard]] hf_valve_err_t GetLastError() const noexcept { return last_error_.load(std::memory_order_acquire); }
+
+    /**
+     * @brief Populate a ValveSystemDiagnostics snapshot.
+     * @param[out] diag Diagnostics structure to fill.
+     * @return VALVE_SUCCESS on success.
+     */
+    [[nodiscard]] hf_valve_err_t GetSystemDiagnostics(ValveSystemDiagnostics& diag) const noexcept;
+
+    /** @brief Log valve channel statistics and driver health to the console. */
     void DumpStatistics() const noexcept;
 
 private:
@@ -475,6 +568,7 @@ private:
     std::array<ValveChannelState, static_cast<size_t>(ValveChannel::CHANNEL_COUNT)> channel_states_{};
 
     std::atomic<bool> initialized_{false};
+    mutable std::atomic<hf_valve_err_t> last_error_{hf_valve_err_t::VALVE_SUCCESS};
     mutable RtosMutex mutex_;
 };
 
@@ -482,6 +576,10 @@ private:
 // CONVENIENCE
 //==============================================================================
 
+/**
+ * @brief Convenience accessor — equivalent to ValveManager::GetInstance().
+ * @return Reference to the singleton ValveManager.
+ */
 [[nodiscard]] inline ValveManager& GetValveManager() noexcept {
     return ValveManager::GetInstance();
 }

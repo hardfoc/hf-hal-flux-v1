@@ -110,7 +110,7 @@ static bool test_adc_vbus_range_sanity() noexcept {
 }
 
 static bool test_adc_diagnostics() noexcept {
-  FluxAdcDiagnostics diag{};
+  AdcSystemDiagnostics diag{};
   [[maybe_unused]] auto ok = ADC().GetSystemDiagnostics(diag);
   return true;
 }

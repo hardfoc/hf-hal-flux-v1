@@ -203,6 +203,17 @@ hf_gpio_err_t GpioManager::SetOutputMode(std::string_view name, hf_gpio_output_m
 // DIAGNOSTICS
 //==============================================================================
 
+hf_gpio_err_t GpioManager::GetSystemDiagnostics(GpioSystemDiagnostics& diag) const noexcept {
+    diag.system_healthy = initialized_.load(std::memory_order_acquire);
+    diag.total_pins_registered = static_cast<uint32_t>(registered_count_);
+    diag.total_operations = total_ops_;
+    diag.successful_operations = successful_ops_;
+    diag.failed_operations = failed_ops_;
+    diag.system_uptime_ms = 0;  // Populated by caller if needed
+    diag.last_error = last_error_;
+    return hf_gpio_err_t::GPIO_SUCCESS;
+}
+
 void GpioManager::DumpStatistics() const noexcept {
     auto& log = Logger::GetInstance();
     log.Info(TAG, "=== Flux GPIO Manager Statistics ===");
@@ -243,4 +254,34 @@ bool GpioManager::Deinitialize() noexcept {
 
     initialized_.store(false, std::memory_order_release);
     return true;
+}
+
+//==============================================================================
+// INTERRUPT STUBS (ESP32 internal GPIOs — basic support)
+//==============================================================================
+
+hf_gpio_err_t GpioManager::ConfigureInterrupt(std::string_view name,
+                                               hf_gpio_interrupt_trigger_t trigger,
+                                               InterruptCallback callback,
+                                               void* user_data) noexcept {
+    auto* gpio = Get(name);
+    if (!gpio) return hf_gpio_err_t::GPIO_ERR_PIN_NOT_FOUND;
+    return gpio->ConfigureInterrupt(trigger, callback, user_data);
+}
+
+hf_gpio_err_t GpioManager::EnableInterrupt(std::string_view name) noexcept {
+    auto* gpio = Get(name);
+    if (!gpio) return hf_gpio_err_t::GPIO_ERR_PIN_NOT_FOUND;
+    return gpio->EnableInterrupt();
+}
+
+hf_gpio_err_t GpioManager::DisableInterrupt(std::string_view name) noexcept {
+    auto* gpio = Get(name);
+    if (!gpio) return hf_gpio_err_t::GPIO_ERR_PIN_NOT_FOUND;
+    return gpio->DisableInterrupt();
+}
+
+bool GpioManager::SupportsInterrupts(std::string_view name) const noexcept {
+    // All ESP32 internal GPIOs support interrupts
+    return FindByName(name) != kInvalidIndex;
 }

@@ -42,16 +42,16 @@ static void example_basic_reading() {
 
     // Read by sensor name (string-based)
     float internal_c = 0.0f;
-    bool ok = temp.ReadTemperatureCelsius("ESP32_INTERNAL", internal_c);
-    if (ok) {
+    auto err = temp.ReadTemperatureCelsius("ESP32_INTERNAL", internal_c);
+    if (err == TemperatureError::SUCCESS) {
         ESP_LOGI(TAG, "ESP32 internal: %.1f C", static_cast<double>(internal_c));
     } else {
         ESP_LOGW(TAG, "ESP32 internal read failed");
     }
 
     float ntc_c = 0.0f;
-    ok = temp.ReadTemperatureCelsius("NTC_THERMISTOR", ntc_c);
-    if (ok) {
+    err = temp.ReadTemperatureCelsius("NTC_THERMISTOR", ntc_c);
+    if (err == TemperatureError::SUCCESS) {
         ESP_LOGI(TAG, "NTC thermistor: %.1f C", static_cast<double>(ntc_c));
     } else {
         ESP_LOGW(TAG, "NTC thermistor read failed");
@@ -68,12 +68,12 @@ static void example_convenience_methods() {
 
     // Direct convenience accessors (no string lookup needed)
     float internal_c = 0.0f;
-    if (temp.ReadInternalTemperature(internal_c)) {
+    if (temp.ReadInternalTemperature(internal_c) == TemperatureError::SUCCESS) {
         ESP_LOGI(TAG, "ReadInternalTemperature: %.1f C", static_cast<double>(internal_c));
     }
 
     float ntc_c = 0.0f;
-    if (temp.ReadNtcTemperature(ntc_c)) {
+    if (temp.ReadNtcTemperature(ntc_c) == TemperatureError::SUCCESS) {
         ESP_LOGI(TAG, "ReadNtcTemperature:     %.1f C", static_cast<double>(ntc_c));
     }
 }
@@ -87,12 +87,12 @@ static void example_fahrenheit() {
     auto& temp = FLUX_API.temp;
 
     float internal_f = 0.0f;
-    if (temp.ReadTemperatureFahrenheit("ESP32_INTERNAL", internal_f)) {
+    if (temp.ReadTemperatureFahrenheit("ESP32_INTERNAL", internal_f) == TemperatureError::SUCCESS) {
         ESP_LOGI(TAG, "ESP32 internal: %.1f F", static_cast<double>(internal_f));
     }
 
     float ntc_f = 0.0f;
-    if (temp.ReadTemperatureFahrenheit("NTC_THERMISTOR", ntc_f)) {
+    if (temp.ReadTemperatureFahrenheit("NTC_THERMISTOR", ntc_f) == TemperatureError::SUCCESS) {
         ESP_LOGI(TAG, "NTC thermistor: %.1f F", static_cast<double>(ntc_f));
     }
 }
@@ -106,7 +106,7 @@ static void example_temperature_stats() {
     auto& temp = FLUX_API.temp;
 
     float min_c = 0.0f, max_c = 0.0f, avg_c = 0.0f;
-    if (temp.GetSystemTemperatureStats(min_c, max_c, avg_c)) {
+    if (temp.GetSystemTemperatureStats(min_c, max_c, avg_c) == TemperatureError::SUCCESS) {
         ESP_LOGI(TAG, "Across all sensors:");
         ESP_LOGI(TAG, "  Min:  %.1f C", static_cast<double>(min_c));
         ESP_LOGI(TAG, "  Max:  %.1f C", static_cast<double>(max_c));
@@ -158,18 +158,18 @@ static void example_monitoring_loop() {
     for (int i = 0; i < 5; ++i) {
         float esp32_c = 0.0f, ntc_c = 0.0f;
 
-        bool esp32_ok = temp.ReadInternalTemperature(esp32_c);
-        bool ntc_ok   = temp.ReadNtcTemperature(ntc_c);
+        auto esp32_err = temp.ReadInternalTemperature(esp32_c);
+        auto ntc_err   = temp.ReadNtcTemperature(ntc_c);
 
         ESP_LOGI(TAG, "  [%d] ESP32=%.1f C  NTC=%.1f C", i,
                  static_cast<double>(esp32_c), static_cast<double>(ntc_c));
 
         // Threshold alerting
-        if (esp32_ok && esp32_c > ESP32_WARN_THRESHOLD_C) {
+        if (esp32_err == TemperatureError::SUCCESS && esp32_c > ESP32_WARN_THRESHOLD_C) {
             ESP_LOGW(TAG, "  WARNING: ESP32 temperature above %.0f C!", 
                      static_cast<double>(ESP32_WARN_THRESHOLD_C));
         }
-        if (ntc_ok && ntc_c > NTC_WARN_THRESHOLD_C) {
+        if (ntc_err == TemperatureError::SUCCESS && ntc_c > NTC_WARN_THRESHOLD_C) {
             ESP_LOGW(TAG, "  WARNING: Board temperature above %.0f C!",
                      static_cast<double>(NTC_WARN_THRESHOLD_C));
         }
@@ -188,7 +188,7 @@ static void example_thermal_protection() {
 
     // Real-world pattern: monitor temperature and adjust LED status
     float ntc_c = 0.0f;
-    if (flux.temp.ReadNtcTemperature(ntc_c)) {
+    if (flux.temp.ReadNtcTemperature(ntc_c) == TemperatureError::SUCCESS) {
         if (ntc_c > 60.0f) {
             // Critical -- shut down valves, indicate error
             flux.valves.DisableAllChannels();
@@ -221,8 +221,8 @@ static void example_diagnostics() {
 
     auto& temp = FLUX_API.temp;
 
-    FluxTempDiagnostics diag{};
-    if (temp.GetSystemDiagnostics(diag)) {
+    TempSystemDiagnostics diag{};
+    if (temp.GetSystemDiagnostics(diag) == TemperatureError::SUCCESS) {
         ESP_LOGI(TAG, "System healthy:      %s", diag.system_healthy ? "YES" : "NO");
         ESP_LOGI(TAG, "Total sensors:       %u", diag.total_sensors);
         ESP_LOGI(TAG, "Registered sensors:  %u", diag.registered_sensors);

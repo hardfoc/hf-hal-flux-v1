@@ -224,12 +224,25 @@ bool Flux::CollectManagerHealth(ManagerHealthSnapshot& snapshot) noexcept {
     addEntry(0, "CommChannels", comms_initialized_.load(),
              static_cast<uint8_t>(comms.GetLastError()));
 
-    // 2-6: No public error accessors yet; report initialized status only
-    addEntry(1, "GPIO",        gpio_initialized_.load(),    0);
-    addEntry(2, "Valves",      valves_initialized_.load(),  0);
-    addEntry(3, "ADC",         adc_initialized_.load(),     0);
-    addEntry(4, "LEDs",        leds_initialized_.load(),    0);
-    addEntry(5, "Temperature", temp_initialized_.load(),    0);
+    // 2. GPIO — GetLastError()
+    addEntry(1, "GPIO",        gpio_initialized_.load(),
+             static_cast<uint8_t>(gpio.GetLastError()));
+
+    // 3. Valves — GetLastError()
+    addEntry(2, "Valves",      valves_initialized_.load(),
+             static_cast<uint8_t>(valves.GetLastError()));
+
+    // 4. ADC — GetLastError()
+    addEntry(3, "ADC",         adc_initialized_.load(),
+             static_cast<uint8_t>(adc.GetLastError()));
+
+    // 5. LEDs — GetLastError()
+    addEntry(4, "LEDs",        leds_initialized_.load(),
+             static_cast<uint8_t>(leds.GetLastError()));
+
+    // 6. Temperature — GetLastError()
+    addEntry(5, "Temperature", temp_initialized_.load(),
+             static_cast<uint8_t>(temp.GetLastError()));
 
     return true;
 }
@@ -312,4 +325,53 @@ void Flux::UpdateSystemDiagnostics() noexcept {
     for (size_t i = 0; i < failed_components_count_ && i < FluxSystemDiagnostics::kMaxDiagEntries; ++i) {
         diagnostics_.failed_components_list[i] = failed_components_[i];
     }
+}
+
+//==============================================================================
+// SHUTDOWN
+//==============================================================================
+
+bool Flux::Shutdown() noexcept {
+    if (!initialized_) return true;
+
+    Logger::GetInstance().Info(TAG, "Shutting down Flux API");
+
+    // Reverse initialization order: Temp → LEDs → ADC → Valves → GPIO → Comms
+    temp.Deinitialize();
+    leds.Deinitialize();
+    adc.Deinitialize();
+    // ValveManager does not have Deinitialize yet — skip
+    gpio.Deinitialize();
+    comms.Deinitialize();
+
+    temp_initialized_   = false;
+    leds_initialized_   = false;
+    adc_initialized_    = false;
+    valves_initialized_ = false;
+    gpio_initialized_   = false;
+    comms_initialized_  = false;
+    initialized_        = false;
+
+    Logger::GetInstance().Info(TAG, "Flux API shut down complete");
+    return true;
+}
+
+//==============================================================================
+// FAILED COMPONENTS / WARNINGS
+//==============================================================================
+
+size_t Flux::GetFailedComponents(const char* out[], size_t max_count) const noexcept {
+    size_t count = (failed_components_count_ < max_count) ? failed_components_count_ : max_count;
+    for (size_t i = 0; i < count; ++i) {
+        out[i] = failed_components_[i];
+    }
+    return count;
+}
+
+size_t Flux::GetSystemWarnings(const char* out[], size_t max_count) const noexcept {
+    size_t count = (system_warnings_count_ < max_count) ? system_warnings_count_ : max_count;
+    for (size_t i = 0; i < count; ++i) {
+        out[i] = system_warnings_[i];
+    }
+    return count;
 }

@@ -143,11 +143,17 @@ const TempEntry* TemperatureManager::GetSensorEntry(std::string_view name) const
 // TEMPERATURE READING
 //==============================================================================
 
-bool TemperatureManager::ReadTemperatureCelsius(std::string_view name, float& temperature_c) noexcept {
-    if (!initialized_.load(std::memory_order_acquire)) return false;
+TemperatureError TemperatureManager::ReadTemperatureCelsius(std::string_view name, float& temperature_c) noexcept {
+    if (!initialized_.load(std::memory_order_acquire)) {
+        last_error_.store(TemperatureError::NOT_INITIALIZED, std::memory_order_release);
+        return TemperatureError::NOT_INITIALIZED;
+    }
 
     size_t idx = FindByName(name);
-    if (idx == kInvalidIndex) return false;
+    if (idx == kInvalidIndex) {
+        last_error_.store(TemperatureError::SENSOR_NOT_FOUND, std::memory_order_release);
+        return TemperatureError::SENSOR_NOT_FOUND;
+    }
 
     MutexLockGuard lock(mutex_);
     auto& entry = entries_[idx];
@@ -156,38 +162,49 @@ bool TemperatureManager::ReadTemperatureCelsius(std::string_view name, float& te
     switch (entry.sensor_type) {
         case FluxTempSensorType::ESP32_INTERNAL: sensor = esp32_temp_.get(); break;
         case FluxTempSensorType::NTC_THERMISTOR: sensor = ntc_handler_.get(); break;
-        default: return false;
+        default: {
+            last_error_.store(TemperatureError::SENSOR_NOT_FOUND, std::memory_order_release);
+            return TemperatureError::SENSOR_NOT_FOUND;
+        }
     }
-    if (!sensor) return false;
+    if (!sensor) {
+        last_error_.store(TemperatureError::SENSOR_NOT_AVAILABLE, std::memory_order_release);
+        return TemperatureError::SENSOR_NOT_AVAILABLE;
+    }
 
     hf_temp_err_t err = sensor->ReadTemperatureCelsius(&temperature_c);
     if (err == hf_temp_err_t::TEMP_SUCCESS) {
         entry.last_reading_celsius = temperature_c;
         entry.read_count++;
-        return true;
+        return TemperatureError::SUCCESS;
     }
 
     entry.error_count++;
-    return false;
+    last_error_.store(TemperatureError::READ_FAILED, std::memory_order_release);
+    return TemperatureError::READ_FAILED;
 }
 
-bool TemperatureManager::ReadTemperatureFahrenheit(std::string_view name, float& temperature_f) noexcept {
+TemperatureError TemperatureManager::ReadTemperatureFahrenheit(std::string_view name, float& temperature_f) noexcept {
     float celsius = 0.0f;
-    if (!ReadTemperatureCelsius(name, celsius)) return false;
+    TemperatureError err = ReadTemperatureCelsius(name, celsius);
+    if (err != TemperatureError::SUCCESS) return err;
     temperature_f = celsius * 1.8f + 32.0f;
-    return true;
+    return TemperatureError::SUCCESS;
 }
 
-bool TemperatureManager::ReadInternalTemperature(float& temperature_c) noexcept {
+TemperatureError TemperatureManager::ReadInternalTemperature(float& temperature_c) noexcept {
     return ReadTemperatureCelsius("ESP32_INTERNAL", temperature_c);
 }
 
-bool TemperatureManager::ReadNtcTemperature(float& temperature_c) noexcept {
+TemperatureError TemperatureManager::ReadNtcTemperature(float& temperature_c) noexcept {
     return ReadTemperatureCelsius("NTC_THERMISTOR", temperature_c);
 }
 
-bool TemperatureManager::GetSystemTemperatureStats(float& min_c, float& max_c, float& avg_c) noexcept {
-    if (!initialized_.load(std::memory_order_acquire) || registered_count_ == 0) return false;
+TemperatureError TemperatureManager::GetSystemTemperatureStats(float& min_c, float& max_c, float& avg_c) noexcept {
+    if (!initialized_.load(std::memory_order_acquire) || registered_count_ == 0) {
+        last_error_.store(TemperatureError::NOT_INITIALIZED, std::memory_order_release);
+        return TemperatureError::NOT_INITIALIZED;
+    }
 
     float sum = 0.0f;
     min_c = 200.0f;
@@ -196,7 +213,7 @@ bool TemperatureManager::GetSystemTemperatureStats(float& min_c, float& max_c, f
 
     for (size_t i = 0; i < registered_count_; ++i) {
         float temp = 0.0f;
-        if (ReadTemperatureCelsius(entries_[i].name, temp)) {
+        if (ReadTemperatureCelsius(entries_[i].name, temp) == TemperatureError::SUCCESS) {
             sum += temp;
             if (temp < min_c) min_c = temp;
             if (temp > max_c) max_c = temp;
@@ -204,16 +221,19 @@ bool TemperatureManager::GetSystemTemperatureStats(float& min_c, float& max_c, f
         }
     }
 
-    if (valid == 0) return false;
+    if (valid == 0) {
+        last_error_.store(TemperatureError::READ_FAILED, std::memory_order_release);
+        return TemperatureError::READ_FAILED;
+    }
     avg_c = sum / static_cast<float>(valid);
-    return true;
+    return TemperatureError::SUCCESS;
 }
 
 //==============================================================================
 // DIAGNOSTICS
 //==============================================================================
 
-bool TemperatureManager::GetSystemDiagnostics(FluxTempDiagnostics& diag) noexcept {
+TemperatureError TemperatureManager::GetSystemDiagnostics(TempSystemDiagnostics& diag) const noexcept {
     diag.total_sensors = static_cast<uint8_t>(kMaxSensors);
     diag.registered_sensors = static_cast<uint8_t>(registered_count_);
     diag.total_reads = 0;
@@ -226,12 +246,9 @@ bool TemperatureManager::GetSystemDiagnostics(FluxTempDiagnostics& diag) noexcep
         diag.total_errors += entries_[i].error_count;
     }
 
-    // Read latest values
-    ReadInternalTemperature(diag.esp32_temp_celsius);
-    ReadNtcTemperature(diag.ntc_temp_celsius);
-
+    diag.last_error = last_error_.load(std::memory_order_acquire);
     diag.system_healthy = (diag.registered_sensors > 0) && (diag.total_errors == 0);
-    return true;
+    return TemperatureError::SUCCESS;
 }
 
 void TemperatureManager::DumpStatistics() const noexcept {

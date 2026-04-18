@@ -43,20 +43,24 @@
  * (hf_temp_err_t) are translated into this common manager error domain.
  */
 enum class TemperatureError : uint8_t {
-    SUCCESS = 0,
-    NOT_INITIALIZED,
-    INITIALIZATION_FAILED,
-    SENSOR_NOT_FOUND,
-    SENSOR_NOT_AVAILABLE,
-    READ_FAILED,
-    INVALID_PARAMETER,
-    NO_SENSORS_AVAILABLE,
-    ALLOCATION_FAILED,
-    DEPENDENCY_NOT_READY,
-    MUTEX_LOCK_FAILED
+    SUCCESS = 0,              ///< Operation completed successfully
+    NOT_INITIALIZED,          ///< Manager not yet initialised
+    INITIALIZATION_FAILED,    ///< Sensor initialisation failed
+    SENSOR_NOT_FOUND,         ///< Named sensor does not exist in registry
+    SENSOR_NOT_AVAILABLE,     ///< Sensor exists but is unavailable
+    READ_FAILED,              ///< Driver-level read returned an error
+    INVALID_PARAMETER,        ///< Null pointer or out-of-range argument
+    NO_SENSORS_AVAILABLE,     ///< No sensors were registered at init
+    ALLOCATION_FAILED,        ///< Heap allocation for a sensor driver failed
+    DEPENDENCY_NOT_READY,     ///< Required dependency not initialised
+    MUTEX_LOCK_FAILED         ///< RTOS mutex acquire timed out
 };
 
-/** @brief Convert TemperatureError to string for debugging. */
+/**
+ * @brief Convert TemperatureError to string for debugging.
+ * @param error Error code to convert.
+ * @return Null-terminated string representation.
+ */
 constexpr const char* TemperatureErrorToString(TemperatureError error) noexcept {
     switch (error) {
         case TemperatureError::SUCCESS:               return "Success";
@@ -78,12 +82,20 @@ constexpr const char* TemperatureErrorToString(TemperatureError error) noexcept 
 // SENSOR TYPE ENUM
 //==============================================================================
 
+/**
+ * @brief Identifies the physical temperature sensor type on the Flux board.
+ */
 enum class FluxTempSensorType : uint8_t {
-    ESP32_INTERNAL = 0,
-    NTC_THERMISTOR = 1,
-    SENSOR_COUNT
+    ESP32_INTERNAL = 0, ///< ESP32-C6 on-chip temperature sensor
+    NTC_THERMISTOR = 1, ///< External NTC thermistor via ADC
+    SENSOR_COUNT        ///< Number of sensor types (not a valid sensor)
 };
 
+/**
+ * @brief Convert FluxTempSensorType to a human-readable string.
+ * @param type Sensor type to convert.
+ * @return Null-terminated string representation.
+ */
 constexpr const char* FluxTempSensorTypeToString(FluxTempSensorType type) noexcept {
     switch (type) {
         case FluxTempSensorType::ESP32_INTERNAL: return "ESP32 Internal";
@@ -96,41 +108,61 @@ constexpr const char* FluxTempSensorTypeToString(FluxTempSensorType type) noexce
 // TEMPERATURE ENTRY — stack-allocated metadata (drivers owned via unique_ptr)
 //==============================================================================
 
+/**
+ * @brief A single temperature sensor entry in the fixed-size registry.
+ */
 struct TempEntry {
     std::string_view name;                   ///< Human-readable name
-    FluxTempSensorType sensor_type{FluxTempSensorType::SENSOR_COUNT};
-    bool registered{false};
-    float last_reading_celsius{0.0f};
+    FluxTempSensorType sensor_type{FluxTempSensorType::SENSOR_COUNT}; ///< Physical sensor type
+    bool registered{false};                  ///< Whether this entry is active
+    float last_reading_celsius{0.0f};        ///< Most recent cached reading in °C
 
     // Statistics
-    uint32_t read_count{0};
-    uint32_t error_count{0};
+    uint32_t read_count{0};                  ///< Cumulative successful reads
+    uint32_t error_count{0};                 ///< Cumulative failed reads
 };
 
 //==============================================================================
 // TEMPERATURE DIAGNOSTICS
 //==============================================================================
 
-struct FluxTempDiagnostics {
-    bool system_healthy;
-    uint8_t total_sensors;
-    uint8_t registered_sensors;
-    uint32_t total_reads;
-    uint32_t total_errors;
-    float esp32_temp_celsius;
-    float ntc_temp_celsius;
+/**
+ * @brief Temperature subsystem diagnostics snapshot.
+ */
+struct TempSystemDiagnostics {
+    bool system_healthy;               ///< True when all registered sensors are responsive
+    uint8_t total_sensors;             ///< Maximum sensor slots available
+    uint8_t registered_sensors;        ///< Number of sensors currently registered
+    uint32_t total_reads;              ///< Cumulative read count across all sensors
+    uint32_t total_errors;             ///< Cumulative error count across all sensors
+    float esp32_temp_celsius;          ///< Latest ESP32 internal temperature in °C
+    float ntc_temp_celsius;            ///< Latest NTC thermistor temperature in °C
+    TemperatureError last_error;       ///< Most recent error code from any operation
 };
 
 //==============================================================================
 // TEMPERATURE MANAGER
 //==============================================================================
 
+/**
+ * @class TemperatureManager
+ * @brief Singleton manager for all temperature sensors on Flux V1.
+ *
+ * @details Manages the ESP32-C6 internal temperature sensor and the NTC
+ *          thermistor connected via ADC (GPIO4 / ADC1_CH4). Sensors are
+ *          registered in a fixed-size array at initialisation; readings
+ *          are returned in Celsius or Fahrenheit.
+ *
+ * @note Call EnsureInitialized() once before any reads. All public methods
+ *       are thread-safe (guarded by an internal RTOS mutex).
+ */
 class TemperatureManager {
 public:
     //==========================================================================
     // SINGLETON AND LIFECYCLE
     //==========================================================================
 
+    /** @brief Return the singleton TemperatureManager instance. */
     static TemperatureManager& GetInstance() noexcept;
 
     TemperatureManager(const TemperatureManager&) = delete;
@@ -138,7 +170,16 @@ public:
     TemperatureManager(TemperatureManager&&) = delete;
     TemperatureManager& operator=(TemperatureManager&&) = delete;
 
+    /**
+     * @brief Initialise the temperature subsystem if not already initialised.
+     * @return true on success or if already initialised.
+     */
     [[nodiscard]] bool EnsureInitialized() noexcept;
+
+    /**
+     * @brief Check whether the temperature subsystem has been initialised.
+     * @return true if initialised and ready for reads.
+     */
     [[nodiscard]] bool IsInitialized() const noexcept { return initialized_.load(std::memory_order_acquire); }
 
     /**
@@ -146,6 +187,12 @@ public:
      * @return true on success
      */
     bool Deinitialize() noexcept;
+
+    /**
+     * @brief Get the most recent error code.
+     * @return Last TemperatureError set by any API call
+     */
+    [[nodiscard]] TemperatureError GetLastError() const noexcept { return last_error_.load(std::memory_order_acquire); }
 
     //==========================================================================
     // TEMPERATURE READING
@@ -155,42 +202,67 @@ public:
      * @brief Read temperature in Celsius from a named sensor.
      * @param name           "ESP32_INTERNAL" or "NTC_THERMISTOR"
      * @param temperature_c  Output temperature in °C
-     * @return true on success
+     * @return TemperatureError::SUCCESS on success
      */
-    [[nodiscard]] bool ReadTemperatureCelsius(std::string_view name, float& temperature_c) noexcept;
+    [[nodiscard]] TemperatureError ReadTemperatureCelsius(std::string_view name, float& temperature_c) noexcept;
 
     /**
-     * @brief Read temperature in Fahrenheit.
+     * @brief Read temperature in Fahrenheit from a named sensor.
+     * @param name          Sensor name ("ESP32_INTERNAL" or "NTC_THERMISTOR").
+     * @param temperature_f Output temperature in °F.
+     * @return TemperatureError::SUCCESS on success.
      */
-    [[nodiscard]] bool ReadTemperatureFahrenheit(std::string_view name, float& temperature_f) noexcept;
+    [[nodiscard]] TemperatureError ReadTemperatureFahrenheit(std::string_view name, float& temperature_f) noexcept;
 
     /**
-     * @brief Convenience: read ESP32 internal temperature.
+     * @brief Convenience: read the ESP32 internal temperature sensor.
+     * @param temperature_c Output temperature in °C.
+     * @return TemperatureError::SUCCESS on success.
      */
-    [[nodiscard]] bool ReadInternalTemperature(float& temperature_c) noexcept;
+    [[nodiscard]] TemperatureError ReadInternalTemperature(float& temperature_c) noexcept;
 
     /**
-     * @brief Convenience: read NTC thermistor temperature.
+     * @brief Convenience: read the NTC thermistor temperature.
+     * @param temperature_c Output temperature in °C.
+     * @return TemperatureError::SUCCESS on success.
      */
-    [[nodiscard]] bool ReadNtcTemperature(float& temperature_c) noexcept;
+    [[nodiscard]] TemperatureError ReadNtcTemperature(float& temperature_c) noexcept;
 
     /**
-     * @brief Read all sensors and return min/max/avg.
+     * @brief Read all sensors and compute min, max, and average temperatures.
+     * @param[out] min_c Minimum temperature across all sensors (°C).
+     * @param[out] max_c Maximum temperature across all sensors (°C).
+     * @param[out] avg_c Average temperature across all sensors (°C).
+     * @return TemperatureError::SUCCESS on success.
      */
-    [[nodiscard]] bool GetSystemTemperatureStats(float& min_c, float& max_c, float& avg_c) noexcept;
+    [[nodiscard]] TemperatureError GetSystemTemperatureStats(float& min_c, float& max_c, float& avg_c) noexcept;
 
     //==========================================================================
     // SENSOR INFO
     //==========================================================================
 
+    /** @brief Get the number of registered temperature sensors. */
     [[nodiscard]] size_t GetSensorCount() const noexcept { return registered_count_; }
+
+    /**
+     * @brief Look up a sensor entry by name.
+     * @param name Sensor name.
+     * @return Pointer to the TempEntry, or nullptr if not found.
+     */
     [[nodiscard]] const TempEntry* GetSensorEntry(std::string_view name) const noexcept;
 
     //==========================================================================
     // DIAGNOSTICS
     //==========================================================================
 
-    [[nodiscard]] bool GetSystemDiagnostics(FluxTempDiagnostics& diag) noexcept;
+    /**
+     * @brief Populate a TempSystemDiagnostics snapshot.
+     * @param[out] diag Diagnostics structure to fill.
+     * @return TemperatureError::SUCCESS on success.
+     */
+    [[nodiscard]] TemperatureError GetSystemDiagnostics(TempSystemDiagnostics& diag) const noexcept;
+
+    /** @brief Log temperature sensor statistics and health info to the console. */
     void DumpStatistics() const noexcept;
 
 private:
@@ -218,6 +290,7 @@ private:
     std::unique_ptr<NtcTemperatureHandler> ntc_handler_;
 
     std::atomic<bool> initialized_{false};
+    std::atomic<TemperatureError> last_error_{TemperatureError::SUCCESS};
     mutable RtosMutex mutex_;
 };
 
@@ -225,6 +298,10 @@ private:
 // CONVENIENCE
 //==============================================================================
 
+/**
+ * @brief Convenience accessor — equivalent to TemperatureManager::GetInstance().
+ * @return Reference to the singleton TemperatureManager.
+ */
 [[nodiscard]] inline TemperatureManager& GetTemperatureManager() noexcept {
     return TemperatureManager::GetInstance();
 }

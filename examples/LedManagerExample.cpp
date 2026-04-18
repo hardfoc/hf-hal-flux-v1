@@ -137,6 +137,12 @@ static void example_brightness() {
     ESP_LOGI(TAG, "  BrightnessRaw(128): 50%% of max range");
     vTaskDelay(pdMS_TO_TICKS(400));
 
+    // Read back current brightness
+    uint8_t read_pct = 0, read_raw = 0;
+    leds.GetCurrentBrightnessPercent(read_pct);
+    leds.GetCurrentBrightnessRaw(read_raw);
+    ESP_LOGI(TAG, "  Read back brightness: %u%% (raw %u)", read_pct, read_raw);
+
     // Set max brightness limit (caps all subsequent brightness operations)
     leds.SetMaxBrightness(100);  // Limit to ~39% max
     ESP_LOGI(TAG, "  MaxBrightness set to 100 (of 255)");
@@ -203,6 +209,13 @@ static void example_status_indicators() {
     ESP_LOGI(TAG, "=== Example 5: Status Indicators ===");
 
     auto& leds = FLUX_API.leds;
+
+    // Generic SetStatus() -- accepts any LedAnimation enum
+    leds.SetStatus(LedAnimation::STATUS_BOOT);
+    ESP_LOGI(TAG, "  SetStatus(STATUS_BOOT)");
+    for (int i = 0; i < 20; ++i) { leds.UpdateAnimation(); vTaskDelay(pdMS_TO_TICKS(50)); }
+
+    // Convenience helpers (equivalent to SetStatus with the matching enum)
 
     // Boot sequence -- typically shown during initialization
     leds.IndicateBoot();

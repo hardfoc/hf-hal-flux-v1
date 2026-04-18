@@ -188,8 +188,8 @@ static void example_diagnostics() {
 
     auto& adc = FLUX_API.adc;
 
-    FluxAdcDiagnostics diag{};
-    if (adc.GetSystemDiagnostics(diag)) {
+    AdcSystemDiagnostics diag{};
+    if (adc.GetSystemDiagnostics(diag) == hf_adc_err_t::ADC_SUCCESS) {
         ESP_LOGI(TAG, "System healthy:      %s", diag.system_healthy ? "YES" : "NO");
         ESP_LOGI(TAG, "Total channels:      %u", diag.total_channels);
         ESP_LOGI(TAG, "Registered channels: %u", diag.registered_channels);

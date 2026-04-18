@@ -42,7 +42,7 @@ class Ads7952Handler;
  * @brief A single ADC channel entry in the fixed-size registry.
  */
 struct AdcEntry {
-    HfFunctionalAdcChannel functional_channel{HfFunctionalAdcChannel::HF_FUNCTIONAL_ADC_COUNT};
+    HfFunctionalAdcChannel functional_channel{HfFunctionalAdcChannel::HF_FUNCTIONAL_ADC_COUNT}; ///< Functional enum for this channel
     std::string_view name;              ///< Human-readable name from pincfg
     BaseAdc* driver{nullptr};           ///< Pointer to the ADC driver (owned by the EspAdc array)
     uint8_t adc_unit{0};                ///< ADC unit (0 = ADC1, 1 = ADC2)
@@ -51,31 +51,45 @@ struct AdcEntry {
     bool registered{false};             ///< Whether this entry is active
 
     // Statistics
-    uint32_t access_count{0};
-    uint32_t error_count{0};
+    uint32_t access_count{0};           ///< Total successful read operations on this channel
+    uint32_t error_count{0};            ///< Total failed read operations on this channel
 };
 
 /**
  * @brief ADC system diagnostics.
  */
-struct FluxAdcDiagnostics {
-    bool system_healthy;
-    uint8_t total_channels;
-    uint8_t registered_channels;
-    uint32_t total_reads;
-    uint32_t total_errors;
+struct AdcSystemDiagnostics {
+    bool system_healthy;            ///< True when all registered channels are operational
+    uint8_t total_channels;         ///< Maximum number of ADC channels available
+    uint8_t registered_channels;    ///< Number of channels currently registered
+    uint32_t total_reads;           ///< Cumulative successful read count across all channels
+    uint32_t total_errors;          ///< Cumulative error count across all channels
+    hf_adc_err_t last_error;        ///< Most recent error code from any operation
 };
 
 //==============================================================================
 // ADC MANAGER
 //==============================================================================
 
+/**
+ * @class AdcManager
+ * @brief Singleton manager for all analogue-to-digital channels on Flux V1.
+ *
+ * @details Provides a uniform API over the internal ESP32 ADC and optional
+ *          external ADS7952 ADC(s). Channels are registered from the pincfg
+ *          X-MACRO table at initialisation and can be looked up by name
+ *          (linear scan) or by functional enum (O(1) index).
+ *
+ * @note Call EnsureInitialized() once before any reads. All public methods
+ *       are thread-safe (guarded by an internal RTOS mutex).
+ */
 class AdcManager {
 public:
     //==========================================================================
     // SINGLETON AND LIFECYCLE
     //==========================================================================
 
+    /** @brief Return the singleton AdcManager instance. */
     static AdcManager& GetInstance() noexcept;
 
     AdcManager(const AdcManager&) = delete;
@@ -83,7 +97,15 @@ public:
     AdcManager(AdcManager&&) = delete;
     AdcManager& operator=(AdcManager&&) = delete;
 
+    /**
+     * @brief Initialise the ADC subsystem if not already initialised.
+     * @return true on success or if already initialised.
+     */
     [[nodiscard]] bool EnsureInitialized() noexcept;
+
+    /** @brief Check whether the ADC subsystem has been initialised.
+     *  @return true if initialised and ready for reads.
+     */
     [[nodiscard]] bool IsInitialized() const noexcept { return initialized_.load(std::memory_order_acquire); }
 
     /**
@@ -96,16 +118,31 @@ public:
     // CHANNEL ACCESS
     //==========================================================================
 
-    /** @brief Get the BaseAdc driver for a named channel. Returns nullptr if not found. */
+    /**
+     * @brief Get the BaseAdc driver for a named channel.
+     * @param name Channel name from the pincfg table (linear scan).
+     * @return Pointer to the BaseAdc driver, or nullptr if not found.
+     */
     [[nodiscard]] BaseAdc* Get(std::string_view name) noexcept;
 
-    /** @brief Get the BaseAdc driver by functional enum. Returns nullptr if not found. */
+    /**
+     * @brief Get the BaseAdc driver by functional enum — O(1) lookup.
+     * @param channel Functional ADC channel enum.
+     * @return Pointer to the BaseAdc driver, or nullptr if not found.
+     */
     [[nodiscard]] BaseAdc* Get(HfFunctionalAdcChannel channel) noexcept;
 
-    /** @brief Check if a named ADC channel exists. */
+    /**
+     * @brief Check whether a named ADC channel is registered.
+     * @param name Channel name to look up.
+     * @return true if the channel exists in the registry.
+     */
     [[nodiscard]] bool Contains(std::string_view name) const noexcept;
 
-    /** @brief Number of registered ADC channels. */
+    /**
+     * @brief Get the number of registered ADC channels.
+     * @return Channel count.
+     */
     [[nodiscard]] size_t Size() const noexcept;
 
     //==========================================================================
@@ -156,7 +193,20 @@ public:
     // DIAGNOSTICS
     //==========================================================================
 
-    [[nodiscard]] bool GetSystemDiagnostics(FluxAdcDiagnostics& diag) const noexcept;
+    /**
+     * @brief Get the most recent error code.
+     * @return Last hf_adc_err_t set by any API call
+     */
+    [[nodiscard]] hf_adc_err_t GetLastError() const noexcept { return last_error_.load(std::memory_order_acquire); }
+
+    /**
+     * @brief Populate an AdcSystemDiagnostics snapshot.
+     * @param[out] diag Diagnostics structure to fill.
+     * @return ADC_SUCCESS on success.
+     */
+    [[nodiscard]] hf_adc_err_t GetSystemDiagnostics(AdcSystemDiagnostics& diag) const noexcept;
+
+    /** @brief Log ADC channel statistics and health info to the console. */
     void DumpStatistics() const noexcept;
 
 private:
@@ -202,6 +252,7 @@ private:
 #endif
 
     std::atomic<bool> initialized_{false};
+    std::atomic<hf_adc_err_t> last_error_{hf_adc_err_t::ADC_SUCCESS};
     mutable RtosMutex mutex_;
 };
 
@@ -209,6 +260,10 @@ private:
 // CONVENIENCE
 //==============================================================================
 
+/**
+ * @brief Convenience accessor — equivalent to AdcManager::GetInstance().
+ * @return Reference to the singleton AdcManager.
+ */
 [[nodiscard]] inline AdcManager& GetAdcManager() noexcept {
     return AdcManager::GetInstance();
 }

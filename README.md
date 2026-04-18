@@ -144,13 +144,28 @@ Dual-source temperature monitoring:
 
 ---
 
+## API Changes (v2.0.0)
+
+| Area | Change |
+|------|--------|
+| **Diagnostics types** | `FluxAdcDiagnostics` → `AdcSystemDiagnostics`, `FluxTempDiagnostics` → `TempSystemDiagnostics` |
+| **Return types** | `GetSystemDiagnostics()` returns typed error codes (`hf_adc_err_t`, `hf_valve_err_t`, `hf_gpio_err_t`) instead of `bool` |
+| **Temperature** | `ReadTemperatureCelsius()` etc. return `TemperatureError` instead of `bool` |
+| **Error tracking** | All managers now expose `GetLastError()` |
+| **GPIO diagnostics** | New `GpioSystemDiagnostics` struct with interrupt counting |
+| **GPIO interrupts** | `EnableInterrupt()`, `DisableInterrupt()`, `RegisterInterruptCallback()`, `GetInterruptCount()` |
+| **Lifecycle** | `Flux::Shutdown()` for graceful reverse-order teardown |
+| **Convenience** | `GetFlux()` free function (equivalent to `Flux::GetInstance()`), `GetCommChannelsManager()` |
+
+---
+
 ## Quick Start
 
 ```cpp
 #include "api/Flux.h"
 
 void app_main() {
-    auto& flux = hf::hal::flux::Flux::GetInstance();
+    auto& flux = hf::hal::flux::GetFlux();
     flux.EnsureInitialized();
 
     // Enable solenoid channel 0
