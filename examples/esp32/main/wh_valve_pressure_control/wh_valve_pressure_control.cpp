@@ -46,6 +46,9 @@
 #include "PressureSensor.h"
 #include "PressureSensorConfig.h"
 #include "PressureSensorThread.h"
+#include "WhDiagnosticsThread.h"
+#include "WhValveControlThread.h"
+#include "WhValveSystem.h"
 #include "api/Flux.h"
 
 #include "OsUtility.h"
@@ -402,6 +405,40 @@ extern "C" void app_main(void) {
     ESP_LOGI(TAG_MAIN,
              "    float v = g_sensors[i]->GetVoltageFiltered();    // V (post-IIR)");
 
+    // ── Bring up the WH valve subsystem (control + diagnostics threads) ────
+    auto& valve_system  = whvalve::WhValveSystem::GetInstance();
+    auto& valve_manager = ValveManager::GetInstance();
+    auto* ads7952_drv = static_cast<Ads7952Handler*>(
+        FLUX_API.adc.Get(HfFunctionalAdcChannel::ADS7952_0_CH0));
+
+    static whvalve::WhValveControlThread valve_ctrl(valve_system, valve_manager, /*ms=*/10);
+    static whvalve::WhDiagnosticsThread  valve_diag(valve_system, valve_manager, ads7952_drv,
+                                                    /*ms=*/100);
+
+    if (!valve_ctrl.EnsureInitialized() ||
+        !valve_ctrl.StartThreadAndWaitToVerify(2000)) {
+        ESP_LOGE(TAG_MAIN, "Valve control thread failed to start");
+    } else {
+        ESP_LOGI(TAG_MAIN, "Valve control thread running (10 ms / 100 Hz, lock-free setpoints)");
+    }
+
+    if (!valve_diag.EnsureInitialized() ||
+        !valve_diag.StartThreadAndWaitToVerify(2000)) {
+        ESP_LOGE(TAG_MAIN, "Valve diagnostics thread failed to start");
+    } else {
+        ESP_LOGI(TAG_MAIN, "Valve diagnostics thread running (100 ms / 10 Hz)");
+    }
+
+    ESP_LOGI(TAG_MAIN, "Valve set:  %zu solenoids, %zu proportionals",
+             valve_system.SolenoidCount(), valve_system.ProportionalCount());
+    ESP_LOGI(TAG_MAIN, "Valve API (lock-free, callable from any thread):");
+    ESP_LOGI(TAG_MAIN,
+             "    valve_system.Get(SolenoidId::OLV_1).RequestState(true);");
+    ESP_LOGI(TAG_MAIN,
+             "    valve_system.Get(ProportionalId::FCV).RequestPosition(0.5f);");
+    ESP_LOGI(TAG_MAIN,
+             "    float pos = valve_system.Get(ProportionalId::FCV).GetActualPosition();");
+
     // ── Main loop: periodic system status ───────────────────────────────────
     while (true) {
         os_delay_msec(30000);  // Status every 30 seconds
@@ -423,5 +460,35 @@ extern "C" void app_main(void) {
         ESP_LOGI(TAG_MAIN, "Total samples: %lu  |  Errors: %lu",
                  static_cast<unsigned long>(total_samples),
                  static_cast<unsigned long>(total_errors));
+
+        // ── Valve diagnostics snapshot ───────────────────────────────────
+        const auto diag = valve_diag.GetSnapshot();
+        ESP_LOGI(TAG_MAIN,
+                 "Valves: mgr=%s  ads7952=%s  apply_errors=%lu  faults=%lu",
+                 diag.manager_ready ? "OK"   : "DOWN",
+                 diag.ads7952_ready ? "OK"   : "DOWN",
+                 static_cast<unsigned long>(diag.valve_total_apply_errors),
+                 static_cast<unsigned long>(diag.valve_total_faults));
+
+        valve_system.ForEachSolenoid([](whvalve::SolenoidValve& v) {
+            ESP_LOGI(TAG_MAIN,
+                     "  SOL %-6.*s : tgt=%-3s act=%-3s  state=%-12s  faults=%lu  err=%s",
+                     static_cast<int>(v.Label().size()), v.Label().data(),
+                     v.GetTargetPosition() > 0.0f ? "ON"  : "OFF",
+                     v.GetActualPosition() > 0.0f ? "ON"  : "OFF",
+                     whvalve::ValveStateToString(v.GetState()),
+                     static_cast<unsigned long>(v.GetFaultCount()),
+                     HfValveErrToString(v.GetLastError()));
+        });
+        valve_system.ForEachProportional([](whvalve::ProportionalValve& v) {
+            ESP_LOGI(TAG_MAIN,
+                     "  PROP %-6.*s: tgt=%5.2f act=%5.2f  state=%-12s  faults=%lu  err=%s",
+                     static_cast<int>(v.Label().size()), v.Label().data(),
+                     static_cast<double>(v.GetTargetPosition()),
+                     static_cast<double>(v.GetActualPosition()),
+                     whvalve::ValveStateToString(v.GetState()),
+                     static_cast<unsigned long>(v.GetFaultCount()),
+                     HfValveErrToString(v.GetLastError()));
+        });
     }
 }
