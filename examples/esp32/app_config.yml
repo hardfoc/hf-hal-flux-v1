@@ -55,6 +55,10 @@ apps:
     source_file: "Ads7952Example.cpp"
     category: "example"
     ci_enabled: false
+  alicat_basis2_example:
+    source_file: "AlicatBasis2Example.cpp"
+    category: "example"
+    ci_enabled: false
   wh_valve_pressure_control:
     source_files:
       - "wh_valve_pressure_control/wh_valve_pressure_control.cpp"
