@@ -141,7 +141,7 @@ bool CommChannelsManager::Initialize() noexcept {
                 if (cs_adc_map) {
                     hf_spi_device_config_t dev_cfg = {};
                     dev_cfg.cs_pin          = cs_adc_map->physical_pin;
-                    dev_cfg.clock_speed_hz  = 20'000'000;
+                    dev_cfg.clock_speed_hz  = 4'000'000;  // 4 MHz for ADS7952 stability
                     dev_cfg.mode            = hf_spi_mode_t::HF_SPI_MODE_0;
                     int idx = spi3_bus_->CreateDevice(dev_cfg);
                     spi_device_indices_[static_cast<uint8_t>(SpiDeviceId::ADS7952_ADC_0)] = idx;
