@@ -50,7 +50,7 @@ void PressureSensorThread::SetFilterCutoff(float cutoff_hz) noexcept {
 
 bool PressureSensorThread::Setup() noexcept {
     // WARN so this line survives aggressive log filtering during bring-up
-    ESP_LOGW(TAG_PRESSURE, "Setup() entered on worker task");
+    ESP_LOGI(TAG_PRESSURE, "[worker] Setup() entered");
     taskYIELD();
 
     if (!sensor_configs_ || num_sensors_ == 0 || num_sensors_ > kMaxSensors) {
@@ -79,7 +79,7 @@ bool PressureSensorThread::Setup() noexcept {
 
     ESP_LOGI(TAG_PRESSURE, "Pressure sensor calibration start (2s settle)...");
     os_delay_msec(2000);
-    ESP_LOGW(TAG_PRESSURE, "Settle complete — starting VA calibration");
+    ESP_LOGI(TAG_PRESSURE, "[worker] Settle complete — starting VA calibration");
 
     float va = calibrator_->CalibrateVA();
     if (va == 0.0f) {

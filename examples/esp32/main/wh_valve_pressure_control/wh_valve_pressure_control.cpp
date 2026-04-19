@@ -310,19 +310,17 @@ extern "C" void app_main(void) {
     esp_log_level_set("PressureSensor", ESP_LOG_INFO);
 
     // ── Initialize Flux HAL ─────────────────────────────────────────────────
+    ESP_LOGI(TAG_MAIN, "[main] Flux HAL bring-up");
     auto& flux = Flux::GetInstance();
-    ESP_LOGW(TAG_MAIN, "DBG: calling Flux::EnsureInitialized()...");
     if (!flux.EnsureInitialized()) {
         ESP_LOGE(TAG_MAIN, "FATAL: Flux initialization failed — aborting");
         return;
     }
-    ESP_LOGW(TAG_MAIN, "DBG: Flux init returned OK");
-    ESP_LOGI(TAG_MAIN, "Flux HAL initialized successfully");
+    ESP_LOGI(TAG_MAIN, "[main] Flux HAL ready");
 
     // ── Verify ADC channels are available ───────────────────────────────────
-    ESP_LOGW(TAG_MAIN, "DBG: getting ADC manager...");
+    ESP_LOGI(TAG_MAIN, "[main] Verifying %zu ADC channel mappings...", kNumSensors);
     auto& adc = FLUX_API.adc;
-    ESP_LOGW(TAG_MAIN, "DBG: checking channels...");
     bool all_channels_ok = true;
     for (size_t i = 0; i < kNumSensors; ++i) {
         BaseAdc* drv = adc.Get(kSensorConfigs[i].adc_channel);
@@ -332,16 +330,14 @@ extern "C" void app_main(void) {
             all_channels_ok = false;
         }
     }
-    
+
     if (!all_channels_ok) {
         ESP_LOGE(TAG_MAIN, "FATAL: One or more ADC channels unavailable");
         return;
     }
-    ESP_LOGW(TAG_MAIN, "DBG: channels OK");
-    ESP_LOGI(TAG_MAIN, "All %zu ADC channels verified", kNumSensors);
+    ESP_LOGI(TAG_MAIN, "[main] All %zu ADC channels verified", kNumSensors);
 
     // ── Test ADC read from main_task before starting pressure task ──────────
-    ESP_LOGW(TAG_MAIN, "DBG: testing ADC read...");
     {
         float test_voltage = 0.0f;
         hf_adc_err_t err = adc.ReadVoltage(
@@ -375,35 +371,28 @@ extern "C" void app_main(void) {
         kPressureAvgSamples,
         kPressureFilterCutoffHz);
 
-    ESP_LOGW(TAG_MAIN, "DBG: calling pressure_thread.EnsureInitialized()...");
+    ESP_LOGI(TAG_MAIN, "[main] Initializing pressure-sensor thread (1 kHz batched ADC sampling)...");
     if (!pressure_thread.EnsureInitialized()) {
         ESP_LOGE(TAG_MAIN, "FATAL: Failed to initialize pressure thread");
         return;
     }
-    ESP_LOGW(TAG_MAIN, "DBG: pressure thread initialized, starting...");
-    // Allow time for the worker to reach MarkThreadRunning() (Setup can run long after that)
     if (!pressure_thread.StartThreadAndWaitToVerify(5000)) {
         ESP_LOGE(TAG_MAIN, "FATAL: Failed to start pressure thread (running flag not set in time)");
         return;
     }
-    ESP_LOGW(TAG_MAIN, "DBG: StartThreadAndWaitToVerify OK — worker marked running; waiting for calibration...");
+    ESP_LOGI(TAG_MAIN, "[main] Pressure-sensor thread started; waiting for VA + zero calibration...");
 
-    // Wait for calibration to complete (Setup runs on worker; main must not spin silently)
+    // Wait for calibration to complete (Setup runs on worker; main must not spin silently).
+    // Print a heartbeat at INFO every 1 s so the user can see the wait is intentional.
     for (uint32_t w = 0; !g_pressure_task_ready.load(std::memory_order_acquire); ++w) {
         os_delay_msec(200);
         if ((w % 5U) == 0U) {
-            ESP_LOGW(TAG_MAIN, "waiting for pressure calibration... (~%u s elapsed)",
+            ESP_LOGI(TAG_MAIN, "[main]   …calibration in progress (~%u s)",
                      static_cast<unsigned>((w + 1U) * 200U / 1000U));
         }
         taskYIELD();
     }
-    ESP_LOGI(TAG_MAIN, "Pressure sensor task running (calibration finished)");
-    ESP_LOGI(TAG_MAIN,
-             "Control-loop access pattern (call from any thread, lock-free):");
-    ESP_LOGI(TAG_MAIN,
-             "    float p = g_sensors[i]->GetPressureFiltered();   // engineering units");
-    ESP_LOGI(TAG_MAIN,
-             "    float v = g_sensors[i]->GetVoltageFiltered();    // V (post-IIR)");
+    ESP_LOGI(TAG_MAIN, "[main] Pressure-sensor thread fully calibrated and streaming data.");
 
     // ── Bring up the WH valve subsystem (control + diagnostics threads) ────
     auto& valve_system  = whvalve::WhValveSystem::GetInstance();
@@ -447,17 +436,17 @@ extern "C" void app_main(void) {
         ESP_LOGI(TAG_MAIN, "Valve diagnostics thread running (100 ms / 10 Hz)");
     }
 
-    ESP_LOGI(TAG_MAIN, "Valve set:  %zu solenoids (incl. SEV pseudo-prop), %zu proportionals",
+    ESP_LOGI(TAG_MAIN, "[main] Valve set ready: %zu solenoids (incl. SEV pseudo-prop), %zu proportionals",
              valve_system.SolenoidCount(), valve_system.ProportionalCount());
-    ESP_LOGI(TAG_MAIN, "Valve API (lock-free, callable from any thread):");
-    ESP_LOGI(TAG_MAIN,
-             "    valve_system.Get(SolenoidId::OLV_1).RequestState(true);");
-    ESP_LOGI(TAG_MAIN,
-             "    valve_system.Get(SolenoidId::SEV).RequestPosition(0.4f);  // pseudo-prop");
-    ESP_LOGI(TAG_MAIN,
-             "    valve_system.Get(ProportionalId::FCV).RequestPosition(0.5f);");
-    ESP_LOGI(TAG_MAIN,
-             "    auto snap = valve_system.Get(ProportionalId::FCV).Snapshot();");
+
+    ESP_LOGI(TAG_MAIN, "");
+    ESP_LOGI(TAG_MAIN, "════════════════════════════════════════════════════════════");
+    ESP_LOGI(TAG_MAIN, "  Boot-up complete — entering steady-state");
+    ESP_LOGI(TAG_MAIN, "  • Pressure thread: 1 kHz batched ADS7952 read + IIR filter");
+    ESP_LOGI(TAG_MAIN, "  • Valve control:   100 Hz lock-free setpoint dispatch");
+    ESP_LOGI(TAG_MAIN, "  • Valve diags:     10 Hz fault scrape + telemetry");
+    ESP_LOGI(TAG_MAIN, "  • System status:   every 30 s on this main task");
+    ESP_LOGI(TAG_MAIN, "════════════════════════════════════════════════════════════");
 
     // ── Main loop: periodic system status ───────────────────────────────────
     while (true) {
