@@ -52,46 +52,72 @@ bool AdcManager::Initialize() noexcept {
     // Create one EspAdc for ADC1 (ESP32 has ADC1 and ADC2)
     hf_adc_unit_config_t adc_cfg{};
     adc_cfg.unit_id = 0;  // ADC1
-    esp_adc_ = hf::utils::make_unique_nothrow<EspAdc>(adc_cfg);
-    if (!esp_adc_) {
-        Logger::GetInstance().Error(TAG, "Failed to allocate EspAdc unit 0");
-        return false;
-    }
 
-    if (!esp_adc_->Initialize()) {
-        Logger::GetInstance().Error(TAG, "Failed to initialize EspAdc unit 0");
-        esp_adc_.reset();
-        return false;
-    }
-
-    // Iterate the pincfg ADC mapping and register each channel
+    // Pre-configure channels before Initialize(), matching EspAdc validation rules:
+    // channel_configs[index].channel_id must equal index and at least one channel enabled.
     for (size_t i = 0; i < HF_ADC_MAPPING_SIZE; ++i) {
         const auto& mapping = HF_ADC_MAPPING[i];
-        const auto fc = static_cast<HfFunctionalAdcChannel>(mapping.functional_channel);
-
-        // Only ESP32_INTERNAL channels on Flux
         if (static_cast<HfAdcChipType>(mapping.chip_type) != HfAdcChipType::ESP32_INTERNAL) {
             continue;
         }
 
-        auto& entry = entries_[registered_count_];
-        entry.functional_channel = fc;
-        entry.name = to_string(fc);
-        entry.adc_unit = mapping.adc_unit;
-        entry.hw_channel = mapping.physical_channel;
-        entry.voltage_divider = mapping.voltage_divider;
-        entry.driver = esp_adc_.get();   // All channels go through ADC1
-        entry.registered = true;
-        enum_to_index_[static_cast<size_t>(fc)] = registered_count_;
-        ++registered_count_;
+        if (mapping.adc_unit != adc_cfg.unit_id) {
+            continue;
+        }
 
-        // Configure the channel on the EspAdc driver
-        esp_adc_->ConfigureChannel(mapping.physical_channel, hf_adc_atten_t::ATTEN_DB_12);
+        const uint8_t hw_channel = mapping.physical_channel;
+        if (hw_channel >= HF_ESP32_ADC_MAX_CHANNELS) {
+            Logger::GetInstance().Warn(TAG,
+                "Skipping internal ADC mapping with invalid channel %u (max=%u)",
+                static_cast<unsigned>(hw_channel),
+                static_cast<unsigned>(HF_ESP32_ADC_MAX_CHANNELS - 1));
+            continue;
+        }
 
-        Logger::GetInstance().Info(TAG, "  Registered ADC: %.*s (unit=%u ch=%u div=%.1f)",
-                                  static_cast<int>(entry.name.size()), entry.name.data(),
-                                  entry.adc_unit, entry.hw_channel,
-                                  static_cast<double>(entry.voltage_divider));
+        adc_cfg.channel_configs[hw_channel].channel_id = hw_channel;
+        adc_cfg.channel_configs[hw_channel].attenuation = hf_adc_atten_t::ATTEN_DB_12;
+        adc_cfg.channel_configs[hw_channel].bitwidth = hf_adc_bitwidth_t::WIDTH_12BIT;
+        adc_cfg.channel_configs[hw_channel].enabled = true;
+    }
+
+    esp_adc_ = hf::utils::make_unique_nothrow<EspAdc>(adc_cfg);
+    
+    bool internal_adc_ok = false;
+    if (esp_adc_ && esp_adc_->EnsureInitialized()) {
+        internal_adc_ok = true;
+        
+        // Iterate the pincfg ADC mapping and register each channel
+        for (size_t i = 0; i < HF_ADC_MAPPING_SIZE; ++i) {
+            const auto& mapping = HF_ADC_MAPPING[i];
+            const auto fc = static_cast<HfFunctionalAdcChannel>(mapping.functional_channel);
+
+            // Only ESP32_INTERNAL channels on this pass
+            if (static_cast<HfAdcChipType>(mapping.chip_type) != HfAdcChipType::ESP32_INTERNAL) {
+                continue;
+            }
+
+            auto& entry = entries_[registered_count_];
+            entry.functional_channel = fc;
+            entry.name = to_string(fc);
+            entry.adc_unit = mapping.adc_unit;
+            entry.hw_channel = mapping.physical_channel;
+            entry.voltage_divider = mapping.voltage_divider;
+            entry.driver = esp_adc_.get();   // All channels go through ADC1
+            entry.registered = true;
+            enum_to_index_[static_cast<size_t>(fc)] = registered_count_;
+            ++registered_count_;
+
+            // Configure the channel on the EspAdc driver
+            esp_adc_->ConfigureChannel(mapping.physical_channel, hf_adc_atten_t::ATTEN_DB_12);
+
+            Logger::GetInstance().Info(TAG, "  Registered ADC: %.*s (unit=%u ch=%u div=%.1f)",
+                                      static_cast<int>(entry.name.size()), entry.name.data(),
+                                      entry.adc_unit, entry.hw_channel,
+                                      static_cast<double>(entry.voltage_divider));
+        }
+    } else {
+        Logger::GetInstance().Warn(TAG, "Internal ESP32 ADC init failed — skipping internal channels");
+        esp_adc_.reset();
     }
 
     //==========================================================================
