@@ -47,11 +47,14 @@ bool TemperatureManager::Initialize() noexcept {
 
     bool esp_ok = InitializeEsp32Internal();
     bool ntc_ok = InitializeNtcThermistor();
+    bool mcp_ok = InitializeMcp9700Thermistor();
 
-    Logger::GetInstance().Info(TAG, "Temperature manager initialized (ESP32=%s, NTC=%s, sensors=%zu)",
-                              esp_ok ? "OK" : "FAIL", ntc_ok ? "OK" : "FAIL", registered_count_);
+    Logger::GetInstance().Info(TAG,
+                              "Temperature manager initialized (ESP32=%s, NTC=%s, MCP9700=%s, sensors=%zu)",
+                              esp_ok ? "OK" : "FAIL", ntc_ok ? "OK" : "FAIL", mcp_ok ? "OK" : "FAIL",
+                              registered_count_);
 
-    return esp_ok || ntc_ok;
+    return esp_ok || ntc_ok || mcp_ok;
 }
 
 bool TemperatureManager::InitializeEsp32Internal() noexcept {
@@ -125,6 +128,51 @@ bool TemperatureManager::InitializeNtcThermistor() noexcept {
     return true;
 }
 
+bool TemperatureManager::InitializeMcp9700Thermistor() noexcept {
+#if !defined(HARDFOC_MCP9700_SUPPORT)
+    return false;
+#else
+    auto& adc = AdcManager::GetInstance();
+    if (!adc.EnsureInitialized()) {
+        Logger::GetInstance().Warn(TAG, "ADC manager not available — skipping MCP9700");
+        return false;
+    }
+
+    BaseAdc* adc_driver = adc.Get(HfFunctionalAdcChannel::ADS7952_0_CH8);
+    if (!adc_driver) {
+        Logger::GetInstance().Warn(TAG, "MCP9700 ADC channel (ADS7952 CH8) not available");
+        return false;
+    }
+
+    const auto* mapping = GetAdcMapping(HfFunctionalAdcChannel::ADS7952_0_CH8);
+    if (!mapping) {
+        Logger::GetInstance().Error(TAG, "MCP9700 ADC mapping not found");
+        return false;
+    }
+
+    mcp9700_handler_ = hf::utils::make_unique_nothrow<Mcp9700TemperatureHandler>(
+        adc_driver, mapping->physical_channel, "MCP9700_THERMISTOR");
+    if (!mcp9700_handler_) {
+        Logger::GetInstance().Error(TAG, "Failed to allocate MCP9700 handler");
+        return false;
+    }
+
+    if (!mcp9700_handler_->EnsureInitialized()) {
+        Logger::GetInstance().Error(TAG, "MCP9700 handler initialization failed");
+        mcp9700_handler_.reset();
+        return false;
+    }
+
+    auto& entry = entries_[registered_count_++];
+    entry.name = "MCP9700_THERMISTOR";
+    entry.sensor_type = FluxTempSensorType::MCP9700_THERMISTOR;
+    entry.registered = true;
+
+    Logger::GetInstance().Info(TAG, "  Registered MCP9700 thermistor (ADC ch=%u)", mapping->physical_channel);
+    return true;
+#endif
+}
+
 //==============================================================================
 // LOOKUP
 //==============================================================================
@@ -165,6 +213,7 @@ TemperatureError TemperatureManager::ReadTemperatureCelsius(std::string_view nam
     switch (entry.sensor_type) {
         case FluxTempSensorType::ESP32_INTERNAL: sensor = esp32_temp_.get(); break;
         case FluxTempSensorType::NTC_THERMISTOR: sensor = ntc_handler_.get(); break;
+        case FluxTempSensorType::MCP9700_THERMISTOR: sensor = mcp9700_handler_.get(); break;
         default: {
             last_error_.store(TemperatureError::SENSOR_NOT_FOUND, std::memory_order_release);
             return TemperatureError::SENSOR_NOT_FOUND;
@@ -201,6 +250,10 @@ TemperatureError TemperatureManager::ReadInternalTemperature(float& temperature_
 
 TemperatureError TemperatureManager::ReadNtcTemperature(float& temperature_c) noexcept {
     return ReadTemperatureCelsius("NTC_THERMISTOR", temperature_c);
+}
+
+TemperatureError TemperatureManager::ReadMcp9700Temperature(float& temperature_c) noexcept {
+    return ReadTemperatureCelsius("MCP9700_THERMISTOR", temperature_c);
 }
 
 TemperatureError TemperatureManager::GetSystemTemperatureStats(float& min_c, float& max_c, float& avg_c) noexcept {
@@ -314,10 +367,8 @@ bool TemperatureManager::Deinitialize() noexcept {
     }
     registered_count_ = 0;
 
-    // Release NTC handler
+    mcp9700_handler_.reset();
     ntc_handler_.reset();
-
-    // Release ESP32 temperature sensor
     esp32_temp_.reset();
 
     initialized_.store(false, std::memory_order_release);

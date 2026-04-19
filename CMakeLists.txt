@@ -24,7 +24,7 @@ set(HF_CORE_RTOS  "FREERTOS")           # RTOS (FREERTOS, THREADX future)
 set(HF_CORE_ENABLE_MAX22200       ON)   # SPI high-side switch (valves)
 set(HF_CORE_ENABLE_TLE92466ED     ON)   # SPI solenoid driver (valves)
 set(HF_CORE_ENABLE_NTC_THERMISTOR ON)   # ADC temperature sensor
-set(HF_CORE_ENABLE_MCP9700        OFF)  # MCP9700 (requires handlers/mcp9700 in hf-core; enable when landed)
+set(HF_CORE_ENABLE_MCP9700        ON)   # MCP9700 on ADS7952 (see TemperatureManager)
 set(HF_CORE_ENABLE_WS2812         ON)   # RMT LED strip
 set(HF_CORE_ENABLE_LOGGER         ON)   # Logging system
 set(HF_CORE_ENABLE_CAN            ON)   # CAN/TWAI bus (CommChannelsManager)

@@ -2,9 +2,10 @@
  * @file TemperatureManager.h
  * @brief Temperature sensor management for the HardFOC Flux V1 platform.
  *
- * @details The Flux board has two temperature sources:
+ * @details The Flux board temperature sources include:
  *            1. ESP32 internal temperature sensor (on-chip)
- *            2. NTC thermistor via ADC (GPIO4 / ADC1_CH4)
+ *            2. NTC thermistor on the internal ADC
+ *            3. MCP9700 on ADS7952 channel 8 (when the external ADC is present)
  *
  *          No TMC9660 temperature sensor (Flux has no motor controller).
  *
@@ -28,6 +29,7 @@
 
 #include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/base/BaseTemperature.h"
 #include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/mcu/esp32/EspTemperature.h"
+#include "handlers/mcp9700/Mcp9700TemperatureHandler.h"
 #include "handlers/ntc/NtcTemperatureHandler.h"
 #include "handlers/logger/Logger.h"
 #include "RtosMutex.h"
@@ -88,6 +90,7 @@ constexpr const char* TemperatureErrorToString(TemperatureError error) noexcept 
 enum class FluxTempSensorType : uint8_t {
     ESP32_INTERNAL = 0, ///< ESP32 on-chip temperature sensor
     NTC_THERMISTOR = 1, ///< External NTC thermistor via ADC
+    MCP9700_THERMISTOR = 2, ///< MCP9700 on ADS7952 multiplexed channel
     SENSOR_COUNT        ///< Number of sensor types (not a valid sensor)
 };
 
@@ -100,6 +103,7 @@ constexpr const char* FluxTempSensorTypeToString(FluxTempSensorType type) noexce
     switch (type) {
         case FluxTempSensorType::ESP32_INTERNAL: return "ESP32 Internal";
         case FluxTempSensorType::NTC_THERMISTOR: return "NTC Thermistor";
+        case FluxTempSensorType::MCP9700_THERMISTOR: return "MCP9700 Thermistor";
         default: return "Unknown";
     }
 }
@@ -205,7 +209,7 @@ public:
 
     /**
      * @brief Read temperature in Celsius from a named sensor.
-     * @param name           "ESP32_INTERNAL" or "NTC_THERMISTOR"
+     * @param name           "ESP32_INTERNAL", "NTC_THERMISTOR", or "MCP9700_THERMISTOR"
      * @param temperature_c  Output temperature in °C
      * @return TemperatureError::SUCCESS on success
      */
@@ -232,6 +236,13 @@ public:
      * @return TemperatureError::SUCCESS on success.
      */
     [[nodiscard]] TemperatureError ReadNtcTemperature(float& temperature_c) noexcept;
+
+    /**
+     * @brief Convenience: read the MCP9700 sensor (ADS7952 CH8).
+     * @param temperature_c Output temperature in °C.
+     * @return TemperatureError::SUCCESS on success.
+     */
+    [[nodiscard]] TemperatureError ReadMcp9700Temperature(float& temperature_c) noexcept;
 
     /**
      * @brief Read all sensors and compute min, max, and average temperatures.
@@ -277,6 +288,7 @@ private:
     bool Initialize() noexcept;
     bool InitializeEsp32Internal() noexcept;
     bool InitializeNtcThermistor() noexcept;
+    bool InitializeMcp9700Thermistor() noexcept;
 
     [[nodiscard]] size_t FindByName(std::string_view name) const noexcept;
 
@@ -294,6 +306,7 @@ private:
     // Sensor driver instances — heap-allocated via unique_ptr (singleton lifetime)
     std::unique_ptr<EspTemperature> esp32_temp_;
     std::unique_ptr<NtcTemperatureHandler> ntc_handler_;
+    std::unique_ptr<Mcp9700TemperatureHandler> mcp9700_handler_;
 
     std::atomic<bool> initialized_{false};
     std::atomic<TemperatureError> last_error_{TemperatureError::SUCCESS};
