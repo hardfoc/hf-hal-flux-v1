@@ -114,7 +114,7 @@ bool CommChannelsManager::Initialize() noexcept {
 
     //==========================================================================
     // SPI2 BUS (SPI2_HOST) — dedicated bus for ADS7952 external ADC
-    // Note: GPIO10-13 are native IOMUX pins for SPI2_HOST on ESP32-S3
+    // Note: GPIO10-13 are native IOMUX pins for SPI2_HOST on ESP32
     //==========================================================================
 #ifdef HARDFOC_ADS7952_SUPPORT
     {

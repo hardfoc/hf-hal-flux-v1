@@ -32,7 +32,7 @@ The `LedManager` is a singleton that drives a single WS2812 addressable RGB LED 
 │  unique_ptr<WS2812Strip>     │  ← RMT LED strip driver
 │  unique_ptr<WS2812Animator>  │  ← Animation engine
 ├──────────────────────────────┤
-│  ESP32-S3 RMT → GPIO3       │  ← Hardware
+│  ESP32 RMT → GPIO3       │  ← Hardware
 └──────────────────────────────┘
 ```
 
@@ -154,7 +154,7 @@ The `LedColors` namespace provides: `BLACK`, `RED`, `GREEN`, `BLUE`, `YELLOW`, `
 ## Hardware Notes
 
 - **LED**: Single WS2812 NeoPixel on GPIO3
-- **Interface**: ESP32-S3 RMT peripheral (channel 0)
+- **Interface**: ESP32 RMT peripheral (channel 0)
 - **Protocol**: WS2812B, 800 kHz, 24-bit RGB
 - **Animation tick**: Call `UpdateAnimation()` every ~50 ms from a FreeRTOS task
 

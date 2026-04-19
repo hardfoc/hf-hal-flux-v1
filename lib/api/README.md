@@ -174,7 +174,7 @@ All components are accessed by reference:
 
 ```cpp
 CommChannelsManager& comms;     // SPI, I2C, CAN buses
-GpioManager&         gpio;      // ESP32-S3 GPIO pins
+GpioManager&         gpio;      // ESP32 GPIO pins
 ValveManager&        valves;    // Solenoid + proportional valve control
 AdcManager&          adc;       // ADC channels (NTC, VBUS)
 LedManager&          leds;      // WS2812 status LED

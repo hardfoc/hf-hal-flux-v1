@@ -1,6 +1,6 @@
 /**
  * @file flux_api_test.cpp
- * @brief Comprehensive Flux HAL API test suite for ESP32-S3 (noexcept)
+ * @brief Comprehensive Flux HAL API test suite for ESP32 (noexcept)
  *
  * This file exercises every public surface of the Flux singleton:
  *   - Full initialization sequence via EnsureInitialized()

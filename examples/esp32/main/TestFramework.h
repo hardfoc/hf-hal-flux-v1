@@ -1,6 +1,6 @@
 /**
  * @file TestFramework.h
- * @brief Shared testing framework for ESP32-C6 comprehensive test suites
+ * @brief Shared testing framework for ESP32 comprehensive test suites
  *
  * This file provides common testing infrastructure including test result tracking,
  * execution timing, and standardized test execution macros used across all

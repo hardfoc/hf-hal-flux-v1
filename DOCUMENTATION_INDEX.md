@@ -14,7 +14,7 @@
 
 ## 📋 Overview
 
-This documentation index provides comprehensive access to all HardFOC Flux HAL system documentation. The Flux board is a valve-control platform based on ESP32-S3 (Xtensa LX7, dual-core, 240 MHz) that drives solenoid valves (MAX22200) and proportional valves (TLE92466ED).
+This documentation index provides comprehensive access to all HardFOC Flux HAL system documentation. The Flux board is a valve-control platform based on ESP32 that drives solenoid valves (MAX22200) and proportional valves (TLE92466ED).
 
 ## 🚀 Quick Start
 
@@ -66,8 +66,8 @@ Component handlers provide high-level management interfaces for system resources
 
 | Component | Purpose | Hardware Sources | Documentation |
 |-----------|---------|------------------|---------------|
-| **🎛️ GpioManager** | GPIO pin management | ESP32-S3 | `lib/managers/GpioManager.h` |
-| **📊 AdcManager** | ADC channel management | ESP32-S3 (VBUS monitor, NTC) | `lib/managers/AdcManager.h` |
+| **🎛️ GpioManager** | GPIO pin management | ESP32 | `lib/managers/GpioManager.h` |
+| **📊 AdcManager** | ADC channel management | ESP32 (VBUS monitor, NTC) | `lib/managers/AdcManager.h` |
 | **📡 CommChannelsManager** | Communication interfaces | SPI/I2C/UART/CAN-TWAI | `lib/managers/CommChannelsManager.h` |
 | **🌡️ TemperatureManager** | Temperature monitoring | NTC thermistors | `lib/managers/TemperatureManager.h` |
 | **💡 LedManager** | LED control system | WS2812 | `lib/managers/LedManager.h` |
@@ -76,7 +76,7 @@ Component handlers provide high-level management interfaces for system resources
 ### Component Handler Features
 
 #### GpioManager - GPIO Management
-- **ESP32-S3 Pins**: Direct GPIO control
+- **ESP32 Pins**: Direct GPIO control
 - **String-Based API**: Flexible pin identification
 - **Thread-Safe Operations**: Concurrent access from multiple tasks
 
@@ -122,7 +122,7 @@ Component handlers provide high-level management interfaces for system resources
 ├─────────────────────────────────────────────────────────────────┤
 │  🔧 Driver Handlers     │ AS5047U, MAX22200, TLE92466ED         │
 ├─────────────────────────────────────────────────────────────────┤
-│  ⚙️ Hardware Drivers    │ ESP32-S3 interfaces & core drivers    │
+│  ⚙️ Hardware Drivers    │ ESP32 interfaces & core drivers    │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -162,7 +162,7 @@ comm.EnsureInitialized();
 
 ### ESP32 On-Target Test Suite
 
-All testing runs on-target via the `examples/esp32/` framework on ESP32-S3 hardware.
+All testing runs on-target via the `examples/esp32/` framework on ESP32 hardware.
 
 - **[📦 ESP32 Test Suite](examples/esp32/README.md)** - On-target test framework
 - **[🔧 Test Framework Header](examples/esp32/main/TestFramework.h)** - Lightweight `TEST_ASSERT` macros

@@ -74,7 +74,7 @@ public:
 };
 
 class McuDigitalGpio : public BaseGpio {
-    // ESP32-S3 specific implementation
+    // ESP32 specific implementation
 };
 ```
 

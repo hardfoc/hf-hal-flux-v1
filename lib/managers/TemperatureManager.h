@@ -3,7 +3,7 @@
  * @brief Temperature sensor management for the HardFOC Flux V1 platform.
  *
  * @details The Flux board has two temperature sources:
- *            1. ESP32-C6 internal temperature sensor (on-chip)
+ *            1. ESP32 internal temperature sensor (on-chip)
  *            2. NTC thermistor via ADC (GPIO4 / ADC1_CH4)
  *
  *          No TMC9660 temperature sensor (Flux has no motor controller).
@@ -86,7 +86,7 @@ constexpr const char* TemperatureErrorToString(TemperatureError error) noexcept 
  * @brief Identifies the physical temperature sensor type on the Flux board.
  */
 enum class FluxTempSensorType : uint8_t {
-    ESP32_INTERNAL = 0, ///< ESP32-C6 on-chip temperature sensor
+    ESP32_INTERNAL = 0, ///< ESP32 on-chip temperature sensor
     NTC_THERMISTOR = 1, ///< External NTC thermistor via ADC
     SENSOR_COUNT        ///< Number of sensor types (not a valid sensor)
 };
@@ -153,7 +153,7 @@ struct TempSystemDiagnostics {
  * @class TemperatureManager
  * @brief Singleton manager for all temperature sensors on Flux V1.
  *
- * @details Manages the ESP32-C6 internal temperature sensor and the NTC
+ * @details Manages the ESP32 internal temperature sensor and the NTC
  *          thermistor connected via ADC (GPIO4 / ADC1_CH4). Sensors are
  *          registered in a fixed-size array at initialisation; readings
  *          are returned in Celsius or Fahrenheit.

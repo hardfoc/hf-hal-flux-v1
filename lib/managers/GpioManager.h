@@ -2,7 +2,7 @@
  * @file GpioManager.h
  * @brief GPIO management for the HardFOC Flux V1 platform.
  *
- * @details The Flux board uses only ESP32-C6 internal GPIOs (no GPIO expander).
+ * @details The Flux board uses only ESP32 internal GPIOs (no GPIO expander).
  *          Control pins for MAX22200 and TLE92466ED are managed as standard GPIOs.
  *          This is simpler than the Vortex GpioManager which spans 3 chip types.
  *

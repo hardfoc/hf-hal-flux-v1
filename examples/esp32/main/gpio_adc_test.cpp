@@ -1,6 +1,6 @@
 /**
  * @file gpio_adc_test.cpp
- * @brief GPIO & ADC focused test for Flux ESP32-S3
+ * @brief GPIO & ADC focused test for Flux ESP32
  *
  * Deep-dive testing of GpioManager and AdcManager on Flux:
  *   - GPIO pin enumeration, set/read, toggle, rapid stress

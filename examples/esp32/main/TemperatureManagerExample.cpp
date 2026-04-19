@@ -3,7 +3,7 @@
  * @brief Documentation example: Temperature monitoring on Flux V1.
  *
  * Demonstrates the TemperatureManager API for the Flux valve-control board:
- *   - Reading ESP32-S3 internal temperature sensor (on-chip)
+ *   - Reading ESP32 internal temperature sensor (on-chip)
  *   - Reading NTC thermistor temperature (via ADC, GPIO4)
  *   - Celsius and Fahrenheit readings
  *   - Convenience methods: ReadInternalTemperature, ReadNtcTemperature

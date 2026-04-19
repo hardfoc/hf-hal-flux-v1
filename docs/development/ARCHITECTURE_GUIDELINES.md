@@ -46,7 +46,7 @@ The HardFOC Flux HAL follows a layered architecture pattern with clear separatio
 │  Driver Handlers     │ MAX22200, TLE92466ED, PCAL95555,       │
 │                      │ ADS7952, WS2812, NTC                   │
 ├─────────────────────────────────────────────────────────────────┤
-│  Hardware Drivers    │ ESP32-S3 interfaces & external drivers │
+│  Hardware Drivers    │ ESP32 interfaces & external drivers │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -160,7 +160,7 @@ public:
 
 // Implementation
 class McuDigitalGpio : public BaseGpio {
-    // ESP32-S3 specific implementation
+    // ESP32 specific implementation
 };
 
 class Pcal95555GpioWrapper : public BaseGpio {

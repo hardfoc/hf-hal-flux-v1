@@ -12,7 +12,7 @@
 
 ## 📋 Overview
 
-The `TemperatureManager` is a singleton that provides unified temperature readings from the ESP32-S3 internal sensor and an external 10 kΩ NTC thermistor. Both sensors are accessed through a consistent `BaseTemperature` interface.
+The `TemperatureManager` is a singleton that provides unified temperature readings from the ESP32 internal sensor and an external 10 kΩ NTC thermistor. Both sensors are accessed through a consistent `BaseTemperature` interface.
 
 ### Key Features
 
@@ -42,7 +42,7 @@ The `TemperatureManager` is a singleton that provides unified temperature readin
 
 | Source | Type | Range | Use Case |
 |--------|------|-------|----------|
-| **ESP32-S3 Internal** | On-die | -10°C to 80°C | MCU thermal protection |
+| **ESP32 Internal** | On-die | -10°C to 80°C | MCU thermal protection |
 | **NTC Thermistor** | 10 kΩ NTC | -40°C to 125°C | Board/ambient monitoring |
 
 ## 🔧 API Reference

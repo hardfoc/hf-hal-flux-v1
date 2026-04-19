@@ -2,7 +2,7 @@
  * @file AdcManager.h
  * @brief ADC management for the HardFOC Flux V1 platform.
  *
- * @details The Flux board has only ESP32-C6 internal ADC channels:
+ * @details The Flux board has only ESP32 internal ADC channels:
  *            - NTC thermistor  (ADC1_CH4, GPIO4)
  *            - VBUS monitor    (ADC1_CH0, GPIO0, 11× voltage divider)
  *
@@ -251,7 +251,7 @@ private:
     size_t registered_count_{0};
     uint64_t init_time_ms_{0};  ///< Timestamp (ms) when Initialize() completed
 
-    // EspAdc instance — only ADC1 used on ESP32-C6
+    // EspAdc instance — only ADC1 used on ESP32
     // Heap-allocated once via unique_ptr; singleton lives forever.
     std::unique_ptr<EspAdc> esp_adc_;
 

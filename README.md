@@ -1,6 +1,6 @@
 # HardFOC Flux V1 – Hardware Abstraction Layer
 
-ESP32-C6 HAL for the **HardFOC Flux V1** valve-control board. Drives solenoid valves (MAX22200) and proportional valves (TLE92466ED) through a unified, stack-based manager architecture.
+ESP32 HAL for the **HardFOC Flux V1** valve-control board. Drives solenoid valves (MAX22200) and proportional valves (TLE92466ED) through a unified, stack-based manager architecture.
 
 ---
 
@@ -8,7 +8,7 @@ ESP32-C6 HAL for the **HardFOC Flux V1** valve-control board. Drives solenoid va
 
 | Feature                | Detail                                           |
 |------------------------|--------------------------------------------------|
-| **MCU**                | ESP32-C6 (RISC-V, single core, 160 MHz)          |
+| **MCU**                | ESP32                                            |
 | **Solenoid Driver**    | MAX22200 – 8-channel octal serial-controlled     |
 | **Proportional Driver**| TLE92466ED – 6-channel low-side switch           |
 | **Status LED**         | WS2812 (NeoPixel), 1 LED, RMT channel 0         |
