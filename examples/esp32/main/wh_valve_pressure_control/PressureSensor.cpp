@@ -320,29 +320,34 @@ void PressureSensor::ResetStatistics() noexcept {
 }
 
 float PressureSensor::VoltageToPressureRaw(float voltage) const noexcept {
-    float v_min = GetEffectiveVoltageMin();
-    float v_max = GetEffectiveVoltageMax();
-    float span = v_max - v_min;
-    
-    if (std::abs(span) < 1e-6f) return 0.0f;
+    const float v_min = GetEffectiveVoltageMin();
+    const float v_max = GetEffectiveVoltageMax();
+    const float v_span = v_max - v_min;
 
-    // Apply zero offset correction if calibrated
-    // The zero offset tells us where "0 pressure" actually falls in voltage
-    float corrected_voltage = voltage;
+    if (std::abs(v_span) < 1e-6f) return 0.0f;
+
+    // Sensitivity from the configured ratiometric span (PSI per Volt).
+    // Sign is naturally negative for vacuum (DIR_NEGATIVE) sensors where
+    // pressure_max < pressure_min.
+    const float sensitivity = (config_.pressure_max - config_.pressure_min) / v_span;
+
     if (zero_calibrated_) {
-        // Shift voltage so that zero_offset_voltage_ maps to the ideal midpoint
-        float ideal_midpoint = (v_min + v_max) / 2.0f;
-        corrected_voltage = voltage - (zero_offset_voltage_ - ideal_midpoint);
+        // The observed atmospheric voltage IS the "atmospheric pressure" anchor.
+        // For DIR_POSITIVE / DIR_NEGATIVE this is pressure_min (= 0 PSI gauge);
+        // for DIR_EITHER (differential) it is 0 differential pressure, which
+        // also corresponds to pressure_min + range/2. In both conventions the
+        // delta from atmospheric voltage to current voltage maps linearly to
+        // the delta from atmospheric pressure.
+        const float atm_pressure =
+            (config_.expected_dir == PressureDirection::DIR_EITHER)
+                ? (config_.pressure_min + config_.pressure_max) * 0.5f  // 0 for symmetric ranges
+                : config_.pressure_min;                                  // 0 PSI gauge for single-ended
+        return atm_pressure + (voltage - zero_offset_voltage_) * sensitivity;
     }
 
-    // Normalize: 0.0 at v_min, 1.0 at v_max
-    float normalized = (corrected_voltage - v_min) / span;
-
-    // Map to pressure range
-    float pressure = config_.pressure_min + 
-                     normalized * (config_.pressure_max - config_.pressure_min);
-
-    return pressure;
+    // No zero calibration yet — fall back to nominal ratiometric mapping.
+    const float normalized = (voltage - v_min) / v_span;
+    return config_.pressure_min + normalized * (config_.pressure_max - config_.pressure_min);
 }
 
 //=============================================================================
