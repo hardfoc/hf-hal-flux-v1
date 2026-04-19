@@ -17,6 +17,21 @@ endif()
 message(STATUS "Building app type: ${APP_TYPE}")
 message(STATUS "Using source file: ${APP_SOURCE_FILE}")
 
+# Check if source file is in a subdirectory and collect all sources
+get_filename_component(APP_SOURCE_DIR "${APP_SOURCE_FILE}" DIRECTORY)
+set(APP_SOURCES "${APP_SOURCE_FILE}")
+set(APP_INCLUDE_DIRS ".")
+
+if(APP_SOURCE_DIR)
+    # Source is in a subdirectory — include all .cpp files from that directory
+    file(GLOB SUBDIR_SOURCES "${APP_SOURCE_DIR}/*.cpp")
+    list(APPEND APP_SOURCES ${SUBDIR_SOURCES})
+    list(REMOVE_DUPLICATES APP_SOURCES)
+    list(APPEND APP_INCLUDE_DIRS "${APP_SOURCE_DIR}")
+    message(STATUS "App subdirectory: ${APP_SOURCE_DIR}")
+    message(STATUS "All sources: ${APP_SOURCES}")
+endif()
+
 set(MAIN_REQUIRES
     hf-hal-flux-v1
     esp_timer               # Required by TestFramework.h
@@ -24,8 +39,8 @@ set(MAIN_REQUIRES
 )
 
 idf_component_register(
-    SRCS "${APP_SOURCE_FILE}"
-    INCLUDE_DIRS "."
+    SRCS ${APP_SOURCES}
+    INCLUDE_DIRS ${APP_INCLUDE_DIRS}
     REQUIRES ${MAIN_REQUIRES}
 )
 

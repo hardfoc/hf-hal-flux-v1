@@ -13,6 +13,8 @@
 
 #pragma once
 
+#include <memory>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -20,10 +22,10 @@ extern "C" {
 #include "esp_log.h"
 #include "esp_timer.h"
 #include "driver/gpio.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/queue.h"
-#include "freertos/semphr.h"
-#include "freertos/task.h"
+
+#include "BaseThread.h"
+#include "OsUtility.h"
+#include "SignalSemaphore.h"
 
 #ifdef __cplusplus
 }
@@ -75,7 +77,7 @@ inline void flip_test_progress_indicator() noexcept {
   const char* TAG = "TestFramework";
   ESP_LOGI(TAG, "Test progression indicator: %s", g_test_progress_state ? "HIGH" : "LOW");
 
-  vTaskDelay(pdMS_TO_TICKS(50));
+  os_delay_msec(50);
 }
 
 inline void cleanup_test_progress_indicator() noexcept {
@@ -94,9 +96,9 @@ inline void output_section_indicator(uint8_t blink_count = 5) noexcept {
 
   for (uint8_t i = 0; i < blink_count; ++i) {
     gpio_set_level(TEST_PROGRESS_PIN, 1);
-    vTaskDelay(pdMS_TO_TICKS(50));
+    os_delay_msec(50);
     gpio_set_level(TEST_PROGRESS_PIN, 0);
-    vTaskDelay(pdMS_TO_TICKS(50));
+    os_delay_msec(50);
   }
 
   g_test_progress_state = false;
@@ -159,7 +161,7 @@ struct TestResults {
     } else {                                                                                       \
       ESP_LOGE(TAG, "[FAILED] FAILED: " #test_func " (%.2f ms)", execution_time / 1000.0);         \
     }                                                                                              \
-    vTaskDelay(pdMS_TO_TICKS(100));                                                                \
+    os_delay_msec(100);                                                                            \
   } while (0)
 
 struct TestTaskContext {
@@ -167,65 +169,127 @@ struct TestTaskContext {
   bool (*test_func)() noexcept;
   TestResults* results;
   const char* tag;
-  SemaphoreHandle_t completion_semaphore;
+  SignalSemaphore* completion_semaphore;
 };
 
-inline void test_task_trampoline(void* param) {
-  TestTaskContext* ctx = static_cast<TestTaskContext*>(param);
-  ESP_LOGI(ctx->tag,
-           "\n"
-           "╔══════════════════════════════════════════════════════════════════════════════╗\n"
-           "║ Running (task): %s                                                            \n"
-           "╚══════════════════════════════════════════════════════════════════════════════╝",
-           ctx->test_name);
-  uint64_t start_time = esp_timer_get_time();
-  bool result = ctx->test_func();
-  uint64_t end_time = esp_timer_get_time();
-  uint64_t execution_time = end_time - start_time;
-  ctx->results->add_result(result, execution_time);
-  if (result) {
-    ESP_LOGI(ctx->tag, "[SUCCESS] PASSED (task): %s (%.2f ms)", ctx->test_name,
-             execution_time / 1000.0);
-  } else {
-    ESP_LOGE(ctx->tag, "[FAILED] FAILED (task): %s (%.2f ms)", ctx->test_name,
-             execution_time / 1000.0);
+class TestTaskThread final : public BaseThread {
+ public:
+  static constexpr uint32_t kDefaultMinStackBytes = 4096;
+
+  TestTaskThread(const char* thread_name,
+                 TestTaskContext* context,
+                 uint32_t requested_stack_bytes,
+                 uint32_t priority) noexcept
+      : BaseThread(thread_name),
+        context_(context),
+        stack_size_bytes_(requested_stack_bytes < kDefaultMinStackBytes ? kDefaultMinStackBytes
+                                                                         : requested_stack_bytes),
+        priority_(priority),
+        executed_(false),
+        stack_(nullptr) {}
+
+ protected:
+  bool Initialize() noexcept override {
+    stack_ = std::make_unique<uint8_t[]>(stack_size_bytes_);
+    if (!stack_) {
+      return false;
+    }
+
+    return CreateBaseThread(stack_.get(),
+                            stack_size_bytes_,
+                            static_cast<OS_Uint>(priority_),
+                            static_cast<OS_Uint>(priority_),
+                            0,
+                            OS_AUTO_START);
   }
 
-  if (ctx->completion_semaphore != nullptr) {
-    xSemaphoreGive(ctx->completion_semaphore);
+  bool Setup() noexcept override {
+    executed_ = false;
+    return context_ != nullptr;
   }
 
-  vTaskDelete(nullptr);
-}
+  uint32_t Step() noexcept override {
+    if (!context_ || executed_) {
+      Stop();
+      return 1;
+    }
+
+    executed_ = true;
+
+    ESP_LOGI(context_->tag,
+             "\n"
+             "╔══════════════════════════════════════════════════════════════════════════════╗\n"
+             "║ Running (task): %s                                                            \n"
+             "╚══════════════════════════════════════════════════════════════════════════════╝",
+             context_->test_name);
+
+    const uint64_t start_time = esp_timer_get_time();
+    const bool result = context_->test_func();
+    const uint64_t end_time = esp_timer_get_time();
+    const uint64_t execution_time = end_time - start_time;
+
+    context_->results->add_result(result, execution_time);
+
+    if (result) {
+      ESP_LOGI(context_->tag, "[SUCCESS] PASSED (task): %s (%.2f ms)", context_->test_name,
+               execution_time / 1000.0);
+    } else {
+      ESP_LOGE(context_->tag, "[FAILED] FAILED (task): %s (%.2f ms)", context_->test_name,
+               execution_time / 1000.0);
+    }
+
+    if (context_->completion_semaphore != nullptr) {
+      context_->completion_semaphore->Signal();
+    }
+
+    Stop();
+    return 1;
+  }
+
+  bool Cleanup() noexcept override { return true; }
+
+  bool ResetVariables() noexcept override {
+    executed_ = false;
+    return true;
+  }
+
+ private:
+  TestTaskContext* context_;
+  uint32_t stack_size_bytes_;
+  uint32_t priority_;
+  bool executed_;
+  std::unique_ptr<uint8_t[]> stack_;
+};
 
 #define RUN_TEST_IN_TASK(name, func, stack_size_bytes, priority)                                   \
   do {                                                                                             \
     ensure_gpio14_initialized();                                                                   \
-    static TestTaskContext ctx;                                                                    \
+    TestTaskContext ctx;                                                                           \
     ctx.test_name = name;                                                                          \
     ctx.test_func = func;                                                                          \
     ctx.results = &g_test_results;                                                                 \
     ctx.tag = TAG;                                                                                 \
-    ctx.completion_semaphore = xSemaphoreCreateBinary();                                           \
-    if (ctx.completion_semaphore == nullptr) {                                                     \
-      ESP_LOGE(TAG, "Failed to create semaphore for test: %s", name);                              \
+    SignalSemaphore completion_semaphore("TestTaskDone", name);                                    \
+    ctx.completion_semaphore = &completion_semaphore;                                              \
+    if (!completion_semaphore.EnsureInitialized()) {                                               \
+      ESP_LOGE(TAG, "Failed to create completion semaphore for test: %s", name);                   \
       RUN_TEST(func);                                                                              \
     } else {                                                                                       \
-      BaseType_t created =                                                                         \
-          xTaskCreate(test_task_trampoline, name, (stack_size_bytes) / sizeof(StackType_t), &ctx,  \
-                      (priority), nullptr);                                                        \
-      if (created != pdPASS) {                                                                     \
-        ESP_LOGE(TAG, "Failed to create test task: %s", name);                                     \
-        vSemaphoreDelete(ctx.completion_semaphore);                                                \
+      TestTaskThread test_thread(name, &ctx, static_cast<uint32_t>(stack_size_bytes),             \
+                                 static_cast<uint32_t>(priority));                                 \
+      if (!test_thread.EnsureInitialized()) {                                                      \
+        ESP_LOGE(TAG, "Failed to initialize test thread: %s", name);                              \
         RUN_TEST(func);                                                                            \
       } else {                                                                                     \
-        if (xSemaphoreTake(ctx.completion_semaphore, pdMS_TO_TICKS(30000)) == pdTRUE) {            \
+        if (!test_thread.Start()) {                                                                \
+          ESP_LOGE(TAG, "Failed to start test thread: %s", name);                                 \
+          RUN_TEST(func);                                                                          \
+        } else if (completion_semaphore.WaitUntilSignalled(30000)) {                              \
           ESP_LOGI(TAG, "Test task completed: %s", name);                                          \
         } else {                                                                                   \
           ESP_LOGW(TAG, "Test task timeout: %s", name);                                            \
         }                                                                                          \
-        vSemaphoreDelete(ctx.completion_semaphore);                                                \
-        vTaskDelay(pdMS_TO_TICKS(100));                                                            \
+        os_delay_msec(100);                                                                        \
       }                                                                                            \
     }                                                                                              \
   } while (0)

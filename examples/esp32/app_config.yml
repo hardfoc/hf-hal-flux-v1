@@ -55,6 +55,15 @@ apps:
     source_file: "Ads7952Example.cpp"
     category: "example"
     ci_enabled: false
+  wh_valve_pressure_control:
+    source_files:
+      - "wh_valve_pressure_control/wh_valve_pressure_control.cpp"
+      - "wh_valve_pressure_control/PressureSensor.cpp"
+      - "wh_valve_pressure_control/PressureSensorThread.cpp"
+    include_dirs:
+      - "wh_valve_pressure_control"
+    category: "example"
+    ci_enabled: false
 
 build_config:
   build_types:
