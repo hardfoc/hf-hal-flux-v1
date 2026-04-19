@@ -16,9 +16,6 @@
 #include "managers/AdcManager.h"
 #include "TestFramework.h"
 
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-
 static const char* TAG = "GpioAdcTest";
 static TestResults g_test_results;
 

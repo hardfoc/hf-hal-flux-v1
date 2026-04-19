@@ -9,9 +9,7 @@
 
 #include "PressureSensor.h"
 #include "esp_log.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-
+#include "OsUtility.h"
 static const char* TAG = "PressureSensor";
 
 //=============================================================================
@@ -64,7 +62,7 @@ bool PressureSensor::CalibrateZero(uint32_t num_samples, uint32_t sample_delay_m
         }
         
         if (sample_delay_ms > 0) {
-            vTaskDelay(pdMS_TO_TICKS(sample_delay_ms));
+            os_delay_msec(sample_delay_ms);
         }
     }
     
@@ -190,7 +188,7 @@ SwapCalibrationResult PressureSensor::CalibrateSwap(
             ++samples_taken;
         }
         
-        vTaskDelay(pdMS_TO_TICKS(sample_interval_ms));
+        os_delay_msec(sample_interval_ms);
         elapsed_ms += sample_interval_ms;
     }
     
@@ -412,7 +410,7 @@ float PressureSensorCalibrator::CalibrateVA() noexcept {
                 ++valid_samples[ci];
             }
         }
-        vTaskDelay(pdMS_TO_TICKS(cal_config_.calibration_sample_delay_ms));
+        os_delay_msec(cal_config_.calibration_sample_delay_ms);
     }
     
     // Calculate averages and verify all sensors responded

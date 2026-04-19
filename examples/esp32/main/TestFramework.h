@@ -15,10 +15,6 @@
 
 #include <memory>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "esp_log.h"
 #include "esp_timer.h"
 #include "driver/gpio.h"
@@ -26,10 +22,6 @@ extern "C" {
 #include "BaseThread.h"
 #include "OsUtility.h"
 #include "SignalSemaphore.h"
-
-#ifdef __cplusplus
-}
-#endif
 
 //=============================================================================
 // GPIO14 TEST PROGRESSION INDICATOR MANAGEMENT

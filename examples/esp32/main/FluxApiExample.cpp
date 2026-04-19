@@ -36,9 +36,7 @@
 #include "managers/TemperatureManager.h"
 
 #include "esp_log.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-
+#include "OsUtility.h"
 static const char* TAG = "FluxApiExample";
 
 //=============================================================================
@@ -220,7 +218,7 @@ static void phase_valve_operation() {
     // Activate solenoid
     err = valves.EnableChannel(ValveChannel::SOL_CH0);
     ESP_LOGI(TAG, "Activate SOL_CH0: %s", HfValveErrToString(err));
-    vTaskDelay(pdMS_TO_TICKS(200));
+    os_delay_msec(200);
 
     // Ramp proportional current
     err = valves.EnableChannel(ValveChannel::PROP_CH0);
@@ -229,7 +227,7 @@ static void phase_valve_operation() {
     for (uint16_t ma = 0; ma <= 1000; ma += 250) {
         valves.SetProportionalCurrent(ValveChannel::PROP_CH0, ma);
         ESP_LOGI(TAG, "  PROP_CH0 current: %u mA", ma);
-        vTaskDelay(pdMS_TO_TICKS(100));
+        os_delay_msec(100);
     }
 
     // Check for faults after operation
@@ -309,7 +307,7 @@ static void phase_health_monitoring() {
         bool healthy = flux.PerformHealthCheck();
         ESP_LOGI(TAG, "  PerformHealthCheck: %s", healthy ? "PASS" : "FAIL");
 
-        vTaskDelay(pdMS_TO_TICKS(1000));
+        os_delay_msec(1000);
     }
 }
 
@@ -357,7 +355,7 @@ extern "C" void app_main(void) {
     if (!boot_ok) {
         ESP_LOGW(TAG, "Boot completed with warnings -- continuing");
     }
-    vTaskDelay(pdMS_TO_TICKS(200));
+    os_delay_msec(200);
 
     // Indicate boot in progress
     FLUX_API.leds.IndicateBoot();
@@ -365,32 +363,32 @@ extern "C" void app_main(void) {
 
     // Phase 2: Validate communications
     phase_validate_comms();
-    vTaskDelay(pdMS_TO_TICKS(200));
+    os_delay_msec(200);
 
     // Phase 3: Check GPIO fault pins
     phase_check_faults();
-    vTaskDelay(pdMS_TO_TICKS(200));
+    os_delay_msec(200);
 
     // Phase 4: Power supply validation
     bool power_ok = phase_check_power();
-    vTaskDelay(pdMS_TO_TICKS(200));
+    os_delay_msec(200);
 
     if (!power_ok) {
         ESP_LOGE(TAG, "Power supply check failed -- skipping valve operation");
         FLUX_API.leds.IndicateError();
         FLUX_API.leds.UpdateAnimation();
-        vTaskDelay(pdMS_TO_TICKS(2000));
+        os_delay_msec(2000);
     } else {
         // Phase 5: Valve operation
         FLUX_API.leds.IndicateReady();
         FLUX_API.leds.UpdateAnimation();
         phase_valve_operation();
-        vTaskDelay(pdMS_TO_TICKS(200));
+        os_delay_msec(200);
     }
 
     // Phase 6: Health monitoring
     phase_health_monitoring();
-    vTaskDelay(pdMS_TO_TICKS(200));
+    os_delay_msec(200);
 
     // Phase 7: Shutdown
     phase_shutdown();

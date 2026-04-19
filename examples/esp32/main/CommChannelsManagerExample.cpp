@@ -25,9 +25,7 @@
 #include "managers/CommChannelsManager.h"
 
 #include "esp_log.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-
+#include "OsUtility.h"
 static const char* TAG = "CommExample";
 
 // ---------------------------------------------------------------------------
@@ -157,16 +155,16 @@ extern "C" void app_main(void) {
 
     // Step 2: Run examples
     example_spi_device_access();
-    vTaskDelay(pdMS_TO_TICKS(100));
+    os_delay_msec(100);
 
     example_bus_access();
-    vTaskDelay(pdMS_TO_TICKS(100));
+    os_delay_msec(100);
 
     example_diagnostics();
-    vTaskDelay(pdMS_TO_TICKS(100));
+    os_delay_msec(100);
 
     example_error_handling();
-    vTaskDelay(pdMS_TO_TICKS(100));
+    os_delay_msec(100);
 
     example_statistics_dump();
 

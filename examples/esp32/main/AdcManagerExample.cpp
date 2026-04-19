@@ -28,9 +28,7 @@
 #include "managers/AdcManager.h"
 
 #include "esp_log.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-
+#include "OsUtility.h"
 static const char* TAG = "AdcExample";
 
 // ---------------------------------------------------------------------------
@@ -158,7 +156,7 @@ static void example_monitoring_loop() {
             ESP_LOGW(TAG, "  [%d] VBUS read error: %d", i, static_cast<int>(err));
         }
 
-        vTaskDelay(pdMS_TO_TICKS(200));
+        os_delay_msec(200);
     }
 }
 
@@ -215,22 +213,22 @@ extern "C" void app_main(void) {
     }
 
     example_channel_registry();
-    vTaskDelay(pdMS_TO_TICKS(100));
+    os_delay_msec(100);
 
     example_vbus_monitoring();
-    vTaskDelay(pdMS_TO_TICKS(100));
+    os_delay_msec(100);
 
     example_ntc_raw_voltage();
-    vTaskDelay(pdMS_TO_TICKS(100));
+    os_delay_msec(100);
 
     example_multi_sample();
-    vTaskDelay(pdMS_TO_TICKS(100));
+    os_delay_msec(100);
 
     example_monitoring_loop();
-    vTaskDelay(pdMS_TO_TICKS(100));
+    os_delay_msec(100);
 
     example_error_handling();
-    vTaskDelay(pdMS_TO_TICKS(100));
+    os_delay_msec(100);
 
     example_diagnostics();
 

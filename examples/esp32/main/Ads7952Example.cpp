@@ -33,15 +33,13 @@
 
 #include "api/Flux.h"
 #include "managers/AdcManager.h"
+#include "OsUtility.h"
 
 #ifdef HARDFOC_ADS7952_SUPPORT
 #include "Ads7952Handler.h"
 #endif
 
 #include "esp_log.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-
 static const char* TAG = "Ads7952Example";
 
 // ---------------------------------------------------------------------------
@@ -354,7 +352,7 @@ static void example_monitoring_loop() {
                  static_cast<double>(ch1_v),
                  e1 == hf_adc_err_t::ADC_SUCCESS ? "" : "(ERR)");
 
-        vTaskDelay(pdMS_TO_TICKS(250));
+        os_delay_msec(250);
     }
 }
 
@@ -376,33 +374,33 @@ extern "C" void app_main(void) {
 
     // Standard AdcManager examples (work with any ADC backend)
     example_channel_registry();
-    vTaskDelay(pdMS_TO_TICKS(100));
+    os_delay_msec(100);
 
     example_single_channel_read();
-    vTaskDelay(pdMS_TO_TICKS(100));
+    os_delay_msec(100);
 
     example_scan_all_channels_manager();
-    vTaskDelay(pdMS_TO_TICKS(100));
+    os_delay_msec(100);
 
     example_multi_sample();
-    vTaskDelay(pdMS_TO_TICKS(100));
+    os_delay_msec(100);
 
 #ifdef HARDFOC_ADS7952_SUPPORT
     // ADS7952-specific examples (require direct handler access)
     example_read_all_channels();
-    vTaskDelay(pdMS_TO_TICKS(100));
+    os_delay_msec(100);
 
     example_range_switching();
-    vTaskDelay(pdMS_TO_TICKS(100));
+    os_delay_msec(100);
 
     example_alarm_programming();
-    vTaskDelay(pdMS_TO_TICKS(100));
+    os_delay_msec(100);
 
     example_visit_driver();
-    vTaskDelay(pdMS_TO_TICKS(100));
+    os_delay_msec(100);
 
     example_diagnostics();
-    vTaskDelay(pdMS_TO_TICKS(100));
+    os_delay_msec(100);
 #endif
 
     // Periodic monitoring (uses standard AdcManager)

@@ -38,9 +38,7 @@
 #include "managers/GpioManager.h"
 
 #include "esp_log.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-
+#include "OsUtility.h"
 static const char* TAG = "GpioExample";
 
 // ---------------------------------------------------------------------------
@@ -96,7 +94,7 @@ static void example_digital_output() {
     err = gpio.Set("GPIO_USER_1", true);
     ESP_LOGI(TAG, "Set(true): %s", (err == hf_gpio_err_t::GPIO_SUCCESS) ? "OK" : "FAIL");
 
-    vTaskDelay(pdMS_TO_TICKS(10));
+    os_delay_msec(10);
 
     err = gpio.Set("GPIO_USER_1", false);
     ESP_LOGI(TAG, "Set(false): %s", (err == hf_gpio_err_t::GPIO_SUCCESS) ? "OK" : "FAIL");
@@ -192,7 +190,7 @@ static void example_heartbeat_pattern() {
     // Toggle 5 times at 100 ms interval (visible on oscilloscope/logic analyzer)
     for (int i = 0; i < 5; ++i) {
         gpio.Toggle("GPIO_USER_1");
-        vTaskDelay(pdMS_TO_TICKS(100));
+        os_delay_msec(100);
     }
 
     // Leave low
@@ -221,19 +219,19 @@ extern "C" void app_main(void) {
     }
 
     example_pin_lookup();
-    vTaskDelay(pdMS_TO_TICKS(100));
+    os_delay_msec(100);
 
     example_digital_output();
-    vTaskDelay(pdMS_TO_TICKS(100));
+    os_delay_msec(100);
 
     example_digital_input();
-    vTaskDelay(pdMS_TO_TICKS(100));
+    os_delay_msec(100);
 
     example_pin_configuration();
-    vTaskDelay(pdMS_TO_TICKS(100));
+    os_delay_msec(100);
 
     example_heartbeat_pattern();
-    vTaskDelay(pdMS_TO_TICKS(100));
+    os_delay_msec(100);
 
     example_statistics();
 

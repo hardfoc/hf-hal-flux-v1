@@ -17,9 +17,6 @@
 #include "managers/TemperatureManager.h"
 #include "TestFramework.h"
 
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-
 static const char* TAG = "LedTempTest";
 static TestResults g_test_results;
 

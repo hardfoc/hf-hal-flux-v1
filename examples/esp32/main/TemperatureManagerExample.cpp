@@ -27,9 +27,7 @@
 #include "managers/LedManager.h"
 
 #include "esp_log.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-
+#include "OsUtility.h"
 static const char* TAG = "TempExample";
 
 // ---------------------------------------------------------------------------
@@ -174,7 +172,7 @@ static void example_monitoring_loop() {
                      static_cast<double>(NTC_WARN_THRESHOLD_C));
         }
 
-        vTaskDelay(pdMS_TO_TICKS(500));
+        os_delay_msec(500);
     }
 }
 
@@ -207,7 +205,7 @@ static void example_thermal_protection() {
 
     // Update the animation once
     flux.leds.UpdateAnimation();
-    vTaskDelay(pdMS_TO_TICKS(500));
+    os_delay_msec(500);
 
     flux.leds.StopAnimation();
     flux.leds.TurnOff();
@@ -251,25 +249,25 @@ extern "C" void app_main(void) {
     }
 
     example_basic_reading();
-    vTaskDelay(pdMS_TO_TICKS(100));
+    os_delay_msec(100);
 
     example_convenience_methods();
-    vTaskDelay(pdMS_TO_TICKS(100));
+    os_delay_msec(100);
 
     example_fahrenheit();
-    vTaskDelay(pdMS_TO_TICKS(100));
+    os_delay_msec(100);
 
     example_temperature_stats();
-    vTaskDelay(pdMS_TO_TICKS(100));
+    os_delay_msec(100);
 
     example_sensor_info();
-    vTaskDelay(pdMS_TO_TICKS(100));
+    os_delay_msec(100);
 
     example_monitoring_loop();
-    vTaskDelay(pdMS_TO_TICKS(100));
+    os_delay_msec(100);
 
     example_thermal_protection();
-    vTaskDelay(pdMS_TO_TICKS(100));
+    os_delay_msec(100);
 
     example_diagnostics();
 

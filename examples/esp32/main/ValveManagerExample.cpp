@@ -30,9 +30,7 @@
 #include "managers/ValveManager.h"
 
 #include "esp_log.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-
+#include "OsUtility.h"
 static const char* TAG = "ValveExample";
 
 /// Helper: log a valve error result
@@ -75,7 +73,7 @@ static void example_solenoid_cdr() {
     err = valves.EnableChannel(ValveChannel::SOL_CH0);
     log_valve_result("EnableChannel(SOL_CH0)", err);
 
-    vTaskDelay(pdMS_TO_TICKS(200));
+    os_delay_msec(200);
 
     // Disable after use
     err = valves.DisableChannel(ValveChannel::SOL_CH0);
@@ -105,7 +103,7 @@ static void example_solenoid_vdr() {
     err = valves.EnableChannel(ValveChannel::SOL_CH2);
     log_valve_result("EnableChannel(SOL_CH2)", err);
 
-    vTaskDelay(pdMS_TO_TICKS(150));
+    os_delay_msec(150);
 
     err = valves.DisableChannel(ValveChannel::SOL_CH2);
     log_valve_result("DisableChannel(SOL_CH2)", err);
@@ -133,13 +131,13 @@ static void example_proportional_current() {
         err = valves.SetProportionalCurrent(ValveChannel::PROP_CH0, ma);
         ESP_LOGI(TAG, "  SetProportionalCurrent(%u mA): %s",
                  ma, HfValveErrOk(err) ? "OK" : HfValveErrToString(err));
-        vTaskDelay(pdMS_TO_TICKS(100));
+        os_delay_msec(100);
     }
 
     // Ramp back down
     for (int i = 4; i >= 0; --i) {
         err = valves.SetProportionalCurrent(ValveChannel::PROP_CH0, steps[i]);
-        vTaskDelay(pdMS_TO_TICKS(100));
+        os_delay_msec(100);
     }
 
     err = valves.DisableChannel(ValveChannel::PROP_CH0);
@@ -174,7 +172,7 @@ static void example_proportional_pwm_dither() {
     err = valves.SetProportionalCurrent(ValveChannel::PROP_CH1, 750);
     log_valve_result("SetProportionalCurrent(CH1, 750 mA)", err);
 
-    vTaskDelay(pdMS_TO_TICKS(500));
+    os_delay_msec(500);
 
     err = valves.DisableChannel(ValveChannel::PROP_CH1);
     log_valve_result("DisableChannel(PROP_CH1)", err);
@@ -196,7 +194,7 @@ static void example_bitmask_operations() {
     err = valves.EnableChannelsMask(mask);
     log_valve_result("EnableChannelsMask(SOL0 + SOL1 + PROP0)", err);
 
-    vTaskDelay(pdMS_TO_TICKS(200));
+    os_delay_msec(200);
 
     // Disable everything at once
     err = valves.DisableAllChannels();
@@ -344,28 +342,28 @@ extern "C" void app_main(void) {
     }
 
     example_solenoid_cdr();
-    vTaskDelay(pdMS_TO_TICKS(200));
+    os_delay_msec(200);
 
     example_solenoid_vdr();
-    vTaskDelay(pdMS_TO_TICKS(200));
+    os_delay_msec(200);
 
     example_proportional_current();
-    vTaskDelay(pdMS_TO_TICKS(200));
+    os_delay_msec(200);
 
     example_proportional_pwm_dither();
-    vTaskDelay(pdMS_TO_TICKS(200));
+    os_delay_msec(200);
 
     example_bitmask_operations();
-    vTaskDelay(pdMS_TO_TICKS(200));
+    os_delay_msec(200);
 
     example_channel_queries();
-    vTaskDelay(pdMS_TO_TICKS(200));
+    os_delay_msec(200);
 
     example_fault_management();
-    vTaskDelay(pdMS_TO_TICKS(200));
+    os_delay_msec(200);
 
     example_direct_driver_access();
-    vTaskDelay(pdMS_TO_TICKS(200));
+    os_delay_msec(200);
 
     example_diagnostics();
 

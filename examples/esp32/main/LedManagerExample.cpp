@@ -25,9 +25,7 @@
 #include "managers/LedManager.h"
 
 #include "esp_log.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-
+#include "OsUtility.h"
 static const char* TAG = "LedExample";
 
 /// Helper: log an LED error result
@@ -51,21 +49,21 @@ static void example_basic_colors() {
     // Set color using LedColor struct
     err = leds.SetColor(LedColor(255, 0, 0));  // Red
     log_led_result("SetColor(255, 0, 0) [Red]", err);
-    vTaskDelay(pdMS_TO_TICKS(500));
+    os_delay_msec(500);
 
     // Set color using predefined constants
     err = leds.SetColor(LedColors::GREEN);
     log_led_result("SetColor(GREEN)", err);
-    vTaskDelay(pdMS_TO_TICKS(500));
+    os_delay_msec(500);
 
     err = leds.SetColor(LedColors::BLUE);
     log_led_result("SetColor(BLUE)", err);
-    vTaskDelay(pdMS_TO_TICKS(500));
+    os_delay_msec(500);
 
     // Set color using raw RGB uint32_t (0xRRGGBB)
     err = leds.SetColor(static_cast<uint32_t>(0xFF8C00));  // Dark orange
     log_led_result("SetColor(0xFF8C00) [DarkOrange]", err);
-    vTaskDelay(pdMS_TO_TICKS(500));
+    os_delay_msec(500);
 
     // Read back the current color
     LedColor current{};
@@ -106,7 +104,7 @@ static void example_color_palette() {
         leds.SetColor(entry.color);
         ESP_LOGI(TAG, "  %s (R%u G%u B%u)", entry.name,
                  entry.color.red, entry.color.green, entry.color.blue);
-        vTaskDelay(pdMS_TO_TICKS(300));
+        os_delay_msec(300);
     }
 
     leds.TurnOff();
@@ -129,20 +127,20 @@ static void example_brightness() {
         LedError err = leds.SetBrightnessPercent(pct);
         ESP_LOGI(TAG, "  Brightness %u%%: %s", pct,
                  (err == LedError::SUCCESS) ? "OK" : LedErrorToString(err));
-        vTaskDelay(pdMS_TO_TICKS(400));
+        os_delay_msec(400);
     }
 
     // Brightness by raw value (0-255)
     leds.SetBrightnessRaw(128);
     ESP_LOGI(TAG, "  BrightnessRaw(128): 50%% of max range");
-    vTaskDelay(pdMS_TO_TICKS(400));
+    os_delay_msec(400);
 
     // Set max brightness limit (caps all subsequent brightness operations)
     leds.SetMaxBrightness(100);  // Limit to ~39% max
     ESP_LOGI(TAG, "  MaxBrightness set to 100 (of 255)");
 
     leds.SetBrightnessPercent(100);  // Now 100% = raw 100, not 255
-    vTaskDelay(pdMS_TO_TICKS(400));
+    os_delay_msec(400);
 
     // Reset max brightness to full range
     leds.SetMaxBrightness(255);
@@ -161,14 +159,14 @@ static void example_animations() {
     // Solid color animation
     err = leds.StartAnimation(LedAnimation::SOLID, LedColors::CYAN);
     log_led_result("StartAnimation(SOLID, CYAN)", err);
-    vTaskDelay(pdMS_TO_TICKS(1000));
+    os_delay_msec(1000);
 
     // Blink animation -- requires periodic UpdateAnimation() calls
     err = leds.StartAnimation(LedAnimation::BLINK, LedColors::RED);
     log_led_result("StartAnimation(BLINK, RED)", err);
     for (int i = 0; i < 20; ++i) {
         leds.UpdateAnimation();
-        vTaskDelay(pdMS_TO_TICKS(50));
+        os_delay_msec(50);
     }
 
     // Breath (fade in/out) animation
@@ -176,7 +174,7 @@ static void example_animations() {
     log_led_result("StartAnimation(BREATH, GREEN)", err);
     for (int i = 0; i < 40; ++i) {
         leds.UpdateAnimation();
-        vTaskDelay(pdMS_TO_TICKS(50));
+        os_delay_msec(50);
     }
 
     // Rainbow animation (cycles through color wheel)
@@ -184,7 +182,7 @@ static void example_animations() {
     log_led_result("StartAnimation(RAINBOW)", err);
     for (int i = 0; i < 60; ++i) {
         leds.UpdateAnimation();
-        vTaskDelay(pdMS_TO_TICKS(50));
+        os_delay_msec(50);
     }
 
     // Check animation state
@@ -207,27 +205,27 @@ static void example_status_indicators() {
     // Boot sequence -- typically shown during initialization
     leds.IndicateBoot();
     ESP_LOGI(TAG, "  IndicateBoot()");
-    for (int i = 0; i < 20; ++i) { leds.UpdateAnimation(); vTaskDelay(pdMS_TO_TICKS(50)); }
+    for (int i = 0; i < 20; ++i) { leds.UpdateAnimation(); os_delay_msec(50); }
 
     // System ready -- green steady
     leds.IndicateReady();
     ESP_LOGI(TAG, "  IndicateReady()");
-    for (int i = 0; i < 20; ++i) { leds.UpdateAnimation(); vTaskDelay(pdMS_TO_TICKS(50)); }
+    for (int i = 0; i < 20; ++i) { leds.UpdateAnimation(); os_delay_msec(50); }
 
     // Warning state -- yellow/amber indication
     leds.IndicateWarning();
     ESP_LOGI(TAG, "  IndicateWarning()");
-    for (int i = 0; i < 20; ++i) { leds.UpdateAnimation(); vTaskDelay(pdMS_TO_TICKS(50)); }
+    for (int i = 0; i < 20; ++i) { leds.UpdateAnimation(); os_delay_msec(50); }
 
     // Error state -- red indication
     leds.IndicateError();
     ESP_LOGI(TAG, "  IndicateError()");
-    for (int i = 0; i < 20; ++i) { leds.UpdateAnimation(); vTaskDelay(pdMS_TO_TICKS(50)); }
+    for (int i = 0; i < 20; ++i) { leds.UpdateAnimation(); os_delay_msec(50); }
 
     // Calibration in progress
     leds.IndicateCalibration();
     ESP_LOGI(TAG, "  IndicateCalibration()");
-    for (int i = 0; i < 20; ++i) { leds.UpdateAnimation(); vTaskDelay(pdMS_TO_TICKS(50)); }
+    for (int i = 0; i < 20; ++i) { leds.UpdateAnimation(); os_delay_msec(50); }
 
     leds.StopAnimation();
     leds.TurnOff();
@@ -246,7 +244,7 @@ static void example_color_wheel() {
         uint32_t rgb = LedManager::ColorWheel(pos);
         leds.SetColor(rgb);
         ESP_LOGI(TAG, "  wheel[%3u] = 0x%06lX", pos, static_cast<unsigned long>(rgb));
-        vTaskDelay(pdMS_TO_TICKS(100));
+        os_delay_msec(100);
     }
 
     leds.TurnOff();
@@ -300,22 +298,22 @@ extern "C" void app_main(void) {
     FLUX_API.leds.SetBrightnessPercent(30);
 
     example_basic_colors();
-    vTaskDelay(pdMS_TO_TICKS(200));
+    os_delay_msec(200);
 
     example_color_palette();
-    vTaskDelay(pdMS_TO_TICKS(200));
+    os_delay_msec(200);
 
     example_brightness();
-    vTaskDelay(pdMS_TO_TICKS(200));
+    os_delay_msec(200);
 
     example_animations();
-    vTaskDelay(pdMS_TO_TICKS(200));
+    os_delay_msec(200);
 
     example_status_indicators();
-    vTaskDelay(pdMS_TO_TICKS(200));
+    os_delay_msec(200);
 
     example_color_wheel();
-    vTaskDelay(pdMS_TO_TICKS(200));
+    os_delay_msec(200);
 
     example_diagnostics();
 
