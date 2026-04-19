@@ -15,7 +15,7 @@
  *
  *            3. The diagnostics thread (`WhDiagnosticsThread`) — atomically
  *               aggregates fault flags from the driver IC into the per-valve
- *               error / fault counters.
+ *               diagnostic snapshot + sticky fault counters.
  *
  *          The base class only owns shared state. Each subclass
  *          (`SolenoidValve`, `ProportionalValve`) implements `Apply()` and
@@ -45,7 +45,8 @@ namespace whvalve {
  * @brief Top-level operational state of a valve as observed by the manager.
  *
  * The state machine is deliberately small; richer fault reporting lives in
- * `Valve::GetLastError()` and the per-driver fault structures.
+ * `Valve::GetLastError()` and the per-valve diagnostic snapshots returned by
+ * `Solenoid|ProportionalValve::Snapshot()`.
  */
 enum class ValveState : uint8_t {
     Uninitialized = 0,  ///< Driver not initialised yet (e.g. SPI brought up but device absent).
@@ -65,6 +66,90 @@ constexpr const char* ValveStateToString(ValveState s) noexcept {
     }
     return "?";
 }
+
+//==============================================================================
+// PER-VALVE DIAGNOSTIC SNAPSHOT TYPES
+//==============================================================================
+
+/**
+ * @brief Per-channel MAX22200 diagnostic snapshot.
+ *
+ * Surfaces every fault flag the driver IC publishes for a single channel
+ * — caller code can read each without inspecting raw bitmasks.
+ *
+ * In medical devices these flags are the early-warning system:
+ *   - `overcurrent`: short to supply, wrong load wired, ESD damage.
+ *   - `hit_not_reached`: HIT current was not achieved within tHIT — coil
+ *     resistance drifted, supply sagged, or the load is open.
+ *   - `open_load`: no current path detected — disconnected coil or wire.
+ *   - `plunger_movement_fault`: the plunger did NOT move under load —
+ *     stuck mechanism, missing armature, or clogged seat. **Critical
+ *     mechanical-failure indicator.**
+ */
+struct SolenoidDiagSnapshot {
+    bool     hardware_initialized{false};
+    bool     overcurrent{false};
+    bool     hit_not_reached{false};
+    bool     open_load{false};
+    bool     plunger_movement_fault{false};
+    uint32_t fault_count{0};            ///< Sticky cumulative count from this channel.
+    uint64_t last_fault_tick_ms{0};
+    bool any_fault() const noexcept {
+        return overcurrent || hit_not_reached || open_load || plunger_movement_fault;
+    }
+};
+
+/**
+ * @brief Per-channel TLE92466ED diagnostic snapshot.
+ *
+ * Surfaces every per-channel fault and warning the driver IC reports plus
+ * the live current / duty / VBAT measurements:
+ *   - `overcurrent` / `short_to_ground` / `open_load` / `over_temperature`:
+ *     hard faults.
+ *   - `open_load_short_ground`: combined OL or SG indication on the same
+ *     output (some failure modes can't distinguish the two).
+ *   - `*_warning`: pre-fault warnings (the chip flagged a precursor but
+ *     didn't trip the fault).
+ *   - `current_regulation_warning` / `pwm_regulation_warning`: control loop
+ *     can't track setpoint — slew-rate, supply or load dynamics too
+ *     aggressive.
+ *   - `average_current_raw` / `duty_cycle_raw`: live measurement of what
+ *     the channel is actually delivering. Can be cross-checked against the
+ *     commanded setpoint as an additional safety layer.
+ */
+struct ProportionalDiagSnapshot {
+    bool     hardware_initialized{false};
+
+    // Hard faults
+    bool     overcurrent{false};
+    bool     short_to_ground{false};
+    bool     open_load{false};
+    bool     over_temperature{false};
+    bool     open_load_short_ground{false};
+
+    // Warnings
+    bool     ot_warning{false};
+    bool     current_regulation_warning{false};
+    bool     pwm_regulation_warning{false};
+    bool     olsg_warning{false};
+
+    // Live measurements
+    uint16_t average_current_raw{0};
+    uint16_t duty_cycle_raw{0};
+    uint16_t vbat_feedback_raw{0};
+
+    uint32_t fault_count{0};            ///< Sticky cumulative count from this channel.
+    uint64_t last_fault_tick_ms{0};
+
+    bool any_fault() const noexcept {
+        return overcurrent || short_to_ground || open_load
+            || over_temperature || open_load_short_ground;
+    }
+    bool any_warning() const noexcept {
+        return ot_warning || current_regulation_warning
+            || pwm_regulation_warning || olsg_warning;
+    }
+};
 
 //==============================================================================
 // BASE VALVE CLASS
@@ -110,10 +195,11 @@ public:
 
     /**
      * @brief Request a normalised position 0..1.
-     * @details For solenoids this is interpreted as 0 → off, > 0 → on.
-     *          For proportionals it linearly maps to current 0..full_flow_ma.
-     *          The control thread observes the change on the next iteration
-     *          and pushes it to the hardware. Out-of-range values are clamped.
+     * @details For binary solenoids this is interpreted as `0 → off, > 0 → on`.
+     *          For variable-current solenoids and proportionals it linearly
+     *          maps to current `0..full_flow_ma`. The control thread observes
+     *          the change on the next iteration and pushes it to the hardware.
+     *          Out-of-range values are clamped.
      */
     void RequestPosition(float pos) noexcept {
         if (pos < 0.0f) pos = 0.0f;
@@ -122,7 +208,7 @@ public:
         target_dirty_.store(true, std::memory_order_release);
     }
 
-    /// Convenience for solenoid-style use; equivalent to RequestPosition(on?1:0).
+    /// Convenience for binary solenoid use; equivalent to `RequestPosition(on?1:0)`.
     void RequestState(bool on) noexcept { RequestPosition(on ? 1.0f : 0.0f); }
 
     /// Snapshot of the actual position the control thread last managed to set.
@@ -138,7 +224,7 @@ public:
     bool IsActuallyEnergised() const noexcept { return GetActualPosition() > 0.0f; }
 
     //=========================================================================
-    // Status / diagnostics (lock-free reads)
+    // Status / sticky counters (lock-free reads)
     //=========================================================================
 
     ValveState GetState() const noexcept { return state_.load(std::memory_order_acquire); }
@@ -168,12 +254,17 @@ public:
      * @brief Refresh per-valve diagnostics from the driver IC.
      * @param mgr Flux::ValveManager — caller must guarantee mgr.IsInitialized().
      * @return Aggregated error code (success if everything is healthy).
-     *
-     * @note Invoked by `WhDiagnosticsThread` at a slow polling rate. Each
-     *       subclass examines the relevant driver-IC fault structure and
-     *       aggregates it into `last_error_` / `fault_count_`.
      */
     virtual hf_valve_err_t OnDiagnostics(ValveManager& mgr) noexcept = 0;
+
+    /**
+     * @brief Push the model's per-channel configuration features (open-load
+     *        detection, slew rate, etc.) once the hardware is ready.
+     *
+     * Called by the control thread on the first apply (and again after a
+     * fault that requires reconfiguration). Subclasses override.
+     */
+    virtual hf_valve_err_t ApplyChannelFeatures(ValveManager& mgr) noexcept = 0;
 
     /**
      * @brief Mark the target as dirty without changing it (used to force the

@@ -4,26 +4,28 @@ This example is the WH bench-test acquisition + actuation stack. It owns:
 
 - **8 Honeywell SSC TruStability** ratiometric pressure transducers on the
   ADS7952 12-bit SPI ADC.
-- **5 Parker C15/C21** cartridge solenoid valves driven through the **MAX22200**
-  octal solenoid driver.
-- **7 Parker VSO / VSO LowPro / LM-Pro** proportional valves driven through
-  the **TLE92466ED** 6-channel current-controlled driver.
+- **6 Parker C15/C21 + VSO** valves driven through the **MAX22200** octal
+  solenoid driver (5 binary hit/hold + 1 pseudo-proportional).
+- **6 Parker VSO / VSO LowPro / LM-Pro** precision proportional valves
+  driven through the **TLE92466ED** 6-channel current-controlled driver.
 
 Everything hangs off the existing Flux V1 HAL — this folder contributes the
-**application-level abstractions** (named valves, hit/hold profiles,
-positional API, dedicated control + diagnostics threads).
+**application-level abstractions** (named valves, datasheet-driven
+profiles, lock-free positional API, dedicated control + diagnostics
+threads, full per-driver fault decoding).
 
 ---
 
 ## 1. Architecture overview
 
 ```
-┌───────────────────────────────────────────────────────────────────┐
-│  Application / control-loop threads (any rate)                    │
-│   - PressureSensor::GetPressureFiltered()      lock-free          │
-│   - WhValveSystem::Get(…).RequestPosition()    lock-free          │
-│   - WhValveSystem::Get(…).GetActualPosition()  lock-free          │
-└───────────────────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────────────┐
+│  Application / control-loop threads (any rate)                     │
+│   - PressureSensor::GetPressureFiltered()      lock-free atomic    │
+│   - WhValveSystem::Get(SolenoidId).RequestState/RequestPosition    │
+│   - WhValveSystem::Get(ProportionalId).RequestPosition             │
+│   - .GetActualPosition() / .GetState() / .Snapshot()  lock-free    │
+└────────────────────────────────────────────────────────────────────┘
           │                                         │
           ▼                                         ▼
 ┌──────────────────────────────┐   ┌──────────────────────────────┐
@@ -34,31 +36,34 @@ positional API, dedicated control + diagnostics threads).
 └──────────────────────────────┘   └──────────────────────────────┘
                               │
                               ▼
-┌───────────────────────────────────────────────────────────────────┐
-│ WhDiagnosticsThread (10 Hz)                                       │
-│  - Per-valve OnDiagnostics() → fault counters                     │
-│  - Aggregates totals into DiagnosticsSnapshot                     │
-│  - (Hook for ADS7952 alarms — see TODO in WhDiagnosticsThread.h)  │
-└───────────────────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────────────┐
+│ WhDiagnosticsThread (10 Hz)                                        │
+│  - Per-valve OnDiagnostics() → per-channel snapshot                │
+│  - MAX22200 STATUS register   → SubsystemFaultSnapshot.max_*       │
+│  - TLE92466 FaultReport       → SubsystemFaultSnapshot.tle_*       │
+│  - Aggregates lock-free SubsystemFaultSnapshot for the app         │
+└────────────────────────────────────────────────────────────────────┘
                               │
                               ▼
-┌───────────────────────────────────────────────────────────────────┐
-│ Flux::ValveManager  +  Flux::AdcManager  +  Flux::CommChannels    │
-│  - MAX22200 (solenoids), TLE92466ED (proportionals), ADS7952 (ADC)│
-└───────────────────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────────────┐
+│ Flux::ValveManager  +  Flux::AdcManager  +  Flux::CommChannels     │
+│  - MAX22200 (SOL_CH0..SOL_CH5)   ← all 6 solenoids                 │
+│  - TLE92466ED (PROP_CH0..PROP_CH5) ← all 6 precision proportionals │
+│  - ADS7952 (SPI3)                  ← pressure ADC                  │
+└────────────────────────────────────────────────────────────────────┘
 ```
 
 ### 1.1 Why three threads?
 
 | Thread | Period | Job |
 |--------|--------|-----|
-| Pressure sampling | 1 ms | Match the SSC ASIC's internal 1 kHz pressure update; produce filtered, atomic snapshots that any control loop can consume lock-free. |
+| Pressure sampling | 1 ms | Match the SSC ASIC's 1 kHz pressure update; produce filtered atomic snapshots that any control loop can consume lock-free. |
 | Valve control | 10 ms | Push every dirty valve setpoint to MAX22200 / TLE92466ED. Doing this at 100 Hz keeps SPI traffic low while still feeling instant to a 500 Hz outer control loop. |
-| Diagnostics | 100 ms | Read driver-IC fault registers and (planned) ADS7952 alarm bits without ever stalling the higher-rate loops on multi-register SPI reads. |
+| Diagnostics | 100 ms | Read per-channel + global driver-IC fault registers and surface a comprehensive `SubsystemFaultSnapshot` so the application doesn't ever have to do multi-register SPI reads itself. |
 
-This separation means the control loop **never** has to read fault registers
-itself — that's the diagnostics thread's responsibility — and the
-diagnostics thread **never** delays the application's set/get path.
+This separation means the control loop **never** has to read fault
+registers itself — that's the diagnostics thread's responsibility — and
+the diagnostics thread **never** delays the application's set/get path.
 
 ---
 
@@ -66,9 +71,8 @@ diagnostics thread **never** delays the application's set/get path.
 
 Honeywell SSC TruStability sensors output **10 % – 90 % of V_supply** over
 the configured pressure range (transfer function "A"), with output clipping
-limits at 2.5 % and 97.5 % of V_supply. Resolution ≥ 0.03 % FSS, accuracy
-±0.25 % FSS BFSL, total error band ±2 % FSS, internal ASIC update ≈ 1 kHz,
-response time ≈ 1 ms.
+limits at 2.5 % / 97.5 %. Resolution ≥ 0.03 % FSS, accuracy ±0.25 % FSS
+BFSL, total error band ±2 % FSS, ASIC update ≈ 1 kHz, response ≈ 1 ms.
 
 Bench wiring:
 
@@ -83,103 +87,76 @@ Bench wiring:
 | CH6     | PWS2     | 0 – 1 PSI        | Positive |
 | CH7     | PWS1     | 0 – 1 PSI        | Positive |
 
-### 2.1 Acquisition pipeline
-
-`PressureSensorThread::Step()` runs every 1 ms and:
-
-1. Calls `Ads7952Handler::ReadMultipleChannels` (Auto-1 mode) — **all 8
-   channels in a single SPI transaction**.
-2. Feeds each raw voltage to `PressureSensor::Update(voltage_raw)`.
-3. `Update()` runs a single-pole IIR low-pass:
-   `y[n] = α·x[n] + (1−α)·y[n−1]` with `α = 1 − exp(−2π·fc/fs)`. Default
-   `fc = 100 Hz`, `fs = 1 kHz` ⇒ `α ≈ 0.467`.
-4. Filtered voltage → calibrated v→p anchor → atomic publish.
-
-### 2.2 Calibration
-
-| Phase | What it does |
-|-------|--------------|
-| **VA** | Average atmospheric voltage across all channels marked `use_for_va_cal` and infer the actual supply voltage. Required for ratiometric scaling. |
-| **Zero** | For each channel, capture the atmospheric voltage and store it as `zero_offset_voltage_`. The sensor doesn't have to physically output `5 % · VA` at 0 PSI; we anchor the conversion at the observed atmospheric voltage with slope `(P_max − P_min) / (V_max − V_min)`. |
-| **Swap** | Optional. Tracks min/max readings during a deliberate pressurisation cycle to detect swapped tubing on single-ended sensors. |
-
-### 2.3 Lock-free read API for control loops
-
-```cpp
-PressureSensor& s = *g_sensors[i];
-float pressure_psi = s.GetPressureFiltered();   // atomic load, acquire ordering
-float voltage_v    = s.GetVoltageFiltered();
-```
-
-A 500 Hz control loop just calls these — no mutex, no SPI traffic.
+Pipeline: 1 kHz Auto-1 batched ADS7952 read → per-channel single-pole IIR
+LPF (default fc = 100 Hz at fs = 1 kHz) → atomic publish. Lock-free
+`PressureSensor::GetPressureFiltered()` for control loops.
 
 ---
 
 ## 3. Valves
 
-### 3.1 Compile-time catalog (`WhValveCatalog.h`)
+### 3.1 Driver-IC capabilities (what we expose)
 
-Single source of truth for:
+#### MAX22200 (octal solenoid driver, 8 channels — using 6)
 
-- **Named IDs** — `whvalve::SolenoidId` (5 valves) and
-  `whvalve::ProportionalId` (7 valves).
-- **Datasheet specs** — `kSpecC21_24V`, `kSpecC15_24V_Small`,
-  `kSpecC15_24V_Large`, `kSpecVSO_24V`, `kSpecVSOLowPro_24V`,
-  `kSpecLMPro_24V`. Each carries the rated voltage, coil resistance,
-  computed full-flow / hit / hold currents, recommended PWM frequency
-  and (for VSO) dither parameters straight out of the catalogs.
-- **Bench mapping** — `kSolenoidMap` and `kProportionalMap` glue each named
-  valve to a Flux `ValveChannel` and one of the model specs. Add or remove
-  a valve by editing exactly two lines (the enum and the corresponding
-  table row); nothing else changes.
+| Capability | Use here |
+|------------|----------|
+| **CDR (Current Drive Regulation)** — 7-bit current ladder per channel | Hit & hold currents on every BinaryHitHold solenoid; sustained current on the SEV pseudo-proportional. |
+| **VDR (Voltage / PWM Duty Regulation)** | Available via `ValveManager::ConfigureSolenoidVdr` — not used today. |
+| **Per-channel feature gates** (CFG_CH register) | All four exposed via `Max22200ChannelFeatures`: `slew_rate_control` (cleaner edges, lower EMI), `open_load_detection`, `plunger_movement_detection`, `hit_current_check`. |
+| **DPM (Detection of Plunger Movement)** — global algorithm (CFG_DPM) | `WhValveSystem::ConfigureGlobalDpm(start_ma, dip_ma, debounce_ms)` configures ISTART / IPTH / TDEB. Per-channel DPM_EN bits set from the catalog's feature gate. |
+| **Per-channel faults** (FAULT register) | `SolenoidValve::Snapshot()` returns `overcurrent`, `hit_not_reached`, `open_load`, `plunger_movement_fault` plus sticky counters. |
+| **Global health** (STATUS register) | `WhDiagnosticsThread::SubsystemFaultSnapshot.max_*` carries OVT, COMER, UVM, the global OCP/OLF/HHF/DPM bits and the active-channels mask. |
 
-### 3.2 Hit-and-Hold for solenoids (C15 / C21)
+#### TLE92466ED (six-channel current-controlled, 6 channels — using all 6)
 
-Each Parker datasheet recommends:
+| Capability | Use here |
+|------------|----------|
+| **Closed-loop current control** | `ValveManager::SetProportionalCurrent` per valve, called every dirty Apply. |
+| **PWM frequency** (mantissa+exponent encoded) | Each valve's `pwm_hz` from the model spec is pushed once via `ValveManager::ConfigureProportionalPwm`. |
+| **Dither** (step size + steps + flat period) | Pushed once via `ValveManager::ConfigureProportionalDither` for VSO-class valves. LM-Pro skips dither (it's a linear motor). |
+| **Slew rate / diagnostic current / open-load threshold / OLSG warning** | Configured via `tle92466ed::ChannelConfig` from `Tle92466ChannelFeatures`. |
+| **Per-channel diagnostics** | `ProportionalValve::Snapshot()` carries every flag from `tle92466ed::ChannelDiagnostics`: `overcurrent`, `short_to_ground`, `open_load`, `over_temperature`, `open_load_short_ground`, `ot_warning`, `current_regulation_warning`, `pwm_regulation_warning`, `olsg_warning`, plus live measurements `average_current_raw`, `duty_cycle_raw`, `vbat_feedback_raw`. |
+| **Global health** (FaultReport) | `WhDiagnosticsThread::SubsystemFaultSnapshot.tle_*` carries VBAT/VIO/VDD UV/OV, central OT warning/error, clock fault, SPI watchdog, POR/reset events, register/OTP ECC errors, supply-NOK summaries. |
 
-- **Hit** at 100 % of rated voltage for **≥ 100 ms**.
-- **Hold** at 50 % of rated voltage (i.e. ~50 % of hit current).
-- **PWM ≥ 1 kHz** during hold.
+### 3.2 Bench mapping
 
-The catalog converts that into `hit_current_ma` and `hold_current_ma` for
-the chosen 24 V coil:
+**Solenoids (MAX22200, channels 0–5):**
 
-| Model              | Coil R | Hit current | Hold current |
-|--------------------|--------|-------------|--------------|
-| C21 (24 V)         | 235 Ω  | 102 mA      | 51 mA        |
-| C15 0.020″ (24 V)  | 525 Ω  | 46 mA       | 23 mA        |
-| C15 ≥0.040″ (24 V) | 361 Ω  | 66 mA       | 33 mA        |
+| ID    | Channel  | Drive mode      | Model                         | Datasheet currents (24 V) |
+|-------|----------|-----------------|-------------------------------|--------------------------|
+| OLV_1 | SOL_CH0  | BinaryHitHold   | Parker C21 (R = 235 Ω)        | hit 102 mA / hold 51 mA / hit 100 ms |
+| OLV_2 | SOL_CH1  | BinaryHitHold   | Parker C21                    | same |
+| VEV   | SOL_CH2  | BinaryHitHold   | Parker C15 ≥0.040″ (R=361 Ω)  | hit 66 mA / hold 33 mA / hit 100 ms |
+| ORV   | SOL_CH3  | BinaryHitHold   | Parker C15 ≥0.040″            | same |
+| GDV   | SOL_CH4  | BinaryHitHold   | Parker C15 0.020″ (R=525 Ω)   | hit 46 mA / hold 23 mA / hit 100 ms |
+| **SEV** | **SOL_CH5** | **VariableCurrent** | **Parker VSO (R=274 Ω)** | **0..66 mA proportional via 7-bit CDR ladder** |
 
-`SolenoidValve::Apply()` configures the MAX22200 channel in CDR mode with
-those numbers the very first time it's called, then just toggles
-`EnableChannel` / `DisableChannel` on subsequent setpoint changes.
+**Proportionals (TLE92466ED, channels 0–5):**
 
-### 3.3 Current control for proportionals (VSO / LM-Pro)
+| ID    | Channel    | Model                | Full-flow current | PWM | Dither |
+|-------|------------|----------------------|-------------------|-----|--------|
+| FCV   | PROP_CH0   | Parker LM-Pro 24 V   | 115 mA            | 5 kHz   | – |
+| FRV   | PROP_CH1   | Parker LM-Pro 24 V   | 115 mA            | 5 kHz   | – |
+| LSV   | PROP_CH2   | Parker VSO 24 V      | 66 mA             | 8 kHz   | 4 mA @ 200 Hz |
+| GFV   | PROP_CH3   | Parker VSO 24 V      | 66 mA             | 8 kHz   | 4 mA @ 200 Hz |
+| SPV_H | PROP_CH4   | Parker VSO LowPro    | 75 mA             | 10 kHz  | 4 mA @ 200 Hz |
+| SPV_L | PROP_CH5   | Parker VSO LowPro    | 75 mA             | 10 kHz  | 4 mA @ 200 Hz |
 
-The proportional position **0..1** linearly maps to current
-**0 mA … full_flow_current_ma**. At 24 V:
+### 3.3 SEV — pseudo-proportional via MAX22200
 
-| Model              | Coil R | Full-flow current | PWM      |
-|--------------------|--------|-------------------|----------|
-| VSO (24 V)         | 274 Ω  | 66 mA             | 8 kHz    |
-| VSO LowPro (24 V)  | 179 Ω  | 75 mA             | 10 kHz   |
-| LM-Pro (24 V)      | 148 Ω  | 115 mA            | ≥ 5 kHz  |
+SEV is a Parker VSO proportional valve, but because precise control is not
+required at this site we route it through MAX22200 instead of taking up a
+TLE92466ED channel. The driver mode is `VariableCurrent`:
 
-`ProportionalValve::Apply()`:
-
-1. (First pass only) configures TLE92466ED PWM frequency + optional dither
-   (VSO family only — LM-Pro is a linear motor and doesn't benefit).
-2. Translates the requested 0..1 position to mA via
-   `PositionToCurrentMa()`.
-3. `SetProportionalCurrent(channel, mA)` (or `DisableChannel` if `pos = 0`).
-
-> **Hardware limit.** TLE92466ED has 6 channels and the bench currently
-> requests 7 proportionals. `SPV_L` is therefore declared `Unmapped` in
-> `kProportionalMap`; calls to it return
-> `VALVE_ERR_DRIVER_NOT_AVAILABLE` and the diagnostics thread reports it
-> as `Uninitialized`. Replace `ValveChannel::CHANNEL_COUNT` in
-> `kProportionalMap` once a second TLE92466ED IC (or another suitable
-> driver) is added.
+- Every Apply() pushes `ConfigureSolenoidCdr(target_ma, target_ma, hit_time = 0)`.
+- With `hit_time = 0` the MAX22200 skips the hit phase; the channel runs
+  at a steady current equal to the requested setpoint.
+- Resolution is 7-bit (≈ 128 steps over 0..IFS); for SEV's 0..66 mA range
+  that's ~0.5 mA per step — more than enough for opening-percentage
+  control.
+- DPM and HHF are disabled for SEV (no hit phase to check; the dip
+  signature DPM looks for is for binary on/off solenoids).
 
 ### 3.4 Per-valve atomic state (`Valve.h`)
 
@@ -198,75 +175,95 @@ last_fault_tick_ms_ atomic<uint64_t>
 ```
 
 All `Get*` accessors use `memory_order_acquire`; the control / diagnostics
-threads use `memory_order_release` on their writes. Within the same valve,
-a single load yields a self-consistent snapshot — control loops never need
-a mutex.
+threads use `memory_order_release` on their writes. A single load yields a
+self-consistent snapshot — control loops never need a mutex.
 
 ### 3.5 Application API
 
 ```cpp
 auto& sys = whvalve::WhValveSystem::GetInstance();
 
-// Solenoid: boolean state.
+// Binary solenoid:
 sys.Get(whvalve::SolenoidId::OLV_1).RequestState(true);
 bool actual_on = sys.Get(whvalve::SolenoidId::OLV_1).IsActuallyEnergised();
 
-// Proportional: 0..1 position.
+// Pseudo-proportional solenoid (SEV via MAX22200 CDR):
+sys.Get(whvalve::SolenoidId::SEV).RequestPosition(0.42f);   // 0..1
+
+// Precision proportional (TLE92466ED):
 sys.Get(whvalve::ProportionalId::FCV).RequestPosition(0.42f);
 float actual = sys.Get(whvalve::ProportionalId::FCV).GetActualPosition();
 
-// Status / diagnostics:
-auto state = sys.Get(whvalve::ProportionalId::FCV).GetState();
-auto err   = sys.Get(whvalve::ProportionalId::FCV).GetLastError();
-uint32_t f = sys.Get(whvalve::ProportionalId::FCV).GetFaultCount();
+// Per-valve diagnostic snapshot:
+auto sol_snap = sys.Get(whvalve::SolenoidId::OLV_1).Snapshot();
+if (sol_snap.plunger_movement_fault) { /* handle stuck valve */ }
+
+auto pro_snap = sys.Get(whvalve::ProportionalId::FCV).Snapshot();
+uint16_t avg_current = pro_snap.average_current_raw;   // live measured
+
+// Subsystem-wide health (run by WhDiagnosticsThread):
+auto sub = valve_diag.GetSnapshot();
+if (sub.tle_vbat_uv || sub.max_undervoltage) { /* supply problem */ }
 ```
 
-Both `RequestState` / `RequestPosition` and the `Get*` calls are lock-free.
-The actual SPI write happens on the next iteration of
-`WhValveControlThread`.
+All `Request*` and `Get*` calls are lock-free. The actual SPI traffic
+happens on the next iteration of the control / diagnostics threads.
 
 ---
 
-## 4. Threads
+## 4. Diagnostics for medical-device safety
 
-### 4.1 `PressureSensorThread`
+The diagnostics thread surfaces every flag the chip can publish — not just
+"any fault" booleans. This is what allows the application layer to make
+informed safety decisions:
 
-- Period: **1 ms** (`kPressureSampleIntervalMs`).
-- IIR cutoff: **100 Hz** (`kPressureFilterCutoffHz`).
-- Status print: every 100 cycles (~5 Hz).
-- Stack: 8 KiB.
+### 4.1 Active diagnostics — react in software
 
-### 4.2 `WhValveControlThread`
+| Signal | Meaning | Recommended response |
+|--------|---------|----------------------|
+| `Solenoid.plunger_movement_fault` | Plunger did not move under load | Mark valve mechanically stuck; alarm; safe-state the system. |
+| `Solenoid.hit_not_reached` | HIT current never achieved within tHIT | Coil drift, supply sag or open coil. Re-attempt; alarm if persistent. |
+| `Solenoid.open_load` | No load current path | Disconnected coil or wire. Disable channel, alarm. |
+| `Solenoid.overcurrent` | Short to supply or shorted coil | Disable immediately; latch. |
+| `Proportional.short_to_ground` | Short to ground | Latched fault. |
+| `Proportional.over_temperature` | Channel die over-temp | Reduce setpoint; back-off duty; alarm. |
+| `Proportional.current_regulation_warning` | Loop can't track current setpoint | Investigate wiring, supply, dither tuning. |
+| `Subsystem.tle_vbat_uv` / `_ov` | Supply rail UV/OV | Stop actuating; raise system alarm. |
+| `Subsystem.tle_spi_wd_error` | SPI watchdog tripped | Communication is failing; latch and re-init. |
+| `Subsystem.tle_reg_ecc_err` / `tle_otp_ecc_err` | Register / OTP memory error | Treat as hard failure; latch. |
+| `Subsystem.max_undervoltage` (UVM) | MAX22200 supply UV at boot or runtime | Re-read STATUS at init clears it; runtime UV is an alarm. |
+| `Subsystem.max_communication_error` | SPI error detected by MAX22200 | Re-init; alarm if persistent. |
 
-- Period: **10 ms** (configurable via constructor).
-- Each iteration: `system.ForEachValve([] (Valve& v) { if v.ConsumeDirty()) v.Apply(mgr); });`.
-- Reports `mgr_was_ready_` so the application can detect whether the
-  underlying ICs ever came up.
-- Stack: 6 KiB, priority 7.
+### 4.2 Preventive features (configured at startup)
 
-### 4.3 `WhDiagnosticsThread`
-
-- Period: **100 ms** (configurable).
-- Walks every valve, calls `OnDiagnostics(mgr)` to refresh per-channel
-  fault counters; aggregates totals into a `DiagnosticsSnapshot` exposed
-  via lock-free `GetSnapshot()`.
-- Hooks into `Ads7952Handler` for future alarm scraping (see TODO in
-  `WhDiagnosticsThread.h`).
-- Stack: 6 KiB, priority 5 (lower than the control thread).
+- **Slew-rate control** enabled by default on every solenoid → cleaner
+  switching edges, lower EMI, less acoustic clicking.
+- **Open-load detection** enabled on every channel → catches a
+  disconnected coil before it hides a real safety event.
+- **Hit-current check (HHF)** enabled on every binary solenoid → if the
+  hit current isn't reached within tHIT we know the solenoid never
+  energised.
+- **DPM (plunger movement)** enabled on all 5 binary cartridge solenoids.
+  Tuned via `ConfigureGlobalDpm(30 mA, 8 mA, 0.5 ms)` at boot — adjust
+  per the actual mechanical signature.
+- **OLSG warning** on every TLE92466 channel → early indication of
+  open-load / short-to-ground precursors.
+- **CRC + SPI watchdog + clock watchdog** on TLE92466ED globally
+  (configured by `Flux::ValveManager` on init).
 
 ---
 
 ## 5. Failure / degraded-mode behaviour
 
-The Flux `ValveManager` may fail to come up if either MAX22200 or
-TLE92466ED is not present (the WH bench in its current state shows exactly
-this — the hardware isn't connected). The application stays alive:
+If `Flux::ValveManager` fails to bring up either driver IC (the WH bench
+in its current state shows exactly this — the hardware isn't connected):
 
 - `ValveManager::IsInitialized()` returns `false`.
 - `WhValveControlThread` keeps stepping but skips `Apply()` calls.
-- `WhDiagnosticsThread` reports `manager_ready = false` in the snapshot.
-- All `Valve::Get*` accessors keep returning the last published state
-  (`Uninitialized` / 0 / `VALVE_SUCCESS`).
+- `WhDiagnosticsThread` reports `manager_ready = false` and zeroes the
+  per-driver readiness flags / fault snapshots.
+- All `Valve::Get*` accessors keep returning the last-published soft
+  state (`Uninitialized` / 0 / `VALVE_SUCCESS`).
 
 This means an outer control loop can be developed and unit-tested against
 the same atomic API even when the valve hardware isn't wired up.
@@ -275,32 +272,45 @@ the same atomic API even when the valve hardware isn't wired up.
 
 ## 6. Extension recipes
 
-### 6.1 Add a solenoid
+### 6.1 Add a binary solenoid
 
-1. Add an enumerator in `whvalve::SolenoidId`, just before `Count`.
+1. Add an enumerator in `whvalve::SolenoidId` before `Count`.
 2. Append a row in `kSolenoidMap` referencing one of the `kSpec*` model
    structs and an unused `ValveChannel::SOL_CHn`.
-3. Done — the system, threads and lookups all scale automatically.
 
-### 6.2 Add a proportional
+### 6.2 Add a pseudo-proportional via MAX22200
 
-Same procedure with `whvalve::ProportionalId` and `kProportionalMap`. If
-all 6 TLE92466ED channels are already taken, leave the mapping at
-`ValveChannel::CHANNEL_COUNT` (the system will mark it `Uninitialized`).
+Same as above, but:
+- pick `SolenoidDriveMode::VariableCurrent`,
+- use a model spec with `full_flow_current_ma` set and
+  `hit_current_ma = hold_current_ma = 0`,
+- disable `plunger_movement_detection` and `hit_current_check` in the
+  channel features (the current waveform in continuous-current mode is
+  not what those algorithms were designed for).
 
-### 6.3 Use a different model
+### 6.3 Add a precision proportional
+
+1. Add an enumerator in `whvalve::ProportionalId` before `Count` (TLE92466
+   has 6 channels — if you exceed that you need a second IC).
+2. Append a row in `kProportionalMap` with the right model spec and
+   feature gates.
+
+### 6.4 Use a different model
 
 Edit (or add) a `SolenoidModelSpec` / `ProportionalModelSpec` literal at
 the top of `WhValveCatalog.h`, then point the relevant table row at it.
 Only the catalog file changes.
 
-### 6.4 Re-tune calibration / sample rate
+### 6.5 Re-tune diagnostics
 
-- Pressure: change `kPressureSampleIntervalMs` (1 ms = 1 kHz) or
-  `kPressureFilterCutoffHz` in `wh_valve_pressure_control.cpp`. The
-  worker re-derives `α` automatically.
-- Valves: change the ms argument when constructing `WhValveControlThread`
-  or call `valve_ctrl.SetSamplePeriodMs(…)` at runtime.
+- DPM parameters: `WhValveSystem::ConfigureGlobalDpm(start, dip, debounce)`.
+  Default 30 mA / 8 mA / 0.5 ms tuned for the C21 hold band; adjust per
+  the actual mechanical signature.
+- Per-channel feature gates: edit the `Max22200ChannelFeatures` /
+  `Tle92466ChannelFeatures` row in the bench map.
+- Diagnostics thread cadence: `WhDiagnosticsThread::SetPeriodMs(n)` —
+  default 100 ms, drop to 20 ms for closer monitoring or raise to 500 ms
+  to lighten SPI load.
 
 ---
 
@@ -308,15 +318,15 @@ Only the catalog file changes.
 
 | File | Purpose |
 |------|---------|
-| `wh_valve_pressure_control.cpp` | App entry; brings up Flux, calibrates pressure sensors, starts threads. |
+| `wh_valve_pressure_control.cpp` | App entry: brings up Flux, calibrates pressure sensors, configures DPM, starts control + diagnostics threads. |
 | `PressureSensorConfig.h` | Sensor enums + ratiometric range + calibration config types. |
 | `PressureSensor.{h,cpp}` | Per-channel pressure sensor: IIR filter, atomic publish. |
-| `PressureSensorThread.{h,cpp}` | 1 kHz BaseThread + Auto-1 ADS7952 batch read + dispatch. |
-| `WhValveCatalog.h` | Compile-time enums + Parker valve datasheet specs + bench map. |
-| `Valve.h` | Base valve class (atomic state, dirty flag, ApplyDispatch hooks). |
-| `SolenoidValve.h` | C15/C21 hit/hold via MAX22200. |
-| `ProportionalValve.h` | VSO / LM-Pro current control via TLE92466ED. |
-| `WhValveSystem.h` | Singleton container, O(1) lookup, iteration helpers. |
+| `PressureSensorThread.{h,cpp}` | 1 kHz BaseThread + Auto-1 ADS7952 batch read. |
+| `WhValveCatalog.h` | Compile-time enums + Parker valve datasheet specs + bench map + per-channel diagnostic feature gates. |
+| `Valve.h` | Base valve class (atomic state, dirty flag, snapshot types). |
+| `SolenoidValve.h` | MAX22200-driven valve — handles BinaryHitHold and VariableCurrent modes; decodes per-channel OCP/HHF/OLF/DPM. |
+| `ProportionalValve.h` | TLE92466ED-driven precision proportional; full per-channel ChannelDiagnostics surfacing. |
+| `WhValveSystem.h` | Singleton container, O(1) lookup, iteration helpers, `ConfigureGlobalDpm`. |
 | `WhValveControlThread.h` | 100 Hz BaseThread that pushes dirty setpoints. |
-| `WhDiagnosticsThread.h` | 10 Hz BaseThread that refreshes per-valve fault counters. |
-| `README.md` | This file. |
+| `WhDiagnosticsThread.h` | 10 Hz BaseThread; per-valve + per-driver-IC fault decoding into `SubsystemFaultSnapshot`. |
+| `README.md` | This document. |

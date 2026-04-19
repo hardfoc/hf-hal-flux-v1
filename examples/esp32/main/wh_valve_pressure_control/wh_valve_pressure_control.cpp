@@ -411,6 +411,24 @@ extern "C" void app_main(void) {
     auto* ads7952_drv = static_cast<Ads7952Handler*>(
         FLUX_API.adc.Get(HfFunctionalAdcChannel::ADS7952_0_CH0));
 
+    // Configure the global MAX22200 plunger-movement detection algorithm
+    // before any solenoid Apply() runs. The DPM_EN bit on the per-channel
+    // CFG_CH register is pushed by SolenoidValve::ApplyChannelFeatures()
+    // for every solenoid that opted in via its Max22200ChannelFeatures.
+    if (valve_manager.IsInitialized()) {
+        const auto dpm_err = valve_system.ConfigureGlobalDpm(
+            valve_manager,
+            /*start_current_ma =*/ 30.0f,    // start dip search above 30 mA
+            /*dip_threshold_ma =*/ 8.0f,     // require ≥ 8 mA dip
+            /*debounce_ms      =*/ 0.5f);    // 0.5 ms minimum dip duration
+        if (dpm_err == hf_valve_err_t::VALVE_SUCCESS) {
+            ESP_LOGI(TAG_MAIN, "MAX22200 DPM: ISTART=30 mA, IPTH=8 mA, TDEB=0.5 ms");
+        } else {
+            ESP_LOGW(TAG_MAIN, "MAX22200 DPM config skipped: %s",
+                     HfValveErrToString(dpm_err));
+        }
+    }
+
     static whvalve::WhValveControlThread valve_ctrl(valve_system, valve_manager, /*ms=*/10);
     static whvalve::WhDiagnosticsThread  valve_diag(valve_system, valve_manager, ads7952_drv,
                                                     /*ms=*/100);
@@ -429,15 +447,17 @@ extern "C" void app_main(void) {
         ESP_LOGI(TAG_MAIN, "Valve diagnostics thread running (100 ms / 10 Hz)");
     }
 
-    ESP_LOGI(TAG_MAIN, "Valve set:  %zu solenoids, %zu proportionals",
+    ESP_LOGI(TAG_MAIN, "Valve set:  %zu solenoids (incl. SEV pseudo-prop), %zu proportionals",
              valve_system.SolenoidCount(), valve_system.ProportionalCount());
     ESP_LOGI(TAG_MAIN, "Valve API (lock-free, callable from any thread):");
     ESP_LOGI(TAG_MAIN,
              "    valve_system.Get(SolenoidId::OLV_1).RequestState(true);");
     ESP_LOGI(TAG_MAIN,
+             "    valve_system.Get(SolenoidId::SEV).RequestPosition(0.4f);  // pseudo-prop");
+    ESP_LOGI(TAG_MAIN,
              "    valve_system.Get(ProportionalId::FCV).RequestPosition(0.5f);");
     ESP_LOGI(TAG_MAIN,
-             "    float pos = valve_system.Get(ProportionalId::FCV).GetActualPosition();");
+             "    auto snap = valve_system.Get(ProportionalId::FCV).Snapshot();");
 
     // ── Main loop: periodic system status ───────────────────────────────────
     while (true) {
@@ -461,34 +481,77 @@ extern "C" void app_main(void) {
                  static_cast<unsigned long>(total_samples),
                  static_cast<unsigned long>(total_errors));
 
-        // ── Valve diagnostics snapshot ───────────────────────────────────
+        // ── Valve subsystem snapshot (system-wide health) ────────────────
         const auto diag = valve_diag.GetSnapshot();
         ESP_LOGI(TAG_MAIN,
-                 "Valves: mgr=%s  ads7952=%s  apply_errors=%lu  faults=%lu",
-                 diag.manager_ready ? "OK"   : "DOWN",
-                 diag.ads7952_ready ? "OK"   : "DOWN",
+                 "Valves: mgr=%s max22200=%s tle92466=%s ads7952=%s "
+                 "apply_errors=%lu faults=%lu",
+                 diag.manager_ready    ? "OK" : "DOWN",
+                 diag.max22200_ready   ? "OK" : "DOWN",
+                 diag.tle92466_ready   ? "OK" : "DOWN",
+                 diag.ads7952_ready    ? "OK" : "DOWN",
                  static_cast<unsigned long>(diag.valve_total_apply_errors),
                  static_cast<unsigned long>(diag.valve_total_faults));
 
-        valve_system.ForEachSolenoid([](whvalve::SolenoidValve& v) {
+        // MAX22200 device-level health
+        if (diag.max22200_ready) {
             ESP_LOGI(TAG_MAIN,
-                     "  SOL %-6.*s : tgt=%-3s act=%-3s  state=%-12s  faults=%lu  err=%s",
+                     "  MAX22200: %sACTIVE channels=0x%02X  ovt=%d uvm=%d comer=%d "
+                     "g_ocp=%d g_olf=%d g_hhf=%d g_dpm=%d",
+                     diag.max_active ? "" : "!",
+                     diag.max_channels_on_mask,
+                     diag.max_overtemperature, diag.max_undervoltage,
+                     diag.max_communication_error,
+                     diag.max_global_overcurrent, diag.max_global_open_load,
+                     diag.max_global_hit_not_reached,
+                     diag.max_global_plunger_movement);
+        }
+        // TLE92466ED device-level health
+        if (diag.tle92466_ready) {
+            ESP_LOGI(TAG_MAIN,
+                     "  TLE92466: vbat[uv=%d ov=%d] vio[uv=%d ov=%d] vdd[uv=%d ov=%d]"
+                     " ot_warn=%d ot_err=%d clk=%d wd=%d ecc[reg=%d otp=%d]"
+                     " sup_nok[int=%d ext=%d]",
+                     diag.tle_vbat_uv, diag.tle_vbat_ov,
+                     diag.tle_vio_uv,  diag.tle_vio_ov,
+                     diag.tle_vdd_uv,  diag.tle_vdd_ov,
+                     diag.tle_ot_warning, diag.tle_ot_error,
+                     diag.tle_clock_fault, diag.tle_spi_wd_error,
+                     diag.tle_reg_ecc_err, diag.tle_otp_ecc_err,
+                     diag.tle_supply_nok_internal, diag.tle_supply_nok_external);
+        }
+
+        // Per-valve detail
+        valve_system.ForEachSolenoid([](whvalve::SolenoidValve& v) {
+            const auto s = v.Snapshot();
+            ESP_LOGI(TAG_MAIN,
+                     "  SOL %-6.*s [%-15s]: tgt=%4.2f act=%4.2f  state=%-12s  "
+                     "fc=%lu  flags=[ocp=%d hhf=%d olf=%d dpm=%d]",
                      static_cast<int>(v.Label().size()), v.Label().data(),
-                     v.GetTargetPosition() > 0.0f ? "ON"  : "OFF",
-                     v.GetActualPosition() > 0.0f ? "ON"  : "OFF",
+                     whvalve::SolenoidDriveModeToString(v.DriveMode()),
+                     static_cast<double>(v.GetTargetPosition()),
+                     static_cast<double>(v.GetActualPosition()),
                      whvalve::ValveStateToString(v.GetState()),
-                     static_cast<unsigned long>(v.GetFaultCount()),
-                     HfValveErrToString(v.GetLastError()));
+                     static_cast<unsigned long>(s.fault_count),
+                     s.overcurrent, s.hit_not_reached,
+                     s.open_load,   s.plunger_movement_fault);
         });
         valve_system.ForEachProportional([](whvalve::ProportionalValve& v) {
+            const auto s = v.Snapshot();
             ESP_LOGI(TAG_MAIN,
-                     "  PROP %-6.*s: tgt=%5.2f act=%5.2f  state=%-12s  faults=%lu  err=%s",
+                     "  PROP %-6.*s: tgt=%4.2f act=%4.2f  state=%-12s  fc=%lu  "
+                     "I_avg=%u duty=%u  flags=[oc=%d sg=%d ol=%d ot=%d olsg=%d]"
+                     "  warn=[ot=%d cur_reg=%d pwm_reg=%d olsg=%d]",
                      static_cast<int>(v.Label().size()), v.Label().data(),
                      static_cast<double>(v.GetTargetPosition()),
                      static_cast<double>(v.GetActualPosition()),
                      whvalve::ValveStateToString(v.GetState()),
-                     static_cast<unsigned long>(v.GetFaultCount()),
-                     HfValveErrToString(v.GetLastError()));
+                     static_cast<unsigned long>(s.fault_count),
+                     s.average_current_raw, s.duty_cycle_raw,
+                     s.overcurrent, s.short_to_ground, s.open_load,
+                     s.over_temperature, s.open_load_short_ground,
+                     s.ot_warning, s.current_regulation_warning,
+                     s.pwm_regulation_warning, s.olsg_warning);
         });
     }
 }

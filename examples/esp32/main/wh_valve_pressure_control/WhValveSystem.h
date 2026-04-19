@@ -13,6 +13,11 @@
  *          init failure of the underlying drivers — the threads still run,
  *          they just keep reporting `VALVE_ERR_NOT_INITIALIZED`.
  *
+ *          The system class also offers a one-shot `ConfigureGlobalDpm()`
+ *          helper that pushes the MAX22200 plunger-movement detection
+ *          parameters used by every solenoid that opted into DPM via its
+ *          `Max22200ChannelFeatures::plunger_movement_detection` flag.
+ *
  * @copyright HardFOC (internal use only)
  * @date 2026
  */
@@ -74,6 +79,37 @@ public:
     void ForceReconfigureAll() noexcept {
         for (auto& v : solenoids_)     { v.ForceReconfigure(); v.MarkTargetDirty(); }
         for (auto& v : proportionals_) { v.ForceReconfigure(); v.MarkTargetDirty(); }
+    }
+
+    /**
+     * @brief Push the global MAX22200 Detection-of-Plunger-Movement (DPM)
+     *        configuration. Per-channel DPM enable bits are pushed by each
+     *        `SolenoidValve::ApplyChannelFeatures()` based on the catalog's
+     *        `Max22200ChannelFeatures::plunger_movement_detection` flag.
+     *
+     * @param mgr               Flux::ValveManager (must be initialised).
+     * @param start_current_ma  ISTART — current at which the dip search begins.
+     * @param dip_threshold_ma  IPTH   — minimum dip amplitude to count as movement.
+     * @param debounce_ms       TDEB   — minimum dip duration in milliseconds.
+     *
+     * @details The driver converts the floating-point inputs into the
+     *          DPM register encoding using IFS and the active chopping
+     *          frequency. Tune the three parameters per the C15/C21
+     *          datasheets and the bench's mechanical signature.
+     *
+     * @note Safe to call multiple times. Returns the underlying driver
+     *       error if anything goes wrong.
+     */
+    hf_valve_err_t ConfigureGlobalDpm(ValveManager& mgr,
+                                      float start_current_ma,
+                                      float dip_threshold_ma,
+                                      float debounce_ms) noexcept {
+        Max22200Handler* h = mgr.GetMax22200Handler();
+        if (!h) return hf_valve_err_t::VALVE_ERR_DRIVER_NOT_AVAILABLE;
+        Max22200Handler::DriverType* drv = h->GetDriver();
+        if (!drv) return hf_valve_err_t::VALVE_ERR_DRIVER_NOT_AVAILABLE;
+        return MaxDriverStatusToValveError(
+            drv->ConfigureDpm(start_current_ma, dip_threshold_ma, debounce_ms));
     }
 
     /// Singleton access (single shared instance for the application).
