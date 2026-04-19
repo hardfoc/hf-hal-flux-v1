@@ -64,17 +64,37 @@ hf_valve_err_t ValveManager::Initialize() noexcept {
         return hf_valve_err_t::VALVE_ERR_DEPENDENCY_NOT_READY;
     }
 
-    bool max_ok = InitializeMax22200();
+    // ── Initialize each driver independently ─────────────────────────────
+    // Both share SPI3_HOST but use separate CS lines and GPIO controls.
+    // One driver's failure must never block the other from attempting init.
+
+    Logger::GetInstance().Info(TAG, "--- [1/2] Attempting TLE92466ED proportional driver ---");
     bool tle_ok = InitializeTle92466();
+    Logger::GetInstance().Info(TAG, "--- [1/2] TLE92466ED result: %s ---", tle_ok ? "OK" : "FAIL");
 
-    Logger::GetInstance().Info(TAG, "Valve manager initialized (MAX22200=%s, TLE92466=%s)",
-                              max_ok ? "OK" : "FAIL", tle_ok ? "OK" : "FAIL");
+    Logger::GetInstance().Info(TAG, "--- [2/2] Attempting MAX22200 solenoid driver ---");
+    bool max_ok = InitializeMax22200();
+    Logger::GetInstance().Info(TAG, "--- [2/2] MAX22200 result: %s ---", max_ok ? "OK" : "FAIL");
 
-    // At least one driver must succeed
-    if (!max_ok && !tle_ok) {
-        return hf_valve_err_t::VALVE_ERR_DRIVER_NOT_AVAILABLE;
+    // ── Evaluate combined results ────────────────────────────────────────
+    Logger::GetInstance().Info(TAG, "Valve driver summary: TLE92466=%s, MAX22200=%s",
+                              tle_ok ? "OK" : "FAIL", max_ok ? "OK" : "FAIL");
+
+    if (tle_ok && max_ok) {
+        Logger::GetInstance().Info(TAG, "Both valve drivers operational");
+        return hf_valve_err_t::VALVE_SUCCESS;
     }
-    return hf_valve_err_t::VALVE_SUCCESS;
+    if (max_ok) {
+        Logger::GetInstance().Warn(TAG, "Operating with MAX22200 only (solenoid channels available)");
+        return hf_valve_err_t::VALVE_SUCCESS;
+    }
+    if (tle_ok) {
+        Logger::GetInstance().Warn(TAG, "Operating with TLE92466ED only (proportional channels available)");
+        return hf_valve_err_t::VALVE_SUCCESS;
+    }
+
+    Logger::GetInstance().Error(TAG, "No valve drivers available — valve subsystem non-functional");
+    return hf_valve_err_t::VALVE_ERR_DRIVER_NOT_AVAILABLE;
 }
 
 bool ValveManager::InitializeMax22200() noexcept {
