@@ -16,9 +16,6 @@
 #include "core/hf-core-drivers/internal/hf-pincfg/src/hf_functional_pin_config_flux_v1.hpp"
 #include "handlers/logger/Logger.h"
 
-#include "driver/gpio.h"
-#include "esp_err.h"
-
 static constexpr const char* TAG = "FluxComm";
 
 // Destructor defined here where EspSpiBus, EspI2cBus, EspCan are complete types
@@ -68,16 +65,6 @@ bool CommChannelsManager::Initialize() noexcept {
         auto* sck_map  = GetGpioMapping(HfFunctionalGpioPin::SPI2_SCK);
 
         if (miso_map && mosi_map && sck_map) {
-            // CRITICAL: enable an internal pull-up on MISO BEFORE the SPI
-            // peripheral takes ownership of the pin. The MAX22200 SDO pin
-            // is open-drain (datasheet rev 1, §"SPI Interface"), so MISO
-            // floats whenever the slave is not actively driving it. Without
-            // a pull-up every read returns garbage. The TLE92466ED's SDO is
-            // push-pull but a weak pull-up does no harm (and helps keep the
-            // line idle-high during the brief CS transitions).
-            (void)gpio_set_pull_mode(static_cast<gpio_num_t>(miso_map->physical_pin),
-                                     GPIO_PULLUP_ONLY);
-
             hf_spi_bus_config_t spi_cfg = {};
             spi_cfg.host      = static_cast<hf_host_id_t>(2); // SPI3_HOST (GPIO matrix, no IOMUX)
             spi_cfg.miso_pin  = miso_map->physical_pin;
