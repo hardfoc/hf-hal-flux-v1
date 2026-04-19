@@ -1,8 +1,9 @@
 /**
  * @file wh_valve_pressure_control.cpp
- * @brief WH bench-test: pressure sensor calibration and monitoring.
+ * @brief WH bench-test: pressure sensor calibration and high-rate monitoring.
  *
- * Configured for the WH test bench with 8 pressure transducers:
+ * Hardware: 8× Honeywell SSC TruStability ratiometric pressure transducers
+ * connected to an ADS7952 12-bit SPI ADC on the Flux V1 board:
  *   - CH0: DPS_LOW  — Differential ±0.18 PSI (low range differential)
  *   - CH1: DPS_HIGH — Differential ±2.32 PSI (high range differential)
  *   - CH2: PMS      — Single-ended 0–5 PSI (manifold supply)
@@ -12,12 +13,30 @@
  *   - CH6: PWS2     — Single-ended 0–1 PSI (pilot/work stage 2)
  *   - CH7: PWS1     — Single-ended 0–1 PSI (pilot/work stage 1)
  *
- * All sensors are ratiometric (5%-95% of VA output).
+ * SSC sensor characteristics (per datasheet, transfer function "A"):
+ *   - Output spans 10% – 90% of V_supply over the full scale (span = 0.8·VA).
+ *   - Output clipping limits: 2.5% / 97.5% of V_supply.
+ *   - Internal calibration & temperature compensation; ASIC updates
+ *     pressure data at ~1 kHz with ~1 ms response time.
+ *   - Resolution ≥ 0.03 % FSS, accuracy ±0.25 % FSS BFSL,
+ *     total error band ±2 % FSS.
  *
- * Calibration sequence:
- *   1. VA calibration — determine actual supply voltage from atmospheric sensors
- *   2. Zero calibration — store per-sensor offset at atmospheric
- *   3. Auto-swap detection — for single-ended sensors, detect reversed lines
+ * Acquisition architecture:
+ *   - Worker thread runs at 1 kHz (1 ms step) — matches the SSC ASIC update.
+ *   - Each step issues ONE batched Auto-1 SPI transaction on the ADS7952
+ *     for all 8 channels (handler `ReadMultipleChannels`).
+ *   - Each channel gets a per-sensor single-pole IIR low-pass (default
+ *     fc = 100 Hz at fs = 1 kHz, α ≈ 0.467) — strongly attenuates ADC and
+ *     supply noise while preserving useful bandwidth for control.
+ *   - Latest filtered voltage and pressure are published atomically per
+ *     channel: control-loop threads at any rate (e.g. 500 Hz) call
+ *     `PressureSensor::GetPressureFiltered()` lock-free.
+ *
+ * Calibration sequence (one-shot at boot):
+ *   1. VA calibration — derive actual supply voltage from atmospheric sensors.
+ *   2. Zero calibration — store per-sensor offset voltage at atmospheric.
+ *   3. (Optional) Auto-swap detection — for single-ended sensors with
+ *      reversed plumbing.
  *
  * @author HardFOC Team — WH Bench Test
  * @date 2026
@@ -42,11 +61,18 @@ static const char* TAG_MAIN     = "WHControl";
 // TASK CONFIGURATION
 //=============================================================================
 
-/// Pressure sensor sampling interval (ms)
-static constexpr uint32_t kPressureSampleIntervalMs = 10;
+/// Pressure sampling interval (ms). 1 ms = 1 kHz, matches the SSC ASIC's
+/// internal ~1 kHz pressure-data update rate. The ADS7952 batched read for
+/// 8 channels takes well under 100 µs, leaving ample headroom.
+static constexpr uint32_t kPressureSampleIntervalMs = 1;
 
-/// Number of ADC samples to average per pressure reading
-static constexpr uint8_t kPressureAvgSamples = 8;
+/// IIR low-pass cutoff (Hz) applied per channel. 100 Hz at 1 kHz sampling
+/// gives ~1.6 ms group delay — clean data for control loops at 200–500 Hz.
+static constexpr float    kPressureFilterCutoffHz   = 100.0f;
+
+/// Calibration-phase ADC averaging (used by Sample(); the live path uses
+/// the IIR filter instead).
+static constexpr uint8_t  kPressureAvgSamples       = 8;
 
 //=============================================================================
 // CALIBRATION CONFIGURATION
@@ -94,7 +120,7 @@ static PressureSensorConfig kSensorConfigs[] = {
     {
         .adc_channel   = HfFunctionalAdcChannel::ADS7952_0_CH0,
         .label         = "DPS_LOW",
-        .ratio_range   = RatiometricRange::RANGE_5_95,
+        .ratio_range   = RatiometricRange::RANGE_10_90,
         .voltage_min   = 0.0f,  // Computed from VA
         .voltage_max   = 0.0f,  // Computed from VA
         .pressure_min  = -0.18f,
@@ -111,7 +137,7 @@ static PressureSensorConfig kSensorConfigs[] = {
     {
         .adc_channel   = HfFunctionalAdcChannel::ADS7952_0_CH1,
         .label         = "DPS_HIGH",
-        .ratio_range   = RatiometricRange::RANGE_5_95,
+        .ratio_range   = RatiometricRange::RANGE_10_90,
         .voltage_min   = 0.0f,
         .voltage_max   = 0.0f,
         .pressure_min  = -2.32f,
@@ -128,7 +154,7 @@ static PressureSensorConfig kSensorConfigs[] = {
     {
         .adc_channel   = HfFunctionalAdcChannel::ADS7952_0_CH2,
         .label         = "PMS",
-        .ratio_range   = RatiometricRange::RANGE_5_95,
+        .ratio_range   = RatiometricRange::RANGE_10_90,
         .voltage_min   = 0.0f,
         .voltage_max   = 0.0f,
         .pressure_min  = 0.0f,
@@ -145,7 +171,7 @@ static PressureSensorConfig kSensorConfigs[] = {
     {
         .adc_channel   = HfFunctionalAdcChannel::ADS7952_0_CH3,
         .label         = "PLS_LOW",
-        .ratio_range   = RatiometricRange::RANGE_5_95,
+        .ratio_range   = RatiometricRange::RANGE_10_90,
         .voltage_min   = 0.0f,
         .voltage_max   = 0.0f,
         .pressure_min  = 0.0f,
@@ -162,7 +188,7 @@ static PressureSensorConfig kSensorConfigs[] = {
     {
         .adc_channel   = HfFunctionalAdcChannel::ADS7952_0_CH4,
         .label         = "PLS_HIGH",
-        .ratio_range   = RatiometricRange::RANGE_5_95,
+        .ratio_range   = RatiometricRange::RANGE_10_90,
         .voltage_min   = 0.0f,
         .voltage_max   = 0.0f,
         .pressure_min  = 0.0f,
@@ -179,7 +205,7 @@ static PressureSensorConfig kSensorConfigs[] = {
     {
         .adc_channel   = HfFunctionalAdcChannel::ADS7952_0_CH5,
         .label         = "RLS",
-        .ratio_range   = RatiometricRange::RANGE_5_95,
+        .ratio_range   = RatiometricRange::RANGE_10_90,
         .voltage_min   = 0.0f,
         .voltage_max   = 0.0f,
         .pressure_min  = 0.0f,       // Zero at atmospheric
@@ -196,7 +222,7 @@ static PressureSensorConfig kSensorConfigs[] = {
     {
         .adc_channel   = HfFunctionalAdcChannel::ADS7952_0_CH6,
         .label         = "PWS2",
-        .ratio_range   = RatiometricRange::RANGE_5_95,
+        .ratio_range   = RatiometricRange::RANGE_10_90,
         .voltage_min   = 0.0f,
         .voltage_max   = 0.0f,
         .pressure_min  = 0.0f,
@@ -213,7 +239,7 @@ static PressureSensorConfig kSensorConfigs[] = {
     {
         .adc_channel   = HfFunctionalAdcChannel::ADS7952_0_CH7,
         .label         = "PWS1",
-        .ratio_range   = RatiometricRange::RANGE_5_95,
+        .ratio_range   = RatiometricRange::RANGE_10_90,
         .voltage_min   = 0.0f,
         .voltage_max   = 0.0f,
         .pressure_min  = 0.0f,
@@ -252,9 +278,13 @@ extern "C" void app_main(void) {
     ESP_LOGI(TAG_MAIN, "║      8-Channel Ratiometric Pressure Monitoring           ║");
     ESP_LOGI(TAG_MAIN, "╚══════════════════════════════════════════════════════════╝");
     ESP_LOGI(TAG_MAIN, "");
-    ESP_LOGI(TAG_MAIN, "Sensors: %zu pressure transducers on ADS7952 (SPI2)", kNumSensors);
-    ESP_LOGI(TAG_MAIN, "Sample rate: %u ms, %u-sample averaging",
-             kPressureSampleIntervalMs, kPressureAvgSamples);
+    ESP_LOGI(TAG_MAIN, "Sensors: %zu Honeywell SSC channels on ADS7952 (SPI3)", kNumSensors);
+    ESP_LOGI(TAG_MAIN, "Sampling: %lu ms (%.0f Hz) batched Auto-1, IIR LPF @ %.1f Hz",
+             static_cast<unsigned long>(kPressureSampleIntervalMs),
+             1000.0 / static_cast<double>(kPressureSampleIntervalMs),
+             static_cast<double>(kPressureFilterCutoffHz));
+    ESP_LOGI(TAG_MAIN, "Calibration averaging: %u ADC samples per call",
+             kPressureAvgSamples);
     ESP_LOGI(TAG_MAIN, "");
 
     // ── Sensor Summary ──────────────────────────────────────────────────────
@@ -339,7 +369,8 @@ extern "C" void app_main(void) {
         kCalConfig,
         shared_state,
         kPressureSampleIntervalMs,
-        kPressureAvgSamples);
+        kPressureAvgSamples,
+        kPressureFilterCutoffHz);
 
     ESP_LOGW(TAG_MAIN, "DBG: calling pressure_thread.EnsureInitialized()...");
     if (!pressure_thread.EnsureInitialized()) {
@@ -364,6 +395,12 @@ extern "C" void app_main(void) {
         taskYIELD();
     }
     ESP_LOGI(TAG_MAIN, "Pressure sensor task running (calibration finished)");
+    ESP_LOGI(TAG_MAIN,
+             "Control-loop access pattern (call from any thread, lock-free):");
+    ESP_LOGI(TAG_MAIN,
+             "    float p = g_sensors[i]->GetPressureFiltered();   // engineering units");
+    ESP_LOGI(TAG_MAIN,
+             "    float v = g_sensors[i]->GetVoltageFiltered();    // V (post-IIR)");
 
     // ── Main loop: periodic system status ───────────────────────────────────
     while (true) {

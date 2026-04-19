@@ -19,6 +19,7 @@
 
 #include "PressureSensorConfig.h"
 #include "api/Flux.h"
+#include <atomic>
 #include <cmath>
 #include <cstdint>
 
@@ -147,16 +148,50 @@ public:
     //=========================================================================
 
     /**
-     * @brief Sample the sensor and update internal state.
+     * @brief Sample the sensor by issuing an ADC read on its channel.
      *
-     * Simply reads voltage, converts to pressure, and applies swap if enabled.
-     * No swap detection is performed here — use CalibrateSwap() during
-     * calibration phase to determine and set swap state.
+     * Synchronous path used during calibration. For high-rate live sampling
+     * prefer the Update(voltage) entry point fed from a batched ADC read in
+     * the worker thread.
      *
      * @param avg_samples Number of ADC samples to average (default 8)
      * @return true if read succeeded
      */
     bool Sample(uint8_t avg_samples = 8) noexcept;
+
+    /**
+     * @brief Feed an externally-acquired raw voltage sample to this channel.
+     *
+     * Designed for the high-rate sampling worker that performs a single
+     * batched SPI transaction (Auto-1) per cycle and then dispatches each
+     * channel reading here. Performs:
+     *   1. Single-pole IIR low-pass on the voltage stream (configurable cutoff).
+     *   2. Voltage→pressure conversion via VoltageToPressureRaw() using the
+     *      calibrated VA + zero-offset anchor.
+     *   3. Atomic publish of the filtered voltage and pressure for lock-free
+     *      consumption by control-loop threads at any rate.
+     */
+    void Update(float voltage_raw) noexcept;
+
+    //=========================================================================
+    // FILTER CONFIGURATION
+    //=========================================================================
+
+    /**
+     * @brief Configure the per-channel single-pole IIR low-pass filter.
+     *
+     * Coefficient is computed from cutoff and sample rate as
+     *   alpha = 1 - exp(-2*pi*fc/fs)
+     * The first sample after (re)configuration primes the filter to that
+     * value (no transient). Pass cutoff_hz <= 0 or >= fs/2 to disable filtering.
+     *
+     * @param cutoff_hz Cutoff frequency (Hz). Default 100 Hz.
+     * @param sample_hz Worker thread sample rate (Hz). Default 1000 Hz.
+     */
+    void ConfigureFilter(float cutoff_hz, float sample_hz) noexcept;
+
+    /** @brief Reset filter state — next Update() re-primes. */
+    void ResetFilter() noexcept;
 
     //=========================================================================
     // LINE SWAP CONTROL
@@ -194,6 +229,23 @@ public:
     const PressureSensorConfig& GetConfig() const noexcept { return config_; }
 
     /**
+     * @brief Lock-free filtered voltage suitable for control loops.
+     *
+     * Updated atomically by the high-rate sampling worker. Safe to call from
+     * any thread at any rate; a single load yields a self-consistent value.
+     */
+    float GetVoltageFiltered() const noexcept {
+        return voltage_filt_atomic_.load(std::memory_order_acquire);
+    }
+
+    /**
+     * @brief Lock-free filtered pressure (engineering units) for control loops.
+     */
+    float GetPressureFiltered() const noexcept {
+        return pressure_filt_atomic_.load(std::memory_order_acquire);
+    }
+
+    /**
      * @brief Reset min/max/count statistics.
      */
     void ResetStatistics() noexcept;
@@ -206,7 +258,7 @@ private:
 
     PressureSensorConfig& config_;
     const CalibrationConfig& cal_config_;
-    
+
     float calibrated_va_;
     float zero_offset_voltage_;     ///< Voltage at atmospheric (ideal = VA/2)
     float last_voltage_;
@@ -219,6 +271,14 @@ private:
     bool swapped_;                  ///< True if pressure direction is inverted
     bool zero_calibrated_;          ///< True if CalibrateZero() has been called
     bool swap_calibrated_;          ///< True if CalibrateSwap() has been called
+
+    // ── Low-pass IIR filter (worker writes, any thread reads atomically) ──
+    float filter_alpha_{1.0f};      ///< 1.0 = passthrough (no filtering)
+    float voltage_filt_state_{0.0f};
+    float pressure_filt_state_{0.0f};
+    bool  filter_primed_{false};
+    std::atomic<float> voltage_filt_atomic_{0.0f};
+    std::atomic<float> pressure_filt_atomic_{0.0f};
 };
 
 //=============================================================================

@@ -121,20 +121,51 @@ bool PressureSensor::Sample(uint8_t avg_samples) noexcept {
         return false;
     }
 
-    last_voltage_ = voltage;
-    
-    // Calculate raw pressure then apply swap if enabled
-    float raw_pressure = VoltageToPressureRaw(voltage);
-    last_pressure_ = swapped_ ? -raw_pressure : raw_pressure;
-    
+    Update(voltage);
+    return true;
+}
+
+void PressureSensor::ConfigureFilter(float cutoff_hz, float sample_hz) noexcept {
+    if (cutoff_hz <= 0.0f || sample_hz <= 0.0f || cutoff_hz >= 0.5f * sample_hz) {
+        // Disable filter (or unrepresentable cutoff).
+        filter_alpha_ = 1.0f;
+    } else {
+        // First-order RC equivalent: alpha = 1 - exp(-2*pi*fc/fs)
+        const float kTwoPi = 6.28318530717958647692f;
+        filter_alpha_ = 1.0f - std::exp(-kTwoPi * cutoff_hz / sample_hz);
+    }
+    filter_primed_ = false;
+}
+
+void PressureSensor::ResetFilter() noexcept {
+    filter_primed_ = false;
+}
+
+void PressureSensor::Update(float voltage_raw) noexcept {
+    // ── Voltage IIR ────────────────────────────────────────────────────────
+    if (!filter_primed_) {
+        voltage_filt_state_ = voltage_raw;
+        filter_primed_ = true;
+    } else {
+        voltage_filt_state_ += filter_alpha_ * (voltage_raw - voltage_filt_state_);
+    }
+
+    // ── Voltage → pressure on the filtered voltage ─────────────────────────
+    const float raw_pressure = VoltageToPressureRaw(voltage_filt_state_);
+    const float final_pressure = swapped_ ? -raw_pressure : raw_pressure;
+    pressure_filt_state_ = final_pressure;
+
+    // ── Bookkeeping ────────────────────────────────────────────────────────
+    last_voltage_ = voltage_filt_state_;
+    last_pressure_ = final_pressure;
     ++sample_count_;
     sensor_ok_ = true;
+    if (final_pressure < min_pressure_) min_pressure_ = final_pressure;
+    if (final_pressure > max_pressure_) max_pressure_ = final_pressure;
 
-    // Track min/max for diagnostics
-    if (last_pressure_ < min_pressure_) min_pressure_ = last_pressure_;
-    if (last_pressure_ > max_pressure_) max_pressure_ = last_pressure_;
-
-    return true;
+    // ── Atomic publish for lock-free control-loop consumers ────────────────
+    voltage_filt_atomic_.store(voltage_filt_state_, std::memory_order_release);
+    pressure_filt_atomic_.store(final_pressure, std::memory_order_release);
 }
 
 SwapCalibrationResult PressureSensor::CalibrateSwap(
