@@ -14,10 +14,16 @@
  *               and RX=GPIO18 (override at the top of the file). The
  *               UART is then switched to `HF_UART_MODE_RS485` so ESP-IDF
  *               drives DE/RE automatically through the RTS pin.
- *            3. **Discover** which BASIS-2 addresses are alive on the
- *               bus (`AlicatBasis2Handler::Discover`), with a short
- *               per-address timeout so the sweep finishes quickly even
- *               when most addresses are empty.
+ *            3. **Multi-baud discovery + normalisation**:
+ *                 - Sweep every supported BASIS-2 baud rate
+ *                   (4800/9600/19200/38400/57600/115200) using
+ *                   `DiscoverAcrossBauds()` so devices that were
+ *                   previously reconfigured aren't invisible.
+ *                 - Run `NormalizeBusBaud(target)` to bring every
+ *                   discovered device onto a single baud (`38400` by
+ *                   default — flip `cfg::kNormalizeBus` off to skip).
+ *                 - Re-run a single-baud `Discover()` at the target
+ *                   baud as a sanity check.
  *            4. For every present address build a dedicated
  *               `AlicatBasis2Handler` that **shares the same bus mutex**;
  *               read identity (firmware/serial/units/full-scale).
@@ -90,6 +96,15 @@ constexpr uint32_t kReadIntervalMs = 1000;
 /// Re-confirm identity once every N polling iterations to make sure the
 /// link is still healthy in long-running tests.
 constexpr uint32_t kIdentityHeartbeatN = 60;
+
+/// When `true` the example runs a multi-baud discovery sweep at start-up
+/// and then `NormalizeBusBaud()` so every device ends up at
+/// `kNormalizedBaud` before the steady-state loop starts.
+///
+/// Set to `false` to skip the sweep entirely (saves ~3 s on boot when
+/// you already know everyone is at the factory baud).
+constexpr bool     kNormalizeBus      = true;
+constexpr uint32_t kNormalizedBaud    = 38400;  // factory default; safe choice
 }  // namespace cfg
 
 //==============================================================================
@@ -259,19 +274,89 @@ extern "C" void app_main(void) {
     // Single bus mutex shared by every handler on this UART.
     static RtosMutex bus_mutex;
 
-    // ─── 3) Bus discovery sweep with a probe handler bound to address 1 ────
+    // Callback the handler uses to retune the host UART during multi-baud
+    // discovery / normalisation.
+    auto set_host_baud = [&uart](std::uint32_t bps) -> bool {
+        const bool ok = uart.SetBaudRate(bps);
+        if (!ok) {
+            ESP_LOGW(TAG, "    set_host_baud(%u) FAILED", static_cast<unsigned>(bps));
+        }
+        return ok;
+    };
+
+    // ─── 3a) Multi-baud discovery sweep ────────────────────────────────────
+    //
+    // Per the BASIS-2 datasheet each instrument may have been previously
+    // configured to one of {4800, 9600, 19200, 38400, 57600, 115200} bps.
+    // The handler iterates over every supported baud, retuning the host
+    // UART through the callback above, and reports back what was found
+    // and at what baud.
+    std::array<AlicatBasis2Handler::DiscoveredDevice, cfg::kMaxMeters> found{};
+    std::size_t n_found = 0;
+
     auto probe_cfg = MakeDefaultBasis2Config(/*addr=*/1, /*idx=*/0);
     static AlicatBasis2Handler probe(uart, probe_cfg, &bus_mutex);
+
+    if (cfg::kNormalizeBus) {
+        ESP_LOGI(TAG, "Multi-baud discovery sweep …");
+        const auto rc = probe.DiscoverAcrossBauds(found.data(), found.size(),
+                                                  set_host_baud,
+                                                  /*probe_timeout_ms=*/40,
+                                                  /*settle_ms=*/25);
+        if (!rc.ok()) {
+            ESP_LOGW(TAG, "DiscoverAcrossBauds failed: %s — falling back to single-baud probe",
+                     al::ToString(rc.error).data());
+        } else {
+            n_found = rc.value;
+            ESP_LOGI(TAG, "Multi-baud sweep: %u instrument(s) responded across all bauds",
+                     static_cast<unsigned>(n_found));
+            for (std::size_t i = 0; i < n_found; ++i) {
+                ESP_LOGI(TAG, "    addr=%u present @ %u bps",
+                         found[i].address, static_cast<unsigned>(found[i].baud_bps));
+            }
+        }
+
+        // ─── 3b) Normalise the whole bus to one baud ───────────────────────
+        if (n_found > 0) {
+            std::uint8_t fail_bm[32] = {0};
+            const auto nz = probe.NormalizeBusBaud(cfg::kNormalizedBaud,
+                                                   found.data(), n_found,
+                                                   set_host_baud,
+                                                   fail_bm, sizeof(fail_bm),
+                                                   /*verify_timeout_ms=*/100);
+            if (nz.ok()) {
+                ESP_LOGI(TAG, "NormalizeBusBaud(%u): %u/%u devices verified at target",
+                         static_cast<unsigned>(cfg::kNormalizedBaud),
+                         static_cast<unsigned>(nz.value),
+                         static_cast<unsigned>(n_found));
+                for (std::uint16_t a = 1; a <= 247; ++a) {
+                    if (fail_bm[a / 8] & (1U << (a % 8))) {
+                        ESP_LOGW(TAG, "    addr=%u FAILED to normalise", a);
+                    }
+                }
+            } else {
+                ESP_LOGW(TAG, "NormalizeBusBaud failed: %s", al::ToString(nz.error).data());
+            }
+        }
+    }
+
+    // ─── 3c) Single-baud confirmation sweep at the normalised baud ─────────
+    if (!set_host_baud(cfg::kNormalizedBaud)) {
+        ESP_LOGE(TAG, "Failed to bring host UART to %u bps — aborting",
+                 static_cast<unsigned>(cfg::kNormalizedBaud));
+        return;
+    }
 
     std::array<std::uint8_t, 32> present{};
     const auto disc = probe.Discover(present.data(), present.size(), /*timeout_ms=*/40);
     if (!disc.ok()) {
-        ESP_LOGW(TAG, "Discover() failed: %s — continuing with default address 1",
+        ESP_LOGW(TAG, "Discover() at %u bps failed: %s — assuming addr=1",
+                 static_cast<unsigned>(cfg::kNormalizedBaud),
                  al::ToString(disc.error).data());
-        // Force address 1 into the bitmap so the rest of the example runs.
         present[0] |= (1U << 1);
     } else {
-        ESP_LOGI(TAG, "Bus discovery: %u BASIS-2 instrument(s) responded", disc.value);
+        ESP_LOGI(TAG, "Final bus map @ %u bps: %u instrument(s)",
+                 static_cast<unsigned>(cfg::kNormalizedBaud), disc.value);
         for (uint16_t a = 1; a <= 247; ++a) {
             if (present[a / 8] & (1U << (a % 8))) {
                 ESP_LOGI(TAG, "    addr=%u present", a);
