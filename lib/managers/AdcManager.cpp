@@ -49,7 +49,7 @@ bool AdcManager::Initialize() noexcept {
     // Initialize enum-to-index lookup table to invalid
     enum_to_index_.fill(kInvalidIndex);
 
-    // Create one EspAdc for ADC1 (ESP32-C6 only has ADC1 usable)
+    // Create one EspAdc for ADC1 (ESP32-S3 has ADC1 and ADC2)
     hf_adc_unit_config_t adc_cfg{};
     adc_cfg.unit_id = 0;  // ADC1
     esp_adc_ = hf::utils::make_unique_nothrow<EspAdc>(adc_cfg);

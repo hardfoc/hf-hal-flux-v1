@@ -18,7 +18,7 @@
 
 // Board information
 #define FLUX_HAL_BOARD_NAME       "HardFOC Flux V1" /**< @brief Human-readable board name. */
-#define FLUX_HAL_MCU              "ESP32-C6"        /**< @brief Target MCU identifier. */
+#define FLUX_HAL_MCU              "ESP32-S3"        /**< @brief Target MCU identifier. */
 
 // Build information
 #define FLUX_HAL_BUILD_DATE       __DATE__ /**< @brief Compilation date stamp. */

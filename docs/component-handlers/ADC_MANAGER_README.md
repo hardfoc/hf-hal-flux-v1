@@ -16,7 +16,7 @@ The `AdcManager` is a singleton component handler that provides unified access t
 
 ### Key Features
 
-- **🔌 ESP32-C6 ADC**: Up to 6 internal ADC channels
+- **🔌 ESP32-S3 ADC**: Up to 6 internal ADC channels
 - **📊 Voltage Conversion**: Automatic raw-to-voltage calibration
 - **🏷️ String-Based API**: Access channels by name (`"ADC_VBUS"`) or functional enum
 - **🔒 Thread-Safe**: Concurrent access from multiple RTOS tasks
@@ -31,7 +31,7 @@ The `AdcManager` is a singleton component handler that provides unified access t
 │  std::array<AdcEntry>     │  ← Fixed-size channel registry
 │  EspAdc drivers (stack)   │  ← Hardware driver instances
 ├──────────────────────────┤
-│  ESP32-C6 ADC1 Peripheral │  ← Hardware layer
+│  ESP32-S3 ADC1 Peripheral │  ← Hardware layer
 └──────────────────────────┘
 ```
 
@@ -39,7 +39,7 @@ The `AdcManager` is a singleton component handler that provides unified access t
 
 | Source | Channels | Use Case |
 |--------|----------|----------|
-| **ESP32-C6 ADC1** | Up to 6 | VBUS monitoring, NTC thermistor readout |
+| **ESP32-S3 ADC1** | Up to 6 | VBUS monitoring, NTC thermistor readout |
 
 ## 🔧 API Reference
 

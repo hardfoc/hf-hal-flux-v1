@@ -16,7 +16,7 @@ The `GpioManager` is a singleton component handler that provides unified access 
 
 ### Key Features
 
-- **🔌 ESP32-C6 GPIO**: Direct pin control for all available GPIO
+- **🔌 ESP32-S3 GPIO**: Direct pin control for all available GPIO
 - **🏷️ String-Based API**: Access pins by name (`"GPIO_LED_STATUS"`) or functional enum
 - **📦 Stack-Allocated**: `EspGpio` drivers stored by value in `std::array`
 - **🔒 Thread-Safe**: Safe for concurrent RTOS task access
@@ -31,7 +31,7 @@ The `GpioManager` is a singleton component handler that provides unified access 
 │  std::array<GpioEntry>    │  ← Fixed-size pin registry
 │    EspGpio driver (value) │  ← Stack-allocated, no heap
 ├──────────────────────────┤
-│  ESP32-C6 GPIO Peripheral │
+│  ESP32-S3 GPIO Peripheral │
 └──────────────────────────┘
 ```
 

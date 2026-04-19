@@ -32,7 +32,7 @@ The `CommChannelsManager` is a singleton that initializes and manages all commun
 │  EspI2cBus*   i2c_bus_           │  ← I2C master
 │  EspCan*      can_bus_           │  ← CAN/TWAI
 ├─────────────────────────────────┤
-│  ESP32-C6 SPI / I2C / TWAI HW   │
+│  ESP32-S3 SPI / I2C / TWAI HW   │
 └─────────────────────────────────┘
 ```
 

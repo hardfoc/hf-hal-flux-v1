@@ -5,7 +5,7 @@
  * @details Provides a single entry point to every subsystem on the Flux board:
  *
  *   - **comms**   — SPI (MAX22200 + TLE92466ED), I2C, CAN
- *   - **gpio**    — ESP32-C6 GPIO management (control pins for both drivers)
+ *   - **gpio**    — ESP32-S3 GPIO management (control pins for both drivers)
  *   - **valves**  — Unified valve control (solenoid + proportional)
  *   - **adc**     — ESP32 ADC (NTC thermistor, VBUS monitor)
  *   - **leds**    — Single WS2812 status LED
