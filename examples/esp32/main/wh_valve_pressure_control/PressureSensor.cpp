@@ -362,7 +362,7 @@ PressureSensorCalibrator::PressureSensorCalibrator(
 {}
 
 float PressureSensorCalibrator::CalibrateVA() noexcept {
-    ESP_LOGI(TAG, "=== VA Supply Calibration ===");
+    ESP_LOGW(TAG, "=== VA Supply Calibration === ENTER");
     
     // Count and identify sensors used for VA calibration
     size_t cal_sensor_count = 0;
@@ -396,22 +396,36 @@ float PressureSensorCalibrator::CalibrateVA() noexcept {
         }
     }
     
+    ESP_LOGW(TAG, "VA cal: sampling %lu rounds x %zu sensors (4 avg each)...",
+             static_cast<unsigned long>(cal_config_.calibration_samples), cal_count);
     // Sample each calibration sensor multiple times
     for (uint32_t sample = 0; sample < cal_config_.calibration_samples; ++sample) {
         for (size_t ci = 0; ci < cal_count; ++ci) {
             size_t idx = cal_indices[ci];
             const auto& cfg = sensors_[idx]->GetConfig();
-            
+
             float voltage = 0.0f;
             hf_adc_err_t err = adc.ReadVoltage(cfg.adc_channel, voltage, 4);
-            
+
             if (err == hf_adc_err_t::ADC_SUCCESS) {
                 voltage_sums[ci] += voltage;
                 ++valid_samples[ci];
+            } else {
+                ESP_LOGW(TAG, "VA cal: ReadVoltage failed (sample=%lu, ch=%s, err=%d)",
+                         static_cast<unsigned long>(sample), cfg.label,
+                         static_cast<int>(err));
             }
         }
         os_delay_msec(cal_config_.calibration_sample_delay_ms);
+
+        // Heartbeat every ~16 rounds (~80 ms with default 5 ms delay)
+        if ((sample & 0x0F) == 0) {
+            ESP_LOGW(TAG, "VA cal progress: round %lu/%lu",
+                     static_cast<unsigned long>(sample),
+                     static_cast<unsigned long>(cal_config_.calibration_samples));
+        }
     }
+    ESP_LOGW(TAG, "VA cal: sampling done — averaging");
     
     // Calculate averages and verify all sensors responded
     float avg_voltages[MAX_CAL_SENSORS] = {};

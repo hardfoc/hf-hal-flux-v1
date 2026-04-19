@@ -31,6 +31,7 @@
 
 #include "OsUtility.h"
 #include "esp_log.h"
+#include "freertos/task.h"
 
 #include <array>
 #include <atomic>
@@ -271,6 +272,10 @@ extern "C" void app_main(void) {
     }
     ESP_LOGI(TAG_MAIN, "");
 
+    // Ensure worker-thread calibration logs are not filtered below INFO
+    esp_log_level_set("Pressure", ESP_LOG_INFO);
+    esp_log_level_set("PressureSensor", ESP_LOG_INFO);
+
     // ── Initialize Flux HAL ─────────────────────────────────────────────────
     auto& flux = Flux::GetInstance();
     ESP_LOGW(TAG_MAIN, "DBG: calling Flux::EnsureInitialized()...");
@@ -342,16 +347,23 @@ extern "C" void app_main(void) {
         return;
     }
     ESP_LOGW(TAG_MAIN, "DBG: pressure thread initialized, starting...");
-    if (!pressure_thread.StartThreadAndWaitToVerify(1000)) {
-        ESP_LOGE(TAG_MAIN, "FATAL: Failed to start pressure thread");
+    // Allow time for the worker to reach MarkThreadRunning() (Setup can run long after that)
+    if (!pressure_thread.StartThreadAndWaitToVerify(5000)) {
+        ESP_LOGE(TAG_MAIN, "FATAL: Failed to start pressure thread (running flag not set in time)");
         return;
     }
+    ESP_LOGW(TAG_MAIN, "DBG: StartThreadAndWaitToVerify OK — worker marked running; waiting for calibration...");
 
-    // Wait for calibration to complete
-    while (!g_pressure_task_ready.load()) {
-        os_delay_msec(100);
+    // Wait for calibration to complete (Setup runs on worker; main must not spin silently)
+    for (uint32_t w = 0; !g_pressure_task_ready.load(std::memory_order_acquire); ++w) {
+        os_delay_msec(200);
+        if ((w % 5U) == 0U) {
+            ESP_LOGW(TAG_MAIN, "waiting for pressure calibration... (~%u s elapsed)",
+                     static_cast<unsigned>((w + 1U) * 200U / 1000U));
+        }
+        taskYIELD();
     }
-    ESP_LOGI(TAG_MAIN, "Pressure sensor task running");
+    ESP_LOGI(TAG_MAIN, "Pressure sensor task running (calibration finished)");
 
     // ── Main loop: periodic system status ───────────────────────────────────
     while (true) {

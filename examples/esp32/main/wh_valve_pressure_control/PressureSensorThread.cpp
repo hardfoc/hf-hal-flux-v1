@@ -2,6 +2,7 @@
 
 #include "OsUtility.h"
 #include "esp_log.h"
+#include "freertos/task.h"
 
 #include <cstring>
 
@@ -36,6 +37,10 @@ bool PressureSensorThread::Initialize() noexcept {
 }
 
 bool PressureSensorThread::Setup() noexcept {
+    // WARN so this line survives aggressive log filtering during bring-up
+    ESP_LOGW(TAG_PRESSURE, "Setup() entered on worker task");
+    taskYIELD();
+
     if (!sensor_configs_ || num_sensors_ == 0 || num_sensors_ > kMaxSensors) {
         ESP_LOGE(TAG_PRESSURE, "Invalid sensor configuration (count=%u)",
                  static_cast<unsigned>(num_sensors_));
@@ -60,8 +65,9 @@ bool PressureSensorThread::Setup() noexcept {
         return false;
     }
 
-    ESP_LOGI(TAG_PRESSURE, "Pressure sensor calibration start");
+    ESP_LOGI(TAG_PRESSURE, "Pressure sensor calibration start (2s settle)...");
     os_delay_msec(2000);
+    ESP_LOGW(TAG_PRESSURE, "Settle complete — starting VA calibration");
 
     float va = calibrator_->CalibrateVA();
     if (va == 0.0f) {
@@ -102,11 +108,13 @@ uint32_t PressureSensorThread::Step() noexcept {
         sensors_[i]->Sample(avg_samples_);
     }
 
+    // Print readings often (~100 ms @ 10 ms/step) so serial shows live sensors
     const uint32_t status_period = (sample_interval_ms_ == 0)
-                                       ? 200U
-                                       : (2000U / sample_interval_ms_);
+                                       ? 10U
+                                       : (100U / sample_interval_ms_);
+    const uint32_t effective_period = (status_period == 0U) ? 1U : status_period;
 
-    if (status_period > 0 && (++iteration_ % status_period) == 0) {
+    if (effective_period > 0 && (++iteration_ % effective_period) == 0) {
         ESP_LOGI(TAG_PRESSURE, "─── Pressure Readings ───");
         for (std::size_t i = 0; i < num_sensors_; ++i) {
             const auto& sensor = *sensors_[i];
