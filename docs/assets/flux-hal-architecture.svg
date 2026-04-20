@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 780" width="980" height="780" role="img" aria-labelledby="t-flux d-flux">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 740" width="980" height="740" role="img" aria-labelledby="t-flux d-flux">
   <title id="t-flux">HardFOC Flux V1 &#8212; HAL architecture and board topology</title>
   <desc id="d-flux">HardFOC Flux V1 valve-control board. The HAL stacks application code on top of board-specific managers (ValveManager, AdcManager, etc.) which orchestrate per-chip handlers (TLE92466ED, MAX22200, ADS7952, WS2812, NTC) backed by the shared hf-core platform. Bottom: the physical chip layout with bus interconnects.</desc>
   <defs>
@@ -16,12 +16,11 @@
       .chip     { fill: #ebf4ff; stroke: #2c5282; stroke-width: 1.6; }
       .adc-chip { fill: #f0fff4; stroke: #276749; stroke-width: 1.6; }
       .sense    { fill: #f0fff4; stroke: #276749; stroke-width: 1.6; }
-      .led      { fill: #faf5ff; stroke: #6b46c1; stroke-width: 1.6; }
-      .wire-pwr { stroke: #c53030; stroke-width: 2.5; fill: none; stroke-linecap: round; }
+      .led      { fill: #faf5ff; stroke: #6b46c1; stroke-width: 2; }
       .wire-spi2{ stroke: #2b6cb0; stroke-width: 2.5; fill: none; stroke-linecap: round; }
       .wire-spi3{ stroke: #276749; stroke-width: 2.5; fill: none; stroke-linecap: round; stroke-dasharray: 6 3; }
       .wire-can { stroke: #d69e2e; stroke-width: 2.5; fill: none; stroke-linecap: round; }
-      .wire-rmt { stroke: #6b46c1; stroke-width: 2; fill: none; stroke-linecap: round; }
+      .wire-rmt { stroke: #6b46c1; stroke-width: 2.5; fill: none; stroke-linecap: round; }
       .wire-adc { stroke: #4a5568; stroke-width: 2; fill: none; stroke-linecap: round; stroke-dasharray: 3 2; }
       .arrow-dn { stroke: #2c5282; stroke-width: 2.5; fill: none; stroke-linecap: round; }
       .head     { font-family: system-ui, sans-serif; font-size: 16px; font-weight: 600; fill: #1a365d; text-anchor: middle; }
@@ -40,7 +39,7 @@
       <path d="M0,0 L8,3 L0,6 z" fill="#2c5282"/>
     </marker>
   </defs>
-  <rect class="panel" width="980" height="780"/>
+  <rect class="panel" width="980" height="740"/>
 
   <text class="head" x="490" y="24">HardFOC Flux V1 &#8212; HAL architecture and board topology</text>
   <text class="small" x="490" y="42">Valve-control board. Drives 8 solenoid valves (MAX22200) and 6 proportional valves (TLE92466ED) with 12-ch external ADC (ADS7952).</text>
@@ -95,112 +94,99 @@
     <rect class="core-cell" x="704" y="326" width="228" height="24" rx="4"/><text class="title" x="818" y="342">+ Logger, Comm, Gpio adapters</text>
   </g>
 
-  <!-- =========== BOTTOM HALF: physical board =========== -->
+  <!-- =========== BOTTOM HALF: physical board (comm topology) =========== -->
 
   <line class="arrow-dn" x1="490" y1="356" x2="490" y2="380" marker-end="url(#ar-d)"/>
   <text class="smallL" x="498" y="374">platform layer constructs Esp* peripherals + chip drivers</text>
 
   <!-- Board panel -->
-  <rect class="board" x="40" y="382" width="900" height="310" rx="6"/>
-  <text class="layer-title" x="56" y="404" fill="#1a365d">Flux V1 board  (physical hardware)</text>
-  <text class="smallL" x="56" y="420">Flux MCU at the centre; SPI2 to valve drivers; SPI3 (dedicated) to ADS7952 ADC; RMT to status LED; internal ADC for NTC/VBUS; CAN to host.</text>
-
-  <!-- Power rail -->
-  <line class="wire-pwr" x1="80" y1="440" x2="900" y2="440"/>
-  <text class="pinL" x="56" y="444">+VBUS</text>
+  <rect class="board" x="40" y="382" width="900" height="276" rx="6"/>
+  <text class="layer-title" x="56" y="404" fill="#1a365d">Flux V1 board  (communication topology)</text>
+  <text class="smallL" x="56" y="420">Flux MCU at the centre. SPI2 shared bus to valve drivers; SPI3 dedicated bus to ADS7952 ADC; RMT to status LED; CAN to host.</text>
 
   <!-- TLE92466ED on the left -->
-  <rect class="chip" x="56" y="472" width="180" height="86" rx="6"/>
-  <text class="title" x="146" y="492">TLE92466ED</text>
-  <text class="small" x="146" y="508">6-ch low-side driver</text>
-  <text class="small" x="146" y="524">proportional valves</text>
-  <text class="small" x="146" y="542">(0&#8211;2 A / 0&#8211;4 A pair)</text>
+  <rect class="chip" x="56" y="446" width="180" height="76" rx="6"/>
+  <text class="title" x="146" y="470">TLE92466ED</text>
+  <text class="small" x="146" y="488">6-ch low-side driver</text>
+  <text class="small" x="146" y="504">proportional valves</text>
 
   <!-- Flux MCU at the centre -->
-  <rect class="mcu" x="350" y="460" width="260" height="110" rx="6"/>
-  <text class="title" x="480" y="482">Flux MCU</text>
-  <text class="small" x="480" y="500">SPI2 host (valve drivers)</text>
-  <text class="small" x="480" y="516">SPI3 host (ADS7952 ADC)</text>
-  <text class="pin" x="480" y="536">CAN/TWAI &#183; RMT0 &#183; ADC1</text>
-  <text class="small" x="480" y="556">3.3 V LDO from +VBUS</text>
+  <rect class="mcu" x="340" y="436" width="280" height="96" rx="6"/>
+  <text class="title" x="480" y="460">Flux MCU</text>
+  <text class="small" x="480" y="478">SPI2 host (valve drivers)</text>
+  <text class="small" x="480" y="494">SPI3 host (ADS7952 ADC)</text>
+  <text class="small" x="480" y="510">CAN/TWAI &#183; RMT &#183; internal ADC</text>
 
   <!-- MAX22200 on the right -->
-  <rect class="chip" x="730" y="472" width="180" height="86" rx="6"/>
-  <text class="title" x="820" y="492">MAX22200</text>
-  <text class="small" x="820" y="508">8-ch half-bridge driver</text>
-  <text class="small" x="820" y="524">on/off solenoid valves</text>
-  <text class="small" x="820" y="542">(36 V, 1 A RMS)</text>
+  <rect class="chip" x="730" y="446" width="180" height="76" rx="6"/>
+  <text class="title" x="820" y="470">MAX22200</text>
+  <text class="small" x="820" y="488">8-ch half-bridge driver</text>
+  <text class="small" x="820" y="504">on/off solenoid valves</text>
 
-  <!-- WS2812 LED above MCU -->
-  <rect class="led" x="420" y="440" width="120" height="16" rx="3"/>
-  <text class="small" x="480" y="452">WS2812 status LED</text>
+  <!-- WS2812 LED (prominent, to the right of MCU) -->
+  <rect class="led" x="730" y="540" width="180" height="46" rx="6"/>
+  <text class="title" x="820" y="560" fill="#6b46c1">WS2812 Status LED</text>
+  <text class="small" x="820" y="576">RMT single-wire NRZ data</text>
 
-  <!-- ADS7952 below MCU (dedicated SPI3) -->
-  <rect class="adc-chip" x="350" y="588" width="180" height="66" rx="6"/>
-  <text class="title" x="440" y="608">ADS7952</text>
-  <text class="small" x="440" y="624">12-ch 12-bit SAR ADC</text>
-  <text class="small" x="440" y="640">(SPI3, Vref=2.5 V)</text>
+  <!-- ADS7952 below MCU -->
+  <rect class="adc-chip" x="340" y="556" width="180" height="56" rx="6"/>
+  <text class="title" x="430" y="578">ADS7952</text>
+  <text class="small" x="430" y="594">12-ch 12-bit SAR ADC</text>
 
   <!-- NTC + internal ADC sense -->
-  <rect class="sense" x="56" y="600" width="170" height="50" rx="4"/>
-  <text class="title" x="141" y="618">NTC 10 k&#937; (B=3950)</text>
-  <text class="small" x="141" y="634">+ internal ADC VBUS sense</text>
-  <text class="small" x="141" y="646">(11x divider)</text>
+  <rect class="sense" x="56" y="556" width="170" height="56" rx="4"/>
+  <text class="title" x="141" y="576">NTC thermistor</text>
+  <text class="small" x="141" y="594">+ VBUS sense (internal ADC)</text>
 
   <!-- CAN transceiver -->
-  <rect class="chip" x="650" y="600" width="170" height="50" rx="4"/>
-  <text class="title" x="735" y="620">CAN/TWAI transceiver</text>
-  <text class="small" x="735" y="638">500 kbps to host</text>
+  <rect class="chip" x="560" y="556" width="150" height="56" rx="4"/>
+  <text class="title" x="635" y="576">CAN/TWAI</text>
+  <text class="small" x="635" y="594">transceiver to host</text>
 
-  <!-- =========== Wires =========== -->
-  <!-- VBUS to MCU and chips -->
-  <line class="wire-pwr" x1="146" y1="440" x2="146" y2="472"/>
-  <line class="wire-pwr" x1="480" y1="440" x2="480" y2="460"/>
-  <line class="wire-pwr" x1="820" y1="440" x2="820" y2="472"/>
+  <!-- =========== Wires (comm only, no power) =========== -->
 
-  <!-- SPI2 bus: MCU to TLE92466ED (left) -->
-  <line class="wire-spi2" x1="350" y1="498" x2="236" y2="498"/>
-  <text class="smallL" x="244" y="490" fill="#2b6cb0">SPI2 (CS_TLE92466)</text>
+  <!-- SPI2: MCU to TLE92466ED (left) -->
+  <line class="wire-spi2" x1="340" y1="474" x2="236" y2="474"/>
+  <text class="smallL" x="244" y="466" fill="#2b6cb0">SPI2 (CS_TLE92466)</text>
 
-  <!-- SPI2 bus: MCU to MAX22200 (right) -->
-  <line class="wire-spi2" x1="610" y1="498" x2="730" y2="498"/>
-  <text class="smallR" x="724" y="490" fill="#2b6cb0">SPI2 (CS_MAX22200)</text>
+  <!-- SPI2: MCU to MAX22200 (right) -->
+  <line class="wire-spi2" x1="620" y1="474" x2="730" y2="474"/>
+  <text class="smallR" x="724" y="466" fill="#2b6cb0">SPI2 (CS_MAX22200)</text>
 
-  <!-- SPI3 bus: MCU to ADS7952 (down) -->
-  <line class="wire-spi3" x1="440" y1="570" x2="440" y2="588"/>
-  <text class="smallL" x="448" y="584" fill="#276749">SPI3 (dedicated)</text>
+  <!-- SPI3: MCU to ADS7952 (down) -->
+  <line class="wire-spi3" x1="430" y1="532" x2="430" y2="556"/>
+  <text class="smallL" x="438" y="550" fill="#276749">SPI3 (dedicated)</text>
 
   <!-- RMT: MCU to WS2812 -->
-  <line class="wire-rmt" x1="480" y1="460" x2="480" y2="456"/>
+  <line class="wire-rmt" x1="620" y1="510" x2="730" y2="556"/>
+  <text class="smallL" x="646" y="528" fill="#6b46c1">RMT</text>
 
-  <!-- Internal ADC: MCU to NTC/VBUS sense -->
-  <line class="wire-adc" x1="350" y1="550" x2="226" y2="610"/>
-  <text class="smallR" x="290" y="572" fill="#4a5568">internal ADC</text>
+  <!-- Internal ADC: MCU to NTC/VBUS -->
+  <line class="wire-adc" x1="340" y1="510" x2="226" y2="570"/>
+  <text class="smallR" x="286" y="534" fill="#4a5568">internal ADC</text>
 
   <!-- CAN: MCU to transceiver -->
-  <line class="wire-can" x1="610" y1="550" x2="650" y2="610"/>
-  <text class="smallL" x="622" y="584" fill="#d69e2e">CAN TX/RX</text>
+  <line class="wire-can" x1="560" y1="510" x2="560" y2="556"/>
+  <text class="smallL" x="568" y="540" fill="#d69e2e">CAN TX/RX</text>
 
   <!-- =========== Bottom legend =========== -->
-  <g transform="translate(40, 724)">
+  <g transform="translate(40, 686)">
     <text class="layer-title" x="0" y="0" fill="#1a365d">Legend</text>
-    <line class="wire-pwr" x1="70"  y1="-5" x2="94" y2="-5"/>
-    <text class="legend" x="100" y="-1">+VBUS power</text>
-    <line class="wire-spi2" x1="190" y1="-5" x2="214" y2="-5"/>
-    <text class="legend" x="220" y="-1">SPI2 (valve drivers)</text>
-    <line class="wire-spi3" x1="360" y1="-5" x2="384" y2="-5"/>
-    <text class="legend" x="390" y="-1">SPI3 (ADC, dedicated)</text>
-    <line class="wire-can" x1="540" y1="-5" x2="564" y2="-5"/>
-    <text class="legend" x="570" y="-1">CAN / TWAI</text>
-    <line class="wire-rmt" x1="650" y1="-5" x2="674" y2="-5"/>
-    <text class="legend" x="680" y="-1">RMT (LED)</text>
-    <line class="wire-adc" x1="740" y1="-5" x2="764" y2="-5"/>
-    <text class="legend" x="770" y="-1">internal ADC</text>
-    <line class="arrow-dn" x1="860" y1="-5" x2="884" y2="-5" marker-end="url(#ar-d)"/>
-    <text class="legend" x="890" y="-1">depends-on</text>
+    <line class="wire-spi2" x1="70"  y1="-5" x2="94" y2="-5"/>
+    <text class="legend" x="100" y="-1">SPI2 (valve drivers, shared)</text>
+    <line class="wire-spi3" x1="280" y1="-5" x2="304" y2="-5"/>
+    <text class="legend" x="310" y="-1">SPI3 (ADC, dedicated)</text>
+    <line class="wire-can" x1="460" y1="-5" x2="484" y2="-5"/>
+    <text class="legend" x="490" y="-1">CAN / TWAI</text>
+    <line class="wire-rmt" x1="570" y1="-5" x2="594" y2="-5"/>
+    <text class="legend" x="600" y="-1">RMT (LED)</text>
+    <line class="wire-adc" x1="660" y1="-5" x2="684" y2="-5"/>
+    <text class="legend" x="690" y="-1">internal ADC</text>
+    <line class="arrow-dn" x1="790" y1="-5" x2="814" y2="-5" marker-end="url(#ar-d)"/>
+    <text class="legend" x="820" y="-1">software depends-on</text>
   </g>
-  <g transform="translate(40, 752)">
+  <g transform="translate(40, 714)">
     <text class="smallL" x="0" y="0">SPI2 shared bus: TLE92466ED + MAX22200 (separate chip-selects). SPI3 dedicated bus: ADS7952 12-ch external ADC.</text>
-    <text class="smallL" x="0" y="14">Internal ADC1 used for VBUS voltage sensing (11x divider) and NTC temperature measurement. CAN/TWAI for host communication at 500 kbps.</text>
+    <text class="smallL" x="0" y="14">NTC and VBUS measured via internal ADC. WS2812 status LED driven by the RMT peripheral. CAN/TWAI for host communication.</text>
   </g>
 </svg>
