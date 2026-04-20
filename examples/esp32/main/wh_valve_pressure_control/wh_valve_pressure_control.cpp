@@ -48,6 +48,7 @@
 #include "PressureSensorThread.h"
 #include "WhDiagnosticsThread.h"
 #include "WhValveControlThread.h"
+#include "WhValveSelfTest.h"
 #include "WhValveSystem.h"
 #include "api/Flux.h"
 
@@ -76,6 +77,64 @@ static constexpr float    kPressureFilterCutoffHz   = 100.0f;
 /// Calibration-phase ADC averaging (used by Sample(); the live path uses
 /// the IIR filter instead).
 static constexpr uint8_t  kPressureAvgSamples       = 8;
+
+//=============================================================================
+// VALVE SELF-TEST CONFIGURATION
+//=============================================================================
+//
+// The boot self-test exercises every valve in `WhValveCatalog.h` once: every
+// MAX22200 solenoid is cycled ON/OFF a few times (mirrors `c21_cycle_test`)
+// and every TLE92466ED proportional is ramped 0 → full → 0 (mirrors
+// `lm_pro_cycle_test`). Diagnostics are scraped between each phase so any
+// per-channel fault (open-load, hit-not-reached, plunger-movement, over-
+// current, regulation warnings, …) is reported with the offending valve.
+//
+// On this bench the operator can only physically attach ONE valve to the
+// manifold at a time, so the plan deliberately walks the catalog one valve
+// at a time with `prompt_wait_ms` and `inter_valve_pause_ms` pauses to give
+// the operator time to move the manifold connection between tests.
+//
+// To skip a valve (for example because it is not yet stocked, or because it
+// was already validated on a prior boot), flip the corresponding entry in
+// `enable_solenoids` / `enable_proportionals` to `false` below.
+//
+// To skip the self-test entirely, set `kRunSelfTestAtBoot = false`.
+//
+static constexpr bool kRunSelfTestAtBoot = true;
+
+static whvalve::SelfTestPlan MakeSelfTestPlan() noexcept {
+    whvalve::SelfTestPlan plan = whvalve::SelfTestPlan::All();
+
+    // ── Solenoids (MAX22200 OUT0..OUT7) ──────────────────────────────────
+    // Default: every catalog row enabled. Comment out / set false to skip.
+    plan.enable_solenoids[static_cast<size_t>(whvalve::SolenoidId::OLV_2)] = true;
+    plan.enable_solenoids[static_cast<size_t>(whvalve::SolenoidId::VEV  )] = true;
+    plan.enable_solenoids[static_cast<size_t>(whvalve::SolenoidId::OLV_1)] = true;
+    plan.enable_solenoids[static_cast<size_t>(whvalve::SolenoidId::SEV  )] = true;
+    plan.enable_solenoids[static_cast<size_t>(whvalve::SolenoidId::GDV  )] = true;
+    plan.enable_solenoids[static_cast<size_t>(whvalve::SolenoidId::ORV  )] = true;
+    plan.enable_solenoids[static_cast<size_t>(whvalve::SolenoidId::AVV  )] = true;
+
+    // ── Proportionals (TLE92466ED OUT0..OUT5) ────────────────────────────
+    plan.enable_proportionals[static_cast<size_t>(whvalve::ProportionalId::FRV  )] = true;
+    plan.enable_proportionals[static_cast<size_t>(whvalve::ProportionalId::SPV_L)] = true;
+    plan.enable_proportionals[static_cast<size_t>(whvalve::ProportionalId::FCV  )] = true;
+    plan.enable_proportionals[static_cast<size_t>(whvalve::ProportionalId::LSV  )] = true;
+    plan.enable_proportionals[static_cast<size_t>(whvalve::ProportionalId::SPV_H)] = true;
+    plan.enable_proportionals[static_cast<size_t>(whvalve::ProportionalId::GFV  )] = true;
+
+    // Tunable cycling knobs — keep modest defaults; raise during deeper
+    // commissioning runs if a valve needs more cycles to surface a fault.
+    plan.solenoid_cycles         = 3;
+    plan.solenoid_on_ms          = 1500;
+    plan.solenoid_off_ms         = 1000;
+    plan.proportional_ramp_ms    = 4000;
+    plan.proportional_steps      = 11;     // 0%, 10%, …, 100%
+    plan.proportional_settle_ms  = 150;
+    plan.inter_valve_pause_ms    = 4000;   // long enough to move a manifold tube
+    plan.prompt_wait_ms          = 3000;   // operator-readable countdown banner
+    return plan;
+}
 
 //=============================================================================
 // CALIBRATION CONFIGURATION
@@ -438,6 +497,49 @@ extern "C" void app_main(void) {
 
     ESP_LOGI(TAG_MAIN, "[main] Valve set ready: %zu solenoids (incl. SEV pseudo-prop), %zu proportionals",
              valve_system.SolenoidCount(), valve_system.ProportionalCount());
+
+    // ── Boot self-test (one valve at a time) ───────────────────────────────
+    if (kRunSelfTestAtBoot && valve_manager.IsInitialized()) {
+        // Wait until the diagnostics thread has actually scraped the bus at
+        // least once — without this the first valve sees stale snapshots.
+        for (uint32_t spins = 0;
+             spins < 50U && valve_diag.IterationCount() == 0U;
+             ++spins) {
+            os_delay_msec(50);
+        }
+        // Quiet noisy tags during the self-test so the USB-CDC serial link
+        // doesn't get flooded (the pressure thread prints 9 lines every
+        // 200 ms by default; the TLE92466ED handler logs every channel
+        // command at INFO). This is a runtime override that is reverted
+        // immediately after the self-test finishes so steady-state telemetry
+        // still appears.
+        esp_log_level_set("Pressure",       ESP_LOG_WARN);
+        esp_log_level_set("PressureSensor", ESP_LOG_WARN);
+        esp_log_level_set("TLE92466ED",     ESP_LOG_WARN);
+        esp_log_level_set("MAX22200",       ESP_LOG_WARN);
+
+        const auto plan = MakeSelfTestPlan();
+        // Run() returns a reference to a function-static report so we
+        // don't blow the main task's ~3 kB stack with the array of per-valve
+        // result records.
+        const auto& report = whvalve::WhValveSelfTest::Run(valve_system, valve_diag, plan);
+
+        // Restore default log verbosity once the self-test is done.
+        esp_log_level_set("Pressure",       ESP_LOG_INFO);
+        esp_log_level_set("PressureSensor", ESP_LOG_INFO);
+        esp_log_level_set("TLE92466ED",     ESP_LOG_INFO);
+        esp_log_level_set("MAX22200",       ESP_LOG_INFO);
+
+        if (report.overall_pass) {
+            ESP_LOGI(TAG_MAIN, "[main] Boot self-test: PASS — bench ready");
+        } else {
+            ESP_LOGE(TAG_MAIN, "[main] Boot self-test: FAIL — see WhSelfTest log above");
+        }
+    } else if (kRunSelfTestAtBoot) {
+        ESP_LOGW(TAG_MAIN, "[main] Boot self-test SKIPPED — ValveManager never initialised");
+    } else {
+        ESP_LOGI(TAG_MAIN, "[main] Boot self-test SKIPPED (kRunSelfTestAtBoot=false)");
+    }
 
     ESP_LOGI(TAG_MAIN, "");
     ESP_LOGI(TAG_MAIN, "════════════════════════════════════════════════════════════");

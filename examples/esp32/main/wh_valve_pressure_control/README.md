@@ -4,10 +4,14 @@ This example is the WH bench-test acquisition + actuation stack. It owns:
 
 - **8 Honeywell SSC TruStability** ratiometric pressure transducers on the
   ADS7952 12-bit SPI ADC.
-- **6 Parker C15/C21 + VSO** valves driven through the **MAX22200** octal
-  solenoid driver (5 binary hit/hold + 1 pseudo-proportional).
-- **6 Parker VSO / VSO LowPro / LM-Pro** precision proportional valves
+- **7 Parker C15 / C21 / SRS / VSO** valves driven through the **MAX22200**
+  octal solenoid driver (6 binary hit/hold + 1 pseudo-proportional).
+- **6 Parker VSO / VSO MaxFlow / LM-Pro** precision proportional valves
   driven through the **TLE92466ED** 6-channel current-controlled driver.
+
+A boot-time **valve self-test** exercises every catalog entry one at a time
+(solenoids ON/OFF, proportionals 0 → full → 0) and reports per-channel
+faults from the underlying drivers — see §6.
 
 Everything hangs off the existing Flux V1 HAL — this folder contributes the
 **application-level abstractions** (named valves, datasheet-driven
@@ -121,27 +125,35 @@ LPF (default fc = 100 Hz at fs = 1 kHz) → atomic publish. Lock-free
 
 ### 3.2 Bench mapping
 
-**Solenoids (MAX22200, channels 0–5):**
+**Solenoids (MAX22200, channels 0–7):**
 
-| ID    | Channel  | Drive mode      | Model                         | Datasheet currents (24 V) |
-|-------|----------|-----------------|-------------------------------|--------------------------|
-| OLV_1 | SOL_CH0  | BinaryHitHold   | Parker C21 (R = 235 Ω)        | hit 102 mA / hold 51 mA / hit 100 ms |
-| OLV_2 | SOL_CH1  | BinaryHitHold   | Parker C21                    | same |
-| VEV   | SOL_CH2  | BinaryHitHold   | Parker C15 ≥0.040″ (R=361 Ω)  | hit 66 mA / hold 33 mA / hit 100 ms |
-| ORV   | SOL_CH3  | BinaryHitHold   | Parker C15 ≥0.040″            | same |
-| GDV   | SOL_CH4  | BinaryHitHold   | Parker C15 0.020″ (R=525 Ω)   | hit 46 mA / hold 23 mA / hit 100 ms |
-| **SEV** | **SOL_CH5** | **VariableCurrent** | **Parker VSO (R=274 Ω)** | **0..66 mA proportional via 7-bit CDR ladder** |
+| OUTn       | ID    | Drive mode          | Model                         | Datasheet currents (24 V)            |
+|------------|-------|---------------------|-------------------------------|---------------------------------------|
+| SOL_CH0    | _spare_ | _unconnected_       | —                              | —                                    |
+| SOL_CH1    | OLV_2 | BinaryHitHold       | Parker C21 (R = 235 Ω)         | hit 102 mA / hold 51 mA / hit 100 ms |
+| SOL_CH2    | VEV   | BinaryHitHold       | Parker C15 ≥0.040″ (R = 361 Ω) | hit  66 mA / hold 33 mA / hit 100 ms |
+| SOL_CH3    | OLV_1 | BinaryHitHold       | Parker C21                     | same as OLV_2                         |
+| **SOL_CH4** | **SEV**   | **VariableCurrent**     | **Parker VSO (R = 274 Ω)**     | **0..66 mA proportional via 7-bit CDR ladder** |
+| SOL_CH5    | GDV   | BinaryHitHold       | Parker SRS 0.5 W (R = 1152 Ω)  | hit  21 mA / hold 10 mA / hit  30 ms  |
+| SOL_CH6    | ORV   | BinaryHitHold       | Parker C15 ≥0.040″             | hit  66 mA / hold 33 mA / hit 100 ms |
+| SOL_CH7    | AVV   | BinaryHitHold       | Parker C15 ≥0.040″             | same as ORV                           |
 
 **Proportionals (TLE92466ED, channels 0–5):**
 
-| ID    | Channel    | Model                | Full-flow current | PWM | Dither |
-|-------|------------|----------------------|-------------------|-----|--------|
-| FCV   | PROP_CH0   | Parker LM-Pro 24 V   | 115 mA            | 5 kHz   | – |
-| FRV   | PROP_CH1   | Parker LM-Pro 24 V   | 115 mA            | 5 kHz   | – |
-| LSV   | PROP_CH2   | Parker VSO 24 V      | 66 mA             | 8 kHz   | 4 mA @ 200 Hz |
-| GFV   | PROP_CH3   | Parker VSO 24 V      | 66 mA             | 8 kHz   | 4 mA @ 200 Hz |
-| SPV_H | PROP_CH4   | Parker VSO LowPro    | 75 mA             | 10 kHz  | 4 mA @ 200 Hz |
-| SPV_L | PROP_CH5   | Parker VSO LowPro    | 75 mA             | 10 kHz  | 4 mA @ 200 Hz |
+> The TLE92466ED PWM frequency is capped at 4 kHz by the chip itself (datasheet
+> `PERIOD::kSpecMaxFrequency`). The catalog therefore drives every model at
+> 4 kHz; the driver clamps and warns if you ever request more. LM-Pro keeps a
+> tiny "telemetry" dither (1 mA @ 50 Hz) so the chip's `FB_I_AVG` / `FB_DC`
+> averagers are populated — see `hf-tle92466ed-driver/docs/troubleshooting.md`.
+
+| OUTn      | ID    | Model                       | Full-flow current | PWM     | Dither               |
+|-----------|-------|-----------------------------|-------------------|---------|----------------------|
+| PROP_CH0  | FRV   | Parker VSO MaxFlow 24 V     | 66 mA             | 4 kHz   | 4 mA @ 200 Hz        |
+| PROP_CH1  | SPV_L | Parker VSO 24 V             | 66 mA             | 4 kHz   | 4 mA @ 200 Hz        |
+| PROP_CH2  | FCV   | Parker VSO MaxFlow 24 V     | 66 mA             | 4 kHz   | 4 mA @ 200 Hz        |
+| PROP_CH3  | LSV   | Parker VSO MaxFlow 24 V     | 66 mA             | 4 kHz   | 4 mA @ 200 Hz        |
+| PROP_CH4  | SPV_H | Parker LM-Pro 24 V          | 115 mA            | 4 kHz   | 1 mA @ 50 Hz (telemetry) |
+| PROP_CH5  | GFV   | Parker LM-Pro 24 V          | 115 mA            | 4 kHz   | 1 mA @ 50 Hz (telemetry) |
 
 ### 3.3 SEV — pseudo-proportional via MAX22200
 
@@ -270,7 +282,91 @@ the same atomic API even when the valve hardware isn't wired up.
 
 ---
 
-## 6. Extension recipes
+## 6. Boot self-test (`WhValveSelfTest`)
+
+Every boot, after the pressure thread is calibrated and the valve control +
+diagnostics threads are running, the application calls
+`WhValveSelfTest::Run()`. This single function:
+
+1. **Walks every solenoid in the catalog** (`SolenoidId::OLV_2 → AVV`) and:
+   - Prints a banner ("Connect ONLY SOL '<label>' …") with a configurable
+     prompt countdown so the operator can move the manifold tube.
+   - Cycles the channel `solenoid_cycles` × (ON `solenoid_on_ms` / OFF
+     `solenoid_off_ms`) — exact same test pattern as the
+     `c21_cycle_test.cpp` example in the MAX22200 driver.
+   - After each ON/OFF transition waits two full diagnostics-thread sweeps
+     and logs a per-channel snapshot (`tgt`, `act`, state, OCP / HHF / OLF /
+     DPM flags, sticky `fc`).
+
+2. **Walks every proportional in the catalog** (`ProportionalId::FRV → GFV`)
+   and:
+   - Prompts the operator (same pattern).
+   - Ramps `0 → full-flow → 0` in `proportional_steps` increments with a
+     `proportional_settle_ms` settle between each setpoint — same pattern as
+     the `lm_pro_cycle_test.cpp` example in the TLE92466ED driver.
+   - Logs the chip's live telemetry at every step: commanded current,
+     `FB_I_AVG` raw, `FB_DC` raw, `last_err`, every fault flag and every
+     warning.
+
+3. **Aggregates a per-valve PASS/FAIL** based on:
+   - `apply_error_count_` delta (ANY non-success Apply during the cycle).
+   - `fault_count_` delta (any per-channel fault flag set during the cycle).
+   - The most recent diagnostic snapshot (`Snapshot::any_fault()`).
+   The summary block at the end prints OK / FAIL plus a one-line fault
+   description for each valve.
+
+### 6.1 Operator workflow on a manifold-limited rig
+
+The bench can only mechanically attach **one valve to the manifold at a
+time**. The defaults (`prompt_wait_ms = 3000`, `inter_valve_pause_ms = 4000`)
+are tuned for that workflow:
+
+| Phase                           | Duration |
+|---------------------------------|----------|
+| Per-valve operator prompt       | 3 s      |
+| Per-valve test (solenoid)       | ~12 s (3 × on/off cycles) |
+| Per-valve test (proportional)   | ~5 s   (22 ramp setpoints × 0.15 s) |
+| Pause between valves            | 4 s      |
+| **Full sweep** (7 sol + 6 prop) | **≈ 3 min** |
+
+Tweak the constants in `MakeSelfTestPlan()` at the top of
+`wh_valve_pressure_control.cpp` to:
+- skip valves that are not yet stocked (set the `enable_*` flag to `false`);
+- shorten / lengthen the pulse profiles or ramp resolution;
+- disable the operator prompt (`prompt_wait_ms = 0`) for fully unattended
+  runs.
+
+To skip the self-test entirely set
+`kRunSelfTestAtBoot = false` at the top of the same file.
+
+### 6.2 What the self-test catches
+
+The self-test is the cheapest way to **catch a stuck plunger, an unconnected
+coil, a damaged driver IC, or an audibly dead solenoid** before the rig
+starts running pressure-control loops. Specifically:
+
+| Symptom                                        | Catalog check that surfaces it          |
+|------------------------------------------------|------------------------------------------|
+| Coil disconnected / connector reversed         | `open_load` / `open_load_short_ground` flag, `last_err = "Open load detected"` |
+| Coil shorted to GND                            | `short_to_ground` flag (TLE92466ED)      |
+| Plunger stuck in valve seat                    | `plunger_movement_fault` (MAX22200 DPM)  |
+| Solenoid hit current never reached             | `hit_not_reached` (MAX22200 HHF)         |
+| TLE chip not in correct mode                   | `last_err = "Operation not allowed in mode"` (Apply-time error count) |
+| Supply browning out                            | `SubsystemFaultSnapshot.max_undervoltage` / `tle_vbat_uv` |
+| TLE PWM regulation can't track                 | `pwm_regulation_warning` |
+| TLE current loop can't track                   | `current_regulation_warning` |
+| Over-temperature, ECC error                    | `over_temperature` / `ot_warning` / `tle_reg_ecc_err` |
+
+> ⚠️  **Configuration-Mode round-trip:** Each `ProportionalValve` enters
+> Configuration Mode, pushes its `ChannelConfig` + PWM + dither, then
+> re-enters Mission Mode. This is required because the TLE92466ED rejects
+> any `CH_x_CTRL` write while in Mission Mode and the handler enters
+> Mission Mode at init time. Skipping this round-trip is what produced the
+> infamous "every Apply returns Operation-not-allowed-in-mode" symptom.
+
+---
+
+## 7. Extension recipes
 
 ### 6.1 Add a binary solenoid
 
@@ -314,7 +410,7 @@ Only the catalog file changes.
 
 ---
 
-## 7. Files in this folder
+## 8. Files in this folder
 
 | File | Purpose |
 |------|---------|
@@ -329,4 +425,5 @@ Only the catalog file changes.
 | `WhValveSystem.h` | Singleton container, O(1) lookup, iteration helpers, `ConfigureGlobalDpm`. |
 | `WhValveControlThread.h` | 100 Hz BaseThread that pushes dirty setpoints. |
 | `WhDiagnosticsThread.h` | 10 Hz BaseThread; per-valve + per-driver-IC fault decoding into `SubsystemFaultSnapshot`. |
+| `WhValveSelfTest.h` | Boot-time per-valve cycler — solenoid ON/OFF and proportional 0→full→0 ramps with full diagnostic capture. Header-only; configured from `MakeSelfTestPlan()` in the app entry. |
 | `README.md` | This document. |

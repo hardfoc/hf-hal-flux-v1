@@ -104,6 +104,17 @@ public:
         const uint8_t hw = static_cast<uint8_t>(entry_.manager_channel) -
                            static_cast<uint8_t>(ValveChannel::PROP_CH0);
 
+        // ── Drop into Configuration Mode ──────────────────────────────────
+        // The TLE92466ED only accepts CH_x_CTRL writes (mode / slew / diag /
+        // open-load / dither / PWM period) while the chip is in Configuration
+        // Mode. The handler enters Mission Mode at init time so we have to
+        // round-trip CONFIG → write everything → MISSION here. Without this
+        // every ConfigureChannel call comes back with
+        // `OperationNotAllowedInMode`.
+        if (auto rc = h->EnterConfigMode(); !rc.has_value()) {
+            return TleDriverErrorToValveError(rc.error());
+        }
+
         // Build a full ChannelConfig from the model spec and feature gates.
         tle92466ed::ChannelConfig cfg{};
         cfg.mode                = tle92466ed::ChannelMode::ICC;
@@ -119,6 +130,7 @@ public:
 
         const auto cfg_res = h->ConfigureChannel(hw, cfg);
         if (!cfg_res.has_value()) {
+            (void)h->EnterMissionMode();          // restore state before returning
             return TleDriverErrorToValveError(cfg_res.error());
         }
 
@@ -126,10 +138,12 @@ public:
         const auto pwm_err = mgr.ConfigureProportionalPwm(
             entry_.manager_channel, static_cast<float>(entry_.model.pwm_hz));
         if (pwm_err != hf_valve_err_t::VALVE_SUCCESS) {
+            (void)h->EnterMissionMode();
             return pwm_err;
         }
 
-        // Optional dither (VSO-class only).
+        // Optional dither (VSO-class only). Dither setup also writes
+        // CH_x_CTRL bits + DITHER_CLK_DIV — must run in Configuration Mode.
         if (entry_.model.supports_dither &&
             entry_.model.dither_amplitude_ma > 0 &&
             entry_.model.dither_frequency_hz > 0) {
@@ -141,6 +155,11 @@ public:
             if (d_err != hf_valve_err_t::VALVE_SUCCESS) {
                 RecordApplyResult(d_err, false);
             }
+        }
+
+        // ── Re-enter Mission Mode so EnableChannel / SetChannelCurrent work ─
+        if (auto rc = h->EnterMissionMode(); !rc.has_value()) {
+            return TleDriverErrorToValveError(rc.error());
         }
 
         features_pushed_.store(true, std::memory_order_release);

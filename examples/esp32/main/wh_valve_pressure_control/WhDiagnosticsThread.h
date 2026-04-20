@@ -117,6 +117,13 @@ public:
     void SetAds7952(Ads7952Handler* h) noexcept { ads7952_ = h; }
     void SetPeriodMs(uint32_t ms) noexcept     { period_ms_ = (ms == 0) ? 1 : ms; }
 
+    /// Total number of full diagnostic sweeps completed since boot. Useful
+    /// for callers that need to wait for a fresh pass before reading
+    /// per-valve snapshots (e.g. the boot self-test).
+    uint32_t IterationCount() const noexcept {
+        return iteration_.load(std::memory_order_acquire);
+    }
+
     /// Lock-free read of the latest subsystem-wide health snapshot.
     SubsystemFaultSnapshot GetSnapshot() const noexcept {
         SubsystemFaultSnapshot s = snapshot_template_;
@@ -211,6 +218,7 @@ protected:
 
         ads7952_ready_.store(ads7952_ != nullptr, std::memory_order_release);
         last_update_ms_.store(now_ms, std::memory_order_release);
+        iteration_.fetch_add(1, std::memory_order_acq_rel);
         return period_ms_;
     }
 
@@ -220,6 +228,7 @@ protected:
         total_apply_errors_.store(0, std::memory_order_release);
         max_flags_.store(0, std::memory_order_release);
         tle_flags_.store(0, std::memory_order_release);
+        iteration_.store(0, std::memory_order_release);
         return true;
     }
 
@@ -331,6 +340,7 @@ private:
     std::atomic<bool>     ads7952_ready_{false};
     std::atomic<uint32_t> total_faults_{0};
     std::atomic<uint32_t> total_apply_errors_{0};
+    std::atomic<uint32_t> iteration_{0};
     std::atomic<uint32_t> max_flags_{0};
     std::atomic<uint32_t> tle_flags_{0};
     std::atomic<uint8_t>  max_channels_on_mask_{0};

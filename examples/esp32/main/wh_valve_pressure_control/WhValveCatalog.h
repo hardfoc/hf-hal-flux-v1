@@ -68,24 +68,44 @@ namespace whvalve {
 /**
  * @brief WH bench valves driven by the MAX22200 (octal solenoid driver).
  *
- *   - OLV_1 / OLV_2 / VEV / ORV / GDV — pure on/off cartridge solenoids
- *     (Parker C21 / C15) controlled with a calibrated hit-and-hold profile.
- *   - SEV — proportional valve being driven via the MAX22200's 7-bit CDR
- *     ladder for low-precision opening-percentage control. SEV does not
- *     need the precision of the TLE92466ED on this bench, so we save a
- *     TLE channel by routing it through MAX22200.
+ *   - OLV_1 / OLV_2 — outlet cartridge solenoids (Parker C21).
+ *   - VEV           — vent solenoid (Parker C15).
+ *   - ORV / AVV     — overflow / air-vent solenoids (Parker C15).
+ *   - GDV           — gas/drain miniature solenoid (Parker SRS, 0.5 W coil).
+ *   - SEV           — proportional valve driven via the MAX22200's 7-bit
+ *                     CDR ladder for coarse opening-percentage control. SEV
+ *                     does not require TLE-class precision on this bench so
+ *                     it lives on the MAX22200 to free up a TLE channel.
+ *
+ * @par Channel mapping (Flux V1 board, MAX22200 OUT0..OUT7)
+ *      The enumerator value is the array index into `kSolenoidMap`. The
+ *      `manager_channel` field of each map entry below names the actual
+ *      MAX22200 hardware channel — see the table for the bench wiring.
+ *
+ *      | OUTn | Valve   | Model       | Notes                                |
+ *      |------|---------|-------------|--------------------------------------|
+ *      | 0    | (none)  | —           | Spare; intentionally left unmapped.  |
+ *      | 1    | OLV_2   | C21         | BinaryHitHold                        |
+ *      | 2    | VEV     | C15 large   | BinaryHitHold                        |
+ *      | 3    | OLV_1   | C21         | BinaryHitHold                        |
+ *      | 4    | SEV     | VSO 24V     | VariableCurrent (CDR pseudo-prop)    |
+ *      | 5    | GDV     | SRS 0.5 W   | BinaryHitHold (low-current coil)     |
+ *      | 6    | ORV     | C15 large   | BinaryHitHold                        |
+ *      | 7    | AVV     | C15 large   | BinaryHitHold                        |
  *
  * @note Adding a new MAX22200-driven valve:
  *       1. Add an enumerator above `Count` here.
  *       2. Add a row in `kSolenoidMap` (below) referencing a model spec.
+ *       3. Bump `kNumSolenoids` automatically (it tracks the enum size).
  */
 enum class SolenoidId : uint8_t {
-    OLV_1 = 0,   ///< Outlet valve #1 (Parker C21, BinaryHitHold)
-    OLV_2,       ///< Outlet valve #2 (Parker C21, BinaryHitHold)
-    VEV,         ///< Vent valve (Parker C15 large orifice, BinaryHitHold)
-    ORV,         ///< Overflow / outflow valve (Parker C15 large orifice, BinaryHitHold)
-    GDV,         ///< Gas/drain/discharge valve (Parker C15 small orifice, BinaryHitHold)
-    SEV,         ///< Selector valve — coarse proportional via MAX22200 CDR (VariableCurrent)
+    OLV_2 = 0,   ///< Outlet valve #2 — Parker C21, MAX22200 OUT1.
+    VEV,         ///< Vent valve     — Parker C15 large orifice, MAX22200 OUT2.
+    OLV_1,       ///< Outlet valve #1 — Parker C21, MAX22200 OUT3.
+    SEV,         ///< Selector valve  — VSO pseudo-prop via CDR, MAX22200 OUT4.
+    GDV,         ///< Gas/drain miniature — Parker SRS 0.5 W, MAX22200 OUT5.
+    ORV,         ///< Overflow valve  — Parker C15 large orifice, MAX22200 OUT6.
+    AVV,         ///< Air-vent valve  — Parker C15 large orifice, MAX22200 OUT7.
     Count        ///< Sentinel — keep last.
 };
 
@@ -95,17 +115,28 @@ enum class SolenoidId : uint8_t {
  * Each channel has full closed-loop current control with PWM frequency,
  * optional dither, slew-rate control and rich per-channel diagnostics.
  *
- * @note With SEV moved to the MAX22200, the bench has exactly 6 precision
- *       proportionals which fits the TLE92466ED's 6 channels with no
- *       unmapped slots.
+ * @par Channel mapping (Flux V1 board, TLE92466ED OUT0..OUT5)
+ *
+ *      | OUTn | Valve  | Model         | Notes                              |
+ *      |------|--------|---------------|------------------------------------|
+ *      | 0    | FRV    | VSO MaxFlow   | Flow Regulator Valve               |
+ *      | 1    | SPV_L  | VSO standard  | Supply Pressure Valve — low range  |
+ *      | 2    | FCV    | VSO MaxFlow   | Flow Control Valve                 |
+ *      | 3    | LSV    | VSO MaxFlow   | Load-Sensing Valve                 |
+ *      | 4    | SPV_H  | LM-Pro        | Supply Pressure Valve — high range |
+ *      | 5    | GFV    | LM-Pro        | Gas Flow Valve                     |
+ *
+ * @note With SEV routed through the MAX22200 as a CDR pseudo-proportional,
+ *       the WH bench needs exactly 6 precision proportionals — a perfect
+ *       fit for the TLE92466ED.
  */
 enum class ProportionalId : uint8_t {
-    FCV   = 0,   ///< Flow control valve (Parker LM-Pro 24 V)
-    FRV,         ///< Flow regulator valve (Parker LM-Pro 24 V)
-    LSV,         ///< Load-sensing valve (Parker VSO 24 V)
-    GFV,         ///< Gas flow valve (Parker VSO 24 V)
-    SPV_H,       ///< Supply pressure valve — high range (Parker VSO LowPro 24 V)
-    SPV_L,       ///< Supply pressure valve — low  range (Parker VSO LowPro 24 V)
+    FRV   = 0,   ///< Flow Regulator Valve         — VSO MaxFlow, PROP_CH0.
+    SPV_L,       ///< Supply Pressure Valve (low)  — VSO standard, PROP_CH1.
+    FCV,         ///< Flow Control Valve           — VSO MaxFlow, PROP_CH2.
+    LSV,         ///< Load-Sensing Valve           — VSO MaxFlow, PROP_CH3.
+    SPV_H,       ///< Supply Pressure Valve (high) — Parker LM-Pro, PROP_CH4.
+    GFV,         ///< Gas Flow Valve               — Parker LM-Pro, PROP_CH5.
     Count        ///< Sentinel — keep last.
 };
 
@@ -197,13 +228,14 @@ struct Tle92466ChannelFeatures {
 //==============================================================================
 
 /// Parker solenoid models we support.
-enum class SolenoidModelId : uint8_t { C15, C21, VSO_PseudoProp };
+enum class SolenoidModelId : uint8_t { C15, C21, SRS, VSO_PseudoProp };
 
 /// Parker proportional valve families we support.
 enum class ProportionalModelId : uint8_t {
-    VSO,        ///< VSO/MD-PRO/HF-PRO/Lone-Wolf — solenoid actuated
-    VSO_LowPro, ///< VSO LowPro / LowPro GC — solenoid actuated, lower power
-    LM_Pro      ///< LM-Pro — linear-motor actuated, requires ≥ 5 kHz PWM
+    VSO,         ///< VSO standard — solenoid actuated, ~66 mA full flow.
+    VSO_MaxFlow, ///< VSO MaxFlow — solenoid actuated, larger orifice (same coil).
+    VSO_LowPro,  ///< VSO LowPro / LowPro GC — solenoid actuated, lower power.
+    LM_Pro       ///< LM-Pro — linear-motor actuated, requires PWM ≤ 4 kHz on TLE92466ED.
 };
 
 /**
@@ -282,6 +314,48 @@ inline constexpr SolenoidModelSpec kSpecC15_24V_Large {
 };
 
 /**
+ * @brief Parker SRS Miniature Pneumatic Solenoid — 24 V, 0.5 W coil.
+ *
+ * Per Parker SRS datasheet (10 mm manifold-mount, 3-port direct-acting
+ * poppet). The "Power Options" column lists 0.5 W and 1.0 W variants:
+ *   - 0.5 W @ 24 V → I = P / V = 20.8 mA, R = V² / P = 1152 Ω.
+ *   - 1.0 W @ 24 V → I = 41.7 mA,         R = 576 Ω.
+ *
+ * The bench uses the 0.5 W variant by default (Models 10, 13, 16). The
+ * datasheet explicitly recommends "spike and hold or PWM electrical control"
+ * for further power reduction, so a `BinaryHitHold` profile fits well.
+ *
+ * Response: < 30 ms cycling (datasheet "Performance Characteristics").
+ */
+inline constexpr SolenoidModelSpec kSpecSRS_24V_HalfWatt {
+    .id                   = SolenoidModelId::SRS,
+    .label                = "Parker SRS 0.5 W (24V)",
+    .rated_voltage_v      = 24.0f,
+    .coil_resistance_ohm  = 1152.0f,
+    .hit_current_ma       =  21,            // 24 V / 1152 Ω ≈ 20.8 mA
+    .hold_current_ma      =  10,            // ~50 % of hit, well below the coil rating
+    .full_flow_current_ma =  21,            // unused in BinaryHitHold; matches hit
+    .min_hit_time_ms      =  30.0f,         // ≥ 30 ms cycling response
+    .min_pwm_hz           = 1000,           // SRS is small, follow C-series PWM floor
+    .typ_response_ms      =  30,
+};
+
+/// Parker SRS 24 V — 1.0 W coil variant (Models 11, 14, 17). Provided for
+/// completeness; switch the catalog row to this spec if a 1 W coil is fitted.
+inline constexpr SolenoidModelSpec kSpecSRS_24V_OneWatt {
+    .id                   = SolenoidModelId::SRS,
+    .label                = "Parker SRS 1.0 W (24V)",
+    .rated_voltage_v      = 24.0f,
+    .coil_resistance_ohm  = 576.0f,
+    .hit_current_ma       =  42,            // 24 V / 576 Ω ≈ 41.7 mA
+    .hold_current_ma      =  21,
+    .full_flow_current_ma =  42,
+    .min_hit_time_ms      =  30.0f,
+    .min_pwm_hz           = 1000,
+    .typ_response_ms      =  30,
+};
+
+/**
  * @brief VSO 24 V proportional driven via MAX22200 CDR (pseudo-proportional).
  *
  * Coil 274 Ω → ~66 mA at full open per the VSO Table 2. Used for SEV which
@@ -324,14 +398,48 @@ struct ProportionalModelSpec {
     bool                supports_dither;         ///< Whether dither is helpful.
 };
 
+// ─── PWM frequency note ───────────────────────────────────────────────────
+// The TLE92466ED datasheet caps the channel PWM frequency at 4 kHz (period
+// 250 µs) in normal mode (110 Hz – 4 kHz) or 500 Hz in low-frequency mode.
+// Anything we put here is clamped/validated by the driver; values above
+// 4 kHz will log a warning and be coerced down to spec. We therefore set
+// every model's `pwm_hz` to ≤ 4 kHz even when the valve datasheet allows
+// higher PWM — the chip is the binding constraint. See:
+// `hf-tle92466ed-driver/inc/tle92466ed_registers.hpp` (PERIOD::kSpecMax*).
+// ──────────────────────────────────────────────────────────────────────────
+
 /// VSO 24 V coil — Table 2 row 5: 274 Ω → 66 mA full flow.
+/// Dither values are kept small: enough to keep the FB_I_AVG / FB_DC
+/// averagers populated (Tmeas requires non-zero dither) without audibly
+/// modulating the valve. See the TLE92466ED LM-Pro test results in
+/// `hf-tle92466ed-driver/examples/esp32/main/lm_pro_cycle_test.cpp`.
 inline constexpr ProportionalModelSpec kSpecVSO_24V {
     .id                   = ProportionalModelId::VSO,
     .label                = "Parker VSO (24V)",
     .rated_voltage_v      = 24.0f,
     .coil_resistance_ohm  = 274.0f,
     .full_flow_current_ma = 66,
-    .pwm_hz               = 8000,
+    .pwm_hz               = 4000,           // chip max (datasheet cap)
+    .dither_amplitude_ma  = 4,              // ~6 % of full flow — valve-friendly
+    .dither_frequency_hz  = 200,
+    .supports_dither      = true,
+};
+
+/// VSO MaxFlow 24 V — same coil family as standard VSO (274 Ω / 66 mA) but
+/// with a larger orifice for higher flow. Electrical setup is therefore
+/// identical to `kSpecVSO_24V`; only the catalog label / `id` differ so
+/// downstream tools / logs can distinguish them.
+///
+/// @note Confirm the actual coil resistance on your stocked MaxFlow part —
+///       Parker offers MaxFlow with several coil options. Update this spec
+///       in-place if your variant differs.
+inline constexpr ProportionalModelSpec kSpecVSO_MaxFlow_24V {
+    .id                   = ProportionalModelId::VSO_MaxFlow,
+    .label                = "Parker VSO MaxFlow (24V)",
+    .rated_voltage_v      = 24.0f,
+    .coil_resistance_ohm  = 274.0f,         // assumes same coil as standard VSO
+    .full_flow_current_ma = 66,
+    .pwm_hz               = 4000,           // chip max
     .dither_amplitude_ma  = 4,
     .dither_frequency_hz  = 200,
     .supports_dither      = true,
@@ -346,23 +454,32 @@ inline constexpr ProportionalModelSpec kSpecVSOLowPro_24V {
     .rated_voltage_v      = 24.0f,
     .coil_resistance_ohm  = 179.0f,
     .full_flow_current_ma = 75,
-    .pwm_hz               = 10000,
+    .pwm_hz               = 4000,           // chip max
     .dither_amplitude_ma  = 4,
     .dither_frequency_hz  = 200,
     .supports_dither      = true,
 };
 
 /// LM-Pro 24 V coil — Table 1: 148 Ω, 115 mA full flow.
+///
+/// LM-Pro is a linear-motor design and does NOT mechanically benefit from
+/// dither, but the TLE92466ED's FB_I_AVG / FB_DC averager only runs once
+/// `Tmeas` has been established — and `Tmeas` is derived from the dither
+/// timing. We therefore enable a tiny "telemetry-grade" dither (1 mA at
+/// 50 Hz). It's far below the LM-Pro's mechanical bandwidth so it is
+/// inaudible / imperceptible at the plunger but it keeps the chip's
+/// feedback registers ticking. See bench notes in
+/// `hf-tle92466ed-driver/docs/troubleshooting.md`.
 inline constexpr ProportionalModelSpec kSpecLMPro_24V {
     .id                   = ProportionalModelId::LM_Pro,
     .label                = "Parker LM-Pro (24V)",
     .rated_voltage_v      = 24.0f,
     .coil_resistance_ohm  = 148.0f,
     .full_flow_current_ma = 115,
-    .pwm_hz               = 5000,           // LM-Pro datasheet: ≥ 5 kHz
-    .dither_amplitude_ma  = 0,
-    .dither_frequency_hz  = 0,
-    .supports_dither      = false,
+    .pwm_hz               = 4000,           // chip max (LM-Pro spec ≥ 5 kHz; chip caps at 4 kHz)
+    .dither_amplitude_ma  = 1,              // telemetry-only; NOT mechanically meaningful
+    .dither_frequency_hz  = 50,
+    .supports_dither      = true,
 };
 
 //==============================================================================
@@ -394,13 +511,20 @@ struct ProportionalMapEntry {
     Tle92466ChannelFeatures   features;
 };
 
-/// Compile-time map of solenoid IDs → MAX22200 channels (6 entries → SOL_CH0..SOL_CH5).
+/// Compile-time map of solenoid IDs → MAX22200 channels.
+///
+/// Bench wiring (MAX22200 OUT0..OUT7):
+///   OUT0 → unconnected (spare)
+///   OUT1 → OLV_2 (C21)
+///   OUT2 → VEV   (C15)
+///   OUT3 → OLV_1 (C21)
+///   OUT4 → SEV   (VSO 24V — pseudo-proportional via CDR)
+///   OUT5 → GDV   (Parker SRS 0.5 W miniature)
+///   OUT6 → ORV   (C15)
+///   OUT7 → AVV   (C15)
+///
+/// Array order MUST match `SolenoidId` enumerator order (used as O(1) index).
 inline constexpr std::array<SolenoidMapEntry, kNumSolenoids> kSolenoidMap {{
-    { SolenoidId::OLV_1, "OLV_1", ValveChannel::SOL_CH0, kSpecC21_24V,
-      SolenoidDriveMode::BinaryHitHold,
-      { .slew_rate_control=true, .open_load_detection=true,
-        .plunger_movement_detection=true, .hit_current_check=true } },
-
     { SolenoidId::OLV_2, "OLV_2", ValveChannel::SOL_CH1, kSpecC21_24V,
       SolenoidDriveMode::BinaryHitHold,
       { .slew_rate_control=true, .open_load_detection=true,
@@ -411,39 +535,61 @@ inline constexpr std::array<SolenoidMapEntry, kNumSolenoids> kSolenoidMap {{
       { .slew_rate_control=true, .open_load_detection=true,
         .plunger_movement_detection=true, .hit_current_check=true } },
 
-    { SolenoidId::ORV,   "ORV",   ValveChannel::SOL_CH3, kSpecC15_24V_Large,
+    { SolenoidId::OLV_1, "OLV_1", ValveChannel::SOL_CH3, kSpecC21_24V,
       SolenoidDriveMode::BinaryHitHold,
       { .slew_rate_control=true, .open_load_detection=true,
         .plunger_movement_detection=true, .hit_current_check=true } },
 
-    { SolenoidId::GDV,   "GDV",   ValveChannel::SOL_CH4, kSpecC15_24V_Small,
-      SolenoidDriveMode::BinaryHitHold,
-      { .slew_rate_control=true, .open_load_detection=true,
-        .plunger_movement_detection=true, .hit_current_check=true } },
-
-    // SEV — VSO proportional driven proportionally via MAX22200 CDR (no
-    // hit/hold). DPM is disabled because the current waveform is not the
-    // same shape DPM was designed for; HHF is meaningless without a hit
-    // phase, so we disable both.
-    { SolenoidId::SEV,   "SEV",   ValveChannel::SOL_CH5, kSpecVSO_24V_PseudoProp,
+    // SEV — VSO proportional driven via MAX22200 CDR ladder (no hit/hold
+    // phase). DPM is disabled because the current waveform isn't the shape
+    // DPM was designed for; HHF is meaningless without a hit phase, so both
+    // are off. Open-load + slew-rate stay on for safety.
+    { SolenoidId::SEV,   "SEV",   ValveChannel::SOL_CH4, kSpecVSO_24V_PseudoProp,
       SolenoidDriveMode::VariableCurrent,
       { .slew_rate_control=true, .open_load_detection=true,
         .plunger_movement_detection=false, .hit_current_check=false } },
+
+    // GDV — Parker SRS miniature solenoid. DPM is disabled by default
+    // because the SRS plunger signature is not yet characterised on this
+    // bench; re-enable once the c21_dpm_tuning_test workflow has been
+    // applied to an SRS coil. HHF stays on (≥30 ms response time).
+    { SolenoidId::GDV,   "GDV",   ValveChannel::SOL_CH5, kSpecSRS_24V_HalfWatt,
+      SolenoidDriveMode::BinaryHitHold,
+      { .slew_rate_control=true, .open_load_detection=true,
+        .plunger_movement_detection=false, .hit_current_check=true } },
+
+    { SolenoidId::ORV,   "ORV",   ValveChannel::SOL_CH6, kSpecC15_24V_Large,
+      SolenoidDriveMode::BinaryHitHold,
+      { .slew_rate_control=true, .open_load_detection=true,
+        .plunger_movement_detection=true, .hit_current_check=true } },
+
+    { SolenoidId::AVV,   "AVV",   ValveChannel::SOL_CH7, kSpecC15_24V_Large,
+      SolenoidDriveMode::BinaryHitHold,
+      { .slew_rate_control=true, .open_load_detection=true,
+        .plunger_movement_detection=true, .hit_current_check=true } },
 }};
 
 /// Compile-time map of proportional IDs → TLE92466ED channels (PROP_CH0..PROP_CH5).
+///
+/// Bench wiring:
+///   OUT0 → FRV   (VSO MaxFlow)
+///   OUT1 → SPV_L (VSO standard)
+///   OUT2 → FCV   (VSO MaxFlow)
+///   OUT3 → LSV   (VSO MaxFlow)
+///   OUT4 → SPV_H (LM-Pro)
+///   OUT5 → GFV   (LM-Pro)
 inline constexpr std::array<ProportionalMapEntry, kNumProportionals> kProportionalMap {{
-    { ProportionalId::FCV,   "FCV",   ValveChannel::PROP_CH0, kSpecLMPro_24V,
+    { ProportionalId::FRV,   "FRV",   ValveChannel::PROP_CH0, kSpecVSO_MaxFlow_24V,
       { .open_load_threshold=3, .olsg_warning_enabled=true } },
-    { ProportionalId::FRV,   "FRV",   ValveChannel::PROP_CH1, kSpecLMPro_24V,
+    { ProportionalId::SPV_L, "SPV_L", ValveChannel::PROP_CH1, kSpecVSO_24V,
       { .open_load_threshold=3, .olsg_warning_enabled=true } },
-    { ProportionalId::LSV,   "LSV",   ValveChannel::PROP_CH2, kSpecVSO_24V,
+    { ProportionalId::FCV,   "FCV",   ValveChannel::PROP_CH2, kSpecVSO_MaxFlow_24V,
       { .open_load_threshold=3, .olsg_warning_enabled=true } },
-    { ProportionalId::GFV,   "GFV",   ValveChannel::PROP_CH3, kSpecVSO_24V,
+    { ProportionalId::LSV,   "LSV",   ValveChannel::PROP_CH3, kSpecVSO_MaxFlow_24V,
       { .open_load_threshold=3, .olsg_warning_enabled=true } },
-    { ProportionalId::SPV_H, "SPV_H", ValveChannel::PROP_CH4, kSpecVSOLowPro_24V,
+    { ProportionalId::SPV_H, "SPV_H", ValveChannel::PROP_CH4, kSpecLMPro_24V,
       { .open_load_threshold=3, .olsg_warning_enabled=true } },
-    { ProportionalId::SPV_L, "SPV_L", ValveChannel::PROP_CH5, kSpecVSOLowPro_24V,
+    { ProportionalId::GFV,   "GFV",   ValveChannel::PROP_CH5, kSpecLMPro_24V,
       { .open_load_threshold=3, .olsg_warning_enabled=true } },
 }};
 
@@ -460,5 +606,23 @@ inline constexpr const ProportionalMapEntry& MapOf(ProportionalId id) noexcept {
 /// edits to the table can't silently break it.
 static_assert(MapOf(SolenoidId::SEV).drive_mode == SolenoidDriveMode::VariableCurrent,
               "SEV is configured as a pseudo-proportional valve and must use VariableCurrent mode");
+
+// Compile-time enforcement: every solenoid entry's `id` must equal the row
+// index. Without this, a re-ordering of the array would silently break the
+// O(1) `MapOf(SolenoidId)` lookup.
+static_assert(MapOf(SolenoidId::OLV_2).id == SolenoidId::OLV_2, "OLV_2 row mis-ordered");
+static_assert(MapOf(SolenoidId::VEV  ).id == SolenoidId::VEV  , "VEV row mis-ordered");
+static_assert(MapOf(SolenoidId::OLV_1).id == SolenoidId::OLV_1, "OLV_1 row mis-ordered");
+static_assert(MapOf(SolenoidId::SEV  ).id == SolenoidId::SEV  , "SEV row mis-ordered");
+static_assert(MapOf(SolenoidId::GDV  ).id == SolenoidId::GDV  , "GDV row mis-ordered");
+static_assert(MapOf(SolenoidId::ORV  ).id == SolenoidId::ORV  , "ORV row mis-ordered");
+static_assert(MapOf(SolenoidId::AVV  ).id == SolenoidId::AVV  , "AVV row mis-ordered");
+
+static_assert(MapOf(ProportionalId::FRV  ).id == ProportionalId::FRV  , "FRV row mis-ordered");
+static_assert(MapOf(ProportionalId::SPV_L).id == ProportionalId::SPV_L, "SPV_L row mis-ordered");
+static_assert(MapOf(ProportionalId::FCV  ).id == ProportionalId::FCV  , "FCV row mis-ordered");
+static_assert(MapOf(ProportionalId::LSV  ).id == ProportionalId::LSV  , "LSV row mis-ordered");
+static_assert(MapOf(ProportionalId::SPV_H).id == ProportionalId::SPV_H, "SPV_H row mis-ordered");
+static_assert(MapOf(ProportionalId::GFV  ).id == ProportionalId::GFV  , "GFV row mis-ordered");
 
 }  // namespace whvalve
