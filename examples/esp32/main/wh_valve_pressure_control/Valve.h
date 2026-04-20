@@ -133,10 +133,14 @@ struct ProportionalDiagSnapshot {
     bool     pwm_regulation_warning{false};
     bool     olsg_warning{false};
 
-    // Live measurements
+    // Live measurements (raw register values, for low-level inspection)
     uint16_t average_current_raw{0};
     uint16_t duty_cycle_raw{0};
     uint16_t vbat_feedback_raw{0};
+
+    // Decoded measurements (use these for tracking / control / logging)
+    int16_t  average_current_mA{0};       ///< Decoded I_avg in mA (signed).
+    uint16_t duty_cycle_permyriad{0};     ///< Duty cycle in 1/10000 (0..10000).
 
     uint32_t fault_count{0};            ///< Sticky cumulative count from this channel.
     uint64_t last_fault_tick_ms{0};

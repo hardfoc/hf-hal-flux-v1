@@ -123,16 +123,25 @@ static whvalve::SelfTestPlan MakeSelfTestPlan() noexcept {
     plan.enable_proportionals[static_cast<size_t>(whvalve::ProportionalId::SPV_H)] = true;
     plan.enable_proportionals[static_cast<size_t>(whvalve::ProportionalId::GFV  )] = true;
 
-    // Tunable cycling knobs — keep modest defaults; raise during deeper
-    // commissioning runs if a valve needs more cycles to surface a fault.
-    plan.solenoid_cycles         = 3;
-    plan.solenoid_on_ms          = 1500;
-    plan.solenoid_off_ms         = 1000;
-    plan.proportional_ramp_ms    = 4000;
-    plan.proportional_steps      = 11;     // 0%, 10%, …, 100%
-    plan.proportional_settle_ms  = 150;
-    plan.inter_valve_pause_ms    = 4000;   // long enough to move a manifold tube
-    plan.prompt_wait_ms          = 3000;   // operator-readable countdown banner
+    // Tunable cycling knobs. Defaults are tuned for fast iteration on the
+    // bench (full sweep ≈ 75 s instead of the 3 min the conservative
+    // defaults take). Raise the values for deeper commissioning runs that
+    // want extra margin to surface intermittent faults.
+    //
+    //                       solenoid    proportional   pause   prompt
+    //                       (each)        (each)
+    //   Fast (default):     ~3.5 s        ~3   s       1.5 s    1   s
+    //   Conservative:       ~12  s        ~5   s       4   s    3   s
+    plan.solenoid_cycles         = 2;
+    plan.solenoid_on_ms          = 500;
+    plan.solenoid_off_ms         = 300;
+    plan.proportional_steps      = 8;      // 9 setpoints up + 8 down = 17 total
+    plan.proportional_settle_ms  = 80;     // ≥ one 50 Hz dither period + one diag tick
+    plan.inter_valve_pause_ms    = 1500;
+    plan.prompt_wait_ms          = 1000;
+    plan.tracking_band_pct       = 5.0f;   // ±5 % of full-flow OR
+    plan.tracking_band_min_mA    = 2.0f;   //   ±2 mA, whichever is greater
+    plan.tracking_max_outliers   = 2;      // tolerate 2 noisy points (low-end)
     return plan;
 }
 
@@ -631,14 +640,15 @@ extern "C" void app_main(void) {
             const auto s = v.Snapshot();
             ESP_LOGI(TAG_MAIN,
                      "  PROP %-6.*s: tgt=%4.2f act=%4.2f  state=%-12s  fc=%lu  "
-                     "I_avg=%u duty=%u  flags=[oc=%d sg=%d ol=%d ot=%d olsg=%d]"
+                     "I_act=%4d mA duty=%4u/10000  flags=[oc=%d sg=%d ol=%d ot=%d olsg=%d]"
                      "  warn=[ot=%d cur_reg=%d pwm_reg=%d olsg=%d]",
                      static_cast<int>(v.Label().size()), v.Label().data(),
                      static_cast<double>(v.GetTargetPosition()),
                      static_cast<double>(v.GetActualPosition()),
                      whvalve::ValveStateToString(v.GetState()),
                      static_cast<unsigned long>(s.fault_count),
-                     s.average_current_raw, s.duty_cycle_raw,
+                     static_cast<int>(s.average_current_mA),
+                     s.duty_cycle_permyriad,
                      s.overcurrent, s.short_to_ground, s.open_load,
                      s.over_temperature, s.open_load_short_ground,
                      s.ot_warning, s.current_regulation_warning,

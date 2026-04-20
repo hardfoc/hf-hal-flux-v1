@@ -194,6 +194,32 @@ bool ValveManager::InitializeTle92466() noexcept {
         Logger::GetInstance().Warn(TAG, "TLE92466ED failed to enter mission mode");
     }
 
+    // Drive the chip's hardware EN pin HIGH so the output stage can deliver
+    // current. Without this every SetChannelCurrent / EnableChannel call
+    // succeeds at the SPI level but the chip silently delivers zero current.
+    if (!tle92466_->EnableOutputStage()) {
+        Logger::GetInstance().Warn(TAG,
+            "TLE92466ED EnableOutputStage failed — outputs will stay gated off");
+    } else {
+        Logger::GetInstance().Info(TAG, "TLE92466ED EN pin HIGH — output stage powered");
+    }
+
+    // Clear the FB_FRZ register — the chip's POR default freezes every
+    // channel's feedback, so FB_DC / FB_I_AVG / FB_VBAT come back as 0
+    // even when the chip is actively driving a coil. Without this the
+    // ProportionalValve diagnostic snapshot is permanently stuck at zero
+    // current / zero duty regardless of the actual setpoint, and any
+    // downstream tracking / closed-loop logic sees garbage. See
+    // `hf-tle92466ed-driver/examples/esp32/main/lm_pro_cycle_test.cpp` for
+    // the original bench discovery.
+    if (!tle92466_->EnableFeedbackUpdates()) {
+        Logger::GetInstance().Warn(TAG,
+            "TLE92466ED FB_FRZ clear failed — feedback registers will read 0");
+    } else {
+        Logger::GetInstance().Info(TAG,
+            "TLE92466ED FB_FRZ cleared — per-channel feedback updates enabled");
+    }
+
     tle92466_valid_ = true;
     Logger::GetInstance().Info(TAG, "TLE92466ED initialized successfully (6 proportional channels)");
     return true;

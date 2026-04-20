@@ -61,25 +61,37 @@ struct SelfTestPlan {
     std::array<bool, kNumProportionals> enable_proportionals{};
 
     /// How long each ON pulse lasts during a solenoid cycle (ms).
-    uint32_t solenoid_on_ms{1500};
+    uint32_t solenoid_on_ms{500};
     /// How long the OFF dwell lasts between solenoid pulses (ms).
-    uint32_t solenoid_off_ms{1000};
+    uint32_t solenoid_off_ms{300};
     /// How many ON/OFF cycles per solenoid.
-    uint32_t solenoid_cycles{3};
+    uint32_t solenoid_cycles{2};
 
-    /// Total time to ramp from 0 → full → 0 for a proportional valve (ms).
-    uint32_t proportional_ramp_ms{4000};
-    /// Number of intermediate setpoints captured during the ramp (>= 5).
-    uint32_t proportional_steps{11};
-    /// Settle time at each step before sampling current (ms).
-    uint32_t proportional_settle_ms{120};
+    /// Number of intermediate setpoints captured during the 0 → full → 0
+    /// triangle ramp (must be ≥ 4). Total visited setpoints = 2 × steps + 1.
+    uint32_t proportional_steps{8};
+    /// Settle time at each step before sampling current (ms). Must be ≥
+    /// (1 / dither_freq + 1 diagnostic period). 80 ms covers a 50 Hz dither
+    /// (20 ms) plus two 10 Hz diag ticks.
+    uint32_t proportional_settle_ms{80};
+    /// Tolerance band for the per-step setpoint-vs-actual current check.
+    /// `tracking_band_pct` of full-flow OR `tracking_band_min_mA` mA,
+    /// whichever is greater. ±2 mA / ±5 % matches the LM-Pro
+    /// characterization done in `lm_pro_cycle_test.cpp`.
+    float    tracking_band_pct{5.0f};
+    float    tracking_band_min_mA{2.0f};
+    /// Maximum number of setpoints in the full triangle that may fall
+    /// outside the band before the valve is marked FAIL. Set to ≥0; the
+    /// LM-Pro typically passes everything ≥ ~10 mA so 2 generous misses are
+    /// allowed for the noise floor at the very low end.
+    uint32_t tracking_max_outliers{2};
 
     /// Pause between valves so the operator can move the manifold connection.
-    uint32_t inter_valve_pause_ms{4000};
+    uint32_t inter_valve_pause_ms{1500};
 
     /// If true, the self-test prompts before each valve and waits this long.
     /// Set to 0 to skip the prompt and run straight through.
-    uint32_t prompt_wait_ms{3000};
+    uint32_t prompt_wait_ms{1000};
 
     /// Default: enable everything.
     static constexpr SelfTestPlan All() noexcept {
@@ -102,6 +114,15 @@ struct SelfTestResult {
     bool             pass{false};
     uint32_t         apply_errors{0};
     uint32_t         fault_count{0};
+
+    // Proportional-only tracking metrics. Zero for solenoids.
+    uint32_t tracking_samples{0};         ///< How many setpoints were measured.
+    uint32_t tracking_outliers{0};        ///< How many fell outside the ±band.
+    int16_t  tracking_max_abs_err_mA{0};  ///< Worst |setpoint − actual| in mA.
+    int16_t  tracking_mean_err_mA{0};     ///< Mean (signed) error across the ramp.
+    bool     ramp_monotonic_up{true};     ///< True if up-ramp actuals strictly ↑.
+    bool     ramp_monotonic_down{true};   ///< True if down-ramp actuals strictly ↓.
+
     /// Aggregated, human-readable description of every fault flag seen.
     /// Empty when `pass == true`. Kept small to fit in the main-task stack.
     std::array<char, 128> fault_summary{};
@@ -278,8 +299,23 @@ private:
     }
 
     //---------------------------------------------------------------------
-    // Proportional: 0 → full → 0 ramp test with telemetry
+    // Proportional: 0 → full → 0 triangle ramp + setpoint-vs-actual tracking
     //---------------------------------------------------------------------
+    //
+    // For each setpoint visited along the triangle we:
+    //   1. Request the position (lock-free atomic, picked up by the
+    //      WhValveControlThread on its next tick).
+    //   2. Sleep `proportional_settle_ms` (covers ≥ one dither period + one
+    //      diagnostic poll).
+    //   3. Wait one full diagnostics-thread sweep so the snapshot's
+    //      `average_current_mA` reflects the new setpoint.
+    //   4. Compare measured |I_avg − setpoint| against
+    //      `max(tracking_band_min_mA, tracking_band_pct% × full_flow)`.
+    //
+    // Up-ramp actuals must strictly increase and down-ramp actuals must
+    // strictly decrease (with a small 1 mA hysteresis to absorb measurement
+    // noise) — that's what catches "the valve doesn't actually track the
+    // setpoint" failures (stuck plunger, broken coil, EN pin LOW, …).
     static SelfTestResult TestProportional(ProportionalValve&         valve,
                                            const ProportionalMapEntry& entry,
                                            const SelfTestPlan&         plan,
@@ -291,57 +327,125 @@ private:
         const uint32_t apply_errors_before = valve.GetApplyErrorCount();
         const uint32_t fault_count_before  = valve.GetFaultCount();
 
-        const uint32_t steps = (plan.proportional_steps < 5) ? 5 : plan.proportional_steps;
+        const uint32_t steps = (plan.proportional_steps < 4) ? 4 : plan.proportional_steps;
+        const uint16_t full_flow_ma = entry.model.full_flow_current_ma;
+        const float band_pct  = (plan.tracking_band_pct * full_flow_ma) / 100.0f;
+        const float band_mA   = (band_pct > plan.tracking_band_min_mA)
+                                ? band_pct : plan.tracking_band_min_mA;
 
         ESP_LOGI(kTag,
-                 "[PROP %.*s] CH=PROP_CH%u  model=%.*s  ramp 0→%u mA→0  steps=%lu",
+                 "[PROP %.*s] CH=PROP_CH%u  model=%.*s  triangle 0→%u→0 mA  "
+                 "steps=%lu  band=±%.1f mA",
                  static_cast<int>(entry.label.size()), entry.label.data(),
                  ChannelHwIndex(entry.manager_channel),
                  static_cast<int>(entry.model.label.size()),
                  entry.model.label.data(),
-                 static_cast<unsigned>(entry.model.full_flow_current_ma),
-                 static_cast<unsigned long>(steps));
+                 static_cast<unsigned>(full_flow_ma),
+                 static_cast<unsigned long>(steps),
+                 static_cast<double>(band_mA));
 
         // Reset to 0 first.
         valve.RequestPosition(0.0f);
-        os_delay_msec(200);
+        os_delay_msec(80);
         WaitForDiagPass(diag);
+
+        int32_t  err_sum_mA  = 0;
+        uint32_t err_count   = 0;
+        int16_t  max_abs_err = 0;
+        int16_t  prev_actual = 0;
+        bool     first_sample = true;
+
+        auto walk_and_check = [&](float pos, const char* tag, bool ascending) {
+            valve.RequestPosition(pos);
+            os_delay_msec(plan.proportional_settle_ms);
+            WaitForDiagPass(diag);
+
+            const auto snap = valve.Snapshot();
+            const int16_t actual_mA = snap.average_current_mA;
+            const int16_t cmd_mA = static_cast<int16_t>(
+                pos * static_cast<float>(full_flow_ma) + 0.5f);
+            const int16_t err_mA = static_cast<int16_t>(actual_mA - cmd_mA);
+            const int16_t abs_err_mA = static_cast<int16_t>(err_mA < 0 ? -err_mA : err_mA);
+
+            const bool inside_band =
+                static_cast<float>(abs_err_mA) <= band_mA;
+            if (!inside_band) ++res.tracking_outliers;
+            err_sum_mA += err_mA;
+            ++err_count;
+            if (abs_err_mA > max_abs_err) max_abs_err = abs_err_mA;
+
+            // Monotonicity check (1 mA hysteresis to absorb chip noise).
+            if (!first_sample) {
+                const int delta = actual_mA - prev_actual;
+                if (ascending && delta < -1) res.ramp_monotonic_up   = false;
+                if (!ascending && delta > 1) res.ramp_monotonic_down = false;
+            }
+            first_sample = false;
+            prev_actual  = actual_mA;
+
+            ESP_LOGI(kTag,
+                     "    %.*s [%s]: pos=%.2f cmd=%4d mA  I_act=%5d mA  "
+                     "err=%+4d mA (%s)  duty=%4u/10000  flags=[oc=%d sg=%d ol=%d ot=%d olsg=%d]"
+                     "  warn=[ot=%d cur=%d pwm=%d olsg=%d]",
+                     static_cast<int>(entry.label.size()), entry.label.data(),
+                     tag,
+                     static_cast<double>(pos),
+                     static_cast<int>(cmd_mA),
+                     static_cast<int>(actual_mA),
+                     static_cast<int>(err_mA),
+                     inside_band ? "OK" : "OUT",
+                     snap.duty_cycle_permyriad,
+                     snap.overcurrent, snap.short_to_ground, snap.open_load,
+                     snap.over_temperature, snap.open_load_short_ground,
+                     snap.ot_warning, snap.current_regulation_warning,
+                     snap.pwm_regulation_warning, snap.olsg_warning);
+        };
 
         // Ramp UP 0 → 1
         for (uint32_t s = 0; s <= steps; ++s) {
             const float pos = static_cast<float>(s) / static_cast<float>(steps);
-            valve.RequestPosition(pos);
-            os_delay_msec(plan.proportional_settle_ms);
-            WaitForDiagPass(diag);
-            LogProportionalSnapshot(entry.label, valve, pos, "UP  ");
+            walk_and_check(pos, "UP  ", /*ascending=*/true);
         }
-
         // Ramp DOWN 1 → 0
+        first_sample = true;  // restart monotonicity check for the down-ramp
         for (int32_t s = static_cast<int32_t>(steps) - 1; s >= 0; --s) {
             const float pos = static_cast<float>(s) / static_cast<float>(steps);
-            valve.RequestPosition(pos);
-            os_delay_msec(plan.proportional_settle_ms);
-            WaitForDiagPass(diag);
-            LogProportionalSnapshot(entry.label, valve, pos, "DOWN");
+            walk_and_check(pos, "DOWN", /*ascending=*/false);
         }
 
         valve.RequestPosition(0.0f);
-        os_delay_msec(200);
+        os_delay_msec(80);
 
-        res.apply_errors = valve.GetApplyErrorCount() - apply_errors_before;
-        res.fault_count  = valve.GetFaultCount()      - fault_count_before;
+        res.apply_errors           = valve.GetApplyErrorCount() - apply_errors_before;
+        res.fault_count            = valve.GetFaultCount()      - fault_count_before;
+        res.tracking_samples       = err_count;
+        res.tracking_max_abs_err_mA = max_abs_err;
+        res.tracking_mean_err_mA   = (err_count > 0)
+            ? static_cast<int16_t>(err_sum_mA / static_cast<int32_t>(err_count))
+            : 0;
 
         const auto snap = valve.Snapshot();
-        FormatProportionalFaults(snap, res.apply_errors, valve.GetLastError(),
-                                 res.fault_summary);
+        const bool tracking_ok = (res.tracking_outliers <= plan.tracking_max_outliers) &&
+                                 res.ramp_monotonic_up && res.ramp_monotonic_down;
         res.pass = (res.apply_errors == 0) && (res.fault_count == 0) &&
-                   !snap.any_fault();
+                   !snap.any_fault() && tracking_ok;
 
-        ESP_LOGI(kTag, "[PROP %.*s] result: %s  apply_errs=%lu  fault_count=%lu",
+        FormatProportionalFaults(snap, res.apply_errors, valve.GetLastError(),
+                                 res, res.fault_summary);
+
+        ESP_LOGI(kTag,
+                 "[PROP %.*s] result: %s  apply_errs=%lu  fc=%lu  "
+                 "tracking[outliers=%lu/%lu  max|err|=%d mA  mean=%+d mA  "
+                 "↑mono=%d ↓mono=%d]",
                  static_cast<int>(entry.label.size()), entry.label.data(),
                  res.pass ? "PASS" : "FAIL",
                  static_cast<unsigned long>(res.apply_errors),
-                 static_cast<unsigned long>(res.fault_count));
+                 static_cast<unsigned long>(res.fault_count),
+                 static_cast<unsigned long>(res.tracking_outliers),
+                 static_cast<unsigned long>(res.tracking_samples),
+                 static_cast<int>(res.tracking_max_abs_err_mA),
+                 static_cast<int>(res.tracking_mean_err_mA),
+                 res.ramp_monotonic_up, res.ramp_monotonic_down);
         if (!res.pass) {
             ESP_LOGE(kTag, "[PROP %.*s] FAULTS: %s",
                      static_cast<int>(entry.label.size()), entry.label.data(),
@@ -408,31 +512,6 @@ private:
                  static_cast<unsigned long>(s.fault_count));
     }
 
-    static void LogProportionalSnapshot(std::string_view label,
-                                        ProportionalValve& v,
-                                        float commanded_pos,
-                                        const char* direction) noexcept {
-        const auto s = v.Snapshot();
-        const auto& model = v.Model();
-        const uint32_t cmd_ma = static_cast<uint32_t>(
-            commanded_pos * static_cast<float>(model.full_flow_current_ma) + 0.5f);
-        const auto last_err = v.GetLastError();
-        ESP_LOGI(kTag,
-                 "    %.*s [%s]: pos=%.2f cmd=%3lu mA  I_avg=%5u  duty=%5u  "
-                 "last_err=%s  flags=[oc=%d sg=%d ol=%d ot=%d olsg=%d]  "
-                 "warn=[ot=%d cur=%d pwm=%d olsg=%d]  fc=%lu",
-                 static_cast<int>(label.size()), label.data(),
-                 direction,
-                 static_cast<double>(commanded_pos),
-                 static_cast<unsigned long>(cmd_ma),
-                 s.average_current_raw, s.duty_cycle_raw,
-                 HfValveErrToString(last_err),
-                 s.overcurrent, s.short_to_ground, s.open_load,
-                 s.over_temperature, s.open_load_short_ground,
-                 s.ot_warning, s.current_regulation_warning,
-                 s.pwm_regulation_warning, s.olsg_warning,
-                 static_cast<unsigned long>(s.fault_count));
-    }
 
     static void FormatSolenoidFaults(const SolenoidDiagSnapshot& s,
                                      uint32_t apply_errors,
@@ -448,17 +527,20 @@ private:
     static void FormatProportionalFaults(const ProportionalDiagSnapshot& s,
                                          uint32_t apply_errors,
                                          hf_valve_err_t last_err,
+                                         const SelfTestResult& tr,
                                          std::array<char, 128>& out) noexcept {
         std::snprintf(out.data(), out.size(),
-                      "apply_errs=%lu fc=%lu last=%s  oc=%d sg=%d ol=%d ot=%d olsg=%d  "
-                      "warn[ot=%d cur=%d pwm=%d olsg=%d]",
+                      "apply_errs=%lu fc=%lu last=%s  trk[out=%lu/%lu max=%dmA "
+                      "↑=%d ↓=%d]  oc=%d sg=%d ol=%d ot=%d olsg=%d",
                       static_cast<unsigned long>(apply_errors),
                       static_cast<unsigned long>(s.fault_count),
                       HfValveErrToString(last_err),
+                      static_cast<unsigned long>(tr.tracking_outliers),
+                      static_cast<unsigned long>(tr.tracking_samples),
+                      static_cast<int>(tr.tracking_max_abs_err_mA),
+                      tr.ramp_monotonic_up, tr.ramp_monotonic_down,
                       s.overcurrent, s.short_to_ground, s.open_load,
-                      s.over_temperature, s.open_load_short_ground,
-                      s.ot_warning, s.current_regulation_warning,
-                      s.pwm_regulation_warning, s.olsg_warning);
+                      s.over_temperature, s.open_load_short_ground);
     }
 
     static void PrintSummary(const SelfTestReport& report) noexcept {
@@ -479,11 +561,22 @@ private:
         }
         for (std::size_t i = 0; i < kNumProportionals; ++i) {
             const auto& r = report.proportionals[i];
+            // For proportionals, print the per-step tracking metrics inline
+            // even on PASS so the operator gets a quick sense of headroom.
+            char buf[160];
+            std::snprintf(buf, sizeof(buf),
+                          "trk[out=%lu/%lu max=%dmA mean=%+dmA ↑=%d ↓=%d]  %s",
+                          static_cast<unsigned long>(r.tracking_outliers),
+                          static_cast<unsigned long>(r.tracking_samples),
+                          static_cast<int>(r.tracking_max_abs_err_mA),
+                          static_cast<int>(r.tracking_mean_err_mA),
+                          r.ramp_monotonic_up, r.ramp_monotonic_down,
+                          r.pass ? "" : r.fault_summary.data());
             ESP_LOGI(kTag, "  %-8s %-12.*s %-6s  %s",
                      "PROP",
                      static_cast<int>(r.label.size()), r.label.data(),
                      r.pass ? "OK" : "FAIL",
-                     r.pass ? "" : r.fault_summary.data());
+                     buf);
         }
         ESP_LOGI(kTag, "");
         ESP_LOGI(kTag, "  OVERALL: %s",

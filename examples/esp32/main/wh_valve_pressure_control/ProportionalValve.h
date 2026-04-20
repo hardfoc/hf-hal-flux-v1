@@ -29,6 +29,7 @@
 #include "WhValveCatalog.h"
 #include "managers/ValveManager.h"
 #include "core/hf-core-drivers/external/hf-tle92466ed-driver/inc/tle92466ed.hpp"
+#include "core/hf-core-drivers/external/hf-tle92466ed-driver/inc/tle92466ed_registers.hpp"
 #include "handlers/tle92466ed/Tle92466edHandler.h"
 
 #include <atomic>
@@ -83,6 +84,8 @@ public:
         s.average_current_raw         = avg_current_raw_.load(std::memory_order_acquire);
         s.duty_cycle_raw              = duty_cycle_raw_.load(std::memory_order_acquire);
         s.vbat_feedback_raw           = vbat_feedback_raw_.load(std::memory_order_acquire);
+        s.average_current_mA          = avg_current_mA_.load(std::memory_order_acquire);
+        s.duty_cycle_permyriad        = duty_cycle_permyriad_.load(std::memory_order_acquire);
         s.fault_count                 = GetFaultCount();
         s.last_fault_tick_ms          = GetLastFaultTickMs();
         return s;
@@ -252,6 +255,27 @@ public:
                 avg_current_raw_.store(ch_diag.average_current, std::memory_order_release);
                 duty_cycle_raw_.store(ch_diag.duty_cycle,       std::memory_order_release);
                 vbat_feedback_raw_.store(ch_diag.vbat_feedback, std::memory_order_release);
+                // Decode the raw FB_I_AVG / FB_DC mantissa+exponent pairs
+                // into engineering units. The driver's `GetAverageCurrent`
+                // / `GetDutyCycle` accessors do the same arithmetic, but
+                // re-issuing those calls would double the SPI cost. We
+                // already have the raw register values from the diagnostics
+                // read above, so just decode in-place using the same
+                // FB_FEEDBACK helpers used inside the driver.
+                const int32_t i_ma = tle92466ed::FB_FEEDBACK::ComputeAverageCurrent_mA(
+                    ch_diag.average_current, ch_diag.duty_cycle);
+                const float dc = tle92466ed::FB_FEEDBACK::ComputeDutyCycle(ch_diag.duty_cycle);
+                const int32_t i_clamped =
+                    (i_ma < INT16_MIN) ? INT16_MIN
+                                       : (i_ma > INT16_MAX ? INT16_MAX : i_ma);
+                const uint32_t dc_pm =
+                    (dc <= 0.0f) ? 0U
+                                 : (dc >= 1.0f ? 10000U
+                                               : static_cast<uint32_t>(dc * 10000.0f + 0.5f));
+                avg_current_mA_.store(static_cast<int16_t>(i_clamped),
+                                      std::memory_order_release);
+                duty_cycle_permyriad_.store(static_cast<uint16_t>(dc_pm),
+                                            std::memory_order_release);
             } else {
                 last_diag_err_ = TleDriverErrorToValveError(dr.error());
                 diag_bits_.store(0, std::memory_order_release);
@@ -311,6 +335,8 @@ private:
     std::atomic<uint16_t>       avg_current_raw_{0};
     std::atomic<uint16_t>       duty_cycle_raw_{0};
     std::atomic<uint16_t>       vbat_feedback_raw_{0};
+    std::atomic<int16_t>        avg_current_mA_{0};
+    std::atomic<uint16_t>       duty_cycle_permyriad_{0};
     hf_valve_err_t              last_diag_err_{hf_valve_err_t::VALVE_SUCCESS};
     uint64_t                    now_ms_{0};
 };
