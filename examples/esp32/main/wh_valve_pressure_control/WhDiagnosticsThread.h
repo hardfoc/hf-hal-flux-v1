@@ -348,7 +348,12 @@ private:
     std::atomic<uint16_t> tle_vio_raw_{0};
     std::atomic<uint64_t> last_update_ms_{0};
 
-    static constexpr std::size_t kThreadStackBytes = 6144;
+    // 16 kB stack: every diagnostic sweep walks every valve and reads the
+    // TLE92466ED's per-channel diagnostics + the global FaultReport, both
+    // of which allocate sizable result structs on the driver's stack
+    // (FaultReport carries a per-channel array). Match the control
+    // thread's headroom to avoid the same overflow class.
+    static constexpr std::size_t kThreadStackBytes = 16384;
     static constexpr OS_Uint     kThreadPriority   = 5;     ///< Lower than control thread.
     uint8_t thread_stack_[kThreadStackBytes]{};
 };

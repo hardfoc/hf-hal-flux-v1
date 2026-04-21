@@ -106,7 +106,15 @@ private:
     std::atomic<bool>     mgr_was_ready_{false};
     std::atomic<uint32_t> iteration_{0};
 
-    static constexpr std::size_t kThreadStackBytes = 6144;
+    // 16 kB stack: the first Apply() on each ProportionalValve enters
+    // Configuration Mode, writes a ChannelConfig (held by value on the
+    // stack), pushes PWM + dither (each of which allocates its own
+    // step/freq/clk-div lookup tables on the stack inside the TLE92466ED
+    // driver), then re-enters Mission Mode. With the default 6 kB the
+    // task overflows the moment that round-trip starts. 16 kB gives
+    // ample headroom for the driver's lambdas, mutex locks and inline
+    // ESP_LOG calls without affecting RAM budget meaningfully.
+    static constexpr std::size_t kThreadStackBytes = 16384;
     static constexpr OS_Uint     kThreadPriority   = 7;
     uint8_t thread_stack_[kThreadStackBytes]{};
 };

@@ -19,6 +19,24 @@
 static constexpr const char* TAG = "FluxTemp";
 
 //==============================================================================
+// LOG HELPERS — surface which physical ADC chipset/instance an ADC channel
+// lives on so the registration log lines tell the operator more than just
+// "ADC ch=N".
+//==============================================================================
+
+namespace {
+
+constexpr const char* AdcChipTypeName(uint8_t chip_type) noexcept {
+    switch (static_cast<HfAdcChipType>(chip_type)) {
+        case HfAdcChipType::ESP32_INTERNAL:   return "ESP32-S3 internal SAR";
+        case HfAdcChipType::ADS7952_EXTERNAL: return "ADS7952";
+        default:                              return "UNKNOWN";
+    }
+}
+
+}  // namespace
+
+//==============================================================================
 // SINGLETON
 //==============================================================================
 
@@ -75,7 +93,8 @@ bool TemperatureManager::InitializeEsp32Internal() noexcept {
     entry.sensor_type = FluxTempSensorType::ESP32_INTERNAL;
     entry.registered = true;
 
-    Logger::GetInstance().Info(TAG, "  Registered ESP32 internal temperature sensor");
+    Logger::GetInstance().Info(TAG,
+        "  Registered ESP32_INTERNAL temperature sensor (on-die SAR diode)");
     return true;
 }
 
@@ -124,7 +143,12 @@ bool TemperatureManager::InitializeNtcThermistor() noexcept {
     entry.sensor_type = FluxTempSensorType::NTC_THERMISTOR;
     entry.registered = true;
 
-    Logger::GetInstance().Info(TAG, "  Registered NTC thermistor (ADC ch=%u)", mapping->physical_channel);
+    Logger::GetInstance().Info(TAG,
+        "  Registered NTC_THERMISTOR on %s (chip_unit=%u adc_unit=%u ch=%u)",
+        AdcChipTypeName(mapping->chip_type),
+        static_cast<unsigned>(mapping->chip_unit),
+        static_cast<unsigned>(mapping->adc_unit),
+        static_cast<unsigned>(mapping->physical_channel));
     return true;
 }
 
@@ -168,7 +192,12 @@ bool TemperatureManager::InitializeMcp9700Thermistor() noexcept {
     entry.sensor_type = FluxTempSensorType::MCP9700_THERMISTOR;
     entry.registered = true;
 
-    Logger::GetInstance().Info(TAG, "  Registered MCP9700 thermistor (ADC ch=%u)", mapping->physical_channel);
+    Logger::GetInstance().Info(TAG,
+        "  Registered MCP9700_THERMISTOR on %s (chip_unit=%u adc_unit=%u ch=%u)",
+        AdcChipTypeName(mapping->chip_type),
+        static_cast<unsigned>(mapping->chip_unit),
+        static_cast<unsigned>(mapping->adc_unit),
+        static_cast<unsigned>(mapping->physical_channel));
     return true;
 #endif
 }
