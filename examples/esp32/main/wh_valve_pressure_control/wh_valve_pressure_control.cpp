@@ -123,25 +123,46 @@ static whvalve::SelfTestPlan MakeSelfTestPlan() noexcept {
     plan.enable_proportionals[static_cast<size_t>(whvalve::ProportionalId::SPV_H)] = true;
     plan.enable_proportionals[static_cast<size_t>(whvalve::ProportionalId::GFV  )] = true;
 
-    // Tunable cycling knobs. Defaults are tuned for fast iteration on the
-    // bench (full sweep ≈ 75 s instead of the 3 min the conservative
-    // defaults take). Raise the values for deeper commissioning runs that
-    // want extra margin to surface intermittent faults.
-    //
-    //                       solenoid    proportional   pause   prompt
-    //                       (each)        (each)
-    //   Fast (default):     ~3.5 s        ~3   s       1.5 s    1   s
-    //   Conservative:       ~12  s        ~5   s       4   s    3   s
-    plan.solenoid_cycles         = 2;
-    plan.solenoid_on_ms          = 500;
-    plan.solenoid_off_ms         = 300;
-    plan.proportional_steps      = 8;      // 9 setpoints up + 8 down = 17 total
-    plan.proportional_settle_ms  = 80;     // ≥ one 50 Hz dither period + one diag tick
-    plan.inter_valve_pause_ms    = 1500;
-    plan.prompt_wait_ms          = 1000;
-    plan.tracking_band_pct       = 5.0f;   // ±5 % of full-flow OR
-    plan.tracking_band_min_mA    = 2.0f;   //   ±2 mA, whichever is greater
-    plan.tracking_max_outliers   = 2;      // tolerate 2 noisy points (low-end)
+    // ── Solenoids ───────────────────────────────────────────────────────
+    // Defaults are tuned for fast iteration. Raise them for deeper
+    // commissioning runs.
+    plan.solenoid_cycles            = 2;
+    plan.solenoid_on_ms             = 500;
+    plan.solenoid_off_ms            = 300;
+    plan.inter_valve_pause_ms       = 1500;
+    plan.prompt_wait_ms             = 1000;
+
+    // ── Per-valve proportional sweep (DEFAULT OFF on the WH bench) ─────
+    // The WH manifold can only physically connect one proportional valve
+    // at a time, but moving the manifold tube between every TLE channel
+    // for a one-at-a-time test isn't practical day-to-day. Leave this off
+    // and rely on the parallel stress test below to exercise every
+    // proportional in one shot. Set to true only when you have a single
+    // valve attached and want a detailed per-channel triangle ramp.
+    plan.enable_per_valve_proportional = false;
+
+    // Per-valve sweep knobs (applied only when enable_per_valve_proportional is true).
+    plan.proportional_steps         = 8;      // 9 setpoints up + 8 down = 17 total
+    plan.proportional_settle_ms     = 80;
+    plan.tracking_band_pct          = 5.0f;
+    plan.tracking_band_min_mA       = 2.0f;
+    plan.tracking_max_outliers      = 2;
+
+    // ── Parallel stress test (worst-case driver load) ───────────────────
+    // Drives every TLE92466ED channel simultaneously through a 7-step
+    // triangle ladder, twice — once with every channel uniformly at the
+    // same level (worst-case current draw / VBAT droop), once with each
+    // channel offset by 1/6 of the cycle (realistic phase-staggered
+    // dynamics). Diagnostic-only: never fails the overall verdict,
+    // surfaces VBAT droop, OT warnings and per-channel regulation
+    // warnings in the summary block so the operator can decide.
+    plan.enable_parallel_stress_test     = true;
+    plan.parallel_stress_run_uniform     = true;
+    plan.parallel_stress_run_staggered   = true;
+    plan.parallel_settle_ms              = 250;   // ample for VSO + LM-Pro alike
+    plan.parallel_steady_state_ms        = 200;
+    plan.parallel_sample_period_ms       = 20;    // 50 Hz inside steady-state
+    plan.parallel_inter_pattern_pause_ms = 1500;
     return plan;
 }
 
