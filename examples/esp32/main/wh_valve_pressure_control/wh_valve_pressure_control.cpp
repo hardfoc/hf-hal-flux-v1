@@ -150,19 +150,45 @@ static whvalve::SelfTestPlan MakeSelfTestPlan() noexcept {
 
     // ── Parallel stress test (worst-case driver load) ───────────────────
     // Drives every TLE92466ED channel simultaneously through a 7-step
-    // triangle ladder, twice — once with every channel uniformly at the
-    // same level (worst-case current draw / VBAT droop), once with each
-    // channel offset by 1/6 of the cycle (realistic phase-staggered
-    // dynamics). Diagnostic-only: never fails the overall verdict,
-    // surfaces VBAT droop, OT warnings and per-channel regulation
-    // warnings in the summary block so the operator can decide.
-    plan.enable_parallel_stress_test     = true;
-    plan.parallel_stress_run_uniform     = true;
-    plan.parallel_stress_run_staggered   = true;
-    plan.parallel_settle_ms              = 250;   // ample for VSO + LM-Pro alike
-    plan.parallel_steady_state_ms        = 200;
-    plan.parallel_sample_period_ms       = 20;    // 50 Hz inside steady-state
-    plan.parallel_inter_pattern_pause_ms = 1500;
+    // triangle ladder, twice — once UNIFORM (every channel at the same
+    // level — worst-case simultaneous current draw / VBAT droop), once
+    // STAGGERED (each channel offset by 1/6 of the cycle — realistic
+    // phase-staggered dynamics). The stress test verdict feeds into the
+    // overall self-test result via the tolerance band knobs below; flip
+    // `parallel_stress_diagnostic_only = true` for first-light /
+    // commissioning when you want the metrics but no failure.
+    plan.enable_parallel_stress_test       = true;
+    plan.parallel_stress_run_uniform       = true;
+    plan.parallel_stress_run_staggered     = true;
+    plan.parallel_stress_diagnostic_only   = false;     // false = enforce tolerances
+    plan.parallel_settle_ms                = 500;       // 2× the per-valve test —
+                                                        // gives VBAT time to recover
+                                                        // and slow VSO valves time to
+                                                        // settle under simultaneous load
+    plan.parallel_steady_state_ms          = 200;
+    plan.parallel_sample_period_ms         = 20;        // 50 Hz inside steady-state
+    plan.parallel_inter_pattern_pause_ms   = 1500;
+
+    // Tolerance band per channel per step (whichever is greater applies):
+    //   ±15 % of cmd  OR  ±6 mA absolute  → mean error
+    //   ±25 % of cmd  OR  ±12 mA absolute → worst-case excursion
+    //   ≤ 10 mA stddev
+    //   ≤ 1 step per channel may fall outside the bands (low-end noise)
+    // Per-channel current_regulation / pwm_regulation warnings are
+    // tolerated (load-dependent and clear once setpoint is reached); hard
+    // faults (open_load / overcurrent / short_to_ground) always fail.
+    // Subsystem: any vbat_uv / ot_err / clock_fault fails the pattern.
+    plan.parallel_max_abs_mean_err_pct          = 15.0f;
+    plan.parallel_max_abs_mean_err_min_mA       = 6.0f;
+    plan.parallel_max_stddev_mA                 = 10.0f;
+    plan.parallel_max_excursion_pct             = 25.0f;
+    plan.parallel_max_excursion_min_mA          = 12.0f;
+    plan.parallel_max_failed_steps_per_channel  = 1;
+    plan.parallel_allow_per_channel_warnings    = true;
+    plan.parallel_fail_on_vbat_uv               = true;
+    plan.parallel_fail_on_ot_warn               = false;
+    plan.parallel_fail_on_ot_err                = true;
+    plan.parallel_fail_on_clock_fault           = true;
     return plan;
 }
 

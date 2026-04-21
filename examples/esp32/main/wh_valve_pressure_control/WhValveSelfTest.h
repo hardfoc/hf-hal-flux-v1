@@ -41,6 +41,7 @@
 
 #include "esp_log.h"
 
+#include <algorithm>
 #include <array>
 #include <cstdint>
 #include <cstdio>
@@ -183,23 +184,81 @@ struct SelfTestPlan {
     //                  staggered control behaviour (different VBAT
     //                  droop / regulation profile than uniform).
     //
-    // The stress test is DIAGNOSTIC ONLY: it never fails the overall
-    // self-test even when warnings fire — those are surfaced in the
-    // summary so the operator can decide what to do (medical-device
-    // "degraded but functional" attitude).
+    // The stress test enforces explicit pass/fail tolerances (below) and
+    // its verdict feeds into the overall self-test result. Set
+    // `parallel_stress_diagnostic_only = true` to revert to the original
+    // behaviour where the stress test only logs and never fails (useful
+    // during commissioning / first light).
     bool     enable_parallel_stress_test{true};
     bool     parallel_stress_run_uniform{true};
     bool     parallel_stress_run_staggered{true};
+    bool     parallel_stress_diagnostic_only{false};
 
-    /// Settle wait per stress-test level (ms). Generous default — VSO
-    /// solenoid families need ~150 ms to fully reach setpoint at 60 mA.
-    uint32_t parallel_settle_ms{250};
+    /// Settle wait per stress-test level (ms). 500 ms covers the slowest
+    /// VSO solenoid family at full current under simultaneous load (which
+    /// briefly droops VBAT and lengthens the chip's CDR settling time
+    /// compared to a single-channel test). LM-Pro can still shortfall
+    /// even at 500 ms when total simultaneous current crosses the bench
+    /// PSU's regulation envelope — that's a real failure to be flagged
+    /// by the tolerance band, not a settling artifact.
+    uint32_t parallel_settle_ms{500};
     /// Steady-state characterization window per stress level (ms).
     uint32_t parallel_steady_state_ms{200};
     /// Sampling cadence inside the stress test (ms).
     uint32_t parallel_sample_period_ms{20};
     /// Pause between the uniform and staggered passes so VBAT can recover.
     uint32_t parallel_inter_pattern_pause_ms{1500};
+
+    //--------------------------------------------------------------------
+    // Parallel-stress PASS/FAIL tolerances
+    //--------------------------------------------------------------------
+    //
+    // For each (channel × stress level) we evaluate three sub-checks:
+    //
+    //   |mean_err|  ≤ max(max_abs_mean_err_min_mA,
+    //                     max_abs_mean_err_pct% × cmd_mA)
+    //   stddev      ≤ max_stddev_mA
+    //   |excursion| ≤ max(max_excursion_min_mA,
+    //                     max_excursion_pct% × cmd_mA)
+    //
+    // A step "fails" if any sub-check fails OR if the channel's snapshot
+    // shows a hard fault flag. Per-channel pass requires that the number
+    // of failed steps is ≤ `parallel_max_failed_steps_per_channel` AND no
+    // forbidden warning flag was raised. Pattern pass requires every
+    // channel pass AND none of the subsystem fail flags below were seen.
+    // Stress test passes (and feeds into overall_pass) only when every
+    // executed pattern passes — unless `parallel_stress_diagnostic_only`
+    // is true, in which case the verdict is logged but does not lower
+    // overall_pass.
+    //
+    // Defaults are tuned for the WH bench: VSO valves typically settle
+    // within ±5 mA of setpoint under simultaneous load; LM-Pro can
+    // shortfall ~20 mA at full simultaneous current draw (494 mA total)
+    // because of VBAT droop into the load. The 15 % / 6 mA threshold
+    // catches "no current at all" and "wildly off" but tolerates that
+    // expected shortfall.
+    float    parallel_max_abs_mean_err_pct{15.0f};
+    float    parallel_max_abs_mean_err_min_mA{6.0f};
+    float    parallel_max_stddev_mA{10.0f};
+    float    parallel_max_excursion_pct{25.0f};
+    float    parallel_max_excursion_min_mA{12.0f};
+    /// Per channel: tolerate this many failed steps before flagging the
+    /// channel as a stress-test failure. ≥ 1 absorbs the very-low-end
+    /// noise step (cmd ≈ 0 with chip offset of -2 mA).
+    uint32_t parallel_max_failed_steps_per_channel{1};
+    /// Per-channel current_regulation_warning / pwm_regulation_warning is
+    /// expected when the load briefly limits a channel; tolerated by
+    /// default. open_load / overcurrent / short-to-ground are caught via
+    /// the hard fault path regardless of this flag.
+    bool     parallel_allow_per_channel_warnings{true};
+
+    /// Subsystem-level fail conditions (any single occurrence fails the
+    /// whole pattern). vbat_uv and ot_err are always treated as faults
+    /// (medical-device safety); ot_warn / clock_fault are configurable.
+    bool     parallel_fail_on_vbat_uv{true};
+    bool     parallel_fail_on_ot_warn{false};
+    bool     parallel_fail_on_ot_err{true};
+    bool     parallel_fail_on_clock_fault{true};
 
     /// Pause between valves so the operator can move the manifold connection.
     uint32_t inter_valve_pause_ms{1500};
@@ -289,6 +348,13 @@ struct ParallelChannelSummary {
     uint32_t         fault_count{0};            ///< Sticky from snapshot.
     bool             any_fault_seen{false};
     bool             any_warning_seen{false};
+
+    // PASS evaluation
+    uint32_t         steps_failed{0};           ///< Per-step sub-check failures.
+    bool             pass{true};                ///< False if too many step failures
+                                                ///< OR a hard fault / disallowed warning.
+    /// One-line reason for failure, empty when pass==true.
+    std::array<char, 96> fail_reason{};
 };
 
 /**
@@ -304,6 +370,11 @@ struct ParallelStressPatternResult {
     bool     clock_fault_seen{false};
     /// One row per proportional channel.
     std::array<ParallelChannelSummary, kNumProportionals> channels{};
+    /// Aggregated PASS verdict across all channels + subsystem flags.
+    bool     pass{true};
+    /// Brief reason for failure ("vbat_uv seen" / "ot_err seen" / "channel
+    /// XYZ failed"). Empty on pass. Diagnostic-only is reported here too.
+    std::array<char, 128> fail_reason{};
 };
 
 /// Aggregated self-test report.
@@ -435,6 +506,17 @@ public:
                 }
                 report.stress_staggered =
                     RunParallelStress(system, diag, plan, /*staggered=*/true);
+            }
+
+            // Stress verdicts feed into overall_pass unless the operator
+            // explicitly opted into diagnostic-only mode (commissioning).
+            if (!plan.parallel_stress_diagnostic_only) {
+                if (report.stress_uniform.executed && !report.stress_uniform.pass) {
+                    report.overall_pass = false;
+                }
+                if (report.stress_staggered.executed && !report.stress_staggered.pass) {
+                    report.overall_pass = false;
+                }
             }
         }
 
@@ -809,9 +891,30 @@ private:
                     const int32_t v32 = (var < 0) ? 0 : static_cast<int32_t>(var);
                     obs.stddev_mA = IsqrtClamped(v32);
                 }
+                // ── Evaluate per-step pass against tolerances ───────────
+                const float abs_cmd_f = static_cast<float>(
+                    obs.cmd_mA < 0 ? -obs.cmd_mA : obs.cmd_mA);
+                const float band_err  = std::max(
+                    plan.parallel_max_abs_mean_err_min_mA,
+                    (plan.parallel_max_abs_mean_err_pct * abs_cmd_f) / 100.0f);
+                const float band_exc  = std::max(
+                    plan.parallel_max_excursion_min_mA,
+                    (plan.parallel_max_excursion_pct * abs_cmd_f) / 100.0f);
+
+                const int16_t abs_mean_err =
+                    obs.mean_err_mA < 0 ? -obs.mean_err_mA : obs.mean_err_mA;
+
+                const bool ok_err  = static_cast<float>(abs_mean_err)        <= band_err;
+                const bool ok_sd   = static_cast<float>(obs.stddev_mA)       <= plan.parallel_max_stddev_mA;
+                const bool ok_exc  = static_cast<float>(obs.max_excursion_mA) <= band_exc;
+                const bool ok_warn = !obs.any_warning ||
+                                     plan.parallel_allow_per_channel_warnings;
+                const bool step_ok = ok_err && ok_sd && ok_exc &&
+                                     !obs.any_fault && ok_warn;
+
                 ESP_LOGI(kTag,
                          "    %-6.*s  cmd=%4d  mean=%4d  err=%+4d  σ=%3d  "
-                         "|exc|=%3d  fault=%d  warn=%d",
+                         "|exc|=%3d  fault=%d  warn=%d  %s",
                          static_cast<int>(result.channels[i].label.size()),
                          result.channels[i].label.data(),
                          static_cast<int>(obs.cmd_mA),
@@ -820,12 +923,11 @@ private:
                          static_cast<int>(obs.stddev_mA),
                          static_cast<int>(obs.max_excursion_mA),
                          obs.any_fault ? 1 : 0,
-                         obs.any_warning ? 1 : 0);
+                         obs.any_warning ? 1 : 0,
+                         step_ok ? "OK" : "FAIL");
 
-                // ── Aggregate worst-case per channel ─────────────────────
+                // ── Aggregate per channel ───────────────────────────────
                 auto& ch = result.channels[i];
-                const int16_t abs_mean_err =
-                    obs.mean_err_mA < 0 ? -obs.mean_err_mA : obs.mean_err_mA;
                 if (abs_mean_err > ch.worst_mean_err_mA)
                     ch.worst_mean_err_mA = abs_mean_err;
                 if (obs.stddev_mA > ch.worst_stddev_mA)
@@ -834,6 +936,7 @@ private:
                     ch.worst_excursion_mA = obs.max_excursion_mA;
                 if (obs.any_fault)   ch.any_fault_seen   = true;
                 if (obs.any_warning) ch.any_warning_seen = true;
+                if (!step_ok)        ++ch.steps_failed;
             }
         }
 
@@ -855,8 +958,69 @@ private:
 
         result.worst_diag_iterations = static_cast<uint16_t>(diag.IterationCount());
 
-        ESP_LOGI(kTag, "  pattern=%s complete — see summary block at end",
-                 pattern_name);
+        // ── Roll up per-channel pass + pattern pass ────────────────────
+        result.pass = true;
+        std::array<char, 96> first_failure{};
+        bool have_first_failure = false;
+
+        // Subsystem-level fail conditions.
+        const auto note_subsystem_fail = [&](const char* what) {
+            if (!have_first_failure) {
+                std::snprintf(result.fail_reason.data(), result.fail_reason.size(),
+                              "subsystem: %s", what);
+                have_first_failure = true;
+            }
+            result.pass = false;
+        };
+        if (plan.parallel_fail_on_vbat_uv && result.vbat_under_voltage_seen)
+            note_subsystem_fail("vbat_uv seen");
+        if (plan.parallel_fail_on_ot_warn && result.ot_warning_seen)
+            note_subsystem_fail("ot_warning seen");
+        if (plan.parallel_fail_on_ot_err && result.ot_error_seen)
+            note_subsystem_fail("ot_error seen");
+        if (plan.parallel_fail_on_clock_fault && result.clock_fault_seen)
+            note_subsystem_fail("clock_fault seen");
+
+        // Per-channel rollup.
+        for (std::size_t i = 0; i < kNumProportionals; ++i) {
+            auto& ch = result.channels[i];
+            ch.pass = true;
+            // Forbidden warnings / hard faults / apply errors.
+            const bool warn_blocks =
+                ch.any_warning_seen && !plan.parallel_allow_per_channel_warnings;
+            if (ch.any_fault_seen)   { ch.pass = false; }
+            if (ch.apply_errors > 0) { ch.pass = false; }
+            if (ch.fault_count > 0)  { ch.pass = false; }
+            if (warn_blocks)         { ch.pass = false; }
+            if (ch.steps_failed > plan.parallel_max_failed_steps_per_channel) {
+                ch.pass = false;
+            }
+            if (!ch.pass) {
+                std::snprintf(ch.fail_reason.data(), ch.fail_reason.size(),
+                              "fail_steps=%lu/%lu fault=%d warn=%d apply_err=%lu fc=%lu",
+                              static_cast<unsigned long>(ch.steps_failed),
+                              static_cast<unsigned long>(num_steps),
+                              ch.any_fault_seen ? 1 : 0,
+                              ch.any_warning_seen ? 1 : 0,
+                              static_cast<unsigned long>(ch.apply_errors),
+                              static_cast<unsigned long>(ch.fault_count));
+                if (!have_first_failure) {
+                    std::snprintf(result.fail_reason.data(), result.fail_reason.size(),
+                                  "%.*s: %s",
+                                  static_cast<int>(ch.label.size()), ch.label.data(),
+                                  ch.fail_reason.data());
+                    have_first_failure = true;
+                }
+                result.pass = false;
+            }
+        }
+
+        ESP_LOGI(kTag, "  pattern=%s complete — verdict=%s%s%s",
+                 pattern_name,
+                 result.pass ? "PASS" : "FAIL",
+                 result.pass ? "" : " (",
+                 result.pass ? "" : result.fail_reason.data());
+        if (!result.pass) ESP_LOGE(kTag, "  ↑ pattern=%s FAILED", pattern_name);
         ESP_LOGI(kTag, "");
         return result;
     }
@@ -1015,9 +1179,6 @@ private:
         ESP_LOGI(kTag, "");
         ESP_LOGI(kTag, "  OVERALL: %s",
                  report.overall_pass ? "PASS" : "FAIL — see entries above");
-        ESP_LOGI(kTag, "  (parallel-stress rows are diagnostic only — they never");
-        ESP_LOGI(kTag, "   fail the overall verdict; review them for VBAT droop,");
-        ESP_LOGI(kTag, "   thermal warnings, regulation warnings under load.)");
         ESP_LOGI(kTag, "════════════════════════════════════════════════════════════");
         ESP_LOGI(kTag, "");
     }
@@ -1026,13 +1187,17 @@ private:
                                     const ParallelStressPatternResult& r) noexcept {
         if (!r.executed) return;
         ESP_LOGI(kTag, "");
-        ESP_LOGI(kTag, "  ── PARALLEL STRESS — pattern=%s ──", pattern);
+        ESP_LOGI(kTag, "  ── PARALLEL STRESS — pattern=%s — %s ──",
+                 pattern, r.pass ? "PASS" : "FAIL");
         ESP_LOGI(kTag, "    subsystem flags seen: vbat_uv=%d ot_warn=%d ot_err=%d clk_fault=%d",
                  r.vbat_under_voltage_seen, r.ot_warning_seen,
                  r.ot_error_seen, r.clock_fault_seen);
-        ESP_LOGI(kTag, "    %-6s  %-9s  %-9s  %-9s  %-7s  %-7s  %s",
-                 "Valve", "max|err|", "max σ", "max|exc|",
-                 "applyE", "fault++", "obs");
+        if (!r.pass) {
+            ESP_LOGE(kTag, "    fail reason: %s", r.fail_reason.data());
+        }
+        ESP_LOGI(kTag, "    %-6s  %-4s  %-9s  %-9s  %-9s  %-7s  %-7s  %-7s  %s",
+                 "Valve", "Pass", "max|err|", "max σ", "max|exc|",
+                 "fail/N", "applyE", "fault++", "obs");
         for (std::size_t i = 0; i < kNumProportionals; ++i) {
             const auto& ch = r.channels[i];
             char obs[48];
@@ -1040,14 +1205,20 @@ private:
                           "fault=%d warn=%d",
                           ch.any_fault_seen ? 1 : 0,
                           ch.any_warning_seen ? 1 : 0);
-            ESP_LOGI(kTag, "    %-6.*s  %4dmA      %4dmA      %4dmA      %5lu     %5lu     %s",
+            ESP_LOGI(kTag,
+                     "    %-6.*s  %-4s  %4dmA      %4dmA      %4dmA      %5lu     %5lu     %5lu     %s",
                      static_cast<int>(ch.label.size()), ch.label.data(),
+                     ch.pass ? "OK" : "FAIL",
                      static_cast<int>(ch.worst_mean_err_mA),
                      static_cast<int>(ch.worst_stddev_mA),
                      static_cast<int>(ch.worst_excursion_mA),
+                     static_cast<unsigned long>(ch.steps_failed),
                      static_cast<unsigned long>(ch.apply_errors),
                      static_cast<unsigned long>(ch.fault_count),
                      obs);
+            if (!ch.pass && ch.fail_reason[0]) {
+                ESP_LOGE(kTag, "      ↳ %s", ch.fail_reason.data());
+            }
         }
     }
 };
