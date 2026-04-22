@@ -32,6 +32,17 @@ set(HF_CORE_ENABLE_ADS7952        ON)   # SPI 12-ch ADC (ADS7952)
 set(HF_CORE_ENABLE_ALICAT_BASIS2  ON)   # UART RS-485 mass-flow meter (Alicat BASIS-2)
 set(HF_CORE_ENABLE_FDO2           ON)   # UART optical oxygen probe (PyroScience FDO2-G2)
 
+# ── Built-in USB Serial/JTAG controller (optional console transport) ─────
+# OFF by default: Flux V1 ships with an external USB-UART bridge wired to
+# UART0 (GPIO43/44), so the IDF bootloader/log/operator-console all share
+# that port the way the chip ROM expects. Flip this to ON only when you
+# want the operator CLI to ride on the ESP32-S3's built-in USB Serial/JTAG
+# controller (GPIO19/20, native USB jack) instead — that pulls in
+# `EspUsbSerialJtag` + the IDF `esp_driver_usb_serial_jtag` component and
+# wakes up `CommChannelsManager::AcquireUsbSerialJtag()`. The HAL stack
+# stays compiled out (zero code, zero deps) when this is OFF.
+set(HF_CORE_ENABLE_USB_SERIAL_JTAG OFF)
+
 # ── Optional Utilities ────────────────────────────────────────────────────
 set(HF_CORE_ENABLE_UTILS_CANOPEN  ON)   # CANopen protocol helpers
 

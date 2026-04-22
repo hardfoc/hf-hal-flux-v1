@@ -2,11 +2,12 @@
  * @file CommChannelsManager.h
  * @brief Communication channels manager for the HardFOC Flux V1 platform.
  *
- * @details Manages all board communication buses (SPI, I2C, CAN) for the Flux
- *          valve-control board. The Flux board uses SPI to talk to:
+ * @details Manages board communication buses (SPI, CAN, lazy UART) for the Flux
+ *          valve-control board. SPI talks to:
  *            - MAX22200 octal solenoid driver
  *            - TLE92466ED six-channel low-side driver
- *          And I2C/CAN for future expansion.
+ *          CAN is used for external devices (e.g. compressor). There is no
+ *          I²C bus on Flux V1 — `GetI2cBus()` always returns nullptr.
  *
  *          Stack-based where possible: fixed-size arrays for known compile-time
  *          device counts, no heap vectors for bus/device lists. Bus objects
@@ -28,18 +29,19 @@
 // Forward declarations
 class EspSpiBus;
 class EspSpiDevice;
-class EspI2cBus;
+class EspI2cBus;  // forward — only appears as return type of GetI2cBus()
 class EspCan;
 class EspUart;
+class EspUsbSerialJtag;
 class BaseSpi;
-class BaseI2c;
 class BaseCan;
 class BaseUart;
+class BaseUsbSerialJtag;
 
 #include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/base/BaseSpi.h"
-#include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/base/BaseI2c.h"
 #include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/base/BaseCan.h"
 #include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/base/BaseUart.h"
+#include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/base/BaseUsbSerialJtag.h"
 #include "RtosMutex.h"
 
 //==============================================================================
@@ -101,7 +103,7 @@ struct CommSystemDiagnostics {
     bool system_healthy;            ///< True when all configured buses are operational
     bool system_initialized;        ///< True if EnsureInitialized() completed
     bool spi_bus_valid;             ///< SPI bus initialised and usable
-    bool i2c_bus_valid;             ///< I²C bus initialised and usable
+    bool i2c_bus_valid;             ///< Always false — Flux V1 has no I²C manager bus
     bool can_bus_valid;             ///< CAN/TWAI bus initialised and usable
     uint8_t spi_device_count;       ///< Number of SPI devices with valid indices
     CommError last_error;           ///< Most recent error code from any operation
@@ -134,8 +136,8 @@ enum class SpiDeviceId : uint8_t {
  * Design decisions vs. Vortex:
  *  - Fixed compile-time device counts (no heap vectors for device tracking).
  *  - SPI bus + two devices known at link time.
- *  - I2C bus kept for future expansion but no devices configured yet.
- *  - CAN bus available for valve network communication.
+ *  - No I²C bus (GPIO not routed / unused on this product).
+ *  - CAN bus available for external controllers (e.g. compressor).
  */
 class CommChannelsManager {
 public:
@@ -202,14 +204,14 @@ public:
     BaseSpi* GetSpiDevice(uint8_t device_index) noexcept;
 
     //==========================================================================
-    // I2C ACCESSOR (for future expansion)
+    // I2C — not present on Flux V1
     //==========================================================================
 
     /**
-     * @brief Get the primary I²C bus (for future expansion).
-     * @return Pointer to EspI2cBus, or nullptr if not initialised.
+     * @brief Flux V1 does not bring up an I²C bus in `CommChannelsManager`.
+     * @return Always nullptr (API retained for portable example code).
      */
-    EspI2cBus* GetI2cBus() noexcept;
+    EspI2cBus* GetI2cBus() noexcept { return nullptr; }
 
     //==========================================================================
     // CAN ACCESSOR
@@ -268,6 +270,38 @@ public:
     BaseUart* GetUart(uint8_t port_number) noexcept;
 
     //==========================================================================
+    // USB SERIAL/JTAG ACCESSORS (ESP32-S3/-C3/-C6 native USB-VCP + JTAG)
+    //==========================================================================
+
+    /**
+     * @brief Lazy-acquire the built-in USB Serial/JTAG controller.
+     *
+     * The ESP32-S3 has exactly one USB Serial/JTAG block, hard-wired to
+     * GPIO19/20 — there are no pins or baud rate to configure, only the
+     * driver-side TX/RX ring sizes. The first caller wins the ring sizes;
+     * subsequent calls reuse the same `BaseUsbSerialJtag&`.
+     *
+     * If the IDF console (`CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG=y`) has
+     * already installed the underlying driver, this just shares it — both
+     * `printf` / `ESP_LOG` and our wrapper push to the same TX ring.
+     *
+     * @param cfg Ring buffer / policy configuration (defaults are sane:
+     *            256-byte TX, 256-byte RX). Honoured only on the first call.
+     * @return Pointer to the cached `BaseUsbSerialJtag` (=== `EspUsbSerialJtag`),
+     *         or nullptr if the host platform has no USB Serial/JTAG block
+     *         or driver install failed.
+     */
+    BaseUsbSerialJtag* AcquireUsbSerialJtag(
+        const hf_usb_serial_jtag_config_t& cfg = {}) noexcept;
+
+    /**
+     * @brief Look up a previously-acquired USB Serial/JTAG instance.
+     * @return Pointer to the cached `BaseUsbSerialJtag`, or nullptr if
+     *         `AcquireUsbSerialJtag()` has never been called.
+     */
+    BaseUsbSerialJtag* GetUsbSerialJtag() noexcept;
+
+    //==========================================================================
     // DIAGNOSTICS
     //==========================================================================
 
@@ -299,10 +333,6 @@ private:
     // Which bus owns each device (0=spi_bus_, 1=spi3_bus_)
     std::array<uint8_t, kSpiDeviceCount> spi_device_bus_{};
 
-    // I2C bus placeholder for future expansion
-    std::unique_ptr<EspI2cBus> i2c_bus_;
-    bool i2c_bus_valid_{false};
-
     // CAN bus
     std::unique_ptr<EspCan> can_bus_;
     bool can_bus_valid_{false};
@@ -310,6 +340,12 @@ private:
     // Lazy UART pool — one slot per ESP32 hardware UART port. App-driven:
     // sensors (BASIS-2, FDO2, etc.) call `AcquireUart(cfg)` at boot.
     std::array<std::unique_ptr<EspUart>, kMaxUartPorts> uarts_{};
+
+    // Lazy USB Serial/JTAG wrapper. The underlying controller is a single
+    // silicon block, so only one `BaseUsbSerialJtag*` ever exists per chip.
+    // Ownership is held by `EspUsbSerialJtag::Default()` (process-wide
+    // magic-static); we only cache the resolved pointer here for fast lookup.
+    BaseUsbSerialJtag* usb_serial_jtag_{nullptr};
 
     std::atomic<bool> initialized_{false};
     std::atomic<CommError> last_error_{CommError::SUCCESS};

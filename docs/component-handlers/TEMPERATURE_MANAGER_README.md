@@ -4,7 +4,7 @@
 
 ![Component](https://img.shields.io/badge/component-TemperatureManager-blue.svg)
 ![Thread Safe](https://img.shields.io/badge/thread--safe-yes-green.svg)
-![Hardware](https://img.shields.io/badge/hardware-ESP32--C6%20%7C%20NTC-orange.svg)
+![Hardware](https://img.shields.io/badge/hardware-ESP32--S3%20%7C%20NTC-orange.svg)
 
 **Multi-sensor temperature monitoring for the HardFOC Flux platform**
 

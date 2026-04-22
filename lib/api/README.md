@@ -25,7 +25,7 @@ The initialization order is carefully managed to handle dependencies:
 ```
 1. NvsManager           (ESP-IDF NVS — `flux` / `flux_cal` / `flux_cfg` namespaces)
    ↓
-2. CommChannelsManager  (SPI, I2C, CAN buses)
+2. CommChannelsManager  (SPI, CAN, lazy UART — no I²C on Flux V1)
    ↓
 3. GpioManager          (depends on comms for future expansion)
    ↓
@@ -180,7 +180,7 @@ bool Shutdown() noexcept;
 All components are accessed by reference:
 
 ```cpp
-CommChannelsManager& comms;     // SPI, I2C, CAN buses
+CommChannelsManager& comms;     // SPI, CAN, UART (no I²C on Flux V1)
 GpioManager&         gpio;      // ESP32 GPIO pins
 ValveManager&        valves;    // Solenoid + proportional valve control
 AdcManager&          adc;       // ADC channels (NTC, VBUS)

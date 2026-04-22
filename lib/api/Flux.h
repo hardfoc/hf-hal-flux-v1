@@ -4,7 +4,7 @@
  *
  * @details Provides a single entry point to every subsystem on the Flux board:
  *
- *   - **comms**   — SPI (MAX22200 + TLE92466ED), I2C, CAN
+ *   - **comms**   — SPI (MAX22200 + TLE92466ED), CAN, lazy UART pool
  *   - **gpio**    — ESP32 GPIO management (control pins for both drivers)
  *   - **valves**  — Unified valve control (solenoid + proportional)
  *   - **adc**     — ESP32 ADC (NTC thermistor, VBUS monitor)
@@ -14,7 +14,7 @@
  *
  * Initialization Order (dependency-based):
  *   1. NvsManager           (flash key-value — before buses so config/cal is available early)
- *   2. CommChannelsManager  (foundation — SPI, I2C, CAN buses)
+ *   2. CommChannelsManager  (foundation — SPI, CAN, lazy UART acquisition)
  *   3. GpioManager          (depends on comms for future expansion)
  *   4. ValveManager         (depends on comms + gpio for drivers)
  *   5. AdcManager           (ESP32 internal ADC, independent)
@@ -232,7 +232,7 @@ public:
     // COMPONENT ACCESS (public references to singletons)
     //==========================================================================
 
-    CommChannelsManager& comms;     ///< SPI, I2C, CAN buses
+    CommChannelsManager& comms;     ///< SPI, CAN, UART (I²C not used on Flux V1)
     NvsManager&          nvs;       ///< NVS (`flux` / `flux_cal` / `flux_cfg`)
     GpioManager&         gpio;      ///< ESP32 GPIO pins
     ValveManager&        valves;    ///< Solenoid + proportional valve control

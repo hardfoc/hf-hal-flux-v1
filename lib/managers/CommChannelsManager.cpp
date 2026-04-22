@@ -10,16 +10,18 @@
 #include "CommChannelsManager.h"
 
 #include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/mcu/esp32/EspSpi.h"
-#include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/mcu/esp32/EspI2c.h"
 #include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/mcu/esp32/EspCan.h"
 #include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/mcu/esp32/EspUart.h"
+#ifdef HARDFOC_USB_SERIAL_JTAG_SUPPORT
+#include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/mcu/esp32/EspUsbSerialJtag.h"
+#endif
 #include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/utils/memory_utils.h"
 #include "core/hf-core-drivers/internal/hf-pincfg/src/hf_functional_pin_config_flux_v1.hpp"
 #include "handlers/logger/Logger.h"
 
 static constexpr const char* TAG = "FluxComm";
 
-// Destructor defined here where EspSpiBus, EspI2cBus, EspCan are complete types
+// Destructor defined here where EspSpiBus, EspCan, EspUart are complete types
 CommChannelsManager::~CommChannelsManager() = default;
 
 //==============================================================================
@@ -189,42 +191,14 @@ bool CommChannelsManager::Initialize() noexcept {
         }
     }
 
-    //==========================================================================
-    // I2C BUS — future expansion (e.g., EEPROM, additional sensors)
-    //==========================================================================
-    {
-        auto* sda_map = GetGpioMapping(HfFunctionalGpioPin::I2C_SDA);
-        auto* scl_map = GetGpioMapping(HfFunctionalGpioPin::I2C_SCL);
-
-        if (sda_map && scl_map) {
-            hf_i2c_master_bus_config_t i2c_cfg = {};
-            i2c_cfg.i2c_port   = I2C_NUM_0;
-            i2c_cfg.sda_io_num = static_cast<hf_pin_num_t>(sda_map->physical_pin);
-            i2c_cfg.scl_io_num = static_cast<hf_pin_num_t>(scl_map->physical_pin);
-
-            i2c_bus_ = hf::utils::make_unique_nothrow<EspI2cBus>(i2c_cfg);
-            if (i2c_bus_ && i2c_bus_->Initialize()) {
-                i2c_bus_valid_   = true;
-                Logger::GetInstance().Info(TAG, "I2C bus configured (SDA=GPIO%d, SCL=GPIO%d, 400kHz)",
-                                          sda_map->physical_pin, scl_map->physical_pin);
-            } else {
-                Logger::GetInstance().Warn(TAG, "I2C bus init failed — non-critical for Flux V1");
-                i2c_bus_.reset();
-            }
-        }
-    }
-
-    Logger::GetInstance().Info(TAG, "Flux V1 comm channels initialized (SPI=%s, CAN=%s, I2C=%s)",
+    Logger::GetInstance().Info(TAG, "Flux V1 comm channels initialized (SPI=%s, CAN=%s)",
                               spi_bus_valid_ ? "OK" : "FAIL",
-                              can_bus_valid_ ? "OK" : "FAIL",
-                              i2c_bus_valid_ ? "OK" : "FAIL");
+                              can_bus_valid_ ? "OK" : "FAIL");
 
     // If SPI failed (hard requirement), clean up any non-critical allocations
     if (!spi_bus_valid_) {
         can_bus_.reset();
         can_bus_valid_ = false;
-        i2c_bus_.reset();
-        i2c_bus_valid_ = false;
     }
 
     return spi_bus_valid_; // SPI is the only hard requirement
@@ -258,13 +232,8 @@ EspSpiBus* CommChannelsManager::GetBusForDevice(uint8_t device_index) noexcept {
 }
 
 //==============================================================================
-// I2C / CAN ACCESSORS
+// CAN ACCESSOR
 //==============================================================================
-
-EspI2cBus* CommChannelsManager::GetI2cBus() noexcept {
-    if (!initialized_.load(std::memory_order_acquire) || !i2c_bus_valid_) return nullptr;
-    return i2c_bus_.get();
-}
 
 BaseCan* CommChannelsManager::GetCanBus() noexcept {
     if (!initialized_.load(std::memory_order_acquire) || !can_bus_valid_) return nullptr;
@@ -353,6 +322,37 @@ BaseUart* CommChannelsManager::GetUart(uint8_t port_number) noexcept {
 }
 
 //==============================================================================
+// USB Serial/JTAG (lazy-acquire; underlying controller is a singleton)
+//==============================================================================
+
+BaseUsbSerialJtag* CommChannelsManager::AcquireUsbSerialJtag(
+    const hf_usb_serial_jtag_config_t& cfg) noexcept {
+#ifdef HARDFOC_USB_SERIAL_JTAG_SUPPORT
+    // Magic-static singleton — first call wins the configuration. Subsequent
+    // callers get the same instance regardless of `cfg` (matches the fact
+    // that the silicon block itself is global to the chip).
+    auto& inst = EspUsbSerialJtag::Default(cfg);
+    if (!inst.EnsureInitialized()) {
+        Logger::GetInstance().Error(TAG, "AcquireUsbSerialJtag: driver install failed");
+        UpdateLastError(CommError::INITIALIZATION_FAILED);
+        return nullptr;
+    }
+    usb_serial_jtag_ = &inst;
+    return usb_serial_jtag_;
+#else
+    // Feature disabled at HAL CMake level (HF_CORE_ENABLE_USB_SERIAL_JTAG=OFF).
+    // The API is intentionally still callable so app code doesn't need its
+    // own #ifdef — it just gets a nullptr and falls back to its UART path.
+    (void)cfg;
+    return nullptr;
+#endif
+}
+
+BaseUsbSerialJtag* CommChannelsManager::GetUsbSerialJtag() noexcept {
+    return usb_serial_jtag_;
+}
+
+//==============================================================================
 // DIAGNOSTICS
 //==============================================================================
 
@@ -363,8 +363,11 @@ void CommChannelsManager::DumpStatistics() const noexcept {
     for (uint8_t i = 0; i < kSpiDeviceCount; ++i) {
         log.Info(TAG, "  SPI device %d: idx=%d", i, spi_device_indices_[i]);
     }
-    log.Info(TAG, "  I2C bus: %s", i2c_bus_valid_ ? "OK" : "NOT CONFIGURED");
+    log.Info(TAG, "  I2C bus: not used on Flux V1");
     log.Info(TAG, "  CAN bus: %s", can_bus_valid_ ? "OK" : "NOT CONFIGURED");
+    log.Info(TAG, "  USB Serial/JTAG: %s%s",
+             usb_serial_jtag_ ? "ACQUIRED" : "NOT CONFIGURED",
+             (usb_serial_jtag_ && usb_serial_jtag_->IsHostConnected()) ? " (host connected)" : "");
     log.Info(TAG, "=== End Flux CommChannels Statistics ===");
 }
 
@@ -377,7 +380,7 @@ CommError CommChannelsManager::GetSystemDiagnostics(CommSystemDiagnostics& diagn
 
     diagnostics.system_initialized = true;
     diagnostics.spi_bus_valid = spi_bus_valid_;
-    diagnostics.i2c_bus_valid = i2c_bus_valid_;
+    diagnostics.i2c_bus_valid = false;
     diagnostics.can_bus_valid = can_bus_valid_;
     diagnostics.last_error = last_error_.load(std::memory_order_acquire);
 
@@ -408,10 +411,6 @@ bool CommChannelsManager::Deinitialize() noexcept {
     // Release SPI3 bus (ADS7952)
     spi3_bus_.reset();
     spi3_bus_valid_ = false;
-
-    // Release I2C bus
-    i2c_bus_.reset();
-    i2c_bus_valid_ = false;
 
     // Release CAN bus
     can_bus_.reset();

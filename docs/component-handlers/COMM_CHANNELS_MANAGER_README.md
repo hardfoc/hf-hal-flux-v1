@@ -4,7 +4,7 @@
 
 ![Component](https://img.shields.io/badge/component-CommChannelsManager-blue.svg)
 ![Thread Safe](https://img.shields.io/badge/thread--safe-yes-green.svg)
-![Hardware](https://img.shields.io/badge/hardware-ESP32--C6-orange.svg)
+![Hardware](https://img.shields.io/badge/hardware-ESP32--S3-orange.svg)
 
 **Unified communication bus management for the HardFOC Flux platform**
 
@@ -12,13 +12,13 @@
 
 ## 📋 Overview
 
-The `CommChannelsManager` is a singleton that initializes and manages all communication buses (SPI, I2C, CAN/TWAI) on the Flux board. It provides typed access to bus instances for use by other managers and driver handlers.
+The `CommChannelsManager` is a singleton that initializes and manages communication buses (SPI, CAN/TWAI, and lazy-acquired UART ports) on the Flux board. It provides typed access to bus instances for use by other managers and driver handlers.
 
 ### Key Features
 
-- **🔌 SPI Bus**: SPI2 with MAX22200 and TLE92466ED device connections
-- **📡 I2C Bus**: I2C master for peripheral expansion
-- **🚌 CAN/TWAI**: Controller Area Network bus for inter-board communication
+- **SPI bus**: SPI2 with MAX22200 and TLE92466ED device connections (plus optional SPI3 / ADS7952)
+- **CAN/TWAI**: Controller Area Network bus for external controllers
+- **UART**: `AcquireUart()` lazy pool for BASIS-2, FDO2, etc. (no I²C on Flux V1)
 - **🏷️ CommError Enum**: Typed error codes for all communication failures
 - **🔒 Thread-Safe**: Bus access guarded by RTOS mutexes
 
@@ -26,13 +26,14 @@ The `CommChannelsManager` is a singleton that initializes and manages all commun
 
 ```
 ┌─────────────────────────────────┐
-│       CommChannelsManager        │  ← Singleton
+│       CommChannelsManager       │  ← Singleton
 ├─────────────────────────────────┤
-│  EspSpiBus*   spi_bus_           │  ← SPI2 (MAX22200 + TLE92466ED)
-│  EspI2cBus*   i2c_bus_           │  ← I2C master
-│  EspCan*      can_bus_           │  ← CAN/TWAI
+│  EspSpiBus*   spi_bus_          │  ← SPI2 (MAX22200 + TLE92466ED)
+│  EspSpiBus*   spi3_bus_         │  ← SPI3 (ADS7952 when enabled)
+│  EspCan*      can_bus_          │  ← CAN/TWAI
+│  EspUart[]    uarts_[]          │  ← lazy UART pool (AcquireUart)
 ├─────────────────────────────────┤
-│  ESP32 SPI / I2C / TWAI HW   │
+│  ESP32 SPI / TWAI / UART HW     │
 └─────────────────────────────────┘
 ```
 
@@ -41,8 +42,9 @@ The `CommChannelsManager` is a singleton that initializes and manages all commun
 | Bus | Driver | Connected Devices |
 |-----|--------|-------------------|
 | **SPI2** | `EspSpiBus` | MAX22200 (solenoid driver), TLE92466ED (proportional driver) |
-| **I2C** | `EspI2cBus` | Peripheral expansion (placeholder) |
-| **CAN** | `EspCan` | Inter-board CAN bus communication |
+| **SPI3** | `EspSpiBus` | ADS7952 (when `HARDFOC_ADS7952_SUPPORT` is defined) |
+| **CAN** | `EspCan` | External CAN devices (e.g. compressor controller) |
+| **UART** | `EspUart` via `AcquireUart` | Serial sensors (BASIS-2, FDO2, …) |
 
 ## 🔧 API Reference
 
@@ -59,9 +61,6 @@ bool ok = comm.EnsureInitialized();
 // SPI bus for valve driver communication
 EspSpiBus* spi = comm.GetSpiBus();
 
-// I2C bus
-EspI2cBus* i2c = comm.GetI2cBus();
-
 // CAN bus
 EspCan* can = comm.GetCanBus();
 ```
@@ -70,7 +69,7 @@ EspCan* can = comm.GetCanBus();
 
 ```cpp
 // CommError enum for typed error handling
-CommError err = comm.CreateI2cDevice(/* ... */);
+CommError err = comm.CreateSpiDevice(/* ... */);
 if (err != CommError::SUCCESS) {
     // Handle error
 }
