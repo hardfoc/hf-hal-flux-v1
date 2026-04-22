@@ -64,7 +64,7 @@ static bool phase_boot() {
 
     // Check per-component initialization status
     auto status = flux.GetComponentInitializationStatus();
-    const char* names[] = {"CommChannels", "GPIO", "Valves", "ADC", "LEDs", "Temperature"};
+    const char* names[] = {"NVS", "CommChannels", "GPIO", "Valves", "ADC", "LEDs", "Temperature"};
     for (size_t i = 0; i < status.size(); ++i) {
         ESP_LOGI(TAG, "  %-15s: %s", names[i], status[i] ? "OK" : "FAILED");
     }

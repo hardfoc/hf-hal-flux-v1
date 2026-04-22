@@ -10,14 +10,16 @@
  *   - **adc**     — ESP32 ADC (NTC thermistor, VBUS monitor)
  *   - **leds**    — Single WS2812 status LED
  *   - **temp**    — Temperature (ESP32 internal + NTC thermistor)
+ *   - **nvs**     — Non-volatile storage (`BaseNvs` / ESP-IDF NVS namespaces)
  *
  * Initialization Order (dependency-based):
- *   1. CommChannelsManager  (foundation — SPI, I2C, CAN buses)
- *   2. GpioManager          (depends on comms for future expansion)
- *   3. ValveManager         (depends on comms + gpio for drivers)
- *   4. AdcManager           (ESP32 internal ADC, independent)
- *   5. LedManager           (WS2812, independent)
- *   6. TemperatureManager   (depends on ADC)
+ *   1. NvsManager           (flash key-value — before buses so config/cal is available early)
+ *   2. CommChannelsManager  (foundation — SPI, I2C, CAN buses)
+ *   3. GpioManager          (depends on comms for future expansion)
+ *   4. ValveManager         (depends on comms + gpio for drivers)
+ *   5. AdcManager           (ESP32 internal ADC, independent)
+ *   6. LedManager           (WS2812, independent)
+ *   7. TemperatureManager   (depends on ADC)
  *
  * Usage:
  * @code
@@ -40,6 +42,7 @@
 
 #include <array>
 #include <atomic>
+#include <cstddef>
 #include <cstring>
 
 #include "FluxVersion.h"
@@ -47,11 +50,15 @@
 
 // Forward declarations
 class CommChannelsManager;
+class NvsManager;
 class GpioManager;
 class ValveManager;
 class AdcManager;
 class LedManager;
 class TemperatureManager;
+
+/** @brief Number of Flux subsystem managers exposed on `Flux` (incl. NVS). */
+inline constexpr size_t kFluxManagerCount = 7;
 
 //==============================================================================
 // FLUX SYSTEM DIAGNOSTICS
@@ -60,6 +67,7 @@ class TemperatureManager;
 /** @brief Complete system diagnostics snapshot for the Flux API. */
 struct FluxSystemDiagnostics {
     bool system_healthy;           ///< true when all components are initialised.
+    bool nvs_initialized;           ///< NvsManager ready.
     bool comms_initialized;        ///< CommChannelsManager ready.
     bool gpio_initialized;         ///< GpioManager ready.
     bool valves_initialized;       ///< ValveManager ready.
@@ -67,22 +75,23 @@ struct FluxSystemDiagnostics {
     bool leds_initialized;         ///< LedManager ready.
     bool temp_initialized;         ///< TemperatureManager ready.
 
-    uint32_t total_components;         ///< Total number of managed components (6).
+    uint32_t total_components;         ///< Total number of managed components (`kFluxManagerCount`).
     uint32_t initialized_components;   ///< Components that initialised successfully.
     uint32_t failed_components;        ///< Components that failed to initialise.
 
     uint64_t initialization_time_ms;   ///< Time taken to initialise all components.
     uint64_t system_uptime_ms;         ///< Milliseconds since first initialisation.
 
-    static constexpr size_t kMaxDiagEntries = 6;  ///< Max failed-component names.
+    static constexpr size_t kMaxDiagEntries = kFluxManagerCount;  ///< Max failed-component names.
     const char* failed_components_list[kMaxDiagEntries]{}; ///< Names of failed components.
     size_t failed_components_list_count{0};                ///< Count of entries in list.
 
     /** @brief Default constructor — all fields zeroed / false. */
     FluxSystemDiagnostics() noexcept
-        : system_healthy(false), comms_initialized(false), gpio_initialized(false),
+        : system_healthy(false), nvs_initialized(false), comms_initialized(false), gpio_initialized(false),
           valves_initialized(false), adc_initialized(false), leds_initialized(false),
-          temp_initialized(false), total_components(6), initialized_components(0),
+          temp_initialized(false), total_components(static_cast<uint32_t>(kFluxManagerCount)),
+          initialized_components(0),
           failed_components(0), initialization_time_ms(0), system_uptime_ms(0) {}
 };
 
@@ -111,6 +120,7 @@ struct ManagerHealthEntry {
  *          of the originating manager's error enum.
  *
  * Supported error sources per manager:
+ *   NVS           — hf_nvs_err_t via GetLastError()
  *   CommChannels  — CommError via GetLastError()
  *   GPIO          — hf_gpio_err_t via GetLastError()
  *   Valves        — hf_valve_err_t via GetLastError()
@@ -119,7 +129,7 @@ struct ManagerHealthEntry {
  *   Temperature   — TemperatureError via GetLastError()
  */
 struct ManagerHealthSnapshot {
-    static constexpr size_t kMaxManagers = 6;
+    static constexpr size_t kMaxManagers = kFluxManagerCount;
 
     ManagerHealthEntry entries[kMaxManagers];    ///< Per-manager entries
     size_t count;                                ///< Number of populated entries
@@ -138,7 +148,7 @@ struct ManagerHealthSnapshot {
  * @class Flux
  * @brief Unified singleton entry point for the HardFOC Flux V1 platform.
  *
- * @details Orchestrates initialisation of all subsystem managers (Comms, GPIO,
+ * @details Orchestrates initialisation of all subsystem managers (NVS, Comms, GPIO,
  *          Valves, ADC, LED, Temperature) in deterministic order and exposes
  *          them as public reference members for direct access.  Provides
  *          system-level diagnostics, health checking, graceful shutdown, and
@@ -190,9 +200,9 @@ public:
 
     /**
      * @brief Per-component init status as a bool array.
-     * @return Array of 6 booleans: [comms, gpio, valves, adc, leds, temp].
+     * @return Array of 7 booleans: [nvs, comms, gpio, valves, adc, leds, temp].
      */
-    [[nodiscard]] std::array<bool, 6> GetComponentInitializationStatus() const noexcept;
+    [[nodiscard]] std::array<bool, kFluxManagerCount> GetComponentInitializationStatus() const noexcept;
 
     /**
      * @brief Get the list of components that failed initialization.
@@ -223,6 +233,7 @@ public:
     //==========================================================================
 
     CommChannelsManager& comms;     ///< SPI, I2C, CAN buses
+    NvsManager&          nvs;       ///< NVS (`flux` / `flux_cal` / `flux_cfg`)
     GpioManager&         gpio;      ///< ESP32 GPIO pins
     ValveManager&        valves;    ///< Solenoid + proportional valve control
     AdcManager&          adc;       ///< ADC channels (NTC, VBUS)
@@ -275,6 +286,7 @@ private:
     std::atomic<uint64_t> initialization_start_time_{0};
     std::atomic<uint64_t> initialization_end_time_{0};
 
+    std::atomic<bool> nvs_initialized_{false};
     std::atomic<bool> comms_initialized_{false};
     std::atomic<bool> gpio_initialized_{false};
     std::atomic<bool> valves_initialized_{false};
@@ -284,7 +296,7 @@ private:
 
     mutable FluxSystemDiagnostics diagnostics_;
 
-    static constexpr size_t kMaxFailedComponents = 6;
+    static constexpr size_t kMaxFailedComponents = kFluxManagerCount;
     const char* failed_components_[kMaxFailedComponents]{};
     size_t failed_components_count_{0};
 

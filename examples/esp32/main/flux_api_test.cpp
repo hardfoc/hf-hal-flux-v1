@@ -85,8 +85,8 @@ static bool test_get_system_diagnostics() noexcept {
   bool ok = flux.GetSystemDiagnostics(diag);
   if (!ok) return false;
 
-  // total_components should be 6 for Flux
-  if (diag.total_components != 6) return false;
+  // total_components matches Flux manager count (incl. NVS)
+  if (diag.total_components != kFluxManagerCount) return false;
   if (diag.initialized_components > diag.total_components) return false;
 
   return true;
@@ -97,8 +97,7 @@ static bool test_component_init_status() noexcept {
   flux.EnsureInitialized();
 
   auto status = flux.GetComponentInitializationStatus();
-  // Should return exactly 6 entries
-  return (status.size() == 6);
+  return (status.size() == kFluxManagerCount);
 }
 
 static bool test_perform_health_check() noexcept {
@@ -116,8 +115,7 @@ static bool test_collect_manager_health() noexcept {
   bool ok = flux.CollectManagerHealth(health);
   if (!ok) return false;
 
-  // Should report 6 managers for Flux
-  if (health.count != 6) return false;
+  if (health.count != kFluxManagerCount) return false;
 
   // Every entry should have a non-null name
   for (size_t i = 0; i < health.count; ++i) {

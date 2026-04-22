@@ -46,8 +46,9 @@ set(API_SOURCES
     "${HF_HAL_ROOT}/lib/api/Flux.cpp"
 )
 
-# Manager Sources (6 managers)
+# Manager Sources (7 managers)
 set(MANAGER_SOURCES
+    "${HF_HAL_ROOT}/lib/managers/NvsManager.cpp"
     "${HF_HAL_ROOT}/lib/managers/CommChannelsManager.cpp"
     "${HF_HAL_ROOT}/lib/managers/GpioManager.cpp"
     "${HF_HAL_ROOT}/lib/managers/AdcManager.cpp"

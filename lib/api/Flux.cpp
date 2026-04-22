@@ -9,6 +9,7 @@
 
 #include "Flux.h"
 
+#include "managers/NvsManager.h"
 #include "managers/CommChannelsManager.h"
 #include "managers/GpioManager.h"
 #include "managers/ValveManager.h"
@@ -35,6 +36,7 @@ Flux& Flux::GetInstance() noexcept {
 
 Flux::Flux() noexcept
     : comms(CommChannelsManager::GetInstance()),
+      nvs(NvsManager::GetInstance()),
       gpio(GpioManager::GetInstance()),
       valves(ValveManager::GetInstance()),
       adc(AdcManager::GetInstance()),
@@ -65,7 +67,8 @@ bool Flux::EnsureInitialized() noexcept {
 
         uint64_t dt = GetInitializationTimeMs();
         Logger::GetInstance().Info(TAG, "Flux API initialized in %llu ms", dt);
-        Logger::GetInstance().Info(TAG, "  Comms=%s GPIO=%s Valves=%s ADC=%s LEDs=%s Temp=%s",
+        Logger::GetInstance().Info(TAG, "  NVS=%s Comms=%s GPIO=%s Valves=%s ADC=%s LEDs=%s Temp=%s",
+            nvs_initialized_    ? "OK" : "FAIL",
             comms_initialized_  ? "OK" : "FAIL",
             gpio_initialized_   ? "OK" : "FAIL",
             valves_initialized_ ? "OK" : "FAIL",
@@ -82,40 +85,54 @@ bool Flux::EnsureInitialized() noexcept {
 bool Flux::InitializeAllComponents() noexcept {
     Logger::GetInstance().Info(TAG, "Initializing Flux components in dependency order");
 
-    // Step 1: Communication buses (must be first)
+    // Step 1: NVS (flash storage — before buses for early config/calibration access)
+    if (!InitializeNvs()) {
+        Logger::GetInstance().Error(TAG, "NVS failed — aborting");
+        return false;
+    }
+
+    // Step 2: Communication buses
     if (!InitializeComms()) {
         Logger::GetInstance().Error(TAG, "CommChannels failed — aborting");
         return false;
     }
 
-    // Step 2: GPIO (depends on comms for future expansion)
+    // Step 3: GPIO (depends on comms for future expansion)
     if (!InitializeGpio()) {
         Logger::GetInstance().Error(TAG, "GPIO failed — aborting");
         return false;
     }
 
-    // Step 3: Valves (depends on comms + gpio)
+    // Step 4: Valves (depends on comms + gpio)
     if (!InitializeValves()) {
         Logger::GetInstance().Warn(TAG, "Valve init failed — continuing");
     }
 
-    // Step 4: ADC (independent)
+    // Step 5: ADC (independent)
     if (!InitializeAdc()) {
         Logger::GetInstance().Warn(TAG, "ADC init failed — continuing");
     }
 
-    // Step 5: LEDs (independent)
+    // Step 6: LEDs (independent)
     if (!InitializeLeds()) {
         Logger::GetInstance().Warn(TAG, "LED init failed — continuing");
     }
 
-    // Step 6: Temperature (depends on ADC)
+    // Step 7: Temperature (depends on ADC)
     if (!InitializeTemperature()) {
         Logger::GetInstance().Warn(TAG, "Temperature init failed — continuing");
     }
 
     Logger::GetInstance().Info(TAG, "Component initialization complete");
     return true;
+}
+
+bool Flux::InitializeNvs() noexcept {
+    bool ok = nvs.EnsureInitialized();
+    nvs_initialized_ = ok;
+    if (!ok && failed_components_count_ < kMaxFailedComponents)
+        failed_components_[failed_components_count_++] = "NvsManager";
+    return ok;
 }
 
 bool Flux::InitializeComms() noexcept {
@@ -177,8 +194,9 @@ bool Flux::GetSystemDiagnostics(FluxSystemDiagnostics& d) const noexcept {
     return true;
 }
 
-std::array<bool, 6> Flux::GetComponentInitializationStatus() const noexcept {
+std::array<bool, kFluxManagerCount> Flux::GetComponentInitializationStatus() const noexcept {
     return {{
+        nvs_initialized_.load(),
         comms_initialized_.load(),
         gpio_initialized_.load(),
         valves_initialized_.load(),
@@ -202,7 +220,7 @@ bool Flux::CollectManagerHealth(ManagerHealthSnapshot& snapshot) noexcept {
     if (!initialized_) return false;
 
     snapshot = ManagerHealthSnapshot{};
-    snapshot.count = 6;
+    snapshot.count = kFluxManagerCount;
     snapshot.all_healthy = true;
     snapshot.managers_with_errors = 0;
 
@@ -220,28 +238,32 @@ bool Flux::CollectManagerHealth(ManagerHealthSnapshot& snapshot) noexcept {
         }
     };
 
-    // 1. CommChannelsManager — direct GetLastError()
-    addEntry(0, "CommChannels", comms_initialized_.load(),
+    // 1. NVS — hf_nvs_err_t
+    addEntry(0, "NVS", nvs_initialized_.load(),
+             static_cast<uint8_t>(nvs.GetLastError()));
+
+    // 2. CommChannelsManager — direct GetLastError()
+    addEntry(1, "CommChannels", comms_initialized_.load(),
              static_cast<uint8_t>(comms.GetLastError()));
 
-    // 2. GPIO — GetLastError()
-    addEntry(1, "GPIO",        gpio_initialized_.load(),
+    // 3. GPIO — GetLastError()
+    addEntry(2, "GPIO",        gpio_initialized_.load(),
              static_cast<uint8_t>(gpio.GetLastError()));
 
-    // 3. Valves — GetLastError()
-    addEntry(2, "Valves",      valves_initialized_.load(),
+    // 4. Valves — GetLastError()
+    addEntry(3, "Valves",      valves_initialized_.load(),
              static_cast<uint8_t>(valves.GetLastError()));
 
-    // 4. ADC — GetLastError()
-    addEntry(3, "ADC",         adc_initialized_.load(),
+    // 5. ADC — GetLastError()
+    addEntry(4, "ADC",         adc_initialized_.load(),
              static_cast<uint8_t>(adc.GetLastError()));
 
-    // 5. LEDs — GetLastError()
-    addEntry(4, "LEDs",        leds_initialized_.load(),
+    // 6. LEDs — GetLastError()
+    addEntry(5, "LEDs",        leds_initialized_.load(),
              static_cast<uint8_t>(leds.GetLastError()));
 
-    // 6. Temperature — GetLastError()
-    addEntry(5, "Temperature", temp_initialized_.load(),
+    // 7. Temperature — GetLastError()
+    addEntry(6, "Temperature", temp_initialized_.load(),
              static_cast<uint8_t>(temp.GetLastError()));
 
     return true;
@@ -259,6 +281,7 @@ void Flux::DumpSystemStatistics() const noexcept {
     Logger::GetInstance().Info(TAG, "Uptime: %llu ms  Init time: %llu ms",
                               GetSystemUptimeMs(), GetInitializationTimeMs());
 
+    nvs.DumpStatistics();
     comms.DumpStatistics();
     gpio.DumpStatistics();
     valves.DumpStatistics();
@@ -301,6 +324,7 @@ const char* Flux::GetSystemVersion() const noexcept {
 }
 
 void Flux::UpdateSystemDiagnostics() noexcept {
+    diagnostics_.nvs_initialized   = nvs_initialized_;
     diagnostics_.comms_initialized = comms_initialized_;
     diagnostics_.gpio_initialized  = gpio_initialized_;
     diagnostics_.valves_initialized = valves_initialized_;
@@ -309,6 +333,7 @@ void Flux::UpdateSystemDiagnostics() noexcept {
     diagnostics_.temp_initialized  = temp_initialized_;
 
     diagnostics_.initialized_components = 0;
+    if (nvs_initialized_)    ++diagnostics_.initialized_components;
     if (comms_initialized_)  ++diagnostics_.initialized_components;
     if (gpio_initialized_)   ++diagnostics_.initialized_components;
     if (valves_initialized_) ++diagnostics_.initialized_components;
@@ -336,13 +361,14 @@ bool Flux::Shutdown() noexcept {
 
     Logger::GetInstance().Info(TAG, "Shutting down Flux API");
 
-    // Reverse initialization order: Temp → LEDs → ADC → Valves → GPIO → Comms
+    // Reverse initialization order: Temp → LEDs → ADC → Valves → GPIO → Comms → NVS
     temp.Deinitialize();
     leds.Deinitialize();
     adc.Deinitialize();
     // ValveManager does not have Deinitialize yet — skip
     gpio.Deinitialize();
     comms.Deinitialize();
+    nvs.Deinitialize();
 
     temp_initialized_   = false;
     leds_initialized_   = false;
@@ -350,6 +376,7 @@ bool Flux::Shutdown() noexcept {
     valves_initialized_ = false;
     gpio_initialized_   = false;
     comms_initialized_  = false;
+    nvs_initialized_    = false;
     initialized_        = false;
 
     Logger::GetInstance().Info(TAG, "Flux API shut down complete");

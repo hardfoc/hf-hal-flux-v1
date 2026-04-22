@@ -23,17 +23,19 @@ exposing them to the application.
 The initialization order is carefully managed to handle dependencies:
 
 ```
-1. CommChannelsManager  (foundation — SPI, I2C, CAN buses)
+1. NvsManager           (ESP-IDF NVS — `flux` / `flux_cal` / `flux_cfg` namespaces)
    ↓
-2. GpioManager          (depends on comms for future expansion)
+2. CommChannelsManager  (SPI, I2C, CAN buses)
    ↓
-3. ValveManager         (depends on comms + gpio for drivers)
+3. GpioManager          (depends on comms for future expansion)
    ↓
-4. AdcManager           (ESP32 internal ADC, independent)
+4. ValveManager         (depends on comms + gpio for drivers)
    ↓
-5. LedManager           (WS2812, independent)
+5. AdcManager           (ESP32 internal ADC, independent)
    ↓
-6. TemperatureManager   (depends on ADC)
+6. LedManager           (WS2812, independent)
+   ↓
+7. TemperatureManager   (depends on ADC)
 ```
 
 ## Quick Start
@@ -42,12 +44,17 @@ The initialization order is carefully managed to handle dependencies:
 
 ```cpp
 #include "api/Flux.h"
+#include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/base/BaseNvs.h"
 
 // Get the Flux API instance
 auto& flux = Flux::GetInstance();
 
 // Ensure all systems are initialized
 if (flux.EnsureInitialized()) {
+    // Non-volatile storage (BaseNvs — calibration, config, app keys)
+    BaseNvs& cal = flux.nvs.Calibration();
+    (void)cal.KeyExists("my_cal_key");
+
     // Access communication channels
     auto& comms = flux.comms;
 
@@ -185,7 +192,7 @@ TemperatureManager&  temp;      // Temperature sensors
 
 ```cpp
 bool GetSystemDiagnostics(FluxSystemDiagnostics& diagnostics) const noexcept;
-std::array<bool, 6> GetComponentInitializationStatus() const noexcept;
+std::array<bool, kFluxManagerCount> GetComponentInitializationStatus() const noexcept;
 size_t GetFailedComponents(const char* out[], size_t max_count) const noexcept;
 size_t GetSystemWarnings(const char* out[], size_t max_count) const noexcept;
 bool CollectManagerHealth(ManagerHealthSnapshot& snapshot) noexcept;
@@ -223,6 +230,7 @@ Equivalent to `Flux::GetInstance()`.
 ```cpp
 struct FluxSystemDiagnostics {
     bool system_healthy;
+    bool nvs_initialized;
     bool comms_initialized;
     bool gpio_initialized;
     bool valves_initialized;
@@ -230,14 +238,14 @@ struct FluxSystemDiagnostics {
     bool leds_initialized;
     bool temp_initialized;
 
-    uint32_t total_components;
+    uint32_t total_components;  // equals kFluxManagerCount (7)
     uint32_t initialized_components;
     uint32_t failed_components;
 
     uint64_t initialization_time_ms;
     uint64_t system_uptime_ms;
 
-    const char* failed_components_list[6];
+    const char* failed_components_list[kFluxManagerCount];
     size_t failed_components_list_count;
 };
 ```
@@ -246,7 +254,7 @@ struct FluxSystemDiagnostics {
 
 ```cpp
 struct ManagerHealthSnapshot {
-    ManagerHealthEntry entries[6];
+    ManagerHealthEntry entries[kFluxManagerCount];
     size_t count;
     size_t managers_with_errors;
     bool all_healthy;
