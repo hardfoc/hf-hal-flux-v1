@@ -11,6 +11,7 @@ that can be built and flashed independently using the `build_app.sh` script.
 | App Type | Source File | Description |
 |---|---|---|
 | `flux_api_test` | `flux_api_test.cpp` | Full Flux API initialization and diagnostics |
+| `flux_nvs_example` | `flux_nvs_example.cpp` | **NVS / `NvsManager`** — `flux` / `flux_cal` / `flux_cfg`, boot counter, blob, string |
 
 ## Quick Start
 
@@ -18,7 +19,11 @@ that can be built and flashed independently using the `build_app.sh` script.
 # Build the default example
 ./scripts/build_app.sh flux_api_test Release
 
-# Flash to device
+# Build & flash the NVS example (ESP32-S3)
+./scripts/build_app.sh flux_nvs_example Debug
+./scripts/flash_app.sh flash_monitor flux_nvs_example Debug
+
+# Flash to device (uses last build / env port)
 ./scripts/flash_app.sh
 
 # List all available examples

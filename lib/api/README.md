@@ -280,6 +280,12 @@ struct ManagerHealthSnapshot {
 - **Initialization**: Thread-safe with atomic operations
 - **Component Access**: Depends on individual component implementations
 
+## NVS example (ESP32-S3)
+
+See `examples/esp32/main/flux_nvs_example.cpp` — build and flash with:
+
+`./scripts/build_app.sh flux_nvs_example Debug` then `./scripts/flash_app.sh flash_monitor flux_nvs_example Debug` from `examples/esp32/`.
+
 ## Related Documentation
 
 - [Valve Manager](../../docs/component-handlers/VALVE_MANAGER_README.md)

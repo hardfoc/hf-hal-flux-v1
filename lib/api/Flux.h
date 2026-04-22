@@ -270,6 +270,7 @@ private:
     ~Flux() = default;
 
     bool InitializeAllComponents() noexcept;
+    bool InitializeNvs() noexcept;
     bool InitializeComms() noexcept;
     bool InitializeGpio() noexcept;
     bool InitializeValves() noexcept;

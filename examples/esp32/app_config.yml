@@ -11,6 +11,11 @@ apps:
     source_file: "flux_api_test.cpp"
     category: "system"
     ci_enabled: true
+  flux_nvs_example:
+    source_file: "flux_nvs_example.cpp"
+    category: "example"
+    description: "Flux NvsManager — App/Cal/Config namespaces, boot counter, blob, string"
+    ci_enabled: true
   valve_cycling_test:
     source_file: "valve_cycling_test.cpp"
     category: "component"
