@@ -250,6 +250,54 @@ public:
     /** @brief Time in ms that the initialisation sequence took to complete. */
     [[nodiscard]] uint64_t GetInitializationTimeMs() const noexcept;
 
+    //==========================================================================
+    // SYSTEM CONTROL (MCU-agnostic wrappers)
+    //==========================================================================
+
+    /**
+     * @brief Reset reason of the **previous** boot, opaque to callers.
+     *
+     * Wraps `esp_reset_reason()` on ESP32 today; on other MCUs an
+     * equivalent vendor enum will back this. Apps treat the return as
+     * an opaque `uint32_t` they can persist to NVS or print verbatim;
+     * decoding is platform-specific and lives in HAL utilities.
+     *
+     * @return Vendor-specific reset cause (`esp_reset_reason_t`-shaped
+     *         on ESP32; 0 on the unsupported test stub).
+     */
+    [[nodiscard]] uint32_t GetLastResetReason() const noexcept;
+
+    /**
+     * @brief Free bytes available in the default heap.
+     *
+     * Wraps `heap_caps_get_free_size(MALLOC_CAP_DEFAULT)` on ESP32.
+     * Useful for diagnostic logging on thread-start failures (e.g.
+     * `xTaskCreate` returning false often correlates with heap
+     * exhaustion). Returns 0 on the unsupported test stub.
+     */
+    [[nodiscard]] uint32_t GetFreeHeapBytes() const noexcept;
+
+    /**
+     * @brief Largest contiguous free block in the default heap.
+     *
+     * Wraps `heap_caps_get_largest_free_block(MALLOC_CAP_DEFAULT)` on
+     * ESP32. Combined with `GetFreeHeapBytes()` it tells you whether
+     * the heap is fragmented (free total >> largest block) or simply
+     * exhausted.
+     */
+    [[nodiscard]] uint32_t GetLargestFreeHeapBlock() const noexcept;
+
+    /**
+     * @brief Trigger a software reset of the MCU. Does not return on
+     *        success.
+     *
+     * Wraps `esp_restart()` on ESP32. Apps call this from supervisor
+     * paths (e.g. `app_main`'s recovery loop) when something has gone
+     * unrecoverably wrong. The HAL closes/flushes nothing here — the
+     * caller is responsible for any pre-reboot logging or NVS commit.
+     */
+    [[noreturn]] void SystemRestart() const noexcept;
+
     /** @brief Log a comprehensive system summary to the console. */
     void DumpSystemStatistics() const noexcept;
 

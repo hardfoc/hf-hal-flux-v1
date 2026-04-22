@@ -19,6 +19,9 @@
 
 #include "core/hf-core-utils/hf-utils-rtos-wrap/include/OsUtility.h"
 
+#include "esp_system.h"
+#include "esp_heap_caps.h"
+
 static constexpr const char* TAG = "Flux";
 
 //==============================================================================
@@ -214,6 +217,28 @@ uint64_t Flux::GetInitializationTimeMs() const noexcept {
     uint64_t s = initialization_start_time_.load();
     uint64_t e = initialization_end_time_.load();
     return (s && e && e >= s) ? (e - s) : 0;
+}
+
+//==============================================================================
+// SYSTEM CONTROL (MCU-agnostic wrappers around vendor reset / restart APIs)
+//==============================================================================
+
+uint32_t Flux::GetLastResetReason() const noexcept {
+    return static_cast<uint32_t>(esp_reset_reason());
+}
+
+void Flux::SystemRestart() const noexcept {
+    Logger::GetInstance().Warn(TAG, "Flux::SystemRestart() — rebooting");
+    esp_restart();
+    while (true) { /* unreachable */ }
+}
+
+uint32_t Flux::GetFreeHeapBytes() const noexcept {
+    return static_cast<uint32_t>(heap_caps_get_free_size(MALLOC_CAP_DEFAULT));
+}
+
+uint32_t Flux::GetLargestFreeHeapBlock() const noexcept {
+    return static_cast<uint32_t>(heap_caps_get_largest_free_block(MALLOC_CAP_DEFAULT));
 }
 
 bool Flux::CollectManagerHealth(ManagerHealthSnapshot& snapshot) noexcept {
