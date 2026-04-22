@@ -12,6 +12,7 @@
 #include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/mcu/esp32/EspSpi.h"
 #include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/mcu/esp32/EspI2c.h"
 #include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/mcu/esp32/EspCan.h"
+#include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/mcu/esp32/EspUart.h"
 #include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/utils/memory_utils.h"
 #include "core/hf-core-drivers/internal/hf-pincfg/src/hf_functional_pin_config_flux_v1.hpp"
 #include "handlers/logger/Logger.h"
@@ -268,6 +269,87 @@ EspI2cBus* CommChannelsManager::GetI2cBus() noexcept {
 BaseCan* CommChannelsManager::GetCanBus() noexcept {
     if (!initialized_.load(std::memory_order_acquire) || !can_bus_valid_) return nullptr;
     return can_bus_.get();
+}
+
+//==============================================================================
+// UART ACCESSORS — lazy-acquire pool (one slot per ESP32 hardware port).
+//
+// Pre-allocating UART ports at HAL bring-up (the way SPI / CAN are done)
+// would force the HAL to know app-level pin assignments per product. The
+// `AcquireUart` lazy pattern keeps the HAL board-agnostic for serial
+// peripherals while still owning the port: apps describe which port +
+// pins + baud they want, the HAL constructs and caches the EspUart
+// instance, and apps consume the returned `BaseUart&` for their device
+// driver. RS-485 half-duplex is enabled automatically when `rts_pin >=
+// 0`.
+//==============================================================================
+
+BaseUart* CommChannelsManager::AcquireUart(const UartAcquireConfig& cfg) noexcept {
+    if (cfg.port_number >= kMaxUartPorts) {
+        Logger::GetInstance().Error(TAG, "AcquireUart: port_number %u out of range",
+                                    static_cast<unsigned>(cfg.port_number));
+        UpdateLastError(CommError::INVALID_PARAMETER);
+        return nullptr;
+    }
+
+    MutexLockGuard lock(mutex_);
+
+    // Already acquired? Return cached instance (config changes ignored).
+    if (uarts_[cfg.port_number]) {
+        return uarts_[cfg.port_number].get();
+    }
+
+    hf_uart_config_t uart_cfg{};
+    uart_cfg.port_number    = static_cast<hf_port_num_t>(cfg.port_number);
+    uart_cfg.baud_rate      = cfg.baud_bps;
+    uart_cfg.tx_pin         = static_cast<hf_pin_num_t>(cfg.tx_pin);
+    uart_cfg.rx_pin         = static_cast<hf_pin_num_t>(cfg.rx_pin);
+    uart_cfg.rts_pin        = static_cast<hf_pin_num_t>(cfg.rts_pin);
+    uart_cfg.cts_pin        = static_cast<hf_pin_num_t>(cfg.cts_pin);
+    uart_cfg.data_bits      = hf_uart_data_bits_t::HF_UART_DATA_8_BITS;
+    uart_cfg.parity         = hf_uart_parity_t::HF_UART_PARITY_DISABLE;
+    uart_cfg.stop_bits      = hf_uart_stop_bits_t::HF_UART_STOP_BITS_1;
+    uart_cfg.flow_control   = hf_uart_flow_ctrl_t::HF_UART_HW_FLOWCTRL_DISABLE;
+    uart_cfg.tx_buffer_size = cfg.tx_buffer_size;
+    uart_cfg.rx_buffer_size = cfg.rx_buffer_size;
+
+    auto u = hf::utils::make_unique_nothrow<EspUart>(uart_cfg);
+    if (!u || !u->EnsureInitialized()) {
+        Logger::GetInstance().Error(TAG, "AcquireUart: EspUart init failed (port=%u tx=%d rx=%d baud=%lu)",
+                                    static_cast<unsigned>(cfg.port_number),
+                                    static_cast<int>(cfg.tx_pin),
+                                    static_cast<int>(cfg.rx_pin),
+                                    static_cast<unsigned long>(cfg.baud_bps));
+        UpdateLastError(CommError::INITIALIZATION_FAILED);
+        return nullptr;
+    }
+
+    if (cfg.rts_pin >= 0) {
+        const auto rs485_err = u->SetCommunicationMode(hf_uart_mode_t::HF_UART_MODE_RS485);
+        if (rs485_err != hf_uart_err_t::UART_SUCCESS) {
+            Logger::GetInstance().Warn(TAG, "AcquireUart: RS-485 mode switch failed for port %u (continuing as plain UART)",
+                                       static_cast<unsigned>(cfg.port_number));
+        } else {
+            Logger::GetInstance().Info(TAG, "UART%u in RS-485 half-duplex (DE/RE=GPIO%d) @ %lu bps",
+                                       static_cast<unsigned>(cfg.port_number),
+                                       static_cast<int>(cfg.rts_pin),
+                                       static_cast<unsigned long>(cfg.baud_bps));
+        }
+    } else {
+        Logger::GetInstance().Info(TAG, "UART%u plain mode TX=%d RX=%d @ %lu bps",
+                                   static_cast<unsigned>(cfg.port_number),
+                                   static_cast<int>(cfg.tx_pin),
+                                   static_cast<int>(cfg.rx_pin),
+                                   static_cast<unsigned long>(cfg.baud_bps));
+    }
+
+    uarts_[cfg.port_number] = std::move(u);
+    return uarts_[cfg.port_number].get();
+}
+
+BaseUart* CommChannelsManager::GetUart(uint8_t port_number) noexcept {
+    if (port_number >= kMaxUartPorts) return nullptr;
+    return uarts_[port_number].get();
 }
 
 //==============================================================================

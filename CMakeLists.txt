@@ -30,6 +30,7 @@ set(HF_CORE_ENABLE_LOGGER         ON)   # Logging system
 set(HF_CORE_ENABLE_CAN            ON)   # CAN/TWAI bus (CommChannelsManager)
 set(HF_CORE_ENABLE_ADS7952        ON)   # SPI 12-ch ADC (ADS7952)
 set(HF_CORE_ENABLE_ALICAT_BASIS2  ON)   # UART RS-485 mass-flow meter (Alicat BASIS-2)
+set(HF_CORE_ENABLE_FDO2           ON)   # UART optical oxygen probe (PyroScience FDO2-G2)
 
 # ── Optional Utilities ────────────────────────────────────────────────────
 set(HF_CORE_ENABLE_UTILS_CANOPEN  ON)   # CANopen protocol helpers

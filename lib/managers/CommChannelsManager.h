@@ -30,13 +30,16 @@ class EspSpiBus;
 class EspSpiDevice;
 class EspI2cBus;
 class EspCan;
+class EspUart;
 class BaseSpi;
 class BaseI2c;
 class BaseCan;
+class BaseUart;
 
 #include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/base/BaseSpi.h"
 #include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/base/BaseI2c.h"
 #include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/base/BaseCan.h"
+#include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/base/BaseUart.h"
 #include "RtosMutex.h"
 
 //==============================================================================
@@ -219,6 +222,52 @@ public:
     BaseCan* GetCanBus() noexcept;
 
     //==========================================================================
+    // UART ACCESSORS
+    //==========================================================================
+
+    /**
+     * @brief Lazy-acquire configuration for an ESP32 UART port.
+     *
+     * Apps that own a serial sensor (BASIS-2, FDO2, …) supply this to
+     * `AcquireUart()`. The HAL owns the port; the app owns the device
+     * driver layered on top of the returned `BaseUart&`.
+     */
+    struct UartAcquireConfig {
+        uint8_t  port_number;       ///< ESP32 UART port (0/1/2)
+        int16_t  tx_pin;            ///< GPIO; -1 to skip pin assignment.
+        int16_t  rx_pin;            ///< GPIO; -1 to skip pin assignment.
+        int16_t  rts_pin;           ///< -1 = plain UART, else RS-485 DE/RE.
+        int16_t  cts_pin;           ///< -1 = no CTS (typical).
+        uint32_t baud_bps;
+        uint16_t tx_buffer_size;
+        uint16_t rx_buffer_size;
+    };
+
+    /// Maximum number of UART ports the manager will track (one slot per
+    /// ESP32-S3 hardware UART; UART0 is normally the IDF console, UART2
+    /// the operator console — pick a free port for app use).
+    static constexpr uint8_t kMaxUartPorts = 3;
+
+    /**
+     * @brief Acquire (lazy-create + cache) a UART on the given ESP32 port.
+     *
+     * First call wins the configuration; subsequent calls with the same
+     * `port_number` return the cached `BaseUart&` and ignore further
+     * config requests (a warning is logged if the new config differs from
+     * what was cached). Returns nullptr on configuration error.
+     *
+     * RS-485 half-duplex is enabled automatically when `rts_pin >= 0`.
+     */
+    BaseUart* AcquireUart(const UartAcquireConfig& cfg) noexcept;
+
+    /**
+     * @brief Look up a previously-acquired UART by port number.
+     * @return Pointer to the cached BaseUart (=== EspUart), or nullptr
+     *         if no UART has been acquired on that port yet.
+     */
+    BaseUart* GetUart(uint8_t port_number) noexcept;
+
+    //==========================================================================
     // DIAGNOSTICS
     //==========================================================================
 
@@ -257,6 +306,10 @@ private:
     // CAN bus
     std::unique_ptr<EspCan> can_bus_;
     bool can_bus_valid_{false};
+
+    // Lazy UART pool — one slot per ESP32 hardware UART port. App-driven:
+    // sensors (BASIS-2, FDO2, etc.) call `AcquireUart(cfg)` at boot.
+    std::array<std::unique_ptr<EspUart>, kMaxUartPorts> uarts_{};
 
     std::atomic<bool> initialized_{false};
     std::atomic<CommError> last_error_{CommError::SUCCESS};
