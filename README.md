@@ -109,7 +109,7 @@ ESP32 HAL for the **HardFOC Flux V1** valve-control board. Drives solenoid valve
 
 ### CommChannelsManager
 
-Initialises the shared SPI2 bus with two devices (MAX22200 @ Mode 0/10 MHz, TLE92466ED @ Mode 1/5 MHz), CAN/TWAI at 500 kbps, and I²C at 400 kHz.
+Initialises the shared SPI2 bus with two devices (MAX22200 @ Mode 0/10 MHz, TLE92466ED @ Mode 1/5 MHz) and CAN/TWAI at 500 kbps. Provides lazy `AcquireUart()` for serial sensors (BASIS-2, FDO2). Also exposes an opt-in `AcquireUsbSerialJtag()` accessor for the ESP32-S3 native-USB CDC-ACM/JTAG console — gated by the CMake flag `HF_CORE_ENABLE_USB_SERIAL_JTAG` (OFF by default; returns `nullptr` when disabled). See [`COMM_CHANNELS_MANAGER_README`](docs/component-handlers/COMM_CHANNELS_MANAGER_README.md).
 
 ### GpioManager
 

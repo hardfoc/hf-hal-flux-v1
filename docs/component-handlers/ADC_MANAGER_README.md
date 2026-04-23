@@ -4,7 +4,7 @@
 
 ![Component](https://img.shields.io/badge/component-AdcManager-blue.svg)
 ![Thread Safe](https://img.shields.io/badge/thread--safe-yes-green.svg)
-![Hardware](https://img.shields.io/badge/hardware-ESP32--C6-orange.svg)
+![Hardware](https://img.shields.io/badge/hardware-ESP32--S3-orange.svg)
 
 **Unified ADC channel management for the HardFOC Flux platform**
 

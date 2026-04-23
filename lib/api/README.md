@@ -25,7 +25,7 @@ The initialization order is carefully managed to handle dependencies:
 ```
 1. NvsManager           (ESP-IDF NVS — `flux` / `flux_cal` / `flux_cfg` namespaces)
    ↓
-2. CommChannelsManager  (SPI, CAN, lazy UART — no I²C on Flux V1)
+2. CommChannelsManager  (SPI, CAN, lazy UART, opt-in USB Serial/JTAG — no I²C on Flux V1)
    ↓
 3. GpioManager          (depends on comms for future expansion)
    ↓
@@ -37,6 +37,17 @@ The initialization order is carefully managed to handle dependencies:
    ↓
 7. TemperatureManager   (depends on ADC)
 ```
+
+> **Logger backend.** `Flux::EnsureInitialized()` (and the constructor's
+> early `Logger::GetInstance().Initialize()` call) use the **default**
+> `Logger::Initialize(const LogConfig&)` overload, which delegates to the
+> per-MCU factory `Logger::CreateDefaultBaseLogger()`. On ESP32 builds
+> that factory lives in `hf-core/handlers/logger/factory/EspLoggerFactory.cpp`
+> and returns an `EspLogger` — so `Logger.cpp` itself never includes any
+> ESP-IDF headers. To inject a custom backend (e.g. one that writes over
+> `EspUsbSerialJtag` instead of UART0), call the second `Initialize`
+> overload **before** `Flux::EnsureInitialized()`. See the
+> [`Logger` handler README](../core/handlers/logger/README.md).
 
 ## Quick Start
 
@@ -180,7 +191,7 @@ bool Shutdown() noexcept;
 All components are accessed by reference:
 
 ```cpp
-CommChannelsManager& comms;     // SPI, CAN, UART (no I²C on Flux V1)
+CommChannelsManager& comms;     // SPI, CAN, UART, opt-in USB Serial/JTAG (no I²C on Flux V1)
 GpioManager&         gpio;      // ESP32 GPIO pins
 ValveManager&        valves;    // Solenoid + proportional valve control
 AdcManager&          adc;       // ADC channels (NTC, VBUS)
