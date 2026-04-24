@@ -1,98 +1,23 @@
-# HardFOC Flux — Development Guidelines
+# Development documentation (Flux HAL)
 
-<div align="center">
+Organization-wide **standards, process, and playbooks** now live in the **[hf-development-handbook](https://github.com/hardfoc/hf-development-handbook)** Git submodule at **[`docs/hf-development-handbook/`](../hf-development-handbook/)**.
 
-![Standards](https://img.shields.io/badge/standards-shared-blue.svg)
-![C++20](https://img.shields.io/badge/C%2B%2B-20-brightgreen.svg)
-![ESP-IDF](https://img.shields.io/badge/ESP--IDF-5.4%2F5.5-orange.svg)
-
-</div>
-
-## 📋 Overview
-
-The HardFOC Flux HAL follows the same development standards as the Vortex HAL. The authoritative development guides live in the **[hf-hal-vortex-v1 docs/development/](https://github.com/hardfoc/hf-hal-vortex-v1/tree/main/docs/development)** directory and apply equally to both HALs.
-
-## 📚 Development Guides
-
-| Guide | Description |
-|-------|-------------|
-| **[Architecture Guidelines](ARCHITECTURE_GUIDELINES.md)** | HAL layer architecture, singleton patterns, init flow |
-| **[Coding Standards](CODING_STANDARDS.md)** | Naming conventions, formatting, comment style |
-| **[Embedded Coding Standards](EMBEDDED_CODING_STANDARDS.md)** | ESP32 / FreeRTOS specific practices |
-| **[CMake Build Contract](CMAKE_BUILD_CONTRACT.md)** | 3-layer CMake architecture for all drivers |
-| **[Testing Requirements](TESTING_REQUIREMENTS.md)** | On-target test framework, coverage expectations |
-| **BaseInterface Reference** | `BaseGpio`, `BaseAdc`, `BaseTemperature` contracts |
-| **Component Manifest Guide** | `idf_component.yml` structure and versioning |
-| **Documentation Standards** | README templates, Doxygen annotations |
-| **Performance Optimization** | String lookups vs cached access patterns |
-
-## 🔧 Flux-Specific Conventions
-
-### Manager Patterns
-
-All Flux managers follow the same singleton + `EnsureInitialized()` → `bool` pattern:
-
-```cpp
-class ExampleManager {
-public:
-    static ExampleManager& GetInstance();
-    bool EnsureInitialized();
-
-private:
-    ExampleManager() = default;
-    bool initialized_{false};
-};
-```
-
-### Memory Ownership
-
-Flux managers use a **`void*` opaque storage** pattern to avoid heavy header dependencies:
-
-```cpp
-// In .h (no driver header required)
-void* driver_storage_{nullptr};
-BaseDriver* driver_{nullptr};  // Non-owning typed alias
-
-// In .cpp
-auto* d = new (std::nothrow) ConcreteDriver(config);
-driver_storage_ = d;
-driver_ = d;
-```
-
-This is intentional — singletons live for the program lifetime, so cleanup is handled by OS teardown. Managers that support explicit cleanup (e.g., `LedManager::Shutdown()`) document it.
-
-### Error Handling
-
-| Manager | Error Type | Notes |
-|---------|-----------|-------|
-| **ValveManager** | `hf_valve_err_t` | Typed enum with driver error mapping |
-| **CommChannelsManager** | `CommError` | 12-value enum class |
-| **All others** | `bool` | `true` = success |
-
-### Valve-Specific Patterns
-
-The Flux board's primary function is valve control. `ValveManager` uses compile-time channel mapping:
-
-```cpp
-// O(1) channel resolution via constexpr array
-static constexpr ValveChannelMapping kValveChannelMap[] = {
-    {0, ValveDriver::kMax22200, 0},   // Solenoid channel 0
-    // ...
-    {8, ValveDriver::kTle92466, 0},   // Proportional channel 0
-};
-```
-
-## 🏗️ Build System
+After cloning this repository:
 
 ```bash
-# Build on-target tests
-cd examples/esp32
-./scripts/build_app.sh --app-type example --build-type debug \
-    --app-source-file main/flux_api_test.cpp --target esp32c6
+git submodule update --init --recursive
 ```
 
-## 🔗 Related
+## Quick links (relative to submodule root)
 
-- **[Flux DOCUMENTATION_INDEX](../../DOCUMENTATION_INDEX.md)** — Full documentation map
-- **[Flux API](../../lib/api/Flux.h)** — Unified API header
-- **[Vortex Development Docs](https://github.com/hardfoc/hf-hal-vortex-v1/tree/main/docs/development)** — Shared standards (authoritative)
+| Topic | Path |
+|-------|------|
+| Map of all doc layers | [`DOCUMENTATION_MAP.md`](../hf-development-handbook/DOCUMENTATION_MAP.md) |
+| Embedded coding standards | [`standards/embedded-coding.md`](../hf-development-handbook/standards/embedded-coding.md) |
+| Coding style | [`standards/coding-style.md`](../hf-development-handbook/standards/coding-style.md) |
+| CMake build contract | [`process/cmake-build-contract.md`](../hf-development-handbook/process/cmake-build-contract.md) |
+| Architecture guidelines | [`process/architecture.md`](../hf-development-handbook/process/architecture.md) |
+| Testing requirements | [`process/testing-requirements.md`](../hf-development-handbook/process/testing-requirements.md) |
+| Agent playbooks | [`agents/README.md`](../hf-development-handbook/agents/README.md) |
+
+Board-specific notes that truly apply **only** to Flux may be added here as additional small markdown files in the future.

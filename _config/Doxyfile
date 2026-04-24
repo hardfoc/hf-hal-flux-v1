@@ -30,7 +30,7 @@ FILTER_PATTERNS        = *.md="sed -e '/^---$/,/^---$/d'"
 
 EXCLUDE                = *build* *cmake-build-* *managed_components* *__pycache__* *.pyc
 EXCLUDE_PATTERNS       = */build/* */cmake-build-*/* */.git/* */managed_components/* */__pycache__/* \
-                         */lib/core/* */examples/esp32/scripts/*
+                         */lib/core/* */examples/esp32/scripts/* */docs/hf-development-handbook/*
 
 #---------------------------------------------------------------------------
 # Extraction

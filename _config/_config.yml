@@ -109,6 +109,7 @@ exclude:
   - examples/esp32/scripts/
   - examples/esp32/build/
   - lib/core/
+  - docs/hf-development-handbook/
   - _config/doxygen-extensions/
 
 include:

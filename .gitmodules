@@ -7,3 +7,6 @@
 [submodule "_config/doxygen-extensions/doxygen-awesome-css"]
 	path = _config/doxygen-extensions/doxygen-awesome-css
 	url = https://github.com/jothepro/doxygen-awesome-css.git
+[submodule "docs/hf-development-handbook"]
+	path = docs/hf-development-handbook
+	url = https://github.com/hardfoc/hf-development-handbook.git
