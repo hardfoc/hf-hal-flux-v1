@@ -4,7 +4,7 @@ ESP32 HAL for the **HardFOC Flux V1** valve-control board. Drives solenoid valve
 
 ## Engineering handbook
 
-Cross-HAL **coding standards, architecture, CMake contract, testing, and agent playbooks** live in the [hf-development-handbook](https://github.com/hardfoc/hf-development-handbook) Git submodule at [`docs/hf-development-handbook/`](docs/hf-development-handbook/). After clone, run `git submodule update --init --recursive`. A short index with relative links is in [`docs/development/README.md`](docs/development/README.md).
+Cross-HAL **coding standards, architecture, CMake contract, testing, and agent playbooks** live in the [hf-development-handbook](https://github.com/hardfoc/hf-development-handbook) Git submodule at [`docs/hf-development-handbook/`](docs/hf-development-handbook/). After clone, run `git submodule update --init --recursive`. Start from [`docs/hf-development-handbook/README.md`](docs/hf-development-handbook/README.md).
 
 ---
 
