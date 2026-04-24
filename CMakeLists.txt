@@ -31,6 +31,8 @@ set(HF_CORE_ENABLE_CAN            ON)   # CAN/TWAI bus (CommChannelsManager)
 set(HF_CORE_ENABLE_ADS7952        ON)   # SPI 12-ch ADC (ADS7952)
 set(HF_CORE_ENABLE_ALICAT_BASIS2  ON)   # UART RS-485 mass-flow meter (Alicat BASIS-2)
 set(HF_CORE_ENABLE_FDO2           ON)   # UART optical oxygen probe (PyroScience FDO2-G2)
+# SE050 secure element (I²C): leave OFF on Flux until a board wires SE050 + enables in product CMake.
+set(HF_CORE_ENABLE_SE050          OFF)
 
 # ── Built-in USB Serial/JTAG controller (optional console transport) ─────
 # OFF by default: Flux V1 ships with an external USB-UART bridge wired to
