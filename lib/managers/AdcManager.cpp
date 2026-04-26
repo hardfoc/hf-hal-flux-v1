@@ -81,11 +81,8 @@ bool AdcManager::Initialize() noexcept {
     }
 
     esp_adc_ = hf::utils::make_unique_nothrow<EspAdc>(adc_cfg);
-    
-    bool internal_adc_ok = false;
+
     if (esp_adc_ && esp_adc_->EnsureInitialized()) {
-        internal_adc_ok = true;
-        
         // Iterate the pincfg ADC mapping and register each channel
         for (size_t i = 0; i < HF_ADC_MAPPING_SIZE; ++i) {
             const auto& mapping = HF_ADC_MAPPING[i];

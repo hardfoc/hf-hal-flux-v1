@@ -322,7 +322,7 @@ bool Flux::PerformHealthCheck() noexcept {
 
     // Collect per-manager error health
     ManagerHealthSnapshot health{};
-    CollectManagerHealth(health);
+    (void)CollectManagerHealth(health);
 
     // Log per-manager status with error codes
     for (size_t i = 0; i < health.count; ++i) {
@@ -387,13 +387,13 @@ bool Flux::Shutdown() noexcept {
     Logger::GetInstance().Info(TAG, "Shutting down Flux API");
 
     // Reverse initialization order: Temp → LEDs → ADC → Valves → GPIO → Comms → NVS
-    temp.Deinitialize();
-    leds.Deinitialize();
-    adc.Deinitialize();
+    (void)temp.Deinitialize();
+    (void)leds.Deinitialize();
+    (void)adc.Deinitialize();
     // ValveManager does not have Deinitialize yet — skip
-    gpio.Deinitialize();
-    comms.Deinitialize();
-    nvs.Deinitialize();
+    (void)gpio.Deinitialize();
+    (void)comms.Deinitialize();
+    (void)nvs.Deinitialize();
 
     temp_initialized_   = false;
     leds_initialized_   = false;

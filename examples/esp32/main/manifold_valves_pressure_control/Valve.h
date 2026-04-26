@@ -2,24 +2,30 @@
  * @file Valve.h
  * @brief Base class for all WH bench valves — atomic state, lock-free API.
  *
- * @details A `Valve` instance lives for the entire program life and is shared
- *          between three asynchronous parties:
+ * @Browser A `Valve` instance lives for the entire program life and is
+ *          shared between three asynchronous parties:
  *
  *            1. Application / control-loop threads — push setpoints
  *               (`RequestPosition`, `RequestState`) and read back the latest
  *               actual state via lock-free atomic loads.
  *
- *            2. The control thread (`WhValveControlThread`) — owns the right
- *               to call into the underlying Flux::ValveManager for this valve
- *               and is the only one that updates the "actual" snapshot.
+ *            2. Any writer that calls `Apply()` to flush the pending
+ *               setpoint to the driver IC via `FLUX_API.valves`. There is
+ *               no dedicated dispatcher thread; writers (the manifold
+ *               control loop, mode-thread setpoints, console valve
+ *               commands, calibration / leak controllers, the verified-stop
+ *               helper) all call `Apply()` themselves, serialised by the
+ *               HAL `ValveManager` SPI mutex.
  *
- *            3. The diagnostics thread (`WhDiagnosticsThread`) — atomically
- *               aggregates fault flags from the driver IC into the per-valve
- *               diagnostic snapshot + sticky fault counters.
+ *            3. `SafetyMonitorThread`, which periodically calls
+ *               `OnDiagnostics()` on every valve to aggregate fault flags
+ *               from the driver IC into the per-valve snapshot + sticky
+ *               fault counters.
  *
  *          The base class only owns shared state. Each subclass
  *          (`SolenoidValve`, `ProportionalValve`) implements `Apply()` and
- *          `OnDiagnostics()` against the Flux::ValveManager API.
+ *          `OnDiagnostics()` against the Flux::ValveManager API
+ *          (`FLUX_API.valves`).
  *
  * @copyright HardFOC (internal use only)
  * @date 2026
@@ -27,15 +33,13 @@
 
 #pragma once
 
-#include "WhValveCatalog.h"
+#include "ManifoldValvesCatalog.h"
 
 #include <atomic>
 #include <cstdint>
 #include <string_view>
 
-class ValveManager;  // Forward declaration to avoid heavy include.
-
-namespace whvalve {
+namespace manifold_valves {
 
 //==============================================================================
 // VALVE STATE / ERROR ENUMS
@@ -199,7 +203,7 @@ public:
 
     /**
      * @brief Request a normalised position 0..1.
-     * @details For binary solenoids this is interpreted as `0 → off, > 0 → on`.
+     * @Browser For binary solenoids this is interpreted as `0 → off, > 0 → on`.
      *          For variable-current solenoids and proportionals it linearly
      *          maps to current `0..full_flow_ma`. The control thread observes
      *          the change on the next iteration and pushes it to the hardware.
@@ -245,21 +249,23 @@ public:
 
     /**
      * @brief Apply the current setpoint to the underlying driver IC.
-     * @param mgr Flux::ValveManager — caller must guarantee mgr.IsInitialized().
      * @return The hf_valve_err_t returned by the underlying call (also stored
-     *         in last_error_).
+     *         in last_error_). Uses `FLUX_API.valves` (must be initialised).
      *
      * @note Implemented by the `SolenoidValve` and `ProportionalValve`
-     *       subclasses. Always invoked by `WhValveControlThread`.
+     *       subclasses. Called by every writer (manifold control loop,
+     *       mode threads, console commands, calibration / leak
+     *       controllers, verified-stop helper). Mutex-protected at the
+     *       HAL `ValveManager` so concurrent calls are safe.
      */
-    virtual hf_valve_err_t Apply(ValveManager& mgr) noexcept = 0;
+    virtual hf_valve_err_t Apply() noexcept = 0;
 
     /**
      * @brief Refresh per-valve diagnostics from the driver IC.
-     * @param mgr Flux::ValveManager — caller must guarantee mgr.IsInitialized().
      * @return Aggregated error code (success if everything is healthy).
+     *         Uses `FLUX_API.valves`.
      */
-    virtual hf_valve_err_t OnDiagnostics(ValveManager& mgr) noexcept = 0;
+    virtual hf_valve_err_t OnDiagnostics() noexcept = 0;
 
     /**
      * @brief Push the model's per-channel configuration features (open-load
@@ -268,7 +274,7 @@ public:
      * Called by the control thread on the first apply (and again after a
      * fault that requires reconfiguration). Subclasses override.
      */
-    virtual hf_valve_err_t ApplyChannelFeatures(ValveManager& mgr) noexcept = 0;
+    virtual hf_valve_err_t ApplyChannelFeatures() noexcept = 0;
 
     /**
      * @brief Mark the target as dirty without changing it (used to force the
@@ -328,4 +334,4 @@ private:
     std::atomic<uint64_t>       last_fault_tick_ms_{0};
 };
 
-}  // namespace whvalve
+}  // namespace manifold_valves

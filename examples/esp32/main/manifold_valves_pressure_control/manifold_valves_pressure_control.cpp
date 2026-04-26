@@ -1,6 +1,6 @@
 /**
- * @file wh_valve_pressure_control.cpp
- * @brief WH bench-test: pressure sensor calibration and high-rate monitoring.
+ * @file manifold_valves_pressure_control.cpp
+ * @brief Manifold test bench: pressure sensor calibration and high-rate monitoring.
  *
  * Hardware: 8× Honeywell SSC TruStability ratiometric pressure transducers
  * connected to an ADS7952 12-bit SPI ADC on the Flux V1 board:
@@ -38,7 +38,7 @@
  *   3. (Optional) Auto-swap detection — for single-ended sensors with
  *      reversed plumbing.
  *
- * @author HardFOC Team — WH Bench Test
+ * @author HardFOC Team — Manifold test bench
  * @date 2026
  * @copyright HardFOC (internal use only)
  */
@@ -46,10 +46,10 @@
 #include "PressureSensor.h"
 #include "PressureSensorConfig.h"
 #include "PressureSensorThread.h"
-#include "WhDiagnosticsThread.h"
-#include "WhValveControlThread.h"
-#include "WhValveSelfTest.h"
-#include "WhValveSystem.h"
+#include "ManifoldValvesDiagnosticsThread.h"
+#include "ManifoldValvesControlThread.h"
+#include "ManifoldValvesSelfTest.h"
+#include "ManifoldValves.h"
 #include "api/Flux.h"
 
 #include "OsUtility.h"
@@ -59,7 +59,7 @@
 #include <array>
 #include <atomic>
 
-static const char* TAG_MAIN     = "WHControl";
+static const char* TAG_MAIN     = "MnfldCtrl";
 
 //=============================================================================
 // TASK CONFIGURATION
@@ -82,7 +82,7 @@ static constexpr uint8_t  kPressureAvgSamples       = 8;
 // VALVE SELF-TEST CONFIGURATION
 //=============================================================================
 //
-// The boot self-test exercises every valve in `WhValveCatalog.h` once: every
+// The boot self-test exercises every valve in `ManifoldValvesCatalog.h` once: every
 // MAX22200 solenoid is cycled ON/OFF a few times (mirrors `c21_cycle_test`)
 // and every TLE92466ED proportional is ramped 0 → full → 0 (mirrors
 // `lm_pro_cycle_test`). Diagnostics are scraped between each phase so any
@@ -102,26 +102,26 @@ static constexpr uint8_t  kPressureAvgSamples       = 8;
 //
 static constexpr bool kRunSelfTestAtBoot = true;
 
-static whvalve::SelfTestPlan MakeSelfTestPlan() noexcept {
-    whvalve::SelfTestPlan plan = whvalve::SelfTestPlan::All();
+static manifold_valves::SelfTestPlan MakeSelfTestPlan() noexcept {
+    manifold_valves::SelfTestPlan plan = manifold_valves::SelfTestPlan::All();
 
     // ── Solenoids (MAX22200 OUT0..OUT7) ──────────────────────────────────
     // Default: every catalog row enabled. Comment out / set false to skip.
-    plan.enable_solenoids[static_cast<size_t>(whvalve::SolenoidId::OLV_2)] = true;
-    plan.enable_solenoids[static_cast<size_t>(whvalve::SolenoidId::VEV  )] = true;
-    plan.enable_solenoids[static_cast<size_t>(whvalve::SolenoidId::OLV_1)] = true;
-    plan.enable_solenoids[static_cast<size_t>(whvalve::SolenoidId::SEV  )] = true;
-    plan.enable_solenoids[static_cast<size_t>(whvalve::SolenoidId::GDV  )] = true;
-    plan.enable_solenoids[static_cast<size_t>(whvalve::SolenoidId::ORV  )] = true;
-    plan.enable_solenoids[static_cast<size_t>(whvalve::SolenoidId::AVV  )] = true;
+    plan.enable_solenoids[static_cast<size_t>(manifold_valves::SolenoidId::OLV_2)] = true;
+    plan.enable_solenoids[static_cast<size_t>(manifold_valves::SolenoidId::VEV  )] = true;
+    plan.enable_solenoids[static_cast<size_t>(manifold_valves::SolenoidId::OLV_1)] = true;
+    plan.enable_solenoids[static_cast<size_t>(manifold_valves::SolenoidId::SEV  )] = true;
+    plan.enable_solenoids[static_cast<size_t>(manifold_valves::SolenoidId::GDV  )] = true;
+    plan.enable_solenoids[static_cast<size_t>(manifold_valves::SolenoidId::ORV  )] = true;
+    plan.enable_solenoids[static_cast<size_t>(manifold_valves::SolenoidId::AVV  )] = true;
 
     // ── Proportionals (TLE92466ED OUT0..OUT5) ────────────────────────────
-    plan.enable_proportionals[static_cast<size_t>(whvalve::ProportionalId::FRV  )] = true;
-    plan.enable_proportionals[static_cast<size_t>(whvalve::ProportionalId::SPV_L)] = true;
-    plan.enable_proportionals[static_cast<size_t>(whvalve::ProportionalId::FCV  )] = true;
-    plan.enable_proportionals[static_cast<size_t>(whvalve::ProportionalId::LSV  )] = true;
-    plan.enable_proportionals[static_cast<size_t>(whvalve::ProportionalId::SPV_H)] = true;
-    plan.enable_proportionals[static_cast<size_t>(whvalve::ProportionalId::GFV  )] = true;
+    plan.enable_proportionals[static_cast<size_t>(manifold_valves::ProportionalId::FRV  )] = true;
+    plan.enable_proportionals[static_cast<size_t>(manifold_valves::ProportionalId::SPV_L)] = true;
+    plan.enable_proportionals[static_cast<size_t>(manifold_valves::ProportionalId::FCV  )] = true;
+    plan.enable_proportionals[static_cast<size_t>(manifold_valves::ProportionalId::LSV  )] = true;
+    plan.enable_proportionals[static_cast<size_t>(manifold_valves::ProportionalId::SPV_H)] = true;
+    plan.enable_proportionals[static_cast<size_t>(manifold_valves::ProportionalId::GFV  )] = true;
 
     // ── Solenoids ───────────────────────────────────────────────────────
     // Defaults are tuned for fast iteration. Raise them for deeper
@@ -132,8 +132,8 @@ static whvalve::SelfTestPlan MakeSelfTestPlan() noexcept {
     plan.inter_valve_pause_ms       = 1500;
     plan.prompt_wait_ms             = 1000;
 
-    // ── Per-valve proportional sweep (DEFAULT OFF on the WH bench) ─────
-    // The WH manifold can only physically connect one proportional valve
+    // ── Per-valve proportional sweep (DEFAULT OFF on the manifold test bench) ─────
+    // The test manifold can only physically connect one proportional valve
     // at a time, but moving the manifold tube between every TLE channel
     // for a one-at-a-time test isn't practical day-to-day. Leave this off
     // and rely on the parallel stress test below to exercise every
@@ -392,7 +392,7 @@ static bool g_calibration_complete = false;
 extern "C" void app_main(void) {
     ESP_LOGI(TAG_MAIN, "");
     ESP_LOGI(TAG_MAIN, "╔══════════════════════════════════════════════════════════╗");
-    ESP_LOGI(TAG_MAIN, "║      WH Valve & Pressure Sensor Control                  ║");
+    ESP_LOGI(TAG_MAIN, "║      Manifold valve & pressure sensor control          ║");
     ESP_LOGI(TAG_MAIN, "║      8-Channel Ratiometric Pressure Monitoring           ║");
     ESP_LOGI(TAG_MAIN, "╚══════════════════════════════════════════════════════════╝");
     ESP_LOGI(TAG_MAIN, "");
@@ -509,8 +509,8 @@ extern "C" void app_main(void) {
     }
     ESP_LOGI(TAG_MAIN, "[main] Pressure-sensor thread fully calibrated and streaming data.");
 
-    // ── Bring up the WH valve subsystem (control + diagnostics threads) ────
-    auto& valve_system  = whvalve::WhValveSystem::GetInstance();
+    // ── Bring up the manifold valve subsystem (control + diagnostics threads) ────
+    auto& valve_system  = manifold_valves::ManifoldValves::GetInstance();
     auto& valve_manager = ValveManager::GetInstance();
     auto* ads7952_drv = static_cast<Ads7952Handler*>(
         FLUX_API.adc.Get(HfFunctionalAdcChannel::ADS7952_0_CH0));
@@ -521,7 +521,6 @@ extern "C" void app_main(void) {
     // for every solenoid that opted in via its Max22200ChannelFeatures.
     if (valve_manager.IsInitialized()) {
         const auto dpm_err = valve_system.ConfigureGlobalDpm(
-            valve_manager,
             /*start_current_ma =*/ 30.0f,    // start dip search above 30 mA
             /*dip_threshold_ma =*/ 8.0f,     // require ≥ 8 mA dip
             /*debounce_ms      =*/ 0.5f);    // 0.5 ms minimum dip duration
@@ -533,8 +532,8 @@ extern "C" void app_main(void) {
         }
     }
 
-    static whvalve::WhValveControlThread valve_ctrl(valve_system, valve_manager, /*ms=*/10);
-    static whvalve::WhDiagnosticsThread  valve_diag(valve_system, valve_manager, ads7952_drv,
+    static manifold_valves::ManifoldValvesControlThread valve_ctrl(valve_system, /*ms=*/10);
+    static manifold_valves::ManifoldValvesDiagnosticsThread  valve_diag(valve_system, ads7952_drv,
                                                     /*ms=*/100);
 
     if (!valve_ctrl.EnsureInitialized() ||
@@ -578,7 +577,7 @@ extern "C" void app_main(void) {
         // Run() returns a reference to a function-static report so we
         // don't blow the main task's ~3 kB stack with the array of per-valve
         // result records.
-        const auto& report = whvalve::WhValveSelfTest::Run(valve_system, valve_diag, plan);
+        const auto& report = manifold_valves::ManifoldValvesSelfTest::Run(valve_system, valve_diag, plan);
 
         // Restore default log verbosity once the self-test is done.
         esp_log_level_set("Pressure",       ESP_LOG_INFO);
@@ -589,7 +588,7 @@ extern "C" void app_main(void) {
         if (report.overall_pass) {
             ESP_LOGI(TAG_MAIN, "[main] Boot self-test: PASS — bench ready");
         } else {
-            ESP_LOGE(TAG_MAIN, "[main] Boot self-test: FAIL — see WhSelfTest log above");
+            ESP_LOGE(TAG_MAIN, "[main] Boot self-test: FAIL — see ManifValvesSelf log above");
         }
     } else if (kRunSelfTestAtBoot) {
         ESP_LOGW(TAG_MAIN, "[main] Boot self-test SKIPPED — ValveManager never initialised");
@@ -669,21 +668,21 @@ extern "C" void app_main(void) {
         }
 
         // Per-valve detail
-        valve_system.ForEachSolenoid([](whvalve::SolenoidValve& v) {
+        valve_system.ForEachSolenoid([](manifold_valves::SolenoidValve& v) {
             const auto s = v.Snapshot();
             ESP_LOGI(TAG_MAIN,
                      "  SOL %-6.*s [%-15s]: tgt=%4.2f act=%4.2f  state=%-12s  "
                      "fc=%lu  flags=[ocp=%d hhf=%d olf=%d dpm=%d]",
                      static_cast<int>(v.Label().size()), v.Label().data(),
-                     whvalve::SolenoidDriveModeToString(v.DriveMode()),
+                     manifold_valves::SolenoidDriveModeToString(v.DriveMode()),
                      static_cast<double>(v.GetTargetPosition()),
                      static_cast<double>(v.GetActualPosition()),
-                     whvalve::ValveStateToString(v.GetState()),
+                     manifold_valves::ValveStateToString(v.GetState()),
                      static_cast<unsigned long>(s.fault_count),
                      s.overcurrent, s.hit_not_reached,
                      s.open_load,   s.plunger_movement_fault);
         });
-        valve_system.ForEachProportional([](whvalve::ProportionalValve& v) {
+        valve_system.ForEachProportional([](manifold_valves::ProportionalValve& v) {
             const auto s = v.Snapshot();
             ESP_LOGI(TAG_MAIN,
                      "  PROP %-6.*s: tgt=%4.2f act=%4.2f  state=%-12s  fc=%lu  "
@@ -692,7 +691,7 @@ extern "C" void app_main(void) {
                      static_cast<int>(v.Label().size()), v.Label().data(),
                      static_cast<double>(v.GetTargetPosition()),
                      static_cast<double>(v.GetActualPosition()),
-                     whvalve::ValveStateToString(v.GetState()),
+                     manifold_valves::ValveStateToString(v.GetState()),
                      static_cast<unsigned long>(s.fault_count),
                      static_cast<int>(s.average_current_mA),
                      s.duty_cycle_permyriad,

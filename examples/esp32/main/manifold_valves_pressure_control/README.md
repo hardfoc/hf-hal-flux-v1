@@ -1,4 +1,4 @@
-# WH Valve & Pressure Sensor Application
+# Manifold valves & pressure sensor application
 
 This example is the WH bench-test acquisition + actuation stack. It owns:
 
@@ -26,14 +26,14 @@ threads, full per-driver fault decoding).
 ┌────────────────────────────────────────────────────────────────────┐
 │  Application / control-loop threads (any rate)                     │
 │   - PressureSensor::GetPressureFiltered()      lock-free atomic    │
-│   - WhValveSystem::Get(SolenoidId).RequestState/RequestPosition    │
-│   - WhValveSystem::Get(ProportionalId).RequestPosition             │
+│   - ManifoldValves::Get(SolenoidId).RequestState/RequestPosition    │
+│   - ManifoldValves::Get(ProportionalId).RequestPosition             │
 │   - .GetActualPosition() / .GetState() / .Snapshot()  lock-free    │
 └────────────────────────────────────────────────────────────────────┘
           │                                         │
           ▼                                         ▼
 ┌──────────────────────────────┐   ┌──────────────────────────────┐
-│ PressureSensorThread (1 kHz) │   │ WhValveControlThread (100 Hz)│
+│ PressureSensorThread (1 kHz) │   │ ManifoldValvesControlThread (100 Hz)│
 │  - Auto-1 batched ADS7952    │   │  - ConsumeDirty() per valve  │
 │  - Per-channel single-pole   │   │  - Apply() → ValveManager    │
 │    IIR + atomic publish      │   │  - Updates actual_position   │
@@ -41,7 +41,7 @@ threads, full per-driver fault decoding).
                               │
                               ▼
 ┌────────────────────────────────────────────────────────────────────┐
-│ WhDiagnosticsThread (10 Hz)                                        │
+│ ManifoldValvesDiagnosticsThread (10 Hz)                                        │
 │  - Per-valve OnDiagnostics() → per-channel snapshot                │
 │  - MAX22200 STATUS register   → SubsystemFaultSnapshot.max_*       │
 │  - TLE92466 FaultReport       → SubsystemFaultSnapshot.tle_*       │
@@ -108,9 +108,9 @@ LPF (default fc = 100 Hz at fs = 1 kHz) → atomic publish. Lock-free
 | **CDR (Current Drive Regulation)** — 7-bit current ladder per channel | Hit & hold currents on every BinaryHitHold solenoid; sustained current on the SEV pseudo-proportional. |
 | **VDR (Voltage / PWM Duty Regulation)** | Available via `ValveManager::ConfigureSolenoidVdr` — not used today. |
 | **Per-channel feature gates** (CFG_CH register) | All four exposed via `Max22200ChannelFeatures`: `slew_rate_control` (cleaner edges, lower EMI), `open_load_detection`, `plunger_movement_detection`, `hit_current_check`. |
-| **DPM (Detection of Plunger Movement)** — global algorithm (CFG_DPM) | `WhValveSystem::ConfigureGlobalDpm(start_ma, dip_ma, debounce_ms)` configures ISTART / IPTH / TDEB. Per-channel DPM_EN bits set from the catalog's feature gate. |
+| **DPM (Detection of Plunger Movement)** — global algorithm (CFG_DPM) | `ManifoldValves::ConfigureGlobalDpm(start_ma, dip_ma, debounce_ms)` configures ISTART / IPTH / TDEB. Per-channel DPM_EN bits set from the catalog's feature gate. |
 | **Per-channel faults** (FAULT register) | `SolenoidValve::Snapshot()` returns `overcurrent`, `hit_not_reached`, `open_load`, `plunger_movement_fault` plus sticky counters. |
-| **Global health** (STATUS register) | `WhDiagnosticsThread::SubsystemFaultSnapshot.max_*` carries OVT, COMER, UVM, the global OCP/OLF/HHF/DPM bits and the active-channels mask. |
+| **Global health** (STATUS register) | `ManifoldValvesDiagnosticsThread::SubsystemFaultSnapshot.max_*` carries OVT, COMER, UVM, the global OCP/OLF/HHF/DPM bits and the active-channels mask. |
 
 #### TLE92466ED (six-channel current-controlled, 6 channels — using all 6)
 
@@ -121,7 +121,7 @@ LPF (default fc = 100 Hz at fs = 1 kHz) → atomic publish. Lock-free
 | **Dither** (step size + steps + flat period) | Pushed once via `ValveManager::ConfigureProportionalDither` for VSO-class valves. LM-Pro skips dither (it's a linear motor). |
 | **Slew rate / diagnostic current / open-load threshold / OLSG warning** | Configured via `tle92466ed::ChannelConfig` from `Tle92466ChannelFeatures`. |
 | **Per-channel diagnostics** | `ProportionalValve::Snapshot()` carries every flag from `tle92466ed::ChannelDiagnostics`: `overcurrent`, `short_to_ground`, `open_load`, `over_temperature`, `open_load_short_ground`, `ot_warning`, `current_regulation_warning`, `pwm_regulation_warning`, `olsg_warning`, plus live measurements `average_current_raw`, `duty_cycle_raw`, `vbat_feedback_raw`. |
-| **Global health** (FaultReport) | `WhDiagnosticsThread::SubsystemFaultSnapshot.tle_*` carries VBAT/VIO/VDD UV/OV, central OT warning/error, clock fault, SPI watchdog, POR/reset events, register/OTP ECC errors, supply-NOK summaries. |
+| **Global health** (FaultReport) | `ManifoldValvesDiagnosticsThread::SubsystemFaultSnapshot.tle_*` carries VBAT/VIO/VDD UV/OV, central OT warning/error, clock fault, SPI watchdog, POR/reset events, register/OTP ECC errors, supply-NOK summaries. |
 
 ### 3.2 Bench mapping
 
@@ -193,27 +193,27 @@ self-consistent snapshot — control loops never need a mutex.
 ### 3.5 Application API
 
 ```cpp
-auto& sys = whvalve::WhValveSystem::GetInstance();
+auto& sys = manifold_valves::ManifoldValves::GetInstance();
 
 // Binary solenoid:
-sys.Get(whvalve::SolenoidId::OLV_1).RequestState(true);
-bool actual_on = sys.Get(whvalve::SolenoidId::OLV_1).IsActuallyEnergised();
+sys.Get(manifold_valves::SolenoidId::OLV_1).RequestState(true);
+bool actual_on = sys.Get(manifold_valves::SolenoidId::OLV_1).IsActuallyEnergised();
 
 // Pseudo-proportional solenoid (SEV via MAX22200 CDR):
-sys.Get(whvalve::SolenoidId::SEV).RequestPosition(0.42f);   // 0..1
+sys.Get(manifold_valves::SolenoidId::SEV).RequestPosition(0.42f);   // 0..1
 
 // Precision proportional (TLE92466ED):
-sys.Get(whvalve::ProportionalId::FCV).RequestPosition(0.42f);
-float actual = sys.Get(whvalve::ProportionalId::FCV).GetActualPosition();
+sys.Get(manifold_valves::ProportionalId::FCV).RequestPosition(0.42f);
+float actual = sys.Get(manifold_valves::ProportionalId::FCV).GetActualPosition();
 
 // Per-valve diagnostic snapshot:
-auto sol_snap = sys.Get(whvalve::SolenoidId::OLV_1).Snapshot();
+auto sol_snap = sys.Get(manifold_valves::SolenoidId::OLV_1).Snapshot();
 if (sol_snap.plunger_movement_fault) { /* handle stuck valve */ }
 
-auto pro_snap = sys.Get(whvalve::ProportionalId::FCV).Snapshot();
+auto pro_snap = sys.Get(manifold_valves::ProportionalId::FCV).Snapshot();
 uint16_t avg_current = pro_snap.average_current_raw;   // live measured
 
-// Subsystem-wide health (run by WhDiagnosticsThread):
+// Subsystem-wide health (run by ManifoldValvesDiagnosticsThread):
 auto sub = valve_diag.GetSnapshot();
 if (sub.tle_vbat_uv || sub.max_undervoltage) { /* supply problem */ }
 ```
@@ -271,8 +271,8 @@ If `Flux::ValveManager` fails to bring up either driver IC (the WH bench
 in its current state shows exactly this — the hardware isn't connected):
 
 - `ValveManager::IsInitialized()` returns `false`.
-- `WhValveControlThread` keeps stepping but skips `Apply()` calls.
-- `WhDiagnosticsThread` reports `manager_ready = false` and zeroes the
+- `ManifoldValvesControlThread` keeps stepping but skips `Apply()` calls.
+- `ManifoldValvesDiagnosticsThread` reports `manager_ready = false` and zeroes the
   per-driver readiness flags / fault snapshots.
 - All `Valve::Get*` accessors keep returning the last-published soft
   state (`Uninitialized` / 0 / `VALVE_SUCCESS`).
@@ -282,11 +282,11 @@ the same atomic API even when the valve hardware isn't wired up.
 
 ---
 
-## 6. Boot self-test (`WhValveSelfTest`)
+## 6. Boot self-test (`ManifoldValvesSelfTest`)
 
 Every boot, after the pressure thread is calibrated and the valve control +
 diagnostics threads are running, the application calls
-`WhValveSelfTest::Run()`. This single function:
+`ManifoldValvesSelfTest::Run()`. This single function:
 
 1. **Walks every solenoid in the catalog** (`SolenoidId::OLV_2 → AVV`) and:
    - Prints a banner ("Connect ONLY SOL '<label>' …") with a configurable
@@ -330,7 +330,7 @@ are tuned for that workflow:
 | **Full sweep** (7 sol + 6 prop) | **≈ 3 min** |
 
 Tweak the constants in `MakeSelfTestPlan()` at the top of
-`wh_valve_pressure_control.cpp` to:
+`manifold_valves_pressure_control.cpp` to:
 - skip valves that are not yet stocked (set the `enable_*` flag to `false`);
 - shorten / lengthen the pulse profiles or ramp resolution;
 - disable the operator prompt (`prompt_wait_ms = 0`) for fully unattended
@@ -370,7 +370,7 @@ starts running pressure-control loops. Specifically:
 
 ### 6.1 Add a binary solenoid
 
-1. Add an enumerator in `whvalve::SolenoidId` before `Count`.
+1. Add an enumerator in `manifold_valves::SolenoidId` before `Count`.
 2. Append a row in `kSolenoidMap` referencing one of the `kSpec*` model
    structs and an unused `ValveChannel::SOL_CHn`.
 
@@ -386,7 +386,7 @@ Same as above, but:
 
 ### 6.3 Add a precision proportional
 
-1. Add an enumerator in `whvalve::ProportionalId` before `Count` (TLE92466
+1. Add an enumerator in `manifold_valves::ProportionalId` before `Count` (TLE92466
    has 6 channels — if you exceed that you need a second IC).
 2. Append a row in `kProportionalMap` with the right model spec and
    feature gates.
@@ -394,17 +394,17 @@ Same as above, but:
 ### 6.4 Use a different model
 
 Edit (or add) a `SolenoidModelSpec` / `ProportionalModelSpec` literal at
-the top of `WhValveCatalog.h`, then point the relevant table row at it.
+the top of `ManifoldValvesCatalog.h`, then point the relevant table row at it.
 Only the catalog file changes.
 
 ### 6.5 Re-tune diagnostics
 
-- DPM parameters: `WhValveSystem::ConfigureGlobalDpm(start, dip, debounce)`.
+- DPM parameters: `ManifoldValves::ConfigureGlobalDpm(start, dip, debounce)`.
   Default 30 mA / 8 mA / 0.5 ms tuned for the C21 hold band; adjust per
   the actual mechanical signature.
 - Per-channel feature gates: edit the `Max22200ChannelFeatures` /
   `Tle92466ChannelFeatures` row in the bench map.
-- Diagnostics thread cadence: `WhDiagnosticsThread::SetPeriodMs(n)` —
+- Diagnostics thread cadence: `ManifoldValvesDiagnosticsThread::SetPeriodMs(n)` —
   default 100 ms, drop to 20 ms for closer monitoring or raise to 500 ms
   to lighten SPI load.
 
@@ -414,16 +414,16 @@ Only the catalog file changes.
 
 | File | Purpose |
 |------|---------|
-| `wh_valve_pressure_control.cpp` | App entry: brings up Flux, calibrates pressure sensors, configures DPM, starts control + diagnostics threads. |
+| `manifold_valves_pressure_control.cpp` | App entry: brings up Flux, calibrates pressure sensors, configures DPM, starts control + diagnostics threads. |
 | `PressureSensorConfig.h` | Sensor enums + ratiometric range + calibration config types. |
 | `PressureSensor.{h,cpp}` | Per-channel pressure sensor: IIR filter, atomic publish. |
 | `PressureSensorThread.{h,cpp}` | 1 kHz BaseThread + Auto-1 ADS7952 batch read. |
-| `WhValveCatalog.h` | Compile-time enums + Parker valve datasheet specs + bench map + per-channel diagnostic feature gates. |
+| `ManifoldValvesCatalog.h` | Compile-time enums + Parker valve datasheet specs + bench map + per-channel diagnostic feature gates. |
 | `Valve.h` | Base valve class (atomic state, dirty flag, snapshot types). |
 | `SolenoidValve.h` | MAX22200-driven valve — handles BinaryHitHold and VariableCurrent modes; decodes per-channel OCP/HHF/OLF/DPM. |
 | `ProportionalValve.h` | TLE92466ED-driven precision proportional; full per-channel ChannelDiagnostics surfacing. |
-| `WhValveSystem.h` | Singleton container, O(1) lookup, iteration helpers, `ConfigureGlobalDpm`. |
-| `WhValveControlThread.h` | 100 Hz BaseThread that pushes dirty setpoints. |
-| `WhDiagnosticsThread.h` | 10 Hz BaseThread; per-valve + per-driver-IC fault decoding into `SubsystemFaultSnapshot`. |
-| `WhValveSelfTest.h` | Boot-time per-valve cycler — solenoid ON/OFF and proportional 0→full→0 ramps with full diagnostic capture. Header-only; configured from `MakeSelfTestPlan()` in the app entry. |
+| `ManifoldValves.h` | Singleton container, O(1) lookup, iteration helpers, `ConfigureGlobalDpm`. |
+| `ManifoldValvesControlThread.h` | 100 Hz BaseThread that pushes dirty setpoints. |
+| `ManifoldValvesDiagnosticsThread.h` | 10 Hz BaseThread; per-valve + per-driver-IC fault decoding into `SubsystemFaultSnapshot`. |
+| `ManifoldValvesSelfTest.h` | Boot-time per-valve cycler — solenoid ON/OFF and proportional 0→full→0 ramps with full diagnostic capture. Header-only; configured from `MakeSelfTestPlan()` in the app entry. |
 | `README.md` | This document. |

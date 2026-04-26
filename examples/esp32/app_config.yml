@@ -64,13 +64,13 @@ apps:
     source_file: "AlicatBasis2Example.cpp"
     category: "example"
     ci_enabled: false
-  wh_valve_pressure_control:
+  manifold_valves_pressure_control:
     source_files:
-      - "wh_valve_pressure_control/wh_valve_pressure_control.cpp"
-      - "wh_valve_pressure_control/PressureSensor.cpp"
-      - "wh_valve_pressure_control/PressureSensorThread.cpp"
+      - "manifold_valves_pressure_control/manifold_valves_pressure_control.cpp"
+      - "manifold_valves_pressure_control/PressureSensor.cpp"
+      - "manifold_valves_pressure_control/PressureSensorThread.cpp"
     include_dirs:
-      - "wh_valve_pressure_control"
+      - "manifold_valves_pressure_control"
     category: "example"
     ci_enabled: false
 

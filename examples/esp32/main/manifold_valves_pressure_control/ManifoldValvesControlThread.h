@@ -1,10 +1,10 @@
 /**
- * @file WhValveControlThread.h
+ * @file ManifoldValvesControlThread.h
  * @brief BaseThread that pushes pending valve setpoints to the driver ICs.
  *
  * @details Runs on its own RTOS task at a fixed period (default 10 ms / 100 Hz).
- *          Each iteration walks every valve in the WhValveSystem; for any valve
- *          whose dirty flag is set, it calls `Apply(ValveManager&)` so the
+ *          Each iteration walks every valve in the ManifoldValves; for any valve
+ *          whose dirty flag is set, it calls `Apply()` so the
  *          new setpoint reaches the hardware.
  *
  *          The thread is intentionally lean: it does NOT poll fault registers,
@@ -20,29 +20,25 @@
 #pragma once
 
 #include "BaseThread.h"
-#include "WhValveSystem.h"
-#include "managers/ValveManager.h"
+#include "ManifoldValves.h"
+#include "api/Flux.h"
 
 #include <atomic>
 #include <cstdint>
 
-namespace whvalve {
+namespace manifold_valves {
 
-class WhValveControlThread final : public BaseThread {
+class ManifoldValvesControlThread final : public BaseThread {
 public:
     /**
-     * @param system           The shared WhValveSystem instance.
-     * @param manager          Flux::ValveManager (need not be initialised yet —
-     *                         the thread surfaces NOT_INITIALIZED until ready).
+     * @param system           The shared ManifoldValves instance.
      * @param sample_period_ms Step period in ms. 10 ms = 100 Hz default;
      *                         feel free to drop to 5 ms or raise to 50 ms.
      */
-    WhValveControlThread(WhValveSystem& system,
-                         ValveManager&  manager,
+    ManifoldValvesControlThread(ManifoldValves& system,
                          uint32_t       sample_period_ms = 10) noexcept
-        : BaseThread("WhValveCtrl"),
+        : BaseThread("MnfldVlvCtrl"),
           system_(system),
-          manager_(manager),
           sample_period_ms_(sample_period_ms) {}
 
     void SetSamplePeriodMs(uint32_t ms) noexcept {
@@ -50,7 +46,7 @@ public:
         sample_period_ms_ = ms;
     }
 
-    /// True once the thread has at least once observed manager.IsInitialized().
+    /// True once the thread has at least once observed FLUX valve manager ready.
     bool ManagerWasReady() const noexcept {
         return mgr_was_ready_.load(std::memory_order_acquire);
     }
@@ -78,13 +74,13 @@ protected:
     }
 
     uint32_t Step() noexcept override {
-        const bool ready = manager_.IsInitialized();
+        const bool ready = FLUX_API.valves.IsInitialized();
         if (ready) mgr_was_ready_.store(true, std::memory_order_release);
 
         if (ready) {
             system_.ForEachValve([this](Valve& v) {
                 if (v.ConsumeDirty()) {
-                    (void)v.Apply(manager_);
+                    (void)v.Apply();
                 }
             });
         }
@@ -99,8 +95,7 @@ protected:
     }
 
 private:
-    WhValveSystem& system_;
-    ValveManager&  manager_;
+    ManifoldValves& system_;
     uint32_t       sample_period_ms_;
 
     std::atomic<bool>     mgr_was_ready_{false};
@@ -119,4 +114,4 @@ private:
     uint8_t thread_stack_[kThreadStackBytes]{};
 };
 
-}  // namespace whvalve
+}  // namespace manifold_valves

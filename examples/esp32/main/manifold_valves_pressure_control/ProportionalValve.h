@@ -2,9 +2,9 @@
  * @file ProportionalValve.h
  * @brief TLE92466ED-driven precision proportional valve.
  *
- * @details Wraps a Flux::ValveManager proportional channel (TLE92466ED
+ * @Browser Wraps a Flux::ValveManager proportional channel (TLE92466ED
  *          backend) with the per-model PWM frequency, slew rate, optional
- *          dither and full-flow current pulled from `WhValveCatalog.h`.
+ *          dither and full-flow current pulled from `ManifoldValvesCatalog.h`.
  *
  *          Position semantics: 0 → 0 mA / valve closed (NC family);
  *          1 → `full_flow_current_ma`. The mapping is linear; control loops
@@ -26,7 +26,8 @@
 #pragma once
 
 #include "Valve.h"
-#include "WhValveCatalog.h"
+#include "ManifoldValvesCatalog.h"
+#include "api/Flux.h"
 #include "managers/ValveManager.h"
 #include "core/hf-core-drivers/external/hf-tle92466ed-driver/inc/tle92466ed.hpp"
 #include "core/hf-core-drivers/external/hf-tle92466ed-driver/inc/tle92466ed_registers.hpp"
@@ -36,7 +37,7 @@
 #include <cmath>
 #include <cstdint>
 
-namespace whvalve {
+namespace manifold_valves {
 
 class ProportionalValve final : public Valve {
 public:
@@ -95,7 +96,8 @@ public:
     // Manager-internal API (control thread)
     //----------------------------------------------------------------------
 
-    hf_valve_err_t ApplyChannelFeatures(ValveManager& mgr) noexcept override {
+    hf_valve_err_t ApplyChannelFeatures() noexcept override {
+        ValveManager& mgr = FLUX_API.valves;
         if (!IsMapped()) return hf_valve_err_t::VALVE_ERR_DRIVER_NOT_AVAILABLE;
         if (features_pushed_.load(std::memory_order_acquire)) {
             return hf_valve_err_t::VALVE_SUCCESS;
@@ -170,7 +172,8 @@ public:
         return hf_valve_err_t::VALVE_SUCCESS;
     }
 
-    hf_valve_err_t Apply(ValveManager& mgr) noexcept override {
+    hf_valve_err_t Apply() noexcept override {
+        ValveManager& mgr = FLUX_API.valves;
         if (!IsMapped()) {
             const auto err = hf_valve_err_t::VALVE_ERR_DRIVER_NOT_AVAILABLE;
             SetState(ValveState::Uninitialized);
@@ -179,7 +182,7 @@ public:
         }
 
         if (!features_pushed_.load(std::memory_order_acquire)) {
-            const auto fe = ApplyChannelFeatures(mgr);
+            const auto fe = ApplyChannelFeatures();
             if (fe != hf_valve_err_t::VALVE_SUCCESS) {
                 RecordApplyResult(fe, false);
                 return fe;
@@ -222,7 +225,8 @@ public:
     // Diagnostics: TLE92466ED per-channel snapshot
     //----------------------------------------------------------------------
 
-    hf_valve_err_t OnDiagnostics(ValveManager& mgr) noexcept override {
+    hf_valve_err_t OnDiagnostics() noexcept override {
+        ValveManager& mgr = FLUX_API.valves;
         if (!IsMapped()) {
             diag_bits_.store(0, std::memory_order_release);
             SetState(ValveState::Uninitialized);
@@ -306,9 +310,23 @@ public:
         last_diag_err_ = hf_valve_err_t::VALVE_SUCCESS;
 
         if (any_fault) {
-            const hf_valve_err_t agg = hf_valve_err_t::VALVE_ERR_HARDWARE_FAULT;
-            RecordFault(agg, now_ms_);
-            return agg;
+            diag_hw_fault_clear_streak_ = 0;
+            if (!diag_hw_fault_was_active_) {
+                RecordFault(hf_valve_err_t::VALVE_ERR_HARDWARE_FAULT, now_ms_);
+            }
+            diag_hw_fault_was_active_ = true;
+            return hf_valve_err_t::VALVE_ERR_HARDWARE_FAULT;
+        }
+        if (diag_hw_fault_was_active_) {
+            if (diag_hw_fault_clear_streak_ < UINT8_MAX) {
+                ++diag_hw_fault_clear_streak_;
+            }
+            if (diag_hw_fault_clear_streak_ >= kDiagHwFaultClearScrapes) {
+                diag_hw_fault_was_active_ = false;
+                diag_hw_fault_clear_streak_ = 0;
+            }
+        } else {
+            diag_hw_fault_clear_streak_ = 0;
         }
         return hf_valve_err_t::VALVE_SUCCESS;
     }
@@ -339,6 +357,11 @@ private:
     std::atomic<uint16_t>       duty_cycle_permyriad_{0};
     hf_valve_err_t              last_diag_err_{hf_valve_err_t::VALVE_SUCCESS};
     uint64_t                    now_ms_{0};
+    /// Previous scrape saw a TLE hard-fault bit (OC/SG/OL/OT/OLSG) — edge-only RecordFault.
+    bool                        diag_hw_fault_was_active_{false};
+    uint8_t                     diag_hw_fault_clear_streak_{0};
+
+    static constexpr uint8_t kDiagHwFaultClearScrapes = 3;
 };
 
-}  // namespace whvalve
+}  // namespace manifold_valves

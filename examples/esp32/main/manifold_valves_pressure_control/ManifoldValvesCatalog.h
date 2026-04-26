@@ -1,5 +1,5 @@
 /**
- * @file WhValveCatalog.h
+ * @file ManifoldValvesCatalog.h
  * @brief Compile-time catalog of all WH bench valves and their datasheet specs.
  *
  * @details Single source of truth for the bench valve set:
@@ -59,7 +59,7 @@
 #include <cstdint>
 #include <string_view>
 
-namespace whvalve {
+namespace manifold_valves {
 
 //==============================================================================
 // PER-VALVE NAMED IDs (compile-time fixed)
@@ -625,4 +625,4 @@ static_assert(MapOf(ProportionalId::LSV  ).id == ProportionalId::LSV  , "LSV row
 static_assert(MapOf(ProportionalId::SPV_H).id == ProportionalId::SPV_H, "SPV_H row mis-ordered");
 static_assert(MapOf(ProportionalId::GFV  ).id == ProportionalId::GFV  , "GFV row mis-ordered");
 
-}  // namespace whvalve
+}  // namespace manifold_valves

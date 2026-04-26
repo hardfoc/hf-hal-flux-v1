@@ -3,9 +3,9 @@
  * @brief MAX22200-driven solenoid valve — supports both BinaryHitHold and
  *        VariableCurrent (pseudo-proportional) drive modes.
  *
- * @details Wraps a Flux::ValveManager solenoid channel with the C15/C21
+ * @Browser Wraps a Flux::ValveManager solenoid channel with the C15/C21
  *          hit-and-hold profile (or, for SEV, the VSO-as-pseudo-proportional
- *          profile) pulled from `WhValveCatalog.h`.
+ *          profile) pulled from `ManifoldValvesCatalog.h`.
  *
  *          Position semantics:
  *            - `BinaryHitHold`   — `pos > 0 → energise (hit then hold)`,
@@ -27,7 +27,8 @@
 #pragma once
 
 #include "Valve.h"
-#include "WhValveCatalog.h"
+#include "ManifoldValvesCatalog.h"
+#include "api/Flux.h"
 #include "managers/ValveManager.h"
 #include "core/hf-core-drivers/external/hf-max22200-driver/inc/max22200_types.hpp"
 #include "handlers/max22200/Max22200Handler.h"
@@ -36,7 +37,7 @@
 #include <cmath>
 #include <cstdint>
 
-namespace whvalve {
+namespace manifold_valves {
 
 class SolenoidValve final : public Valve {
 public:
@@ -83,7 +84,8 @@ public:
     // Manager-internal API (control thread)
     //----------------------------------------------------------------------
 
-    hf_valve_err_t ApplyChannelFeatures(ValveManager& mgr) noexcept override {
+    hf_valve_err_t ApplyChannelFeatures() noexcept override {
+        ValveManager& mgr = FLUX_API.valves;
         if (features_pushed_.load(std::memory_order_acquire)) {
             return hf_valve_err_t::VALVE_SUCCESS;
         }
@@ -122,11 +124,12 @@ public:
         return err;
     }
 
-    hf_valve_err_t Apply(ValveManager& mgr) noexcept override {
+    hf_valve_err_t Apply() noexcept override {
+        ValveManager& mgr = FLUX_API.valves;
         // Push channel features (and base CDR profile) on the very first
         // apply, or after ForceReconfigure() / a fault recovery flow.
         if (!features_pushed_.load(std::memory_order_acquire)) {
-            const auto fe = ApplyChannelFeatures(mgr);
+            const auto fe = ApplyChannelFeatures();
             if (fe != hf_valve_err_t::VALVE_SUCCESS) {
                 RecordApplyResult(fe, false);
                 return fe;
@@ -186,7 +189,8 @@ public:
     // Diagnostics: MAX22200 per-channel fault decoding
     //----------------------------------------------------------------------
 
-    hf_valve_err_t OnDiagnostics(ValveManager& mgr) noexcept override {
+    hf_valve_err_t OnDiagnostics() noexcept override {
+        ValveManager& mgr = FLUX_API.valves;
         max22200::FaultStatus faults{};
         const hf_valve_err_t err = mgr.GetSolenoidFaults(faults);
         if (err != hf_valve_err_t::VALVE_SUCCESS) {
@@ -214,10 +218,30 @@ public:
         if (dpm) bits |= kBitDpm;
         diag_bits_.store(bits, std::memory_order_release);
 
-        if (ocp || hhf || olf || dpm) {
-            const hf_valve_err_t agg = hf_valve_err_t::VALVE_ERR_HARDWARE_FAULT;
-            RecordFault(agg, now_ms_);
-            return agg;
+        const bool hw_fault = (ocp || hhf || olf || dpm);
+        if (hw_fault) {
+            // Count fault *episodes* (rising edge), not every 10 Hz poll while
+            // the MAX22200 latched bits stay asserted — otherwise status
+            // `faults=` grows without bound during a single stuck condition.
+            diag_hw_fault_clear_streak_ = 0;
+            if (!diag_hw_fault_was_active_) {
+                RecordFault(hf_valve_err_t::VALVE_ERR_HARDWARE_FAULT, now_ms_);
+            }
+            diag_hw_fault_was_active_ = true;
+            return hf_valve_err_t::VALVE_ERR_HARDWARE_FAULT;
+        }
+        // Latched bits can read 0 for a scrape between SPI transactions; do not
+        // re-arm the edge detector until several consecutive clean reads.
+        if (diag_hw_fault_was_active_) {
+            if (diag_hw_fault_clear_streak_ < UINT8_MAX) {
+                ++diag_hw_fault_clear_streak_;
+            }
+            if (diag_hw_fault_clear_streak_ >= kDiagHwFaultClearScrapes) {
+                diag_hw_fault_was_active_ = false;
+                diag_hw_fault_clear_streak_ = 0;
+            }
+        } else {
+            diag_hw_fault_clear_streak_ = 0;
         }
         return hf_valve_err_t::VALVE_SUCCESS;
     }
@@ -238,6 +262,12 @@ private:
     std::atomic<uint32_t>    diag_bits_{0};      ///< Packed per-channel diag flags.
     hf_valve_err_t           last_diag_err_{hf_valve_err_t::VALVE_SUCCESS};
     uint64_t                 now_ms_{0};
+    /// Previous scrape had a latched MAX hard-fault (for edge-only RecordFault).
+    bool                     diag_hw_fault_was_active_{false};
+    /// Clean scrapes before clearing `diag_hw_fault_was_active_` (debounce).
+    uint8_t                  diag_hw_fault_clear_streak_{0};
+
+    static constexpr uint8_t kDiagHwFaultClearScrapes = 3;
 };
 
-}  // namespace whvalve
+}  // namespace manifold_valves

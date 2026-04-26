@@ -1,10 +1,10 @@
 /**
- * @file WhDiagnosticsThread.h
+ * @file ManifoldValvesDiagnosticsThread.h
  * @brief BaseThread that polls valve + driver-IC + ADC diagnostics.
  *
  * @details Every iteration (default 100 ms = 10 Hz):
  *
- *   1. Walks every valve and calls `OnDiagnostics(ValveManager&)` so each
+ *   1. Walks every valve and calls `OnDiagnostics()` so each
  *      MAX22200 / TLE92466ED per-channel fault flag is decoded and the
  *      per-valve diagnostic snapshot is refreshed.
  *
@@ -32,7 +32,8 @@
 
 #include "BaseThread.h"
 #include "OsUtility.h"
-#include "WhValveSystem.h"
+#include "ManifoldValves.h"
+#include "api/Flux.h"
 #include "managers/ValveManager.h"
 #include "handlers/ads7952/Ads7952Handler.h"
 #include "handlers/max22200/Max22200Handler.h"
@@ -43,7 +44,7 @@
 #include <atomic>
 #include <cstdint>
 
-namespace whvalve {
+namespace manifold_valves {
 
 /**
  * @brief Lock-free snapshot of subsystem-wide health, refreshed by the thread.
@@ -95,22 +96,19 @@ struct SubsystemFaultSnapshot {
     uint64_t last_update_ms{0};
 };
 
-class WhDiagnosticsThread final : public BaseThread {
+class ManifoldValvesDiagnosticsThread final : public BaseThread {
 public:
     /**
-     * @param system   Shared WhValveSystem.
-     * @param manager  Flux::ValveManager (need not be initialised yet).
+     * @param system   Shared ManifoldValves.
      * @param ads7952  Pointer to the resolved ADS7952 handler (may be nullptr;
      *                 readiness flag will then read false).
      * @param period_ms Polling period; default 100 ms = 10 Hz.
      */
-    WhDiagnosticsThread(WhValveSystem& system,
-                        ValveManager&  manager,
+    ManifoldValvesDiagnosticsThread(ManifoldValves& system,
                         Ads7952Handler* ads7952,
                         uint32_t        period_ms = 100) noexcept
-        : BaseThread("WhDiag"),
+        : BaseThread("MnfldVlvDiag"),
           system_(system),
-          manager_(manager),
           ads7952_(ads7952),
           period_ms_(period_ms) {}
 
@@ -182,18 +180,19 @@ protected:
 
     uint32_t Step() noexcept override {
         const uint64_t now_ms = static_cast<uint64_t>(os_get_elapsed_time_msec());
-        const bool mgr_ready = manager_.IsInitialized();
+        ValveManager& mgr    = FLUX_API.valves;
+        const bool    mgr_ready = mgr.IsInitialized();
         manager_ready_.store(mgr_ready, std::memory_order_release);
 
         if (mgr_ready) {
             // ── Per-valve fault aggregation ───────────────────────────────
             system_.ForEachSolenoid([this, now_ms](SolenoidValve& v) {
                 v.SetDiagnosticTimestamp(now_ms);
-                (void)v.OnDiagnostics(manager_);
+                (void)v.OnDiagnostics();
             });
             system_.ForEachProportional([this, now_ms](ProportionalValve& v) {
                 v.SetDiagnosticTimestamp(now_ms);
-                (void)v.OnDiagnostics(manager_);
+                (void)v.OnDiagnostics();
             });
 
             // ── System totals (sticky counters) ───────────────────────────
@@ -206,9 +205,9 @@ protected:
             total_apply_errors_.store(total_e, std::memory_order_release);
 
             // ── MAX22200 global STATUS scrape ─────────────────────────────
-            ScrapeMax22200();
+            ScrapeMax22200(mgr);
             // ── TLE92466ED global FaultReport scrape ──────────────────────
-            ScrapeTle92466();
+            ScrapeTle92466(mgr);
         } else {
             max22200_ready_.store(false, std::memory_order_release);
             tle92466_ready_.store(false, std::memory_order_release);
@@ -260,8 +259,8 @@ private:
     static constexpr uint32_t kTleSupNokInt  = 1U << 14;
     static constexpr uint32_t kTleSupNokExt  = 1U << 15;
 
-    void ScrapeMax22200() noexcept {
-        Max22200Handler* h = manager_.GetMax22200Handler();
+    void ScrapeMax22200(ValveManager& mgr) noexcept {
+        Max22200Handler* h = mgr.GetMax22200Handler();
         if (!h) {
             max22200_ready_.store(false, std::memory_order_release);
             max_flags_.store(0, std::memory_order_release);
@@ -287,9 +286,9 @@ private:
         max_channels_on_mask_.store(st.channels_on_mask, std::memory_order_release);
     }
 
-    void ScrapeTle92466() noexcept {
+    void ScrapeTle92466(ValveManager& mgr) noexcept {
         tle92466ed::FaultReport report{};
-        const hf_valve_err_t err = manager_.GetProportionalFaults(report);
+        const hf_valve_err_t err = mgr.GetProportionalFaults(report);
         if (err != hf_valve_err_t::VALVE_SUCCESS) {
             tle92466_ready_.store(false, std::memory_order_release);
             return;
@@ -315,7 +314,7 @@ private:
         tle_flags_.store(bits, std::memory_order_release);
         // Optionally also pull live VBAT/VIO from DeviceStatus (separate
         // call) — the FaultReport does not include voltages.
-        Tle92466edHandler* h = manager_.GetTle92466Handler();
+        Tle92466edHandler* h = mgr.GetTle92466Handler();
         if (h) {
             tle92466ed::DeviceStatus dev{};
             // GetDeviceStatus exists on the underlying driver but the
@@ -329,8 +328,7 @@ private:
     // Templated empty snapshot used to seed GetSnapshot() reads.
     static const SubsystemFaultSnapshot snapshot_template_;
 
-    WhValveSystem&  system_;
-    ValveManager&   manager_;
+    ManifoldValves&  system_;
     Ads7952Handler* ads7952_;
     uint32_t        period_ms_;
 
@@ -358,6 +356,6 @@ private:
     uint8_t thread_stack_[kThreadStackBytes]{};
 };
 
-inline const SubsystemFaultSnapshot WhDiagnosticsThread::snapshot_template_{};
+inline const SubsystemFaultSnapshot ManifoldValvesDiagnosticsThread::snapshot_template_{};
 
-}  // namespace whvalve
+}  // namespace manifold_valves

@@ -1,5 +1,5 @@
 /**
- * @file WhValveSelfTest.h
+ * @file ManifoldValvesSelfTest.h
  * @brief Boot-time self-test that exercises every WH bench valve in sequence
  *        and surfaces any per-valve diagnostic the driver IC reports.
  *
@@ -14,8 +14,8 @@
  *              while sampling the live `FB_I_AVG` telemetry, exactly like
  *              the `lm_pro_cycle_test` in the TLE92466ED examples folder.
  *
- *          The self-test does NOT bypass the existing `WhValveControlThread`
- *          / `WhDiagnosticsThread`; it is layered on top of them. It sets
+ *          The self-test does NOT bypass the existing `ManifoldValvesControlThread`
+ *          / `ManifoldValvesDiagnosticsThread`; it is layered on top of them. It sets
  *          the per-valve target via `RequestPosition` (the same lock-free
  *          API any control loop would use) and waits for the control thread
  *          to push it. Diagnostics are read back through `Snapshot()` after
@@ -36,8 +36,8 @@
 #pragma once
 
 #include "OsUtility.h"
-#include "WhDiagnosticsThread.h"
-#include "WhValveSystem.h"
+#include "ManifoldValvesDiagnosticsThread.h"
+#include "ManifoldValves.h"
 
 #include "esp_log.h"
 
@@ -46,14 +46,14 @@
 #include <cstdint>
 #include <cstdio>
 
-namespace whvalve {
+namespace manifold_valves {
 
 /**
  * @brief Per-valve enable mask + tunable knobs for the boot self-test.
  *
  * Defaults: every valve in the catalog is tested; the user can flip any
  * `enable_*` flag to false in the application before calling
- * `WhValveSelfTest::Run`.
+ * `ManifoldValvesSelfTest::Run`.
  */
 struct SelfTestPlan {
     /// One bit per `SolenoidId`; index = static_cast<size_t>(id).
@@ -390,21 +390,21 @@ struct SelfTestReport {
  * @brief Driver for the boot self-test.
  *
  * Owns no state; everything lives on the stack of `Run()`. The class exists
- * purely as a namespace for the helpers. Logs use the `WhSelfTest` ESP-IDF
+ * purely as a namespace for the helpers. Logs use the `ManifValvesSelf` ESP-IDF
  * tag at INFO level for normal flow and WARN/ERROR for faults.
  */
-class WhValveSelfTest {
+class ManifoldValvesSelfTest {
 public:
-    static constexpr const char* kTag = "WhSelfTest";
+    static constexpr const char* kTag = "ManifValvesSelf";
 
     /**
      * @brief Run the configured self-test plan synchronously on the caller.
      *
-     * Caller MUST have brought up `WhValveControlThread` and
-     * `WhDiagnosticsThread` already (otherwise targets won't reach hardware
+     * Caller MUST have brought up `ManifoldValvesControlThread` and
+     * `ManifoldValvesDiagnosticsThread` already (otherwise targets won't reach hardware
      * and diagnostics won't be refreshed).
      *
-     * @param system  Shared WhValveSystem instance.
+     * @param system  Shared ManifoldValves instance.
      * @param diag    Diagnostics thread (used to pull subsystem-level health).
      * @param plan    Test plan (defaults to `SelfTestPlan::All()`).
      * @return Per-valve report. `overall_pass` is true if every enabled
@@ -414,8 +414,8 @@ public:
      * @return Reference to a static report. Held by the self-test instance;
      *         do not call `Run()` concurrently from multiple threads.
      */
-    static const SelfTestReport& Run(WhValveSystem&         system,
-                                     WhDiagnosticsThread&   diag,
+    static const SelfTestReport& Run(ManifoldValves&         system,
+                                     ManifoldValvesDiagnosticsThread&   diag,
                                      const SelfTestPlan&    plan = SelfTestPlan::All()) noexcept {
         // Keep the (~3 kB) report off the main task's small stack.
         static SelfTestReport report{};
@@ -423,7 +423,7 @@ public:
 
         ESP_LOGI(kTag, "");
         ESP_LOGI(kTag, "════════════════════════════════════════════════════════════");
-        ESP_LOGI(kTag, "  WH Valve Self-Test — bench commissioning sweep");
+        ESP_LOGI(kTag, "  Manifold valves self-test — bench commissioning sweep");
         ESP_LOGI(kTag, "  one valve at a time, 1× ON/OFF or ramp + diagnostics");
         ESP_LOGI(kTag, "════════════════════════════════════════════════════════════");
         ESP_LOGI(kTag, "");
@@ -531,7 +531,7 @@ private:
     static SelfTestResult TestSolenoid(SolenoidValve&          valve,
                                        const SolenoidMapEntry& entry,
                                        const SelfTestPlan&     plan,
-                                       WhDiagnosticsThread&    diag) noexcept {
+                                       ManifoldValvesDiagnosticsThread&    diag) noexcept {
         SelfTestResult res{};
         res.label   = entry.label;
         res.channel = entry.manager_channel;
@@ -603,7 +603,7 @@ private:
     //
     // For each setpoint visited along the triangle we:
     //   1. Request the position (lock-free atomic, picked up by the
-    //      WhValveControlThread on its next tick).
+    //      ManifoldValvesControlThread on its next tick).
     //   2. Sleep `proportional_settle_ms` (covers ≥ one dither period + one
     //      diagnostic poll).
     //   3. Wait one full diagnostics-thread sweep so the snapshot's
@@ -618,7 +618,7 @@ private:
     static SelfTestResult TestProportional(ProportionalValve&         valve,
                                            const ProportionalMapEntry& entry,
                                            const SelfTestPlan&         plan,
-                                           WhDiagnosticsThread&        diag) noexcept {
+                                           ManifoldValvesDiagnosticsThread&        diag) noexcept {
         SelfTestResult res{};
         res.label   = entry.label;
         res.channel = entry.manager_channel;
@@ -758,8 +758,8 @@ private:
     // Parallel stress test: drive every TLE92466ED channel simultaneously
     //---------------------------------------------------------------------
     static ParallelStressPatternResult
-    RunParallelStress(WhValveSystem&         system,
-                      WhDiagnosticsThread&   diag,
+    RunParallelStress(ManifoldValves&         system,
+                      ManifoldValvesDiagnosticsThread&   diag,
                       const SelfTestPlan&    plan,
                       bool                   staggered) noexcept {
         ParallelStressPatternResult result{};
@@ -1052,7 +1052,7 @@ private:
 
     /// Wait until the diagnostics thread has completed one fresh full pass
     /// after the call returns. Without this we'd race the snapshot read.
-    static void WaitForDiagPass(WhDiagnosticsThread& diag) noexcept {
+    static void WaitForDiagPass(ManifoldValvesDiagnosticsThread& diag) noexcept {
         const uint32_t before = diag.IterationCount();
         const uint32_t target = before + 2U;        // two ticks for safety
         for (uint32_t spins = 0; spins < 200U; ++spins) {
@@ -1129,7 +1129,7 @@ private:
     static void PrintSummary(const SelfTestReport& report) noexcept {
         ESP_LOGI(kTag, "");
         ESP_LOGI(kTag, "════════════════════════════════════════════════════════════");
-        ESP_LOGI(kTag, "  WH Valve Self-Test Summary");
+        ESP_LOGI(kTag, "  Manifold valves self-test summary");
         ESP_LOGI(kTag, "════════════════════════════════════════════════════════════");
         ESP_LOGI(kTag, "  %-8s %-12s %-6s  %s", "Type", "Valve", "Pass", "Notes");
         ESP_LOGI(kTag, "  %-8s %-12s %-6s  %s", "----", "-----", "----", "-----");
@@ -1223,4 +1223,4 @@ private:
     }
 };
 
-}  // namespace whvalve
+}  // namespace manifold_valves

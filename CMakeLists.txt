@@ -117,6 +117,11 @@ endif()
 # Note: -Werror=padded, -Werror=suggest-*, -Werror=unused-function removed
 # because they fire on core/third-party struct layouts, header-only static
 # functions, and virtual method patterns the HAL cannot control.
+# -Wno-padded: same rationale — otherwise ~1k+ lines of struct-padding noise
+#   per full build (IDF, FreeRTOS, static buffers).
+# C-only and C++-only -Werror= must be set per language: applying C flags to
+# cc1plus and C++ flags to cc1 each emits a "not valid for …" driver warning
+# for every .c / .cpp file.
 target_compile_options(${COMPONENT_LIB} PRIVATE
     -Wall
     -Wextra
@@ -134,8 +139,6 @@ target_compile_options(${COMPONENT_LIB} PRIVATE
     -Werror=enum-conversion
     -Werror=free-nonheap-object
     -Werror=ignored-qualifiers
-    -Werror=implicit
-    -Werror=implicit-function-declaration
     -Werror=init-self
     -Werror=logical-not-parentheses
     -Werror=logical-op
@@ -143,17 +146,13 @@ target_compile_options(${COMPONENT_LIB} PRIVATE
     -Werror=maybe-uninitialized
     -Werror=memset-transposed-args
     -Werror=mismatched-dealloc
-    -Werror=mismatched-new-delete
     -Wno-error=missing-include-dirs
     -Werror=multichar
     -Werror=multistatement-macros
     -Werror=narrowing
     -Wno-error=noexcept
-    -Werror=non-template-friend
     -Werror=parentheses
     -Werror=pointer-arith
-    -Werror=pointer-sign
-    -Werror=reorder
     -Werror=return-local-addr
     -Werror=sequence-point
     -Werror=shift-count-negative
@@ -175,17 +174,24 @@ target_compile_options(${COMPONENT_LIB} PRIVATE
     -Werror=write-strings
     -Wno-error=zero-as-null-pointer-constant
     -Wno-error=format=
-    # Warnings kept but not treated as errors (fire on core/third-party code)
-    -Wpadded
+    -Wno-padded
     -Wunused-function
     -Wno-unused-parameter
     -Wno-missing-field-initializers
     -Wno-sign-compare
-    -Wno-volatile
     -Wno-duplicated-branches
     -Wno-missing-braces
     -Wno-missing-declarations
-    -Wno-overloaded-virtual
+)
+target_compile_options(${COMPONENT_LIB} PRIVATE
+    $<$<COMPILE_LANGUAGE:C>:-Werror=implicit>
+    $<$<COMPILE_LANGUAGE:C>:-Werror=implicit-function-declaration>
+    $<$<COMPILE_LANGUAGE:C>:-Werror=pointer-sign>
+    $<$<COMPILE_LANGUAGE:CXX>:-Werror=mismatched-new-delete>
+    $<$<COMPILE_LANGUAGE:CXX>:-Werror=non-template-friend>
+    $<$<COMPILE_LANGUAGE:CXX>:-Werror=reorder>
+    $<$<COMPILE_LANGUAGE:CXX>:-Wno-volatile>
+    $<$<COMPILE_LANGUAGE:CXX>:-Wno-overloaded-virtual>
 )
 
 # WS2812 Kconfig defaults — PUBLIC because ws2812 headers are transitively

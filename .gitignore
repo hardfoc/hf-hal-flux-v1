@@ -140,5 +140,5 @@ Thumbs.db
 CHANGELOG.md
 
 # Local bench tests (machine-specific, not for GitHub)
-examples/wh_valve_pressure_control.cpp
-examples/esp32/main/wh_valve_pressure_control.cpp
+examples/manifold_valves_pressure_control.cpp
+examples/esp32/main/manifold_valves_pressure_control/manifold_valves_pressure_control.cpp

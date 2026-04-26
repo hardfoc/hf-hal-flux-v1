@@ -39,8 +39,16 @@ bool LedManager::Shutdown() noexcept {
     std::lock_guard<RtosMutex> lock(mutex_);
     if (!is_initialized_.load(std::memory_order_acquire)) return true;
 
-    StopAnimation();
-    TurnOff();
+    const LedError anim_err = StopAnimation();
+    if (anim_err != LedError::SUCCESS) {
+        Logger::GetInstance().Warn(TAG, "StopAnimation during shutdown: %s",
+                                   LedErrorToString(anim_err));
+    }
+    const LedError off_err = TurnOff();
+    if (off_err != LedError::SUCCESS) {
+        Logger::GetInstance().Warn(TAG, "TurnOff during shutdown: %s",
+                                   LedErrorToString(off_err));
+    }
     led_animator_.reset();
     led_strip_.reset();
     is_initialized_.store(false, std::memory_order_release);
@@ -74,7 +82,13 @@ LedError LedManager::SetColor(const LedColor& color, uint32_t led_index) noexcep
 
     std::lock_guard<RtosMutex> lock(mutex_);
 
-    if (current_animation_ != LedAnimation::OFF) StopAnimation();
+    if (current_animation_ != LedAnimation::OFF) {
+        const LedError se = StopAnimation();
+        if (se != LedError::SUCCESS) {
+            UpdateLastError(se);
+            return se;
+        }
+    }
 
     led_strip_->SetPixel(led_index, color.ToRgb());
     esp_err_t result = led_strip_->Show();
@@ -100,7 +114,13 @@ LedError LedManager::TurnOff() noexcept {
     if (!EnsureInitialized()) { UpdateLastError(LedError::NOT_INITIALIZED); return LedError::NOT_INITIALIZED; }
 
     std::lock_guard<RtosMutex> lock(mutex_);
-    if (current_animation_ != LedAnimation::OFF) StopAnimation();
+    if (current_animation_ != LedAnimation::OFF) {
+        const LedError se = StopAnimation();
+        if (se != LedError::SUCCESS) {
+            UpdateLastError(se);
+            return se;
+        }
+    }
 
     led_strip_->SetPixel(0, 0);
     esp_err_t result = led_strip_->Show();
@@ -165,7 +185,13 @@ LedError LedManager::StartAnimation(LedAnimation animation, const LedColor& colo
     if (!EnsureInitialized()) return LedError::NOT_INITIALIZED;
 
     std::lock_guard<RtosMutex> lock(mutex_);
-    if (current_animation_ != LedAnimation::OFF) StopAnimation();
+    if (current_animation_ != LedAnimation::OFF) {
+        const LedError se = StopAnimation();
+        if (se != LedError::SUCCESS) {
+            UpdateLastError(se);
+            return se;
+        }
+    }
 
     current_animation_ = animation;
     current_color_ = color;
