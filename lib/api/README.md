@@ -1,5 +1,13 @@
 # Flux API — Unified HardFOC Platform Interface
 
+## CPU affinity (`FluxCpuAffinity.h`)
+
+FreeRTOS task pinning uses **logical** core indices defined in
+`FluxCpuAffinity.h` (`flux_hal::kFluxCpuNoAffinity`, `kFluxCpuHostIo`,
+`kFluxCpuRealtime`). Application firmware (`main/`) includes that header
+only—vendor core names (e.g. PRO/APP on Espressif dual-core parts) are
+documented in the board integration guide, not as macros in `main/`.
+
 ## Overview
 
 The Flux API provides a unified singleton interface to all component managers

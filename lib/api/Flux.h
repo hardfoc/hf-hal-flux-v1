@@ -21,6 +21,9 @@
  *   6. LedManager           (WS2812, independent)
  *   7. TemperatureManager   (depends on ADC)
  *
+ * Task CPU affinity for this board uses logical indices from
+ * `FluxCpuAffinity.h` (`flux_hal::kFluxCpuHostIo`, `kFluxCpuRealtime`, …).
+ *
  * Usage:
  * @code
  *   auto& flux = Flux::GetInstance();
