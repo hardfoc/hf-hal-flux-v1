@@ -220,6 +220,37 @@ bool ValveManager::InitializeTle92466() noexcept {
             "TLE92466ED FB_FRZ cleared — per-channel feedback updates enabled");
     }
 
+    // Configure VBAT supply-voltage trip thresholds for the 24 V valve rail.
+    // The chip's POR defaults (UV ≈ 4 V, OV ≈ 41 V) span almost the full
+    // ADC range and will never fire a useful diagnostic on a 24 V system.
+    // Formula: register = voltage / 0.16208 V  (per TLE92466ED datasheet).
+    //
+    // 24 V nominal, ±20 % operating band → flag outside [19 V … 29 V].
+    //   UV 19 V → register ≈ 117  (19.0 / 0.16208 = 117.2)
+    //   OV 29 V → register ≈ 179  (29.0 / 0.16208 = 178.9)
+    //
+    // Tighten these once final PSU regulation specs are confirmed; they must
+    // remain within the supply's rated output range to avoid false trips from
+    // normal load-step droop (inrush during simultaneous valve actuation can
+    // sag the rail by several volts on a lightly buffered bench supply).
+    constexpr float kVbatUvV = 19.0F;  ///< UV trip: 24 V − 21 % (flag true supply loss)
+    constexpr float kVbatOvV = 29.0F;  ///< OV trip: 24 V + 21 % (flag regulator runaway)
+    {
+        auto* drv = tle92466_->GetDriver();
+        auto result = drv ? drv->SetVbatThresholds(kVbatUvV, kVbatOvV)
+                          : tle92466ed::DriverResult<void>{tle::unexpected(tle92466ed::DriverError::NotInitialized)};
+        if (!result) {
+            Logger::GetInstance().Warn(TAG,
+                "TLE92466ED SetVbatThresholds(UV=%.1f V, OV=%.1f V) failed — "
+                "supply monitoring uses chip defaults (UV≈4 V / OV≈41 V)",
+                static_cast<double>(kVbatUvV), static_cast<double>(kVbatOvV));
+        } else {
+            Logger::GetInstance().Info(TAG,
+                "TLE92466ED VBAT thresholds set: UV=%.1f V, OV=%.1f V",
+                static_cast<double>(kVbatUvV), static_cast<double>(kVbatOvV));
+        }
+    }
+
     tle92466_valid_ = true;
     Logger::GetInstance().Info(TAG, "TLE92466ED initialized successfully (6 proportional channels)");
     return true;
