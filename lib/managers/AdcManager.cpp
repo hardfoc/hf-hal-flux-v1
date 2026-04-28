@@ -9,6 +9,7 @@
 
 #include "AdcManager.h"
 #include "handlers/logger/Logger.h"
+#include "handlers/logger/LogDecorators.h"
 #include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/utils/memory_utils.h"
 #include "core/hf-core-utils/hf-utils-rtos-wrap/include/OsUtility.h"
 
@@ -43,6 +44,9 @@ bool AdcManager::EnsureInitialized() noexcept {
 
 bool AdcManager::Initialize() noexcept {
     Logger::GetInstance().Info(TAG, "Initializing Flux ADC manager");
+    logger_decor::Section(TAG, "ADC registration table");
+    Logger::GetInstance().Info(TAG, "  %-27s %-15s %-8s %-5s %-6s", "Channel", "Source", "Unit", "Ch", "Div");
+    Logger::GetInstance().Info(TAG, "  %-27s %-15s %-8s %-5s %-6s", "-------", "------", "----", "--", "---");
 
     init_time_ms_ = os_get_elapsed_time_msec();
 
@@ -107,8 +111,9 @@ bool AdcManager::Initialize() noexcept {
             // Configure the channel on the EspAdc driver
             esp_adc_->ConfigureChannel(mapping.physical_channel, hf_adc_atten_t::ATTEN_DB_12);
 
-            Logger::GetInstance().Info(TAG, "  Registered ADC: %.*s (unit=%u ch=%u div=%.1f)",
+            Logger::GetInstance().Info(TAG, "  %-27.*s %-15s %-8u %-5u %-6.1f",
                                       static_cast<int>(entry.name.size()), entry.name.data(),
+                                      "ESP32_INTERNAL",
                                       entry.adc_unit, entry.hw_channel,
                                       static_cast<double>(entry.voltage_divider));
         }
@@ -147,14 +152,14 @@ bool AdcManager::Initialize() noexcept {
                 if (ads7952_handlers_[dev_idx]) {
                     if (ads7952_handlers_[dev_idx]->EnsureInitialized()) {
                         ++ads7952_device_count_;
-                        Logger::GetInstance().Info(TAG, "  ADS7952 Dev%u handler initialized", dev_idx);
+                        Logger::GetInstance().Info(TAG, "  [ADS7952] Dev%u handler initialized", dev_idx);
                     } else {
-                        Logger::GetInstance().Error(TAG, "  ADS7952 Dev%u initialization failed", dev_idx);
+                        Logger::GetInstance().Error(TAG, "  [ADS7952] Dev%u initialization failed", dev_idx);
                         ads7952_handlers_[dev_idx].reset();
                     }
                 }
             } else {
-                Logger::GetInstance().Warn(TAG, "  ADS7952 Dev%u: SPI device not available", dev_idx);
+                Logger::GetInstance().Warn(TAG, "  [ADS7952] Dev%u: SPI device not available", dev_idx);
             }
         }
 
@@ -173,14 +178,18 @@ bool AdcManager::Initialize() noexcept {
             enum_to_index_[static_cast<size_t>(fc)] = registered_count_;
             ++registered_count_;
 
-            Logger::GetInstance().Info(TAG, "  Registered ADC: %.*s (ADS7952 Dev%u ch=%u div=%.1f)",
+            char src[24];
+            std::snprintf(src, sizeof(src), "ADS7952_DEV%u", static_cast<unsigned>(dev_idx));
+            Logger::GetInstance().Info(TAG, "  %-27.*s %-15s %-8u %-5u %-6.1f",
                                       static_cast<int>(entry.name.size()), entry.name.data(),
-                                      dev_idx, entry.hw_channel,
+                                      src,
+                                      entry.adc_unit, entry.hw_channel,
                                       static_cast<double>(entry.voltage_divider));
         }
     }
 #endif // HARDFOC_ADS7952_SUPPORT
 
+    logger_decor::Rule(TAG);
     Logger::GetInstance().Info(TAG, "ADC manager initialized (%zu channels)", registered_count_);
     return registered_count_ > 0;
 }

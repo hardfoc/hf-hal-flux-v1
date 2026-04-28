@@ -18,11 +18,49 @@
 #include "managers/TemperatureManager.h"
 
 #include "core/hf-core-utils/hf-utils-rtos-wrap/include/OsUtility.h"
+#include "core/handlers/logger/LogDecorators.h"
 
 #include "esp_system.h"
 #include "esp_heap_caps.h"
 
 static constexpr const char* TAG = "Flux";
+
+namespace {
+
+void LogInitHeader() noexcept {
+    logger_decor::Banner(TAG, "Flux HAL bring-up");
+    Logger::GetInstance().Info(TAG, "  %-2s %-15s %-7s %s", "#", "Component", "Result", "Elapsed");
+    Logger::GetInstance().Info(TAG, "  %-2s %-15s %-7s %s", "--", "---------", "------", "-------");
+}
+
+void LogInitRow(unsigned step,
+                const char* name,
+                bool ok,
+                bool fatal,
+                uint32_t elapsed_ms) noexcept {
+    const char* result = ok ? "OK" : (fatal ? "FAIL" : "WARN");
+    if (ok) {
+        Logger::GetInstance().Info(TAG,
+            "  %-2u %-15s %-7s %5lu ms", step, name, result,
+            static_cast<unsigned long>(elapsed_ms));
+        return;
+    }
+    Logger::GetInstance().Warn(TAG,
+        "  %-2u %-15s %-7s %5lu ms", step, name, result,
+        static_cast<unsigned long>(elapsed_ms));
+}
+
+void LogInitFooter() noexcept {
+    logger_decor::Rule(TAG);
+}
+
+void LogStepBanner(unsigned step, const char* name) noexcept {
+    char title[64];
+    std::snprintf(title, sizeof(title), "[%u/7] %s", step, name);
+    logger_decor::Section(TAG, title);
+}
+
+}  // namespace
 
 //==============================================================================
 // SINGLETON
@@ -69,7 +107,8 @@ bool Flux::EnsureInitialized() noexcept {
         UpdateSystemDiagnostics();
 
         uint64_t dt = GetInitializationTimeMs();
-        Logger::GetInstance().Info(TAG, "Flux API initialized in %llu ms", dt);
+        Logger::GetInstance().Info(TAG, "Flux API initialized in %lu ms",
+            static_cast<unsigned long>(dt));
         Logger::GetInstance().Info(TAG, "  NVS=%s Comms=%s GPIO=%s Valves=%s ADC=%s LEDs=%s Temp=%s",
             nvs_initialized_    ? "OK" : "FAIL",
             comms_initialized_  ? "OK" : "FAIL",
@@ -87,45 +126,44 @@ bool Flux::EnsureInitialized() noexcept {
 
 bool Flux::InitializeAllComponents() noexcept {
     Logger::GetInstance().Info(TAG, "Initializing Flux components in dependency order");
+    LogInitHeader();
 
-    // Step 1: NVS (flash storage — before buses for early config/calibration access)
-    if (!InitializeNvs()) {
-        Logger::GetInstance().Error(TAG, "NVS failed — aborting");
+    auto run_step = [](unsigned step,
+                       const char* name,
+                       bool fatal,
+                       bool (*fn)(Flux*)) noexcept -> bool {
+        LogStepBanner(step, name);
+        const uint64_t t0 = static_cast<uint64_t>(os_get_elapsed_time_msec());
+        Flux* self = &Flux::GetInstance();
+        const bool ok = fn(self);
+        const uint64_t t1 = static_cast<uint64_t>(os_get_elapsed_time_msec());
+        const uint32_t dt = static_cast<uint32_t>((t1 >= t0) ? (t1 - t0) : 0U);
+        LogInitRow(step, name, ok, fatal, dt);
+        if (!ok && fatal) {
+            Logger::GetInstance().Error(TAG, "%s failed - aborting", name);
+        }
+        return ok || !fatal;
+    };
+
+    if (!run_step(1, "NVS", true, [](Flux* f) noexcept { return f->InitializeNvs(); })) {
+        LogInitFooter();
+        return false;
+    }
+    if (!run_step(2, "Comms", true, [](Flux* f) noexcept { return f->InitializeComms(); })) {
+        LogInitFooter();
+        return false;
+    }
+    if (!run_step(3, "GPIO", true, [](Flux* f) noexcept { return f->InitializeGpio(); })) {
+        LogInitFooter();
         return false;
     }
 
-    // Step 2: Communication buses
-    if (!InitializeComms()) {
-        Logger::GetInstance().Error(TAG, "CommChannels failed — aborting");
-        return false;
-    }
+    (void)run_step(4, "Valves", false, [](Flux* f) noexcept { return f->InitializeValves(); });
+    (void)run_step(5, "ADC", false, [](Flux* f) noexcept { return f->InitializeAdc(); });
+    (void)run_step(6, "LEDs", false, [](Flux* f) noexcept { return f->InitializeLeds(); });
+    (void)run_step(7, "Temp", false, [](Flux* f) noexcept { return f->InitializeTemperature(); });
 
-    // Step 3: GPIO (depends on comms for future expansion)
-    if (!InitializeGpio()) {
-        Logger::GetInstance().Error(TAG, "GPIO failed — aborting");
-        return false;
-    }
-
-    // Step 4: Valves (depends on comms + gpio)
-    if (!InitializeValves()) {
-        Logger::GetInstance().Warn(TAG, "Valve init failed — continuing");
-    }
-
-    // Step 5: ADC (independent)
-    if (!InitializeAdc()) {
-        Logger::GetInstance().Warn(TAG, "ADC init failed — continuing");
-    }
-
-    // Step 6: LEDs (independent)
-    if (!InitializeLeds()) {
-        Logger::GetInstance().Warn(TAG, "LED init failed — continuing");
-    }
-
-    // Step 7: Temperature (depends on ADC)
-    if (!InitializeTemperature()) {
-        Logger::GetInstance().Warn(TAG, "Temperature init failed — continuing");
-    }
-
+    LogInitFooter();
     Logger::GetInstance().Info(TAG, "Component initialization complete");
     return true;
 }

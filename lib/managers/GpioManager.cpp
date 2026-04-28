@@ -9,6 +9,7 @@
 
 #include "GpioManager.h"
 #include "handlers/logger/Logger.h"
+#include "handlers/logger/LogDecorators.h"
 #include "core/hf-core-utils/hf-utils-rtos-wrap/include/OsUtility.h"
 
 static constexpr const char* TAG = "FluxGpio";
@@ -41,6 +42,9 @@ bool GpioManager::EnsureInitialized() noexcept {
 
 bool GpioManager::Initialize() noexcept {
     Logger::GetInstance().Info(TAG, "Initializing Flux GPIO manager");
+    logger_decor::Section(TAG, "GPIO registration table");
+    Logger::GetInstance().Info(TAG, "  %-28s %-7s %-7s", "Name", "Pin", "Result");
+    Logger::GetInstance().Info(TAG, "  %-28s %-7s %-7s", "----", "---", "------");
 
     init_time_ms_ = os_get_elapsed_time_msec();
     registered_count_ = 0;
@@ -90,16 +94,17 @@ bool GpioManager::Initialize() noexcept {
         if (entry.driver->EnsureInitialized()) {
             entry.registered = true;
             ++registered_count_;
-            Logger::GetInstance().Info(TAG, "Registered GPIO: %.*s (GPIO%d)",
+            Logger::GetInstance().Info(TAG, "  %-28.*s GPIO%-3d %-7s",
                                       static_cast<int>(mapping.name.size()), mapping.name.data(),
-                                      mapping.physical_pin);
+                                      mapping.physical_pin, "OK");
         } else {
-            Logger::GetInstance().Error(TAG, "Failed to register GPIO: %.*s (GPIO%d)",
+            Logger::GetInstance().Error(TAG, "  %-28.*s GPIO%-3d %-7s",
                                        static_cast<int>(mapping.name.size()), mapping.name.data(),
-                                       mapping.physical_pin);
+                                       mapping.physical_pin, "FAIL");
         }
     }
 
+    logger_decor::Rule(TAG);
     Logger::GetInstance().Info(TAG, "GPIO manager initialized: %zu pins registered", registered_count_);
     return registered_count_ > 0;
 }
