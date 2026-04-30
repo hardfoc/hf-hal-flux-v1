@@ -58,6 +58,17 @@ bool CommChannelsManager::EnsureInitialized() noexcept {
 bool CommChannelsManager::Initialize() noexcept {
     Logger::GetInstance().Info(TAG, "Initializing Flux V1 communication channels");
 
+    struct SpiSpeedDisplay {
+        uint32_t value;
+        const char* unit;
+    };
+    const auto format_spi_speed = [](uint32_t hz) noexcept -> SpiSpeedDisplay {
+        if (hz >= 1'000'000U) {
+            return {hz / 1'000'000U, "MHz"};
+        }
+        return {hz / 1'000U, "kHz"};
+    };
+
     //==========================================================================
     // SPI BUS (SPI3_HOST) — shared by MAX22200 and TLE92466ED
     // Note: GPIO35-38 use SPI3_HOST via GPIO matrix (SPI3 has no IOMUX pins)
@@ -93,9 +104,12 @@ bool CommChannelsManager::Initialize() noexcept {
                     dev_cfg.clock_speed_hz  = 1'000'000;
                     dev_cfg.mode            = hf_spi_mode_t::HF_SPI_MODE_0;
                     int idx = spi_bus_->CreateDevice(dev_cfg);
+                    const SpiSpeedDisplay speed = format_spi_speed(static_cast<uint32_t>(dev_cfg.clock_speed_hz));
                     spi_device_indices_[static_cast<uint8_t>(SpiDeviceId::MAX22200_SOLENOID_DRIVER)] = idx;
-                    Logger::GetInstance().Info(TAG, "MAX22200 SPI device added (CS=GPIO%d, idx=%d, 1 MHz mode 0)",
-                                              cs_max_map->physical_pin, idx);
+                    Logger::GetInstance().Info(TAG,
+                                               "MAX22200 SPI device added (host=%d SPI3_HOST, CS=GPIO%d, idx=%d, speed=%u %s, mode=%d)",
+                                               static_cast<int>(spi_cfg.host), cs_max_map->physical_pin, idx,
+                                               speed.value, speed.unit, static_cast<int>(dev_cfg.mode));
                 }
 
                 // Device 1: TLE92466ED — SPI Mode 1, 1 MHz (lowered from
@@ -109,9 +123,12 @@ bool CommChannelsManager::Initialize() noexcept {
                     dev_cfg.clock_speed_hz  = 1'000'000;
                     dev_cfg.mode            = hf_spi_mode_t::HF_SPI_MODE_1;
                     int idx = spi_bus_->CreateDevice(dev_cfg);
+                    const SpiSpeedDisplay speed = format_spi_speed(static_cast<uint32_t>(dev_cfg.clock_speed_hz));
                     spi_device_indices_[static_cast<uint8_t>(SpiDeviceId::TLE92466_LOWSIDE_DRIVER)] = idx;
-                    Logger::GetInstance().Info(TAG, "TLE92466ED SPI device added (CS=GPIO%d, idx=%d, 1 MHz mode 1)",
-                                              cs_tle_map->physical_pin, idx);
+                    Logger::GetInstance().Info(TAG,
+                                               "TLE92466ED SPI device added (host=%d SPI3_HOST, CS=GPIO%d, idx=%d, speed=%u %s, mode=%d)",
+                                               static_cast<int>(spi_cfg.host), cs_tle_map->physical_pin, idx,
+                                               speed.value, speed.unit, static_cast<int>(dev_cfg.mode));
                 }
             } else {
                 Logger::GetInstance().Error(TAG, "SPI bus initialization failed");
@@ -154,10 +171,13 @@ bool CommChannelsManager::Initialize() noexcept {
                     dev_cfg.clock_speed_hz  = 4'000'000;  // 4 MHz for ADS7952 stability
                     dev_cfg.mode            = hf_spi_mode_t::HF_SPI_MODE_0;
                     int idx = spi3_bus_->CreateDevice(dev_cfg);
+                    const SpiSpeedDisplay speed = format_spi_speed(static_cast<uint32_t>(dev_cfg.clock_speed_hz));
                     spi_device_indices_[static_cast<uint8_t>(SpiDeviceId::ADS7952_ADC_0)] = idx;
                     spi_device_bus_[static_cast<uint8_t>(SpiDeviceId::ADS7952_ADC_0)] = 1; // SPI3
-                    Logger::GetInstance().Info(TAG, "ADS7952 SPI device added (CS=GPIO%d, idx=%d, SPI3)",
-                                              cs_adc_map->physical_pin, idx);
+                    Logger::GetInstance().Info(TAG,
+                                               "ADS7952 SPI device added (host=%d SPI2_HOST, CS=GPIO%d, idx=%d, speed=%u %s, mode=%d)",
+                                               static_cast<int>(spi3_cfg.host), cs_adc_map->physical_pin, idx,
+                                               speed.value, speed.unit, static_cast<int>(dev_cfg.mode));
                 }
             } else {
                 Logger::GetInstance().Warn(TAG, "SPI3 bus initialization failed — ADS7952 unavailable");
