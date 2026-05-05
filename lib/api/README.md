@@ -305,11 +305,8 @@ See `examples/esp32/main/flux_nvs_example.cpp` — build and flash with:
 
 `./scripts/build_app.sh flux_nvs_example Debug` then `./scripts/flash_app.sh flash_monitor flux_nvs_example Debug` from `examples/esp32/`.
 
-## Related Documentation
+## Related documentation
 
-- [Valve Manager](../../docs/component-handlers/VALVE_MANAGER_README.md)
-- [ADC Manager](../../docs/component-handlers/ADC_MANAGER_README.md)
-- [GPIO Manager](../../docs/component-handlers/GPIO_MANAGER_README.md)
-- [LED Manager](../../docs/component-handlers/LED_MANAGER_README.md)
-- [Temperature Manager](../../docs/component-handlers/TEMPERATURE_MANAGER_README.md)
-- [Comm Channels Manager](../../docs/component-handlers/COMM_CHANNELS_MANAGER_README.md)
+- [HAL documentation hub](../../docs/hal/README.md)
+- [Manager ↔ handler map](../../docs/hal/managers-and-handlers.md)
+- Manager headers: [`../../lib/managers/`](../../lib/managers/)

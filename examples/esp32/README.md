@@ -6,7 +6,9 @@ This directory contains buildable ESP-IDF examples that exercise the **Flux HAL 
 from `lib/api/Flux.h`. Each `.cpp` file in `main/` is a standalone test/example
 that can be built and flashed independently using the `build_app.sh` script.
 
-## Available Examples
+**Full catalog** of every `APP_TYPE`, CI flags, and paths: **[`docs/README.md`](docs/README.md)** (kept in sync with [`app_config.yml`](app_config.yml)).
+
+## Available Examples (short list)
 
 | App Type | Source File | Description |
 |---|---|---|
