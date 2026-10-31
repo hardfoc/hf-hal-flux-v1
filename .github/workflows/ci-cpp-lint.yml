@@ -10,7 +10,7 @@ on:
 
 jobs:
   cpp-lint:
-    uses: N3b3x/hf-general-ci-tools/.github/workflows/ru-cpp-lint.yml@main
+    uses: hardfoc/hf-general-ci-tools/.github/workflows/ru-cpp-lint.yml@main
     with:
       clang_version: "20"
       clang_format_config: "_config/.clang-format"

@@ -18,7 +18,7 @@ concurrency:
 
 jobs:
   publish:
-    uses: N3b3x/hf-general-ci-tools/.github/workflows/ru-docs-publish.yml@main
+    uses: hardfoc/hf-general-ci-tools/.github/workflows/ru-docs-publish.yml@main
     with:
       doxygen_config: "_config/Doxyfile"
       jekyll_config: "_config/_config.yml"

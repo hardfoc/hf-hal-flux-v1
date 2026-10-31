@@ -47,7 +47,7 @@ jobs:
 
   build:
     needs: validate
-    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/ru-build.yml@main
+    uses: hardfoc/hf-espidf-ci-tools/.github/workflows/ru-build.yml@main
     with:
       project_dir: ${{ needs.validate.outputs.project_dir }}
       project_tools_dir: ${{ needs.validate.outputs.tools_dir }}

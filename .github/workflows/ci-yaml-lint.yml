@@ -10,7 +10,7 @@ on:
 
 jobs:
   yamllint:
-    uses: N3b3x/hf-general-ci-tools/.github/workflows/ru-yaml-lint.yml@main
+    uses: hardfoc/hf-general-ci-tools/.github/workflows/ru-yaml-lint.yml@main
     with:
       paths: ".github/workflows/*.yml,**/*.yml,**/*.yaml"
       config_file: "_config/.yamllint"
