@@ -6,7 +6,7 @@ on:
 
 jobs:
   release:
-    uses: N3b3x/hf-espidf-ci-tools/.github/workflows/ru-release-with-artifacts.yml@main
+    uses: hardfoc/hf-espidf-ci-tools/.github/workflows/ru-release-with-artifacts.yml@main
     with:
       build_workflow: "esp32-examples-build-ci.yml"
       artifact_pattern: "fw-.*"

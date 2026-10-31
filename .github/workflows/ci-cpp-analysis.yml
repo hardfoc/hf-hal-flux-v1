@@ -10,7 +10,7 @@ on:
 
 jobs:
   cppcheck:
-    uses: N3b3x/hf-general-ci-tools/.github/workflows/ru-cpp-analysis.yml@main
+    uses: hardfoc/hf-general-ci-tools/.github/workflows/ru-cpp-analysis.yml@main
     with:
       paths: "lib/managers lib/api"
       std: "c++20"
