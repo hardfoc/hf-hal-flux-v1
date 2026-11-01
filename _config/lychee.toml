@@ -17,13 +17,10 @@ exclude = [
   # CI (update = none in .gitmodules) and returns 404 to anonymous requests.
   '^https://github\.com/hardfoc/hf-development-handbook.*',
   '/docs/hf-development-handbook/',
+  # lib/core (hf-core) is a submodule. The reusable link check can only check
+  # out submodules recursively, and recursion fails at the pinned hf-core
+  # (hf-pf1550-driver there has a gitlink with no .gitmodules entry), so the
+  # submodule is not present when links are checked.
+  '/lib/core/',
 ]
 
-# Only check this repository's own Markdown. Submodules are checked out so that
-# links into them resolve, but their documentation is checked in their own repos.
-exclude_path = [
-  '^lib/core/',
-  '^examples/esp32/scripts/',
-  '^_config/doxygen-extensions/',
-  '^docs/hf-development-handbook/',
-]
