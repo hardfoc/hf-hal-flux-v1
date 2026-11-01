@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1078" viewBox="0 0 1200 1078" role="img" aria-labelledby="board-overview-title board-overview-desc" font-family="Inter, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif">
+<title id="board-overview-title">Flux V1: buses and chips</title>
+<desc id="board-overview-desc">Block diagram of the Flux V1 board: the ESP32-S3 connects over one SPI bus to the MAX22200 solenoid driver and the TLE92466ED proportional driver, over a second SPI bus to the ADS7952 ADC, over its internal ADC to the NTC thermistor and bus-voltage divider, over TWAI to the CAN transceiver, over UART to the FDO2 probe and to a WS2812 LED.</desc>
+<defs><marker id="fk-arrow-amber-strong" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#FBBF24"/></marker><marker id="fk-arrow-blue-strong" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#60A5FA"/></marker><marker id="fk-arrow-green-strong" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#4ADE80"/></marker><marker id="fk-arrow-teal-strong" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#2DD4BF"/></marker></defs>
+<rect x="0.5" y="0.5" width="1199" height="1077" rx="16" fill="#0E131A" stroke="#283241"/>
+<text x="32" y="44" font-size="12.5" font-weight="700" letter-spacing="1.2" fill="#C7CBFF">HARDWARE</text>
+<text x="32" y="77.3" font-size="26" font-weight="700" fill="#E8EDF3">Flux V1: buses and chips</text>
+<text x="32" y="103.8" font-size="15" fill="#9AA6B5">Every GPIO, ADC channel and SPI mode below is read from the pin map and the comms manager.</text>
+<rect x="32" y="119.8" width="1136" height="1" fill="#252F3C"/>
+<path d="M266 173.8 L638 173.8" fill="none" stroke="#60A5FA" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#fk-arrow-blue-strong)"/>
+<path d="M266 217.8 L638 217.8" fill="none" stroke="#60A5FA" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#fk-arrow-blue-strong)"/>
+<path d="M266 303.8 L638 303.8" fill="none" stroke="#60A5FA" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#fk-arrow-blue-strong)"/>
+<path d="M266 347.8 L638 347.8" fill="none" stroke="#60A5FA" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#fk-arrow-blue-strong)"/>
+<path d="M266 433.8 L638 433.8" fill="none" stroke="#2DD4BF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#fk-arrow-teal-strong)"/>
+<path d="M266 467.8 L638 467.8" fill="none" stroke="#2DD4BF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#fk-arrow-teal-strong)"/>
+<path d="M266 556.8 L638 556.8" fill="none" stroke="#2DD4BF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#fk-arrow-teal-strong)"/>
+<path d="M266 657.8 L638 657.8" fill="none" stroke="#4ADE80" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#fk-arrow-green-strong)"/>
+<path d="M266 753.8 L638 753.8" fill="none" stroke="#4ADE80" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="7 5" marker-end="url(#fk-arrow-green-strong)"/>
+<path d="M266 849.8 L638 849.8" fill="none" stroke="#FBBF24" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#fk-arrow-amber-strong)"/>
+<rect x="32" y="137.8" width="230" height="770" rx="10" fill="#1C1F3D" stroke="#8C93FF" stroke-width="1.4"/>
+<rect x="32" y="145.8" width="4" height="754" rx="2" fill="#8C93FF"/>
+<rect x="642" y="137.8" width="526" height="110" rx="10" fill="#151C26" stroke="#3A4657" stroke-width="1"/>
+<rect x="642" y="145.8" width="4" height="94" rx="2" fill="#60A5FA"/>
+<rect x="642" y="267.8" width="526" height="110" rx="10" fill="#151C26" stroke="#3A4657" stroke-width="1"/>
+<rect x="642" y="275.8" width="4" height="94" rx="2" fill="#60A5FA"/>
+<rect x="642" y="397.8" width="526" height="96" rx="10" fill="#151C26" stroke="#3A4657" stroke-width="1"/>
+<rect x="642" y="405.8" width="4" height="80" rx="2" fill="#2DD4BF"/>
+<rect x="642" y="513.8" width="526" height="86" rx="10" fill="#151C26" stroke="#3A4657" stroke-width="1"/>
+<rect x="642" y="521.8" width="4" height="70" rx="2" fill="#2DD4BF"/>
+<rect x="642" y="619.8" width="526" height="76" rx="10" fill="#151C26" stroke="#3A4657" stroke-width="1"/>
+<rect x="642" y="627.8" width="4" height="60" rx="2" fill="#4ADE80"/>
+<rect x="642" y="715.8" width="526" height="76" rx="10" fill="#151C26" stroke="#3A4657" stroke-width="1" stroke-dasharray="6 4"/>
+<rect x="642" y="811.8" width="526" height="76" rx="10" fill="#151C26" stroke="#3A4657" stroke-width="1"/>
+<rect x="642" y="819.8" width="4" height="60" rx="2" fill="#FBBF24"/>
+<rect x="32" y="937.8" width="1136" height="79.3" rx="10" fill="#1B232E" stroke="#3A4656" stroke-width="1"/>
+<text x="52" y="164.6" font-size="15" font-weight="700" fill="#C7CBFF">ESP32-S3</text>
+<text x="52" y="189.4" font-size="13" fill="#D2DAE4">dual-core MCU</text>
+<text x="52" y="208.2" font-size="13" fill="#D2DAE4">runs the HAL and your app</text>
+<text x="52" y="227.1" font-size="13" fill="#D2DAE4">USB-JTAG on GPIO19/20</text>
+<text x="662" y="164.6" font-size="15" font-weight="700" fill="#E8EDF3">MAX22200</text>
+<text x="662" y="189.4" font-size="13" fill="#D2DAE4">8 solenoid channels (SOL_CH0-7)</text>
+<text x="662" y="208.2" font-size="13" fill="#D2DAE4">hit / hold current or duty</text>
+<text x="662" y="294.6" font-size="15" font-weight="700" fill="#E8EDF3">TLE92466ED</text>
+<text x="662" y="319.4" font-size="13" fill="#D2DAE4">6 proportional channels (PROP_CH0-5)</text>
+<text x="662" y="338.2" font-size="13" fill="#D2DAE4">current control, PWM, dither</text>
+<text x="662" y="424.6" font-size="15" font-weight="700" fill="#E8EDF3">ADS7952</text>
+<text x="662" y="449.4" font-size="13" fill="#D2DAE4">12-channel 12-bit external ADC</text>
+<text x="662" y="468.3" font-size="13" fill="#D2DAE4">MCP9700 sensor on CH8</text>
+<text x="662" y="540.5" font-size="15" font-weight="700" fill="#E8EDF3">NTC thermistor and VBUS divider</text>
+<text x="662" y="565.4" font-size="13" fill="#D2DAE4">ESP32 ADC1 CH7 and CH8 (divider 11)</text>
+<text x="662" y="646.5" font-size="15" font-weight="700" fill="#E8EDF3">CAN transceiver</text>
+<text x="662" y="671.4" font-size="13" fill="#D2DAE4">external devices</text>
+<text x="662" y="742.5" font-size="15" font-weight="700" fill="#E8EDF3">FDO2 oxygen probe</text>
+<text x="662" y="767.4" font-size="13" fill="#D2DAE4">UART, acquired on demand</text>
+<text x="662" y="838.5" font-size="15" font-weight="700" fill="#E8EDF3">WS2812</text>
+<text x="662" y="863.4" font-size="13" fill="#D2DAE4">RGB status LED</text>
+<text x="280" y="149.8" font-size="12" fill="#9AA6B5">Valve SPI: SCK GPIO36, MOSI GPIO37, MISO GPIO35</text>
+<rect x="373.9" y="163.8" width="156.2" height="20" rx="10" fill="#0E131A"/>
+<text x="452" y="178.1" font-size="12" font-weight="500" text-anchor="middle" fill="#9AA6B5">SPI mode 0, CS GPIO38</text>
+<rect x="322.9" y="207.8" width="258.2" height="20" rx="10" fill="#0E131A"/>
+<text x="452" y="222.1" font-size="12" font-weight="500" text-anchor="middle" fill="#9AA6B5">EN GPIO2, CMD GPIO39, FAULT GPIO42</text>
+<rect x="379.2" y="293.8" width="145.6" height="20" rx="10" fill="#0E131A"/>
+<text x="452" y="308.1" font-size="12" font-weight="500" text-anchor="middle" fill="#9AA6B5">SPI mode 1, CS GPIO4</text>
+<rect x="326.6" y="337.8" width="250.8" height="20" rx="10" fill="#0E131A"/>
+<text x="452" y="352.1" font-size="12" font-weight="500" text-anchor="middle" fill="#9AA6B5">EN GPIO5, RESN GPIO6, FAULT GPIO16</text>
+<rect x="359.7" y="423.8" width="184.6" height="20" rx="10" fill="#0E131A"/>
+<text x="452" y="438.1" font-size="12" font-weight="500" text-anchor="middle" fill="#9AA6B5">ADC SPI mode 0, CS GPIO10</text>
+<rect x="322.7" y="457.8" width="258.6" height="20" rx="10" fill="#0E131A"/>
+<text x="452" y="472.1" font-size="12" font-weight="500" text-anchor="middle" fill="#9AA6B5">SCK GPIO12, MOSI GPIO11, MISO GPIO13</text>
+<rect x="405.1" y="546.8" width="93.8" height="20" rx="10" fill="#0E131A"/>
+<text x="452" y="561.1" font-size="12" font-weight="500" text-anchor="middle" fill="#9AA6B5">analog inputs</text>
+<rect x="357.4" y="647.8" width="189.2" height="20" rx="10" fill="#0E131A"/>
+<text x="452" y="662.1" font-size="12" font-weight="500" text-anchor="middle" fill="#9AA6B5">TWAI TX GPIO17 / RX GPIO18</text>
+<rect x="353.6" y="743.8" width="196.7" height="20" rx="10" fill="#0E131A"/>
+<text x="452" y="758.1" font-size="12" font-weight="500" text-anchor="middle" fill="#9AA6B5">UART TX GPIO47 / RX GPIO48</text>
+<rect x="395.8" y="839.8" width="112.4" height="20" rx="10" fill="#0E131A"/>
+<text x="452" y="854.1" font-size="12" font-weight="500" text-anchor="middle" fill="#9AA6B5">RMT data GPIO3</text>
+<text x="46" y="964.5" font-size="15" font-weight="700" fill="#E2E8F0">Also on the pin map</text>
+<text x="46" y="982.3" font-size="13" fill="#E2E8F0">MAX22200 trigger inputs: TRIGA GPIO40, TRIGB GPIO41. TLE92466ED direct drive inputs: DRV0 GPIO7, DRV1 GPIO15. The pin map calls the valve bus SPI2 and the ADC</text>
+<text x="46" y="1001.2" font-size="13" fill="#E2E8F0">bus SPI3; in ESP-IDF terms the valve bus runs on SPI3_HOST and the ADC bus on SPI2_HOST (see CommChannelsManager.cpp).</text>
+<rect x="32" y="1032.5" width="14" height="14" rx="4" fill="#1C1F3D" stroke="#8C93FF" stroke-width="1.4"/>
+<text x="54" y="1044.2" font-size="12.5" fill="#9AA6B5">MCU</text>
+<rect x="109.5" y="1032.5" width="14" height="14" rx="4" fill="#13233A" stroke="#60A5FA" stroke-width="1.4"/>
+<text x="131.5" y="1044.2" font-size="12.5" fill="#9AA6B5">valve drivers</text>
+<rect x="236" y="1032.5" width="14" height="14" rx="4" fill="#0F2A28" stroke="#2DD4BF" stroke-width="1.4"/>
+<text x="258" y="1044.2" font-size="12.5" fill="#9AA6B5">sensing</text>
+<rect x="330.7" y="1032.5" width="14" height="14" rx="4" fill="#11281A" stroke="#4ADE80" stroke-width="1.4"/>
+<text x="352.7" y="1044.2" font-size="12.5" fill="#9AA6B5">communication</text>
+<rect x="472.6" y="1032.5" width="14" height="14" rx="4" fill="#2C2310" stroke="#FBBF24" stroke-width="1.4"/>
+<text x="494.6" y="1044.2" font-size="12.5" fill="#9AA6B5">status</text>
+</svg>

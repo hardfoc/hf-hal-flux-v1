@@ -1,0 +1,63 @@
+{
+  "managers": {
+    "AdcManager": {
+      "handlers": [
+        "ads7952"
+      ],
+      "drivers": []
+    },
+    "CommChannelsManager": {
+      "handlers": [],
+      "drivers": []
+    },
+    "GpioManager": {
+      "handlers": [],
+      "drivers": []
+    },
+    "LedManager": {
+      "handlers": [],
+      "drivers": [
+        "hf-ws2812-rmt"
+      ]
+    },
+    "NvsManager": {
+      "handlers": [],
+      "drivers": []
+    },
+    "TemperatureManager": {
+      "handlers": [
+        "mcp9700",
+        "ntc"
+      ],
+      "drivers": []
+    },
+    "ValveManager": {
+      "handlers": [
+        "max22200",
+        "tle92466ed"
+      ],
+      "drivers": []
+    }
+  },
+  "handler_drivers": {
+    "ads7952": [
+      "hf-ads7952"
+    ],
+    "max22200": [
+      "hf-max22200"
+    ],
+    "mcp9700": [
+      "hf-mcp9700"
+    ],
+    "ntc": [
+      "hf-ntc-thermistor"
+    ],
+    "tle92466ed": [
+      "hf-tle92466ed"
+    ]
+  },
+  "sources": [
+    "lib/managers:#includes",
+    "lib/core/handlers:#includes"
+  ]
+}

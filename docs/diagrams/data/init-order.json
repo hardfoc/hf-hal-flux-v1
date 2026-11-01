@@ -1,0 +1,50 @@
+{
+  "facade": "Flux",
+  "init": [
+    {
+      "function": "InitializeNvs",
+      "member": "nvs",
+      "class": "NvsManager",
+      "required": true
+    },
+    {
+      "function": "InitializeComms",
+      "member": "comms",
+      "class": "CommChannelsManager",
+      "required": true
+    },
+    {
+      "function": "InitializeGpio",
+      "member": "gpio",
+      "class": "GpioManager",
+      "required": true
+    },
+    {
+      "function": "InitializeValves",
+      "member": "valves",
+      "class": "ValveManager",
+      "required": false
+    },
+    {
+      "function": "InitializeAdc",
+      "member": "adc",
+      "class": "AdcManager",
+      "required": false
+    },
+    {
+      "function": "InitializeLeds",
+      "member": "leds",
+      "class": "LedManager",
+      "required": false
+    },
+    {
+      "function": "InitializeTemperature",
+      "member": "temp",
+      "class": "TemperatureManager",
+      "required": false
+    }
+  ],
+  "sources": [
+    "lib/api/Flux.cpp:Flux::InitializeAllComponents"
+  ]
+}
