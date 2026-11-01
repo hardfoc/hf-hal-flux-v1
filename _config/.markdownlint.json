@@ -1,5 +1,5 @@
 {
-  "_comment": "Markdownlint configuration for hf-hal-flux-v1 documentation",
+  "_comment": "Markdownlint configuration for hf-hal-flux-v1. The docs site uses Material syntax: a few HTML elements (hero, figures, cards) and indented admonition bodies.",
   "MD012": false,
   "MD013": { "line_length": 120, "tables": false, "code_blocks": false },
   "MD022": false,
@@ -8,8 +8,11 @@
   "MD029": false,
   "MD031": false,
   "MD032": false,
+  "MD033": { "allowed_elements": ["div", "span", "picture", "source", "img", "figure", "figcaption", "details", "summary", "br", "a", "kbd"] },
   "MD036": false,
   "MD040": false,
+  "MD041": false,
+  "MD046": false,
   "MD047": false,
   "MD051": false
 }
