@@ -3,8 +3,8 @@ metadata:
   project: "ESP32 Flux HAL Examples"
   default_app: "flux_api_test"
   target: "esp32s3"
-  idf_versions: ["release/v5.5", "release/v5.4"]
-  build_types: [["Debug", "Release"], ["Debug"]]
+  idf_versions: ["release/v5.5"]
+  build_types: [["Debug", "Release"]]
 
 apps:
   flux_api_test:

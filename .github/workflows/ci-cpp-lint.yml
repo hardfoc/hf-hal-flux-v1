@@ -8,6 +8,12 @@ on:
     branches: [main]
   workflow_dispatch:
 
+# ru-cpp-lint.yml requests pull-requests: write; a called workflow can only
+# receive permissions the caller grants.
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
   cpp-lint:
     uses: hardfoc/hf-general-ci-tools/.github/workflows/ru-cpp-lint.yml@main

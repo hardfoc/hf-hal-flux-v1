@@ -12,6 +12,13 @@ on:
         default: false
         type: boolean
 
+# ru-build.yml requests these; a called workflow can only receive permissions
+# the caller grants.
+permissions:
+  contents: read
+  actions: read
+  pull-requests: write
+
 env:
   PROJECT_DIR: examples/esp32
   TOOLS_DIR: examples/esp32/scripts
@@ -24,8 +31,10 @@ jobs:
       tools_dir: ${{ steps.vars.outputs.tools_dir }}
     steps:
       - uses: actions/checkout@v4
-        with:
-          submodules: recursive
+
+      # Only the project tools are needed to generate the matrix.
+      - name: Checkout project tools submodule
+        run: git submodule update --init examples/esp32/scripts
 
       - name: Set paths
         id: vars

@@ -13,4 +13,14 @@ exclude = [
   '^https://hardfoc\.github\.io/hf-hal-flux-v1/.*',
   '^https://github\.com/hardfoc/hf-core-drivers.*',
   '^https://github\.com/hardfoc/hf-core-utils.*',
+  # hf-development-handbook is a private repository: it is not checked out in
+  # CI (update = none in .gitmodules) and returns 404 to anonymous requests.
+  '^https://github\.com/hardfoc/hf-development-handbook.*',
+  '/docs/hf-development-handbook/',
+  # lib/core (hf-core) is a submodule. The reusable link check can only check
+  # out submodules recursively, and recursion fails at the pinned hf-core
+  # (hf-pf1550-driver there has a gitlink with no .gitmodules entry), so the
+  # submodule is not present when links are checked.
+  '/lib/core/',
 ]
+
