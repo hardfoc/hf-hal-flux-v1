@@ -7,6 +7,10 @@
 [submodule "_config/doxygen-extensions/doxygen-awesome-css"]
 	path = _config/doxygen-extensions/doxygen-awesome-css
 	url = https://github.com/jothepro/doxygen-awesome-css.git
+# hf-development-handbook is private, so CI cannot clone it. "update = none"
+# keeps "git submodule update --init --recursive" from trying; with access, run
+#   git submodule update --init --checkout docs/hf-development-handbook
 [submodule "docs/hf-development-handbook"]
 	path = docs/hf-development-handbook
 	url = https://github.com/hardfoc/hf-development-handbook.git
+	update = none
