@@ -1,0 +1,11 @@
+<map id="manifold_valves::Valve::RequestPosition" name="manifold_valves::Valve::RequestPosition">
+<area shape="rect" id="Node000001" title="Request a normalised position 0..1. @Browser For binary solenoids this is interpreted as 0 → off,..." alt="" coords="665,40,839,85"/>
+<area shape="rect" id="Node000002" href="$classmanifold__valves_1_1Valve.html#aae1cc19cf8898b86fd79a0caab699153" title="Convenience for binary solenoid use; equivalent to RequestPosition(on?1:0)." alt="" coords="412,5,586,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="647,48,586,42,586,37,652,48"/>
+<area shape="rect" id="Node000003" href="$classmanifold__valves_1_1ManifoldValvesSelfTest.html#af7007dfd27637e49b8de7efdd32e30b0" title=" " alt="" coords="381,75,617,119"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="652,76,618,83,618,78,647,77"/>
+<area shape="rect" id="Node000004" href="$classmanifold__valves_1_1ManifoldValvesSelfTest.html#addef632a632864e37101d4bc54db12b2" title="Run the configured self&#45;test plan synchronously on the caller." alt="" coords="139,75,333,119"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="363,97,334,100,334,94,368,97"/>
+<area shape="rect" id="Node000005" href="$manifold__valves__pressure__control_8cpp.html#a630544a7f0a2cc40d8a7fefab7e2fe70" title=" " alt="" coords="5,83,91,111"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="121,98,91,100,91,94,126,96"/>
+</map>

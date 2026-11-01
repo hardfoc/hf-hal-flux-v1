@@ -1,0 +1,5 @@
+<map id="manifold_valves::Valve::ConsumeDirty" name="manifold_valves::Valve::ConsumeDirty">
+<area shape="rect" id="Node000001" title="Atomically test&#45;and&#45;clear the dirty bit." alt="" coords="248,5,421,50"/>
+<area shape="rect" id="Node000002" href="$classmanifold__valves_1_1ManifoldValvesControlThread.html#ac63fb7dfb51f814375e19418a091969c" title=" " alt="" coords="5,5,200,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="229,28,200,30,200,25,234,27"/>
+</map>

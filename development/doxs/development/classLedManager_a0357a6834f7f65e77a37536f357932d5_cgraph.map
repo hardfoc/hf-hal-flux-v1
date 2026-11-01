@@ -1,0 +1,20 @@
+<map id="LedManager::UpdateAnimation" name="LedManager::UpdateAnimation">
+<area shape="rect" id="Node000001" title="Advance the animation by one tick. Call periodically (~50 ms)." alt="" coords="5,57,229,85"/>
+<area shape="rect" id="Node000002" href="$classLedManager.html#afa325e20cb2d4356fb870fdd86d4c729" title="Initialise the WS2812 LED strip (idempotent)." alt="" coords="294,7,512,34"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="198,54,308,36,303,39,200,59"/>
+<area shape="rect" id="Node000005" href="$classLedManager.html#aec49368647c9b09857ea1b775d655e5e" title=" " alt="" coords="825,57,1074,85"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="229,69,810,69,809,74,229,74"/>
+<area shape="rect" id="Node000006" href="$classLedManager.html#a1e4f703fea5db47a9bcbcbb32d6e573c" title=" " alt="" coords="277,133,529,161"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="172,83,335,127,331,130,172,88"/>
+<area shape="rect" id="Node000003" href="$classLedManager.html#aeb27eef4ebf25b19bd864c9822a6c892" title=" " alt="" coords="594,7,760,34"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="511,18,582,20,577,21,512,23"/>
+<area shape="rect" id="Node000004" href="$classLedManager.html#ac6bff1fceb7eab43ee606dd3807d3d47" title=" " alt="" coords="847,5,1052,33"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="760,17,834,19,828,20,760,23"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="755,32,859,54,854,54,755,38"/>
+<area shape="rect" id="Node000007" href="$classLedManager.html#a6af5cc51dbd544ee3e3c5f7c6ccb1368" title="Map a 0–255 wheel position to a rainbow RGB colour." alt="" coords="585,108,769,136"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="529,133,572,131,567,132,530,138"/>
+<area shape="rect" id="Node000008" href="$classLedManager.html#a826467b3b04221aea43588f1f0e70937" title=" " alt="" coords="577,160,777,188"/>
+<area shape="poly" id="edge8_Node000006_Node000008" title=" " alt="" coords="530,157,564,163,559,163,530,162"/>
+<area shape="rect" id="Node000009" href="$structLedColor.html#a5d1972e2bcb71b4bd4c885fa12ba609c" title="Pack into a 24&#45;bit 0xRRGGBB integer." alt="" coords="614,212,740,240"/>
+<area shape="poly" id="edge9_Node000006_Node000009" title=" " alt="" coords="451,159,578,197,610,208,604,207,576,202,451,164"/>
+</map>

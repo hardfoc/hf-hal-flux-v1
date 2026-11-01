@@ -1,0 +1,5 @@
+<map id="LedManager::StopAnimation" name="LedManager::StopAnimation">
+<area shape="rect" id="Node000001" title="Stop the current animation and turn the LED off." alt="" coords="5,5,211,33"/>
+<area shape="rect" id="Node000002" href="$namespaceLedColors.html#ac73d9c4d71b45c9f83cf04a51e6dbb3c" title="Off / black." alt="" coords="259,5,396,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="211,17,246,19,241,19,211,22"/>
+</map>

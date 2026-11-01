@@ -1,0 +1,88 @@
+version: "1.0"
+metadata:
+  project: "ESP32 Flux HAL Examples"
+  default_app: "flux_api_test"
+  target: "esp32s3"
+  idf_versions: ["release/v5.5"]
+  build_types: [["Debug", "Release"]]
+
+apps:
+  flux_api_test:
+    source_file: "flux_api_test.cpp"
+    category: "system"
+    ci_enabled: true
+  flux_nvs_example:
+    source_file: "flux_nvs_example.cpp"
+    category: "example"
+    description: "Flux NvsManager — App/Cal/Config namespaces, boot counter, blob, string"
+    ci_enabled: true
+  valve_cycling_test:
+    source_file: "valve_cycling_test.cpp"
+    category: "component"
+    ci_enabled: true
+  gpio_adc_test:
+    source_file: "gpio_adc_test.cpp"
+    category: "component"
+    ci_enabled: true
+  led_temp_test:
+    source_file: "led_temp_test.cpp"
+    category: "component"
+    ci_enabled: true
+  adc_manager_example:
+    source_file: "AdcManagerExample.cpp"
+    category: "example"
+    ci_enabled: false
+  comm_channels_example:
+    source_file: "CommChannelsManagerExample.cpp"
+    category: "example"
+    ci_enabled: false
+  flux_api_example:
+    source_file: "FluxApiExample.cpp"
+    category: "example"
+    ci_enabled: false
+  gpio_manager_example:
+    source_file: "GpioManagerExample.cpp"
+    category: "example"
+    ci_enabled: false
+  led_manager_example:
+    source_file: "LedManagerExample.cpp"
+    category: "example"
+    ci_enabled: false
+  temperature_example:
+    source_file: "TemperatureManagerExample.cpp"
+    category: "example"
+    ci_enabled: false
+  valve_manager_example:
+    source_file: "ValveManagerExample.cpp"
+    category: "example"
+    ci_enabled: false
+  ads7952_example:
+    source_file: "Ads7952Example.cpp"
+    category: "example"
+    ci_enabled: false
+  alicat_basis2_example:
+    source_file: "AlicatBasis2Example.cpp"
+    category: "example"
+    ci_enabled: false
+  manifold_valves_pressure_control:
+    source_files:
+      - "manifold_valves_pressure_control/manifold_valves_pressure_control.cpp"
+      - "manifold_valves_pressure_control/PressureSensor.cpp"
+      - "manifold_valves_pressure_control/PressureSensorThread.cpp"
+    include_dirs:
+      - "manifold_valves_pressure_control"
+    category: "example"
+    ci_enabled: false
+
+build_config:
+  build_types:
+    Debug:
+      optimization: "-O0"
+      debug_level: "-g3"
+      defines: ["DEBUG"]
+    Release:
+      optimization: "-O2"
+      debug_level: "-g0"
+      defines: ["NDEBUG"]
+  build_directory_pattern: "build-app-{app_type}-type-{build_type}-target-{target}-idf-{idf_version}"
+  project_name_pattern: "esp32_flux_{app_type}_app"

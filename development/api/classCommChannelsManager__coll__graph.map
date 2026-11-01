@@ -1,0 +1,19 @@
+<map id="CommChannelsManager" name="CommChannelsManager">
+<area shape="rect" id="Node000001" title="Singleton managing all board communication channels for Flux V1." alt="" coords="746,198,927,225"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="334,8,549,36"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="564,31,646,51,686,66,723,85,758,111,788,142,829,198,824,197,784,145,754,115,721,90,684,71,644,56,565,37"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="343,60,540,105"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="554,98,638,118,723,145,774,170,817,197,811,197,771,174,721,150,637,123,555,104"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="366,129,517,174"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="532,159,722,186,769,197,764,197,722,192,533,165"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="343,198,540,225"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="555,209,748,211,743,212,555,214"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="318,249,565,294"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="580,252,722,231,768,226,763,227,722,237,581,257"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="5,258,205,285"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="220,269,320,271,315,273,221,274"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="365,318,518,345"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="532,318,625,301,721,273,772,249,812,227,817,225,774,254,723,278,626,306,533,323"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="342,370,540,397"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="556,377,639,361,681,348,721,330,755,306,784,277,824,227,829,225,788,281,758,311,723,335,683,353,641,367,556,382"/>
+</map>

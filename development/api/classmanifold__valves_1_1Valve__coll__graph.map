@@ -1,0 +1,19 @@
+<map id="manifold_valves::Valve" name="manifold_valves::Valve">
+<area shape="rect" id="Node000001" title="Common state owned by every valve — base for SolenoidValve / ProportionalValve." alt="" coords="592,180,766,208"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="255,14,379,42"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="394,22,437,24,482,30,527,42,570,60,605,87,635,120,673,181,668,180,631,123,602,91,567,65,525,47,481,35,436,29,396,27"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,5,171,50"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="185,25,257,26,252,29,187,30"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="240,76,394,104"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="409,95,488,107,569,129,619,153,660,180,655,180,616,157,567,134,487,113,410,100"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="241,128,393,156"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="408,148,569,169,615,180,610,180,568,174,409,154"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="220,180,414,208"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="430,192,595,193,590,195,430,197"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="234,232,400,277"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="414,238,568,214,612,208,607,210,569,219,416,244"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="228,327,406,355"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="421,341,495,332,532,322,567,308,600,286,628,258,667,210,671,207,632,262,603,290,570,313,534,327,496,337,421,347"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="228,379,406,407"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="421,398,458,396,496,390,533,379,567,362,588,347,607,327,637,284,658,241,671,210,675,207,663,243,642,286,611,331,592,351,570,367,535,384,497,395,459,401,421,404"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" href="$classmanifold__valves_1_1Valve.html" title="Common state owned by every valve — base for SolenoidValve / ProportionalValve." alt="" coords="5,48,179,76"/>
+<area shape="rect" id="Node000001" href="$classmanifold__valves_1_1ProportionalValve.html" title=" " alt="" coords="227,5,443,50"/>
+<area shape="poly" id="edge5_Node000000_Node000001" title=" " alt="" coords="193,45,229,42,223,44,194,50"/>
+<area shape="rect" id="Node000002" href="$classmanifold__valves_1_1SolenoidValve.html" title=" " alt="" coords="238,75,432,119"/>
+<area shape="poly" id="edge6_Node000000_Node000002" title=" " alt="" coords="194,74,240,83,235,83,194,80"/>
+</map>

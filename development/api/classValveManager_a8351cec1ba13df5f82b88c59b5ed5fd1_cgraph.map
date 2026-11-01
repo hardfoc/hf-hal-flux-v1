@@ -1,0 +1,15 @@
+<map id="ValveManager::Initialize" name="ValveManager::Initialize">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,71,184,98"/>
+<area shape="rect" id="Node000002" href="$classCommChannelsManager.html#ad1249df1c4ece9e2468d4b4536d237ae" title="Return the singleton CommChannelsManager instance." alt="" coords="464,27,646,72"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="115,68,166,38,198,23,231,12,291,4,351,4,410,11,465,23,459,24,409,16,351,9,291,9,232,18,200,28,168,43,118,72"/>
+<area shape="rect" id="Node000003" href="$classGpioManager.html#af18a40c292b97c42dace2eb42c511053" title="Access the singleton instance (Meyers singleton, thread&#45;safe)." alt="" coords="458,105,652,133"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="117,96,168,126,200,141,232,151,302,160,372,158,438,148,492,138,497,137,439,153,373,163,301,165,231,156,198,146,166,131,116,101"/>
+<area shape="rect" id="Node000004" href="$classValveManager.html#a65a366456425166815040d2415d534d9" title=" " alt="" coords="232,27,410,72"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="184,68,219,65,214,67,185,73"/>
+<area shape="rect" id="Node000005" href="$classValveManager.html#a3f22e9630f0367e73f28487aa375f664" title=" " alt="" coords="232,97,410,141"/>
+<area shape="poly" id="edge6_Node000001_Node000005" title=" " alt="" coords="184,95,219,103,213,103,184,101"/>
+<area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="410,47,452,49,446,50,411,52"/>
+<area shape="poly" id="edge5_Node000004_Node000003" title=" " alt="" coords="399,70,494,100,488,100,398,75"/>
+<area shape="poly" id="edge7_Node000005_Node000002" title=" " alt="" coords="398,94,460,78,465,76,399,99"/>
+<area shape="poly" id="edge8_Node000005_Node000003" title=" " alt="" coords="410,116,445,119,440,119,411,122"/>
+</map>

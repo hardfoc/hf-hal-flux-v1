@@ -1,0 +1,29 @@
+<map id="GpioManager.cpp" name="GpioManager.cpp">
+<area shape="rect" id="Node000001" title="Implementation of the Flux V1 GPIO manager." alt="" coords="635,5,770,33"/>
+<area shape="rect" id="Node000002" href="$GpioManager_8h.html" title="GPIO management for the HardFOC Flux V1 platform." alt="" coords="353,98,473,126"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="646,34,572,57,486,84,458,94,456,89,484,78,570,52,651,33"/>
+<area shape="rect" id="Node000012" title=" " alt="" coords="497,98,678,126"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="688,32,618,90,615,86,684,35"/>
+<area shape="rect" id="Node000013" title=" " alt="" coords="702,98,934,126"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="720,31,792,88,787,88,718,36"/>
+<area shape="rect" id="Node000014" title=" " alt="" coords="959,81,1102,143"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="762,31,946,80,941,81,762,36"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,216,61,244"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="351,118,293,127,221,141,146,162,74,193,56,207,52,203,72,188,144,157,220,136,292,122,356,116"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="85,216,152,244"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="351,125,262,152,211,170,164,193,143,208,140,203,161,188,209,165,260,147,355,123"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="175,216,240,244"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="382,125,320,156,253,193,233,208,231,203,250,188,317,151,377,127"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="264,216,340,244"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="403,125,326,207,323,203,398,127"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="365,216,461,244"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="415,124,415,202,411,199,411,128"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="485,191,664,269"/>
+<area shape="poly" id="edge7_Node000002_Node000008" title=" " alt="" coords="432,123,511,181,506,181,430,129"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="688,191,864,269"/>
+<area shape="poly" id="edge8_Node000002_Node000009" title=" " alt="" coords="443,124,486,140,578,164,675,190,670,190,577,169,484,145,442,129"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="888,216,991,244"/>
+<area shape="poly" id="edge9_Node000002_Node000010" title=" " alt="" coords="440,124,486,140,544,152,594,158,682,159,769,163,819,172,877,188,912,208,907,207,875,193,818,177,768,168,682,165,594,164,543,158,484,145,440,129"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="1016,191,1199,269"/>
+<area shape="poly" id="edge10_Node000002_Node000011" title=" " alt="" coords="440,124,486,140,562,156,627,163,741,166,856,168,923,174,1004,190,998,190,922,179,856,173,741,171,626,169,561,161,484,145,440,129"/>
+</map>

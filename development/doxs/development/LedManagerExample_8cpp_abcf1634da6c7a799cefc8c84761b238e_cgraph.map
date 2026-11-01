@@ -1,0 +1,5 @@
+<map id="example_color_wheel" name="example_color_wheel">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,169,33"/>
+<area shape="rect" id="Node000002" href="$classLedManager.html#a6af5cc51dbd544ee3e3c5f7c6ccb1368" title="Map a 0–255 wheel position to a rainbow RGB colour." alt="" coords="217,5,401,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="169,17,204,19,198,19,169,22"/>
+</map>

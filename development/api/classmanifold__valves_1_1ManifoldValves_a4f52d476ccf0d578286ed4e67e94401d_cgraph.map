@@ -1,0 +1,5 @@
+<map id="manifold_valves::ManifoldValves::ConfigureGlobalDpm" name="manifold_valves::ManifoldValves::ConfigureGlobalDpm">
+<area shape="rect" id="Node000001" title="Push the global MAX22200 Detection&#45;of&#45;Plunger&#45;Movement (DPM) configuration. Per&#45;channel DPM enable bi..." alt="" coords="5,5,213,50"/>
+<area shape="rect" id="Node000002" href="$ValveManager_8h.html#a1029903401a6b8ed1b70aaff9b2c6acc" title="Map MAX22200 DriverStatus to the unified hf_valve_err_t domain." alt="" coords="261,14,472,42"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="213,25,248,27,242,28,213,30"/>
+</map>

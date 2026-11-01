@@ -1,0 +1,13 @@
+<map id="manifold_valves::ManifoldValvesSelfTest::TestProportional" name="manifold_valves::ManifoldValvesSelfTest::TestProportional">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,83,234,127"/>
+<area shape="rect" id="Node000002" href="$classmanifold__valves_1_1ManifoldValvesSelfTest.html#a54459016828b36deaccfc5992c754440" title="Map a ValveChannel to its 0&#45;based hardware index within the chip." alt="" coords="289,5,522,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="204,80,308,53,303,56,206,85"/>
+<area shape="rect" id="Node000003" href="$classmanifold__valves_1_1ManifoldValvesSelfTest.html#a4a3ffc886e1eb71456195d0579650983" title=" " alt="" coords="282,74,530,136"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="234,102,269,104,263,106,235,108"/>
+<area shape="rect" id="Node000005" href="$classmanifold__valves_1_1ManifoldValvesSelfTest.html#a8b01d2640285fc27668a6519d03d3fa2" title=" " alt="" coords="290,160,522,205"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="205,125,308,155,303,156,205,131"/>
+<area shape="rect" id="Node000004" href="$ValveManager_8h.html#a255db5fbbcc6babf9a239474d3363b4c" title="Convert hf_valve_err_t to a human&#45;readable description string." alt="" coords="604,91,746,119"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="530,102,591,105,586,105,531,108"/>
+<area shape="rect" id="Node000006" href="$classmanifold__valves_1_1ManifoldValvesDiagnosticsThread.html#a69dc5bd3497c796ad5daa8fa4aff54f4" title=" " alt="" coords="578,152,772,213"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="522,180,565,182,560,182,522,185"/>
+</map>

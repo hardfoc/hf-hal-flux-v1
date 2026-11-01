@@ -1,0 +1,20 @@
+<map id="LedManager::TurnOff" name="LedManager::TurnOff">
+<area shape="rect" id="Node000001" title="Turn the LED off (set colour to black)." alt="" coords="5,88,161,116"/>
+<area shape="rect" id="Node000002" href="$namespaceLedColors.html#ac73d9c4d71b45c9f83cf04a51e6dbb3c" title="Off / black." alt="" coords="488,11,625,38"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="99,85,145,51,176,34,208,22,276,8,346,3,413,4,475,11,470,12,413,10,347,9,277,13,209,27,178,39,148,56,102,89"/>
+<area shape="rect" id="Node000003" href="$classLedManager.html#afa325e20cb2d4356fb870fdd86d4c729" title="Initialise the WS2812 LED strip (idempotent)." alt="" coords="209,88,426,116"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="160,99,196,101,191,103,161,104"/>
+<area shape="rect" id="Node000007" href="$classLedManager.html#a121a6a5f0c2da5ebc117f9f7d054a12c" title="Stop the current animation and turn the LED off." alt="" coords="215,36,420,64"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="148,85,239,66,235,69,150,90"/>
+<area shape="rect" id="Node000008" href="$classLedManager.html#a6305fee5cff625bb3332808eb7e63207" title=" " alt="" coords="210,140,424,168"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="149,114,239,135,234,137,149,119"/>
+<area shape="rect" id="Node000009" href="$classLedManager.html#aee4b32be72e10edb7a7d69d49f8967b4" title=" " alt="" coords="209,192,426,220"/>
+<area shape="poly" id="edge9_Node000001_Node000009" title=" " alt="" coords="104,113,151,145,210,177,233,187,228,187,208,182,148,150,103,119"/>
+<area shape="rect" id="Node000004" href="$classLedManager.html#aeb27eef4ebf25b19bd864c9822a6c892" title=" " alt="" coords="474,88,639,116"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="426,99,461,101,456,102,427,104"/>
+<area shape="rect" id="Node000005" href="$classLedManager.html#ac6bff1fceb7eab43ee606dd3807d3d47" title=" " alt="" coords="709,61,914,89"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="639,90,696,87,691,88,640,96"/>
+<area shape="rect" id="Node000006" href="$classLedManager.html#aec49368647c9b09857ea1b775d655e5e" title=" " alt="" coords="687,113,936,141"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="640,107,675,113,669,113,640,113"/>
+<area shape="poly" id="edge7_Node000007_Node000002" title=" " alt="" coords="420,36,475,33,470,34,421,41"/>
+</map>

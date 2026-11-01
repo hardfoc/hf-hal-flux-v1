@@ -1,0 +1,11 @@
+<map id="manifold_valves::SolenoidValve::ApplyChannelFeatures" name="manifold_valves::SolenoidValve::ApplyChannelFeatures">
+<area shape="rect" id="Node000001" title="Push the model&#39;s per&#45;channel configuration features (open&#45;load detection, slew rate,..." alt="" coords="5,105,217,150"/>
+<area shape="rect" id="Node000002" href="$classValveManager.html#a06a544369e2a6334cad94bcc98886deb" title="Get the MAX22200 handler for advanced solenoid operations." alt="" coords="265,5,478,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="161,102,264,60,286,54,281,57,266,65,164,107"/>
+<area shape="rect" id="Node000003" href="$classmanifold__valves_1_1Valve.html#ad00042f68aa8db577fe725c6e3d9e9b0" title="Snapshot of the last setpoint the app pushed (may not yet be applied)." alt="" coords="285,75,458,119"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="216,113,272,108,267,110,218,118"/>
+<area shape="rect" id="Node000004" href="$ValveManager_8h.html#a1029903401a6b8ed1b70aaff9b2c6acc" title="Map MAX22200 DriverStatus to the unified hf_valve_err_t domain." alt="" coords="266,143,477,171"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="217,137,253,143,248,144,217,142"/>
+<area shape="rect" id="Node000005" href="$classmanifold__valves_1_1SolenoidValve.html#a5aae6e8ed96655323694a86e41c1a601" title=" " alt="" coords="272,195,471,239"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="176,148,266,180,288,189,283,189,264,185,175,153"/>
+</map>

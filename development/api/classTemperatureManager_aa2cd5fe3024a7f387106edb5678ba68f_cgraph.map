@@ -1,0 +1,5 @@
+<map id="TemperatureManager::DumpStatistics" name="TemperatureManager::DumpStatistics">
+<area shape="rect" id="Node000001" title="Log temperature sensor statistics and health info to the console." alt="" coords="5,5,166,50"/>
+<area shape="rect" id="Node000002" href="$TemperatureManager_8h.html#a9bb4ad5afd19eebe59111f20b539aa46" title="Convert FluxTempSensorType to a human&#45;readable string." alt="" coords="214,14,424,42"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="166,25,201,27,195,28,166,30"/>
+</map>

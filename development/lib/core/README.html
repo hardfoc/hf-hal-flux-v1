@@ -1,0 +1,789 @@
+
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+
+  <link rel="stylesheet" href="/hf-hal-flux-v1/development/assets/css/just-the-docs-default.css">
+
+  <link rel="stylesheet" href="/hf-hal-flux-v1/development/assets/css/just-the-docs-head-nav.css" id="jtd-head-nav-stylesheet">
+
+  <style id="jtd-nav-activation">
+  
+
+    
+    .site-nav > ul.nav-list:first-child > li:not(:nth-child(1)) > a,
+    .site-nav > ul.nav-list:first-child > li > ul > li a {
+      background-image: none;
+    }
+
+    .site-nav > ul.nav-list:not(:first-child) a,
+    .site-nav li.external a {
+      background-image: none;
+    }
+
+    .site-nav > ul.nav-list:first-child > li:nth-child(1) > a {
+      font-weight: 600;
+      text-decoration: none;
+    }.site-nav > ul.nav-list:first-child > li:nth-child(1) > button svg {
+      transform: rotate(-90deg);
+    }.site-nav > ul.nav-list:first-child > li.nav-list-item:nth-child(1) > ul.nav-list {
+      display: block;
+    }
+  </style>
+
+  
+
+  
+    <script src="/hf-hal-flux-v1/development/assets/js/vendor/lunr.min.js"></script>
+  
+
+  <script src="/hf-hal-flux-v1/development/assets/js/just-the-docs.js"></script>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+
+
+  <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>HardFOC Core Platform | HardFOC Flux V1 HAL (hf-hal-flux-v1) - development</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="HardFOC Core Platform" />
+<meta name="author" content="hardfoc" />
+<meta property="og:locale" content="en" />
+<meta name="description" content="Shared platform layer for HardFOC boards — handlers, RTOS utilities, driver integration, and CANopen for motor control systems" />
+<meta property="og:description" content="Shared platform layer for HardFOC boards — handlers, RTOS utilities, driver integration, and CANopen for motor control systems" />
+<link rel="canonical" href="https://hardfoc.github.io/hf-hal-flux-v1/development/lib/core/README.html" />
+<meta property="og:url" content="https://hardfoc.github.io/hf-hal-flux-v1/development/lib/core/README.html" />
+<meta property="og:site_name" content="HardFOC Flux V1 HAL (hf-hal-flux-v1) - development" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="HardFOC Core Platform" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","author":{"@type":"Person","name":"hardfoc","url":"https://github.com/hardfoc"},"description":"Shared platform layer for HardFOC boards — handlers, RTOS utilities, driver integration, and CANopen for motor control systems","headline":"HardFOC Core Platform","url":"https://hardfoc.github.io/hf-hal-flux-v1/development/lib/core/README.html"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+  <!-- Custom head content for hf-hal-flux-v1 docs -->
+
+<!-- Doxygen API docs stylesheet (when generated) -->
+<link rel="stylesheet" href="/hf-hal-flux-v1/development/assets/css/custom.css" onerror="this.remove()">
+
+<!-- Doxygen-awesome theme integration -->
+<style>
+  /* Doxygen iframe integration */
+  .doxygen-embed {
+    width: 100%;
+    min-height: 600px;
+    border: 1px solid var(--color-border-default, #e1e4e8);
+    border-radius: 6px;
+  }
+
+  /* Code block enhancements */
+  pre.highlight {
+    border-radius: 6px;
+    border: 1px solid var(--color-border-default, #e1e4e8);
+  }
+
+  /* Badge styles for cross-references */
+  .hal-badge {
+    display: inline-block;
+    padding: 0.15rem 0.5rem;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    background-color: #0366d6;
+    color: white;
+    vertical-align: middle;
+  }
+</style>
+
+
+</head>
+
+<body>
+  <a class="skip-to-main" href="#main-content">Skip to main content</a>
+  <svg xmlns="http://www.w3.org/2000/svg" class="d-none">
+  <symbol id="svg-link" viewBox="0 0 24 24">
+  <title>Link</title>
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-link">
+    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+  </svg>
+</symbol>
+
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+  <title>Menu</title>
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu">
+    <line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line>
+  </svg>
+</symbol>
+
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+  <title>Expand</title>
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+    <polyline points="9 18 15 12 9 6"></polyline>
+  </svg>
+</symbol>
+
+  <!-- Feather. MIT License: https://github.com/feathericons/feather/blob/master/LICENSE -->
+<symbol id="svg-external-link" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link">
+  <title id="svg-external-link-title">(external link)</title>
+  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line>
+</symbol>
+
+  
+    <symbol id="svg-doc" viewBox="0 0 24 24">
+  <title>Document</title>
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file">
+    <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline>
+  </svg>
+</symbol>
+
+    <symbol id="svg-search" viewBox="0 0 24 24">
+  <title>Search</title>
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search">
+    <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+  </svg>
+</symbol>
+
+  
+  
+    <!-- Bootstrap Icons. MIT License: https://github.com/twbs/icons/blob/main/LICENSE.md -->
+<symbol id="svg-copy" viewBox="0 0 16 16">
+  <title>Copy</title>
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard" viewBox="0 0 16 16">
+    <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/>
+    <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/>
+  </svg>
+</symbol>
+<symbol id="svg-copied" viewBox="0 0 16 16">
+  <title>Copied</title>
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard-check-fill" viewBox="0 0 16 16">
+    <path d="M6.5 0A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3Zm3 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3Z"/>
+    <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1A2.5 2.5 0 0 1 9.5 5h-3A2.5 2.5 0 0 1 4 2.5v-1Zm6.854 7.354-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 0 1 .708-.708L7.5 10.793l2.646-2.647a.5.5 0 0 1 .708.708Z"/>
+  </svg>
+</symbol>
+
+  
+</svg>
+
+  
+    <header class="side-bar">
+  <div class="site-header">
+    <a href="/hf-hal-flux-v1/development/" class="site-title lh-tight">
+  HardFOC Flux V1 HAL (hf-hal-flux-v1) - development
+
+</a>
+    <button id="menu-button" class="site-button btn-reset" aria-label="Menu" aria-expanded="false">
+      <svg viewBox="0 0 24 24" class="icon" aria-hidden="true"><use xlink:href="#svg-menu"></use></svg>
+    </button>
+  </div>
+
+  <nav aria-label="Main" id="site-nav" class="site-nav">
+  
+  
+    <ul class="nav-list"><li class="nav-list-item"><a href="/hf-hal-flux-v1/development/lib/core/README.html" class="nav-list-link">HardFOC Core Platform</a></li><li class="nav-list-item"><a href="/hf-hal-flux-v1/development/" class="nav-list-link">HardFOC ESP-IDF Project Tools</a></li><li class="nav-list-item"><a href="/hf-hal-flux-v1/development/lib/api/README.html" class="nav-list-link">Flux API — Unified HardFOC Platform Interface</a></li><li class="nav-list-item"><a href="/hf-hal-flux-v1/development/lib/api/" class="nav-list-link">Flux API — Unified HardFOC Platform Interface</a></li><li class="nav-list-item"><a href="/hf-hal-flux-v1/development/examples/esp32/docs/README.html" class="nav-list-link">Flux ESP32 examples — full index</a></li><li class="nav-list-item"><a href="/hf-hal-flux-v1/development/examples/esp32/docs/" class="nav-list-link">Flux ESP32 examples — full index</a></li><li class="nav-list-item"><a href="/hf-hal-flux-v1/development/docs/hal/architecture.html" class="nav-list-link">Flux HAL — architecture (as implemented)</a></li><li class="nav-list-item"><a href="/hf-hal-flux-v1/development/docs/hal/README.html" class="nav-list-link">Flux HAL — documentation hub</a></li><li class="nav-list-item"><a href="/hf-hal-flux-v1/development/docs/hal/" class="nav-list-link">Flux HAL — documentation hub</a></li><li class="nav-list-item"><a href="/hf-hal-flux-v1/development/docs/hal/managers-and-handlers.html" class="nav-list-link">Flux — managers and hf-core handlers</a></li><li class="nav-list-item"><a href="/hf-hal-flux-v1/development/docs/component-handlers/README.html" class="nav-list-link">Former location: docs/component-handlers/</a></li><li class="nav-list-item"><a href="/hf-hal-flux-v1/development/docs/component-handlers/" class="nav-list-link">Former location: docs/component-handlers/</a></li><li class="nav-list-item"><a href="/hf-hal-flux-v1/development/docs/driver-handlers/README.html" class="nav-list-link">Former location: docs/driver-handlers/</a></li><li class="nav-list-item"><a href="/hf-hal-flux-v1/development/docs/driver-handlers/" class="nav-list-link">Former location: docs/driver-handlers/</a></li><li class="nav-list-item"><a href="/hf-hal-flux-v1/development/examples/esp32/README.html" class="nav-list-link">HardFOC Flux HAL — ESP32 Examples</a></li><li class="nav-list-item"><a href="/hf-hal-flux-v1/development/examples/esp32/" class="nav-list-link">HardFOC Flux HAL — ESP32 Examples</a></li><li class="nav-list-item"><a href="/hf-hal-flux-v1/development/DOCUMENTATION_INDEX.html" class="nav-list-link">HardFOC Flux HAL — documentation index</a></li><li class="nav-list-item"><a href="/hf-hal-flux-v1/development/README.html" class="nav-list-link">HardFOC Flux V1 – Hardware Abstraction Layer</a></li><li class="nav-list-item"><a href="/hf-hal-flux-v1/development/examples/esp32/main/manifold_valves_pressure_control/README.html" class="nav-list-link">Manifold valves &amp; pressure sensor application</a></li><li class="nav-list-item"><a href="/hf-hal-flux-v1/development/examples/esp32/main/manifold_valves_pressure_control/" class="nav-list-link">Manifold valves &amp; pressure sensor application</a></li></ul>
+  
+</nav>
+
+
+<div class="d-md-block d-none site-footer">
+  
+  
+    This site uses <a href="https://github.com/just-the-docs/just-the-docs">Just the Docs</a>, a documentation theme for Jekyll.
+  
+  </div>
+</header>
+
+  
+  <div class="main" id="top">
+    <div id="main-header" class="main-header">
+  
+    
+
+<div class="search" role="search">
+  <div class="search-input-wrap">
+    <input type="text" id="search-input" class="search-input" tabindex="0" placeholder="Search HardFOC Flux V1 HAL (hf-hal-flux-v1) - development" autocomplete="off">
+    <label for="search-input" class="search-label">
+      <span class="sr-only">Search HardFOC Flux V1 HAL (hf-hal-flux-v1) - development</span>
+      <svg viewBox="0 0 24 24" class="search-icon" aria-hidden="true"><use xlink:href="#svg-search"></use></svg>
+    </label>
+  </div>
+  <div id="search-results" class="search-results"></div>
+</div>
+
+  
+  
+  
+    <nav aria-label="Auxiliary" class="aux-nav">
+  <ul class="aux-nav-list">
+    
+      <li class="aux-nav-list-item">
+        <a href="/hf-hal-flux-v1/development/api/index.html" class="site-button"
+          
+          target="_blank" rel="noopener noreferrer"
+          
+        >
+          📖 API Reference
+        </a>
+      </li>
+    
+      <li class="aux-nav-list-item">
+        <a href="https://github.com/hardfoc/hf-hal-flux-v1" class="site-button"
+          
+          target="_blank" rel="noopener noreferrer"
+          
+        >
+          GitHub
+        </a>
+      </li>
+    
+      <li class="aux-nav-list-item">
+        <a href="https://github.com/hardfoc/hf-hal-flux-v1/issues" class="site-button"
+          
+          target="_blank" rel="noopener noreferrer"
+          
+        >
+          Issues
+        </a>
+      </li>
+    
+  </ul>
+</nav>
+
+  
+</div>
+
+    <div class="main-content-wrap">
+      
+      <div id="main-content" class="main-content">
+        <main>
+          
+            <h1 id="hf-core-platform">
+  
+  
+    <a href="#hf-core-platform" class="anchor-heading" aria-labelledby="hf-core-platform"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> HF-Core Platform
+  
+  
+</h1>
+    
+
+<p><strong>Shared platform layer for HardFOC boards — handlers, RTOS utilities, driver integration, and CANopen for motor control systems</strong></p>
+
+<p><a href="https://en.cppreference.com/w/cpp/20.html"><img src="https://img.shields.io/badge/C%2B%2B-20-blue.svg" alt="C++" /></a>
+<a href="https://www.gnu.org/licenses/gpl-3.0"><img src="https://img.shields.io/badge/License-GPLv3-blue.svg" alt="License" /></a>
+<a href="https://github.com/hardfoc/hf-core/actions/workflows/esp32-examples-build-ci.yml"><img src="https://github.com/hardfoc/hf-core/actions/workflows/esp32-examples-build-ci.yml/badge.svg" alt="ESP-IDF Build" /></a>
+<a href="https://github.com/hardfoc/hf-core/actions/workflows/ci-cpp-analysis.yml"><img src="https://github.com/hardfoc/hf-core/actions/workflows/ci-cpp-analysis.yml/badge.svg" alt="C++ Analysis" /></a>
+<a href="https://github.com/hardfoc/hf-core/actions/workflows/ci-cpp-lint.yml"><img src="https://github.com/hardfoc/hf-core/actions/workflows/ci-cpp-lint.yml/badge.svg" alt="C++ Lint" /></a>
+<a href="https://github.com/hardfoc/hf-core/actions/workflows/ci-docs-publish.yml"><img src="https://github.com/hardfoc/hf-core/actions/workflows/ci-docs-publish.yml/badge.svg" alt="Docs" /></a>
+<a href="https://github.com/hardfoc/hf-core/actions/workflows/ci-markdown-lint.yml"><img src="https://github.com/hardfoc/hf-core/actions/workflows/ci-markdown-lint.yml/badge.svg" alt="Markdown Lint" /></a>
+<a href="https://github.com/hardfoc/hf-core/actions/workflows/ci-yaml-lint.yml"><img src="https://github.com/hardfoc/hf-core/actions/workflows/ci-yaml-lint.yml/badge.svg" alt="YAML Lint" /></a>
+<a href="https://github.com/hardfoc/hf-core/actions/workflows/ci-docs-linkcheck.yml"><img src="https://github.com/hardfoc/hf-core/actions/workflows/ci-docs-linkcheck.yml/badge.svg" alt="Link Check" /></a>
+<a href="https://github.com/hardfoc/hf-core/actions/workflows/release.yml"><img src="https://github.com/hardfoc/hf-core/actions/workflows/release.yml/badge.svg" alt="Release" /></a></p>
+<h2 id="-table-of-contents">
+  
+  
+    <a href="#-table-of-contents" class="anchor-heading" aria-labelledby="-table-of-contents"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> 📚 Table of Contents
+  
+  
+</h2>
+    
+
+<ol>
+  <li><a href="#-overview">Overview</a></li>
+  <li><a href="#-features">Features</a></li>
+  <li><a href="#-architecture">Architecture</a></li>
+  <li><a href="#-quick-start">Quick Start</a></li>
+  <li><a href="#-handlers">Handlers</a></li>
+  <li><a href="#-utilities">Utilities</a></li>
+  <li><a href="#-repository-structure">Repository Structure</a></li>
+  <li><a href="#-documentation">Documentation</a></li>
+  <li><a href="#-contributing">Contributing</a></li>
+  <li><a href="#-license">License</a></li>
+</ol>
+<h2 id="-overview">
+  
+  
+    <a href="#-overview" class="anchor-heading" aria-labelledby="-overview"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> 📦 Overview
+  
+  
+</h2>
+    
+
+<blockquote>
+  <p><strong>📖 <a href="https://hardfoc.github.io/hf-core/">📚🌐 Live Complete Documentation</a></strong> —
+Architecture guides, per-handler API reference, and testing instructions</p>
+</blockquote>
+
+<p><strong>hf-core</strong> is the shared platform layer for all HardFOC boards. It provides
+the handler layer, RTOS utilities, and driver integration that form the backbone
+of the HardFOC motor control system.</p>
+
+<p>hf-core is the <strong>bridge layer</strong> between hardware-agnostic base interfaces
+(<code class="language-plaintext highlighter-rouge">BaseI2c</code>, <code class="language-plaintext highlighter-rouge">BaseSpi</code>, <code class="language-plaintext highlighter-rouge">BaseGpio</code>, <code class="language-plaintext highlighter-rouge">BaseAdc</code>, <code class="language-plaintext highlighter-rouge">BaseTemperature</code>) and CRTP-templated
+device drivers (<code class="language-plaintext highlighter-rouge">hf-tmc9660-driver</code>, <code class="language-plaintext highlighter-rouge">hf-bno08x-driver</code>, <code class="language-plaintext highlighter-rouge">hf-as5047u-driver</code>, etc.).
+No board-specific configuration lives here — board HALs (e.g. <code class="language-plaintext highlighter-rouge">hf-hal-vortex-v1</code>)
+depend on this repo and add managers, API, and pin mapping.</p>
+<h2 id="-features">
+  
+  
+    <a href="#-features" class="anchor-heading" aria-labelledby="-features"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> ✨ Features
+  
+  
+</h2>
+    
+
+<ul>
+  <li>✅ <strong>16 Device Handlers</strong> — AS5047U, BNO08x, PCA9685, PCAL95555, NTC, TMC9660, TMC5160, TLE92466ED, MAX22200, ISF15ACP4 (opt-in), ADS9324 (opt-in), SFM (opt-in), BMP581 (opt-in), WS2812, SE050, Logger</li>
+  <li>✅ <strong>30+ General Utilities</strong> — Buffers, filters, timers, CRC, interpolation, linked
+lists, flag sets, physical units</li>
+  <li>✅ <strong>Full RTOS Abstraction</strong> — Mutex, semaphore, queue, event flags, threads, timers</li>
+  <li>✅ <strong>CANopen Utilities</strong> — CAN frame, SDO protocol, NMT commands</li>
+  <li>✅ <strong>ESP32 Test Suite</strong> — 16 test applications covering every handler, utility, and
+integration scenario</li>
+  <li>✅ <strong>8 CI Pipelines</strong> — Build, lint, analysis, documentation, release</li>
+  <li>✅ <strong>Thread-Safe</strong> — All handlers use <code class="language-plaintext highlighter-rouge">RtosMutex</code> for safe concurrent access</li>
+  <li>✅ <strong>Modern C++20</strong> — Type-safe APIs with CRTP-based design and zero-overhead abstractions</li>
+</ul>
+<h2 id="️-architecture">
+  
+  
+    <a href="#️-architecture" class="anchor-heading" aria-labelledby="️-architecture"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> 🏗️ Architecture
+  
+  
+</h2>
+    
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><div class="table-wrapper"><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+</pre></td><td class="rouge-code"><pre>┌─────────────────────────────────────────────────┐
+│                Board HAL (Vortex)                │  Managers + API
+├─────────────────────────────────────────────────┤
+│              hf-core (this repo)                │
+│  ┌──────────┐  ┌──────────────┐  ┌───────────┐ │
+│  │ Handlers │  │ hf-core-utils│  │  Logger   │ │
+│  │ (adapt)  │  │ (general,    │  │(singleton)│ │
+│  │          │  │  rtos, can)  │  │           │ │
+│  └────┬─────┘  └──────────────┘  └───────────┘ │
+│       │                                         │
+│  ┌────▼──────────────────────────────────────┐  │
+│  │         hf-core-drivers (submodule)       │  │
+│  │  BaseI2c, BaseSpi, BaseGpio, BaseAdc      │  │
+│  │  AS5047U, BNO08x, PCA9685, SE050, TMC9660 ... │  │
+│  └───────────────────────────────────────────┘  │
+├─────────────────────────────────────────────────┤
+│          MCU Platform (ESP32, etc.)             │
+└─────────────────────────────────────────────────┘
+</pre></td></tr></tbody></table></div></code></pre></div></div>
+
+<p>Handlers <strong>own</strong> their driver instances and translate base-interface calls into
+high-level operations. They never expose the raw driver — all access goes through
+handler methods.</p>
+<h2 id="-quick-start">
+  
+  
+    <a href="#-quick-start" class="anchor-heading" aria-labelledby="-quick-start"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> 🚀 Quick Start
+  
+  
+</h2>
+    
+<h3 id="clone">
+  
+  
+    <a href="#clone" class="anchor-heading" aria-labelledby="clone"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Clone
+  
+  
+</h3>
+    
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><div class="table-wrapper"><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>git clone <span class="nt">--recurse-submodules</span> https://github.com/hardfoc/hf-core.git
+</pre></td></tr></tbody></table></div></code></pre></div></div>
+
+<p>Or after a shallow clone:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><div class="table-wrapper"><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>git submodule update <span class="nt">--init</span> <span class="nt">--recursive</span>
+</pre></td></tr></tbody></table></div></code></pre></div></div>
+<h3 id="build-and-flash-a-test">
+  
+  
+    <a href="#build-and-flash-a-test" class="anchor-heading" aria-labelledby="build-and-flash-a-test"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Build and Flash a Test
+  
+  
+</h3>
+    
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><div class="table-wrapper"><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+</pre></td><td class="rouge-code"><pre><span class="nb">cd </span>examples/esp32/scripts
+
+<span class="c"># Build a utility test (no hardware needed)</span>
+./build_app.sh general_utils_test Debug
+
+<span class="c"># Flash and monitor</span>
+<span class="nb">cd</span> .. <span class="o">&amp;&amp;</span> idf.py <span class="nt">-p</span> /dev/ttyUSB0 flash monitor
+</pre></td></tr></tbody></table></div></code></pre></div></div>
+<h3 id="build-all-ci-enabled-tests">
+  
+  
+    <a href="#build-all-ci-enabled-tests" class="anchor-heading" aria-labelledby="build-all-ci-enabled-tests"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Build All CI-Enabled Tests
+  
+  
+</h3>
+    
+
+<p>Use the CI pipeline or iterate over <code class="language-plaintext highlighter-rouge">app_config.yml</code> entries:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><div class="table-wrapper"><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>./build_app.sh list  <span class="c"># See all available apps</span>
+</pre></td></tr></tbody></table></div></code></pre></div></div>
+<h2 id="-handlers">
+  
+  
+    <a href="#-handlers" class="anchor-heading" aria-labelledby="-handlers"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> 📖 Handlers
+  
+  
+</h2>
+    
+
+<div class="table-wrapper"><table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Handler</th>
+      <th style="text-align: left">Device</th>
+      <th style="text-align: left">Bus</th>
+      <th style="text-align: left">Key Capabilities</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">As5047uHandler</code></td>
+      <td style="text-align: left">AS5047U</td>
+      <td style="text-align: left">SPI</td>
+      <td style="text-align: left">Angle, velocity, DAEC, diagnostics, zero-position</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">Bno08xHandler</code></td>
+      <td style="text-align: left">BNO08x</td>
+      <td style="text-align: left">I2C</td>
+      <td style="text-align: left">Sensor enable/disable, data read, freshness gating</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">Pca9685Handler</code></td>
+      <td style="text-align: left">PCA9685</td>
+      <td style="text-align: left">I2C</td>
+      <td style="text-align: left">PWM duty/frequency, phase offset, sleep/wake</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">Pcal95555Handler</code></td>
+      <td style="text-align: left">PCAL95555</td>
+      <td style="text-align: left">I2C</td>
+      <td style="text-align: left">GPIO read/write, toggle, batch, interrupt drain</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">NtcTemperatureHandler</code></td>
+      <td style="text-align: left">NTC</td>
+      <td style="text-align: left">ADC</td>
+      <td style="text-align: left">Temperature, calibration, EMA filter, thresholds</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">Tmc9660Handler</code></td>
+      <td style="text-align: left">TMC9660</td>
+      <td style="text-align: left">SPI/UART</td>
+      <td style="text-align: left">Motor control, telemetry, GPIO/ADC/temp wrappers</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">Tmc5160Handler</code></td>
+      <td style="text-align: left">TMC5160</td>
+      <td style="text-align: left">SPI/UART</td>
+      <td style="text-align: left">Stepper motor, ramp generator, StallGuard, visitDriver</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">Tle92466edHandler</code></td>
+      <td style="text-align: left">TLE92466ED</td>
+      <td style="text-align: left">SPI</td>
+      <td style="text-align: left">6-ch solenoid driver, PWM, diagnostics, watchdog</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">Max22200Handler</code></td>
+      <td style="text-align: left">MAX22200</td>
+      <td style="text-align: left">SPI</td>
+      <td style="text-align: left">8-ch solenoid/motor, CDR/VDR, HIT/HOLD, DPM</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">Isf15acp4Handler</code></td>
+      <td style="text-align: left">ISF15ACP4</td>
+      <td style="text-align: left">SPI + GPIO</td>
+      <td style="text-align: left">96×64 OLED pushbutton, pluggable graphics (<a href="docs/handlers/isf15acp4_handler.md">details</a>; <strong>default OFF</strong>)</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">Ads9324Handler</code></td>
+      <td style="text-align: left">ADS9324</td>
+      <td style="text-align: left">SPI + CONVST/DRDY</td>
+      <td style="text-align: left">16-ch 16-bit simultaneous SAR + PGA (<a href="docs/handlers/ads9324_handler.md">details</a>; <strong>default OFF</strong>)</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">Ws2812Handler</code></td>
+      <td style="text-align: left">WS2812</td>
+      <td style="text-align: left">RMT</td>
+      <td style="text-align: left">Addressable LED strip, pixel control, animations</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">SfmHandler</code></td>
+      <td style="text-align: left">SFM4300 / SF06 family</td>
+      <td style="text-align: left">I2C</td>
+      <td style="text-align: left">Gas mass flow: per-gas tables, CRC-8 frames, averaging, variant gating (<a href="docs/handlers/sfm_handler.md">details</a>; <strong>default OFF</strong>)</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">Bmp581Handler</code></td>
+      <td style="text-align: left">BMP581</td>
+      <td style="text-align: left">I2C</td>
+      <td style="text-align: left">Barometric pressure: OSR/ODR/IIR preset, data-ready, Pa/°C (<a href="docs/handlers/bmp581_handler.md">details</a>; <strong>default OFF</strong>)</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">Se050Handler</code></td>
+      <td style="text-align: left">SE050 / SE050A</td>
+      <td style="text-align: left">I2C</td>
+      <td style="text-align: left">Secure element, T=1 over I²C, <code class="language-plaintext highlighter-rouge">GetDevice()</code> for <code class="language-plaintext highlighter-rouge">se050::Device</code> (<a href="docs/handlers/se050_handler.md">details</a>)</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">Logger</code></td>
+      <td style="text-align: left">—</td>
+      <td style="text-align: left">—</td>
+      <td style="text-align: left">Singleton, log levels, per-tag filter, formatted output, MCU-agnostic via injectable <code class="language-plaintext highlighter-rouge">BaseLogger</code> backend (<a href="handlers/logger/README.md">details</a>)</td>
+    </tr>
+  </tbody>
+</table></div>
+<h2 id="-utilities">
+  
+  
+    <a href="#-utilities" class="anchor-heading" aria-labelledby="-utilities"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> 🔧 Utilities
+  
+  
+</h2>
+    
+
+<div class="table-wrapper"><table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Library</th>
+      <th style="text-align: left">Contents</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">hf-utils-general</code></td>
+      <td style="text-align: left">CircularBuffer, RingBuffer, AveragingFilter, CRC, ActionTimer, IntervalAction, SoftwareVersion, LinearInterpolation, SimpleLinkedList, FlagSet, PhysicalUnit, and more</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">hf-utils-rtos-wrap</code></td>
+      <td style="text-align: left">RtosMutex, MutexLockGuard, PeriodicTimer, BaseThread, OsQueue, OsEventFlags, OsSemaphore, os_delay_msec</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="language-plaintext highlighter-rouge">hf-utils-canopen</code></td>
+      <td style="text-align: left">CanFrame, SDO helpers, NMT commands</td>
+    </tr>
+  </tbody>
+</table></div>
+<h2 id="-repository-structure">
+  
+  
+    <a href="#-repository-structure" class="anchor-heading" aria-labelledby="-repository-structure"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> 📂 Repository Structure
+  
+  
+</h2>
+    
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><div class="table-wrapper"><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+</pre></td><td class="rouge-code"><pre>hf-core/
+├── handlers/           # Device handler implementations
+│   ├── as5047u/        #   Magnetic encoder (SPI)
+│   ├── ads9324/        #   16-ch simultaneous SAR + PGA (SPI; default OFF)
+│   ├── bno08x/         #   9-axis IMU (I2C)
+│   ├── common/         #   Shared handler utilities (HandlerCommon.h)
+│   ├── logger/         #   Singleton logging
+│   ├── max22200/       #   8-ch solenoid/motor driver (SPI)
+│   ├── ntc/            #   NTC thermistor (ADC)
+│   ├── pca9685/        #   16-ch PWM controller (I2C)
+│   ├── pcal95555/      #   16-bit GPIO expander (I2C)
+│   ├── se050/          #   NXP SE050 secure element (I2C)
+│   ├── tle92466ed/     #   6-ch solenoid driver (SPI)
+│   ├── tmc5160/        #   Stepper motor driver (SPI/UART)
+│   ├── tmc9660/        #   Motor controller (SPI/UART)
+│   └── ws2812/         #   Addressable LED strip (RMT)
+├── hf-core-drivers/    # [submodule] Base interfaces + external drivers
+├── hf-core-utils/      # [submodule] General, RTOS, CANopen utilities
+├── examples/
+│   └── esp32/          # ESP-IDF test applications
+│       ├── app_config.yml      # Test app registry (16 apps)
+│       ├── main/
+│       │   ├── handler_tests/  # 13 handler test apps
+│       │   ├── utils_tests/    # 4 utility test apps
+│       │   └── integration_tests/  # 1 integration test
+│       └── components/
+│           └── hf_core/        # ESP-IDF component wrapper
+├── .github/workflows/  # 8 CI pipelines
+├── _config/            # clang-format, clang-tidy, Jekyll, Doxygen, linters
+├── docs/               # Jekyll documentation site
+└── README.md
+</pre></td></tr></tbody></table></div></code></pre></div></div>
+<h2 id="-documentation">
+  
+  
+    <a href="#-documentation" class="anchor-heading" aria-labelledby="-documentation"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> 📚 Documentation
+  
+  
+</h2>
+    
+
+<p>Full documentation is available at the <a href="https://hardfoc.github.io/hf-core/">GitHub Pages site</a>:</p>
+
+<ul>
+  <li><a href="docs/architecture.md">Architecture</a> — Layered design, handler pattern, ownership</li>
+  <li><a href="docs/folder_structure.md">Folder Structure</a> — Complete tree with descriptions</li>
+  <li><a href="docs/handlers/index.md">Handler Reference</a> — Per-handler API documentation</li>
+  <li><a href="docs/utils/index.md">Utilities Reference</a> — General, RTOS, CANopen utilities</li>
+  <li><a href="docs/testing/testing_guide.md">Testing Guide</a> — How to build and run tests</li>
+  <li><a href="docs/testing/ci_pipelines.md">CI Pipelines</a> — Workflow descriptions</li>
+</ul>
+<h2 id="-contributing">
+  
+  
+    <a href="#-contributing" class="anchor-heading" aria-labelledby="-contributing"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> 🤝 Contributing
+  
+  
+</h2>
+    
+
+<ol>
+  <li>Create a feature branch from <code class="language-plaintext highlighter-rouge">develop</code></li>
+  <li>Follow <code class="language-plaintext highlighter-rouge">.clang-format</code> and <code class="language-plaintext highlighter-rouge">.clang-tidy</code> (configs in <code class="language-plaintext highlighter-rouge">_config/</code>)</li>
+  <li>Add or update tests for any handler/utility changes</li>
+  <li>Ensure all CI checks pass</li>
+  <li>Open a pull request targeting <code class="language-plaintext highlighter-rouge">develop</code></li>
+</ol>
+<h2 id="-license">
+  
+  
+    <a href="#-license" class="anchor-heading" aria-labelledby="-license"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> 📄 License
+  
+  
+</h2>
+    
+
+<p>This project is licensed under the <strong>GNU General Public License v3.0</strong>.
+See the <a href="https://www.gnu.org/licenses/gpl-3.0">GPL v3 license</a> for details.
+Individual submodules may carry their own licenses — see per-submodule LICENSE files.</p>
+
+          
+
+          
+            
+          
+        </main>
+        
+<hr>
+<footer>
+  
+
+  <!-- Custom footer for hf-hal-flux-v1 docs -->
+<div class="site-footer">
+  <p>
+    <strong>HF HAL Flux v1</strong> — Motor control HAL for ESP32-C6
+    &middot;
+    <a href="https://github.com/hardfoc/hf-hal-flux-v1">GitHub</a>
+    &middot;
+    <a href="/hf-hal-flux-v1/development/LICENSE">License (GPL v3)</a>
+  </p>
+  <p>
+    <small>
+      Built with <a href="https://just-the-docs.com">Just the Docs</a>
+      &middot;
+      Powered by <a href="https://pages.github.com">GitHub Pages</a>
+    </small>
+  </p>
+</div>
+
+
+  <div class="d-md-none mt-4 fs-2">
+    
+    
+      This site uses <a href="https://github.com/just-the-docs/just-the-docs">Just the Docs</a>, a documentation theme for Jekyll.
+    
+  </div>
+</footer>
+
+      </div>
+    </div>
+    
+      
+<button id="search-button" class="search-button btn-reset" aria-label="Focus on search">
+  <svg viewBox="0 0 24 24" class="icon" aria-hidden="true"><use xlink:href="#svg-search"></use></svg>
+</button>
+
+
+<div class="search-overlay"></div>
+
+    
+  </div>
+
+  
+</body>
+</html>
+

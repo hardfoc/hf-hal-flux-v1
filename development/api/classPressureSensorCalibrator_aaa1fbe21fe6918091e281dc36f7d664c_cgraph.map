@@ -1,0 +1,5 @@
+<map id="PressureSensorCalibrator::CalibrateVA" name="PressureSensorCalibrator::CalibrateVA">
+<area shape="rect" id="Node000001" title="Perform VA calibration using atmospheric sensors." alt="" coords="5,5,191,50"/>
+<area shape="rect" id="Node000002" href="$classPressureSensor.html#afb21c6573e75eb818a7c47dd6310fe9d" title=" " alt="" coords="239,14,432,42"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="191,25,226,27,220,28,191,30"/>
+</map>

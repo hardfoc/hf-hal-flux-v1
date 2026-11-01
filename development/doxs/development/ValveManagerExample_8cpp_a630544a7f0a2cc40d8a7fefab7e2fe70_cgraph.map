@@ -1,0 +1,37 @@
+<map id="app_main" name="app_main">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,260,91,288"/>
+<area shape="rect" id="Node000002" href="$ValveManagerExample_8cpp.html#a4e620e9fd97796234e6c9b1fd0047bfc" title=" " alt="" coords="139,57,353,85"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="50,259,59,225,75,181,101,134,118,113,137,94,145,91,142,95,140,99,121,116,105,137,80,183,64,227,55,260"/>
+<area shape="rect" id="Node000006" href="$ValveManagerExample_8cpp.html#aa2ef312be971337f577fe85d062fe9c4" title=" " alt="" coords="150,349,342,377"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="65,286,99,311,140,335,157,343,152,345,137,340,96,316,66,291"/>
+<area shape="rect" id="Node000007" href="$ValveManagerExample_8cpp.html#a299758709c807c14cf018f60c4841dc3" title=" " alt="" coords="166,401,326,429"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="57,286,90,336,113,363,140,386,154,395,149,396,137,391,109,367,85,339,56,291"/>
+<area shape="rect" id="Node000008" href="$ValveManagerExample_8cpp.html#aed1496d3a0203c07b6609aa0a7a36659" title=" " alt="" coords="162,453,330,498"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="53,286,66,319,83,359,107,402,140,439,151,448,146,448,137,442,103,405,78,362,61,321,53,291"/>
+<area shape="rect" id="Node000009" href="$ValveManagerExample_8cpp.html#ad702c5a2ae45c4e49b1e73ae4cb469a6" title=" " alt="" coords="141,5,350,33"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="48,259,54,217,69,159,95,97,114,69,137,44,146,39,143,44,140,48,118,72,100,100,74,160,59,218,53,260"/>
+<area shape="rect" id="Node000010" href="$ValveManagerExample_8cpp.html#adc4731cc76646a84e5681cbd7544d40c" title=" " alt="" coords="164,281,328,326"/>
+<area shape="poly" id="edge11_Node000001_Node000010" title=" " alt="" coords="90,278,151,287,147,290,92,283"/>
+<area shape="rect" id="Node000011" href="$ValveManagerExample_8cpp.html#a8d86fd6058d95e07895773e225299d47" title=" " alt="" coords="164,109,328,154"/>
+<area shape="poly" id="edge15_Node000001_Node000011" title=" " alt="" coords="55,258,87,212,110,186,137,164,151,157,148,161,140,168,114,190,91,215,60,261"/>
+<area shape="rect" id="Node000012" href="$ValveManagerExample_8cpp.html#a6364b347b4950afcf77db7e1dfcd26a3" title=" " alt="" coords="162,177,330,205"/>
+<area shape="poly" id="edge17_Node000001_Node000012" title=" " alt="" coords="66,258,99,236,138,215,161,208,158,212,140,220,102,240,70,261"/>
+<area shape="rect" id="Node000013" href="$ValveManagerExample_8cpp.html#a85d6c20131366559d81c901faa08a8ee" title=" " alt="" coords="162,229,330,257"/>
+<area shape="poly" id="edge19_Node000001_Node000013" title=" " alt="" coords="90,265,148,257,145,260,93,269"/>
+<area shape="rect" id="Node000014" href="$classFlux.html#a4bbee39ff1da8e9359edb151e4ee3cda" title="Access the singleton instance (Meyers singleton, thread&#45;safe)." alt="" coords="178,521,314,549"/>
+<area shape="poly" id="edge21_Node000001_Node000014" title=" " alt="" coords="51,285,58,331,72,391,99,454,117,483,140,508,166,525,161,524,137,512,113,486,94,457,67,392,53,332,50,291"/>
+<area shape="rect" id="Node000003" href="$ValveManagerExample_8cpp.html#a1adc375ca8066a47d1642ce384f5a5dd" title="Helper: log a valve error result." alt="" coords="401,177,529,205"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="325,83,354,94,404,128,444,166,438,166,400,132,352,99,327,88"/>
+<area shape="rect" id="Node000004" href="$ValveManager_8h.html#ae6cff86821790a19053b6f8423493fe7" title="Check if a valve error code indicates success." alt="" coords="594,177,703,205"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="529,189,581,190,576,192,530,194"/>
+<area shape="rect" id="Node000005" href="$ValveManager_8h.html#a255db5fbbcc6babf9a239474d3363b4c" title="Convert hf_valve_err_t to a human&#45;readable description string." alt="" coords="577,257,720,285"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="499,203,603,250,598,251,499,208"/>
+<area shape="poly" id="edge10_Node000009_Node000003" title=" " alt="" coords="328,31,355,44,395,92,448,165,442,165,391,95,351,48,329,36"/>
+<area shape="poly" id="edge9_Node000009_Node000004" title=" " alt="" coords="313,31,354,43,427,73,498,107,612,169,607,170,496,112,425,78,352,48,314,36"/>
+<area shape="poly" id="edge14_Node000010_Node000003" title=" " alt="" coords="327,278,352,266,376,246,399,224,424,211,419,214,403,228,379,250,354,271,330,283"/>
+<area shape="poly" id="edge12_Node000010_Node000004" title=" " alt="" coords="328,278,583,208,579,211,330,283"/>
+<area shape="poly" id="edge13_Node000010_Node000005" title=" " alt="" coords="328,294,564,276,560,280,329,299"/>
+<area shape="poly" id="edge16_Node000011_Node000003" title=" " alt="" coords="328,151,400,172,395,174,329,156"/>
+<area shape="poly" id="edge18_Node000012_Node000003" title=" " alt="" coords="329,189,388,190,383,192,331,194"/>
+<area shape="poly" id="edge20_Node000013_Node000003" title=" " alt="" coords="306,226,391,208,386,211,309,231"/>
+</map>

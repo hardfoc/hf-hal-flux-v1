@@ -1,0 +1,23 @@
+<map id="LedManager::GetLedGpioPin" name="LedManager::GetLedGpioPin">
+<area shape="rect" id="Node000001" title=" " alt="" coords="1416,57,1622,85"/>
+<area shape="rect" id="Node000002" href="$classLedManager.html#aeb27eef4ebf25b19bd864c9822a6c892" title=" " alt="" coords="1203,57,1368,85"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1398,71,1369,74,1369,69,1403,71"/>
+<area shape="rect" id="Node000003" href="$classLedManager.html#afa325e20cb2d4356fb870fdd86d4c729" title="Initialise the WS2812 LED strip (idempotent)." alt="" coords="938,57,1155,85"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="1185,71,1156,74,1156,69,1190,71"/>
+<area shape="rect" id="Node000004" href="$classFlux.html#a52462f0d3eb1a4c1380f270362698209" title=" " alt="" coords="706,5,850,33"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="953,54,850,36,850,30,959,54"/>
+<area shape="rect" id="Node000007" href="$classLedManager.html#a70ae6019c2839bdc8c371a440e10908d" title="Turn the LED off (set colour to black)." alt="" coords="700,57,856,85"/>
+<area shape="poly" id="edge6_Node000003_Node000007" title=" " alt="" coords="920,71,856,74,856,69,925,71"/>
+<area shape="rect" id="Node000011" href="$classLedManager.html#a0357a6834f7f65e77a37536f357932d5" title="Advance the animation by one tick. Call periodically (~50 ms)." alt="" coords="666,109,890,137"/>
+<area shape="poly" id="edge10_Node000003_Node000011" title=" " alt="" coords="959,88,854,111,853,106,953,89"/>
+<area shape="rect" id="Node000005" href="$classFlux.html#a0d67fb153ddebb59c51eb20ad311cb32" title=" " alt="" coords="406,5,618,33"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="688,19,619,22,618,17,694,19"/>
+<area shape="rect" id="Node000006" href="$classFlux.html#a6c011c136a43dd2d9859dcf7d56571e8" title="Ensure all Flux subsystems are properly initialized." alt="" coords="184,5,349,33"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="388,20,350,22,349,17,393,19"/>
+<area shape="rect" id="Node000008" href="$classLedManager.html#a2dc2c5f9181410493ab66b14e6c40788" title="Turn off the LED and release driver resources." alt="" coords="426,57,599,85"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="682,71,599,74,599,69,687,71"/>
+<area shape="rect" id="Node000009" href="$classLedManager.html#a4c571368a2d02ce4dc616b6881878d4c" title="Alias for Shutdown()." alt="" coords="175,57,358,85"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="408,71,359,74,358,69,413,71"/>
+<area shape="rect" id="Node000010" href="$classFlux.html#a381c21e10f3556ecc16df4b4f2ead006" title="Shut down all subsystems in reverse initialisation order." alt="" coords="5,57,127,85"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="157,72,127,74,127,69,162,70"/>
+</map>

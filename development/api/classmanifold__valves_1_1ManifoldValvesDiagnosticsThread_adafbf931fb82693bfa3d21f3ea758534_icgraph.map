@@ -1,0 +1,10 @@
+<map id="manifold_valves::ManifoldValvesDiagnosticsThread::GetSnapshot" name="manifold_valves::ManifoldValvesDiagnosticsThread::GetSnapshot">
+<area shape="rect" id="Node000001" title="Lock&#45;free read of the latest subsystem&#45;wide health snapshot." alt="" coords="665,5,860,67"/>
+<area shape="rect" id="Node000002" href="$manifold__valves__pressure__control_8cpp.html#a630544a7f0a2cc40d8a7fefab7e2fe70" title=" " alt="" coords="5,22,91,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="647,32,617,33,378,30,139,33,92,36,91,31,139,28,378,24,617,28,652,32"/>
+<area shape="rect" id="Node000003" href="$classmanifold__valves_1_1ManifoldValvesSelfTest.html#af7007dfd27637e49b8de7efdd32e30b0" title=" " alt="" coords="381,43,617,88"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="653,48,618,55,617,50,647,49"/>
+<area shape="rect" id="Node000004" href="$classmanifold__valves_1_1ManifoldValvesSelfTest.html#addef632a632864e37101d4bc54db12b2" title="Run the configured self&#45;test plan synchronously on the caller." alt="" coords="139,43,333,88"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="363,66,334,68,334,63,368,65"/>
+<area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="121,49,91,45,91,40,126,47"/>
+</map>

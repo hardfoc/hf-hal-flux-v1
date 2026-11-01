@@ -1,0 +1,55 @@
+<map id="HfValveErrOk" name="HfValveErrOk">
+<area shape="rect" id="Node000001" title="Check if a valve error code indicates success." alt="" coords="1054,273,1162,301"/>
+<area shape="rect" id="Node000002" href="$classValveManager.html#aa45a05ea99d548ca5e6bc37199d76e02" title="Clear faults on both drivers." alt="" coords="769,5,980,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1101,257,1091,211,1074,154,1046,96,1027,70,1004,48,981,34,981,28,1007,44,1031,67,1050,93,1079,152,1097,210,1105,259"/>
+<area shape="rect" id="Node000003" href="$classValveManager.html#a7ccec1088213c4d670a7fcfeeeeca2c7" title="Configure a solenoid channel with CDR (current drive regulation)." alt="" coords="743,57,1006,85"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="1097,257,1085,222,1066,179,1039,136,1004,100,984,88,984,83,1007,96,1044,132,1071,176,1090,220,1102,259"/>
+<area shape="rect" id="Node000005" href="$classValveManager.html#af4516b2a983b758785a59321f42a20b0" title="Configure a solenoid channel with VDR (voltage drive regulation)." alt="" coords="743,213,1006,241"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="1052,268,1005,255,959,244,959,239,1006,250,1057,268"/>
+<area shape="rect" id="Node000006" href="$classValveManager.html#adf0a124b524aeaff77fd8ae6104a12b0" title="Disable all channels on both drivers." alt="" coords="780,265,969,309"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="1035,288,970,290,969,285,1040,287"/>
+<area shape="rect" id="Node000007" href="$classValveManager.html#a40cab939ee2a6269d3f9b47339ab2c2b" title="Disable a valve channel output." alt="" coords="762,161,987,189"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="1081,262,1047,232,1004,204,973,192,973,187,1007,199,1051,228,1086,263"/>
+<area shape="rect" id="Node000009" href="$classValveManager.html#a915cd57bf1c1e510f11ac54b57ec2f02" title="Enable a valve channel output." alt="" coords="765,109,984,137"/>
+<area shape="poly" id="edge9_Node000001_Node000009" title=" " alt="" coords="1091,259,1057,204,1033,176,1004,152,981,140,981,135,1007,148,1037,172,1062,201,1096,260"/>
+<area shape="rect" id="Node000010" href="$classValveManager.html#a18f9a4ed2c88fe65e16b264c873bc24e" title="Enable multiple channels by bitmask." alt="" coords="744,333,1005,361"/>
+<area shape="poly" id="edge12_Node000001_Node000010" title=" " alt="" coords="1057,306,1006,324,960,335,958,330,1005,319,1052,307"/>
+<area shape="rect" id="Node000011" href="$classValveManager.html#a7a708a5ebc126913968db54b7629aff9" title="Ensure the valve manager system is initialized." alt="" coords="759,385,990,413"/>
+<area shape="poly" id="edge13_Node000001_Node000011" title=" " alt="" coords="1086,311,1051,346,1007,375,974,387,973,382,1004,370,1047,342,1082,313"/>
+<area shape="rect" id="Node000015" href="$ValveManagerExample_8cpp.html#ad702c5a2ae45c4e49b1e73ae4cb469a6" title=" " alt="" coords="482,497,692,525"/>
+<area shape="poly" id="edge17_Node000001_Node000015" title=" " alt="" coords="1102,314,1092,355,1073,399,1045,443,1027,463,1007,479,967,501,923,517,878,527,832,533,744,535,668,528,668,523,744,530,832,528,877,522,922,512,965,496,1004,474,1024,459,1041,440,1068,397,1087,353,1098,317"/>
+<area shape="rect" id="Node000017" href="$ValveManagerExample_8cpp.html#adc4731cc76646a84e5681cbd7544d40c" title=" " alt="" coords="505,549,669,594"/>
+<area shape="poly" id="edge19_Node000001_Node000017" title=" " alt="" coords="1106,315,1099,367,1083,428,1070,460,1053,490,1032,517,1007,540,968,564,926,580,881,592,835,598,747,599,670,591,670,585,747,594,835,592,880,586,924,575,966,559,1004,536,1029,513,1049,487,1065,457,1077,427,1094,366,1102,318"/>
+<area shape="rect" id="Node000018" href="$ValveManagerExample_8cpp.html#a1adc375ca8066a47d1642ce384f5a5dd" title="Helper: log a valve error result." alt="" coords="810,437,939,465"/>
+<area shape="poly" id="edge21_Node000001_Node000018" title=" " alt="" coords="1096,314,1062,373,1037,402,1007,427,974,442,939,450,938,445,972,437,1004,422,1033,399,1057,370,1092,316"/>
+<area shape="rect" id="Node000004" href="$classmanifold__valves_1_1SolenoidValve.html#ad7486ef4737a16cb1a91d3d7f34f18d3" title="Apply the current setpoint to the underlying driver IC." alt="" coords="490,84,684,128"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="737,88,685,97,684,92,742,86"/>
+<area shape="poly" id="edge8_Node000007_Node000004" title=" " alt="" coords="781,158,743,151,668,131,667,126,744,146,786,157"/>
+<area shape="rect" id="Node000008" href="$classmanifold__valves_1_1ProportionalValve.html#a58f901541484fe897dcf0455325c53e2" title="Apply the current setpoint to the underlying driver IC." alt="" coords="479,153,695,198"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="744,176,697,178,695,173,750,174"/>
+<area shape="poly" id="edge11_Node000009_Node000004" title=" " alt="" coords="747,116,685,114,684,109,752,115"/>
+<area shape="poly" id="edge10_Node000009_Node000008" title=" " alt="" coords="776,141,696,158,695,153,781,139"/>
+<area shape="rect" id="Node000012" href="$classFlux.html#af36707264a8180cfeb4f7a31247ad66b" title=" " alt="" coords="509,221,665,249"/>
+<area shape="poly" id="edge14_Node000011_Node000012" title=" " alt="" coords="748,377,742,375,729,361,721,347,716,318,712,290,705,277,694,264,666,248,666,243,697,260,710,274,717,288,722,317,727,345,733,358,745,370,753,378"/>
+<area shape="rect" id="Node000013" href="$classFlux.html#a0d67fb153ddebb59c51eb20ad311cb32" title=" " alt="" coords="219,221,431,249"/>
+<area shape="poly" id="edge15_Node000012_Node000013" title=" " alt="" coords="491,236,432,238,431,233,496,234"/>
+<area shape="rect" id="Node000014" href="$classFlux.html#a6c011c136a43dd2d9859dcf7d56571e8" title="Ensure all Flux subsystems are properly initialized." alt="" coords="5,221,171,249"/>
+<area shape="poly" id="edge16_Node000013_Node000014" title=" " alt="" coords="201,237,172,238,170,233,205,234"/>
+<area shape="rect" id="Node000016" href="$ValveManagerExample_8cpp.html#a630544a7f0a2cc40d8a7fefab7e2fe70" title=" " alt="" coords="282,407,368,434"/>
+<area shape="poly" id="edge18_Node000015_Node000016" title=" " alt="" coords="500,493,478,488,411,463,355,437,356,432,413,458,480,483,505,493"/>
+<area shape="poly" id="edge20_Node000017_Node000016" title=" " alt="" coords="489,542,478,539,436,514,398,486,341,438,342,432,401,482,439,510,480,534,494,543"/>
+<area shape="poly" id="edge24_Node000018_Node000015" title=" " alt="" coords="798,467,657,499,656,494,793,468"/>
+<area shape="poly" id="edge25_Node000018_Node000017" title=" " alt="" coords="835,472,770,507,696,539,664,551,663,546,694,534,768,502,830,473"/>
+<area shape="rect" id="Node000019" href="$ValveManagerExample_8cpp.html#a4e620e9fd97796234e6c9b1fd0047bfc" title=" " alt="" coords="480,377,694,405"/>
+<area shape="poly" id="edge22_Node000018_Node000019" title=" " alt="" coords="792,435,743,427,655,408,655,403,744,422,798,435"/>
+<area shape="rect" id="Node000020" href="$ValveManagerExample_8cpp.html#a8d86fd6058d95e07895773e225299d47" title=" " alt="" coords="505,429,669,474"/>
+<area shape="poly" id="edge26_Node000018_Node000020" title=" " alt="" coords="792,452,670,454,670,449,798,451"/>
+<area shape="rect" id="Node000021" href="$ValveManagerExample_8cpp.html#a6364b347b4950afcf77db7e1dfcd26a3" title=" " alt="" coords="504,273,671,301"/>
+<area shape="poly" id="edge28_Node000018_Node000021" title=" " alt="" coords="792,447,767,441,742,427,729,413,721,399,716,370,712,342,705,329,694,316,671,302,671,297,697,312,710,326,717,340,722,369,727,397,733,410,745,422,769,436,798,448"/>
+<area shape="rect" id="Node000022" href="$ValveManagerExample_8cpp.html#a85d6c20131366559d81c901faa08a8ee" title=" " alt="" coords="503,325,671,353"/>
+<area shape="poly" id="edge30_Node000018_Node000022" title=" " alt="" coords="792,444,767,439,742,427,726,412,717,397,709,382,694,368,670,356,670,351,697,364,713,379,722,394,730,409,745,422,769,434,798,444"/>
+<area shape="poly" id="edge23_Node000019_Node000016" title=" " alt="" coords="462,406,369,418,367,413,467,404"/>
+<area shape="poly" id="edge27_Node000020_Node000016" title=" " alt="" coords="487,440,368,428,368,423,492,439"/>
+<area shape="poly" id="edge29_Node000021_Node000016" title=" " alt="" coords="496,307,480,316,440,338,402,363,344,408,341,404,399,359,437,333,478,311,501,305"/>
+<area shape="poly" id="edge31_Node000022_Node000016" title=" " alt="" coords="506,358,480,368,364,409,362,404,478,363,511,356"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="ValveManager::DisableChannel" name="ValveManager::DisableChannel">
+<area shape="rect" id="Node000001" title="Disable a valve channel output." alt="" coords="270,48,494,76"/>
+<area shape="rect" id="Node000002" href="$classmanifold__valves_1_1ProportionalValve.html#a58f901541484fe897dcf0455325c53e2" title="Apply the current setpoint to the underlying driver IC." alt="" coords="5,5,222,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="252,46,222,44,222,39,257,46"/>
+<area shape="rect" id="Node000003" href="$classmanifold__valves_1_1SolenoidValve.html#ad7486ef4737a16cb1a91d3d7f34f18d3" title="Apply the current setpoint to the underlying driver IC." alt="" coords="17,75,210,119"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="252,79,211,87,210,82,258,78"/>
+</map>

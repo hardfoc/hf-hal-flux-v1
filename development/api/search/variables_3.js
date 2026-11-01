@@ -1,0 +1,21 @@
+var searchData=
+[
+  ['data_0',['data',['../structflux__version_1_1EntrySpan.html#a813aedb4fa9369d1a8ee3a97f1856d88',1,'flux_version::EntrySpan']]],
+  ['deep_5fdither_5fenabled_1',['deep_dither_enabled',['../structmanifold__valves_1_1Tle92466ChannelFeatures.html#abcfecdd299048d2affcb11c66859324e',1,'manifold_valves::Tle92466ChannelFeatures']]],
+  ['default_5fmax_5fbrightness_2',['DEFAULT_MAX_BRIGHTNESS',['../classLedManager.html#aa735963f5b014c6bb5ef294234b11fda',1,'LedManager']]],
+  ['default_5frmt_5fchannel_3',['DEFAULT_RMT_CHANNEL',['../classLedManager.html#a296c09abb88c053ea38a794757ec0e28',1,'LedManager']]],
+  ['diag_5fbits_5f_4',['diag_bits_',['../classmanifold__valves_1_1ProportionalValve.html#a7525f260e980e126c0ea657fd888210e',1,'manifold_valves::ProportionalValve::diag_bits_'],['../classmanifold__valves_1_1SolenoidValve.html#acde6cc2f6a770abf3e2a072e8f97e686',1,'manifold_valves::SolenoidValve::diag_bits_']]],
+  ['diag_5fhw_5ffault_5fclear_5fstreak_5f_5',['diag_hw_fault_clear_streak_',['../classmanifold__valves_1_1ProportionalValve.html#ad80b677a4be200adec19c7c2513bccec',1,'manifold_valves::ProportionalValve::diag_hw_fault_clear_streak_'],['../classmanifold__valves_1_1SolenoidValve.html#a823f53f4e3c18fa145338c56ba92770c',1,'manifold_valves::SolenoidValve::diag_hw_fault_clear_streak_']]],
+  ['diag_5fhw_5ffault_5fwas_5factive_5f_6',['diag_hw_fault_was_active_',['../classmanifold__valves_1_1ProportionalValve.html#a017853b963e6d2216c5d0fb4b13e74fd',1,'manifold_valves::ProportionalValve::diag_hw_fault_was_active_'],['../classmanifold__valves_1_1SolenoidValve.html#a4d2ac1cf3c0a47b337ad9334e58a8441',1,'manifold_valves::SolenoidValve::diag_hw_fault_was_active_']]],
+  ['diagnostics_5f_7',['diagnostics_',['../classFlux.html#ab4a4c3eee8f1543115ee314a1838cc5a',1,'Flux']]],
+  ['dither_5famplitude_5fma_8',['dither_amplitude_ma',['../structValveChannelState.html#a8c9d46e3bd59df7931313ddcfea18757',1,'ValveChannelState::dither_amplitude_ma'],['../structmanifold__valves_1_1ProportionalModelSpec.html#a200d4a93cc866fa05945bb6610644e81',1,'manifold_valves::ProportionalModelSpec::dither_amplitude_ma']]],
+  ['dither_5ffrequency_5fhz_9',['dither_frequency_hz',['../structValveChannelState.html#ae6d4042f6d2a44b08efa0fee659903a8',1,'ValveChannelState::dither_frequency_hz'],['../structmanifold__valves_1_1ProportionalModelSpec.html#a7114f108755cb788c6d85a4269c4ceab',1,'manifold_valves::ProportionalModelSpec::dither_frequency_hz']]],
+  ['drive_5fmode_10',['drive_mode',['../structmanifold__valves_1_1SolenoidMapEntry.html#a92d9f95200be33e63c08775170e9f7a9',1,'manifold_valves::SolenoidMapEntry']]],
+  ['driver_11',['driver',['../structAdcEntry.html#a520221768c792d1d683b1cb773cf1761',1,'AdcEntry::driver'],['../structGpioEntry.html#a85a04a0d9b613f496d8b04c42c7cd333',1,'GpioEntry::driver']]],
+  ['driver_5ftype_12',['driver_type',['../structValveChannelInfo.html#ab255c2e88dc39ce46dad5fa32ec8ca6b',1,'ValveChannelInfo']]],
+  ['duty_5fcycle_5fpermyriad_13',['duty_cycle_permyriad',['../structmanifold__valves_1_1ProportionalDiagSnapshot.html#a721f059860719700002591e4b6a9d6d6',1,'manifold_valves::ProportionalDiagSnapshot']]],
+  ['duty_5fcycle_5fpermyriad_5f_14',['duty_cycle_permyriad_',['../classmanifold__valves_1_1ProportionalValve.html#afe8aa5c9f717df4575bebf12e78914bb',1,'manifold_valves::ProportionalValve']]],
+  ['duty_5fcycle_5fraw_15',['duty_cycle_raw',['../structmanifold__valves_1_1ProportionalDiagSnapshot.html#a981f39e1a6de8fca627de21577a309d3',1,'manifold_valves::ProportionalDiagSnapshot']]],
+  ['duty_5fcycle_5fraw_5f_16',['duty_cycle_raw_',['../classmanifold__valves_1_1ProportionalValve.html#a63acba5a290774154f1dba97169fe041',1,'manifold_valves::ProportionalValve']]],
+  ['duty_5fpercent_17',['duty_percent',['../structValveChannelState.html#a5a9be04e73e66b4cec06603ef7412177',1,'ValveChannelState']]]
+];

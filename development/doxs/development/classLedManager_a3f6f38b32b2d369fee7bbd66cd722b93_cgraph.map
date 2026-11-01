@@ -1,0 +1,7 @@
+<map id="LedManager::DumpStatistics" name="LedManager::DumpStatistics">
+<area shape="rect" id="Node000001" title="Log current LED state and statistics to the console." alt="" coords="5,32,214,60"/>
+<area shape="rect" id="Node000002" href="$LedManager_8h.html#ac2f6dcce9b042a5bb336e016cb9a9a98" title="Convert a LedAnimation to a human&#45;readable C&#45;string." alt="" coords="262,5,425,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="214,31,249,30,243,31,215,37"/>
+<area shape="rect" id="Node000003" href="$structLedColor.html#a5d1972e2bcb71b4bd4c885fa12ba609c" title="Pack into a 24&#45;bit 0xRRGGBB integer." alt="" coords="281,57,406,85"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="214,55,268,63,263,63,214,60"/>
+</map>

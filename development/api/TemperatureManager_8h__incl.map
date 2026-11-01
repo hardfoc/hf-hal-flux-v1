@@ -1,0 +1,25 @@
+<map id="TemperatureManager.h" name="TemperatureManager.h">
+<area shape="rect" id="Node000001" title="Temperature sensor management for the HardFOC Flux V1 platform." alt="" coords="489,5,660,33"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,106,61,134"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="486,25,382,34,262,45,151,61,107,72,74,83,55,97,51,93,72,79,106,67,150,56,261,40,381,29,491,24"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="85,106,152,134"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="486,28,308,51,223,66,163,83,142,98,139,93,161,79,222,60,307,45,491,26"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="175,106,240,134"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="486,25,434,33,373,44,312,60,253,83,231,98,229,93,250,79,310,55,372,39,433,28,491,24"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="264,106,340,134"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="502,33,428,55,354,83,329,99,327,94,352,79,426,50,497,34"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="365,106,461,134"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="555,33,474,83,447,100,445,95,472,79,550,34"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="485,81,664,160"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="576,31,576,67,572,64,573,35"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="688,81,874,160"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="602,31,689,74,684,74,601,36"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="898,98,1102,143"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="658,31,768,51,887,78,928,93,923,92,886,84,767,56,658,36"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="1126,98,1335,143"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="660,22,869,40,992,56,1115,78,1161,93,1155,93,1114,84,991,61,868,45,660,27"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="1360,106,1541,134"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="660,17,794,19,966,27,1157,46,1254,60,1348,78,1411,101,1405,100,1347,84,1253,66,1157,51,966,33,794,24,660,22"/>
+<area shape="rect" id="Node000012" title=" " alt="" coords="1565,106,1669,134"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="660,18,864,21,1122,30,1373,48,1476,61,1554,78,1590,98,1585,97,1552,84,1475,66,1373,53,1122,35,864,26,661,23"/>
+</map>

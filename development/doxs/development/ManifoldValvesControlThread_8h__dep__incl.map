@@ -1,0 +1,5 @@
+<map id="ManifoldValvesControlThread.h" name="ManifoldValvesControlThread.h">
+<area shape="rect" id="Node000001" title="BaseThread that pushes pending valve setpoints to the driver ICs." alt="" coords="5,5,231,33"/>
+<area shape="rect" id="Node000002" href="$manifold__valves__pressure__control_8cpp.html" title="Manifold test bench: pressure sensor calibration and high&#45;rate monitoring." alt="" coords="22,81,214,126"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="120,47,120,81,116,79,116,51"/>
+</map>

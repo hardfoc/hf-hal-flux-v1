@@ -1,0 +1,21 @@
+<map id="GpioManager.h" name="GpioManager.h">
+<area shape="rect" id="Node000001" title="GPIO management for the HardFOC Flux V1 platform." alt="" coords="353,5,473,33"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,106,61,134"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="351,22,293,28,221,37,146,55,74,83,55,97,52,93,72,79,144,50,220,32,292,22,356,20"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="85,106,152,134"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="350,28,261,48,211,63,164,83,143,98,140,93,161,79,209,58,260,42,355,26"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="175,106,240,134"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="368,33,310,56,253,83,232,98,230,94,250,79,308,51,363,34"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="264,106,340,134"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="401,32,329,98,327,94,396,34"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="365,106,461,134"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="415,31,415,93,411,90,411,35"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="485,81,664,160"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="435,31,501,73,495,72,433,36"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="688,81,864,160"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="473,29,564,49,675,80,670,80,563,54,473,35"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="888,106,991,134"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="473,18,555,22,657,31,768,49,877,79,912,98,907,97,875,83,766,54,656,36,554,27,473,23"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="1016,81,1199,160"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="473,19,572,23,702,33,850,51,1003,81,998,81,849,56,702,39,572,29,474,24"/>
+</map>

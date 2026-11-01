@@ -1,0 +1,9 @@
+<map id="manifold_valves::SolenoidValve::OnDiagnostics" name="manifold_valves::SolenoidValve::OnDiagnostics">
+<area shape="rect" id="Node000001" title="Refresh per&#45;valve diagnostics from the driver IC." alt="" coords="5,40,199,85"/>
+<area shape="rect" id="Node000002" href="$classValveManager.html#a086a80073b5d6e33bf0c380396445525" title="Retrieve the MAX22200 fault status." alt="" coords="247,5,448,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="199,46,234,43,228,45,200,51"/>
+<area shape="rect" id="Node000004" href="$classmanifold__valves_1_1Valve.html#aa5dbf5c89269cd002d1060c906896f9a" title=" " alt="" coords="261,75,434,119"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="199,73,248,82,243,83,199,79"/>
+<area shape="rect" id="Node000003" href="$ValveManager_8h.html#a1029903401a6b8ed1b70aaff9b2c6acc" title="Map MAX22200 DriverStatus to the unified hf_valve_err_t domain." alt="" coords="496,14,707,42"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="448,25,483,27,478,28,449,30"/>
+</map>

@@ -1,0 +1,15 @@
+<map id="LedManager::IndicateBoot" name="LedManager::IndicateBoot">
+<area shape="rect" id="Node000001" title="Show the boot indicator (blue blink)." alt="" coords="5,109,197,137"/>
+<area shape="rect" id="Node000002" href="$classLedManager.html#a6e36bf7b11956c56582ce34da47d08ba" title="Start a named animation with an optional base colour." alt="" coords="245,109,452,137"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="197,121,232,122,227,124,198,126"/>
+<area shape="rect" id="Node000003" href="$namespaceLedColors.html#ae2a97d61b4ffac876640780401177e7f" title="Pure blue." alt="" coords="510,5,637,33"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="374,106,499,43,514,40,519,38,501,48,376,111"/>
+<area shape="rect" id="Node000004" href="$namespaceLedColors.html#a10b798abecc127d3529e0fa597426e6a" title="Pure green." alt="" coords="504,57,642,85"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="411,106,498,88,493,90,412,111"/>
+<area shape="rect" id="Node000005" href="$namespaceLedColors.html#a967d5a1dfb0d78523c126b564050f55c" title="Purple." alt="" coords="502,109,645,137"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="452,121,489,123,483,124,453,126"/>
+<area shape="rect" id="Node000006" href="$namespaceLedColors.html#af4d56375fdebf6240c7690d7f8e8f1fe" title="Pure red." alt="" coords="513,161,633,189"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="412,135,501,158,495,158,411,140"/>
+<area shape="rect" id="Node000007" href="$namespaceLedColors.html#a884ae4aac5589990c381e97c734283d8" title="Yellow." alt="" coords="500,213,646,241"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="376,135,501,198,519,208,514,207,499,203,375,140"/>
+</map>

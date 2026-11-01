@@ -1,0 +1,5 @@
+<map id="LedManager::GetCurrentBrightnessPercent" name="LedManager::GetCurrentBrightnessPercent">
+<area shape="rect" id="Node000001" title="Read current brightness as a percentage of max." alt="" coords="5,5,255,50"/>
+<area shape="rect" id="Node000002" href="$classLedManager.html#af56f8e3fe390499c55decd544610b352" title=" " alt="" coords="303,14,503,42"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="255,25,290,28,284,28,255,30"/>
+</map>

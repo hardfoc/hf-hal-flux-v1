@@ -1,0 +1,5 @@
+<map id="GetAdcManager" name="GetAdcManager">
+<area shape="rect" id="Node000001" title="Convenience accessor — equivalent to AdcManager::GetInstance()." alt="" coords="5,5,131,33"/>
+<area shape="rect" id="Node000002" href="$classAdcManager.html#ae3d2137cd97edce8f97092d5b4a6d1d1" title="Return the singleton AdcManager instance." alt="" coords="179,5,367,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="131,17,166,19,160,19,131,22"/>
+</map>

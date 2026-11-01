@@ -1,0 +1,17 @@
+<map id="GpioManager.h" name="GpioManager.h">
+<area shape="rect" id="Node000001" title="GPIO management for the HardFOC Flux V1 platform." alt="" coords="480,5,599,33"/>
+<area shape="rect" id="Node000002" href="$Flux_8cpp.html" title="Implementation of the unified Flux API singleton." alt="" coords="5,81,82,109"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="462,29,295,52,95,84,83,86,81,81,94,78,294,46,467,28"/>
+<area shape="rect" id="Node000003" href="$FluxApiExample_8cpp.html" title="Comprehensive documentation example: Full Flux API on Flux V1." alt="" coords="106,81,261,109"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="467,36,248,83,247,78,462,35"/>
+<area shape="rect" id="Node000004" href="$GpioManager_8cpp.html" title="Implementation of the Flux V1 GPIO manager." alt="" coords="284,81,419,109"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="494,39,386,83,384,78,489,39"/>
+<area shape="rect" id="Node000005" href="$GpioManagerExample_8cpp.html" title="Documentation example: GPIO management on Flux V1." alt="" coords="443,81,636,109"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="541,47,542,82,537,79,538,51"/>
+<area shape="rect" id="Node000006" href="$ValveManager_8cpp.html" title="Implementation of the unified Flux V1 valve manager." alt="" coords="660,81,800,109"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="588,36,699,81,694,80,587,42"/>
+<area shape="rect" id="Node000007" href="$flux__api__test_8cpp.html" title="Comprehensive Flux HAL API test suite for ESP32 (noexcept)" alt="" coords="824,81,956,109"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="615,33,830,80,824,80,614,39"/>
+<area shape="rect" id="Node000008" href="$gpio__adc__test_8cpp.html" title="GPIO &amp; ADC focused test for Flux ESP32." alt="" coords="980,81,1118,109"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="615,28,968,78,982,83,977,83,967,84,614,33"/>
+</map>

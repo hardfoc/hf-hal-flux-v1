@@ -1,0 +1,2313 @@
+warning: ignoring unsupported tag 'PAGE_OUTLINE_PANEL' at line 63, file /tmp/doxyfile.id0BTR
+warning: Tag 'DOT_TRANSPARENT' at line 79 of file '/tmp/doxyfile.id0BTR' has become obsolete.
+         To avoid this warning please remove this line from your configuration file or upgrade it using "doxygen -u"
+Doxygen version used: 1.10.0 (ebc57c6dd303a980bd19dd74b8b61c8f3f5180ca)
+Notice: Output directory 'docs/_doxygen' does not exist. I have created it for you.
+Searching for include files...
+Searching for example files...
+Searching for images...
+Searching for dot files...
+Searching for msc files...
+Searching for dia files...
+Searching for files to exclude
+Searching INPUT for files to process...
+Searching for files in directory /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/lib/api
+Searching for files in directory /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/lib/managers
+Searching for files in directory /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main
+Searching for files in directory /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/manifold_valves_pressure_control
+Searching for files in directory /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples
+Searching for files in directory /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32
+Searching for files in directory /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/docs
+Searching for files in directory /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/scripts
+Searching for files in directory /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main
+Searching for files in directory /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/manifold_valves_pressure_control
+Reading and parsing tag files
+Parsing files
+Preprocessing /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/lib/api/Flux.cpp...
+Parsing file /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/lib/api/Flux.cpp...
+Preprocessing /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/lib/api/Flux.h...
+Parsing file /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/lib/api/Flux.h...
+Preprocessing /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/lib/api/FluxCpuAffinity.h...
+Parsing file /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/lib/api/FluxCpuAffinity.h...
+Preprocessing /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/lib/api/FluxVersion.h...
+Parsing file /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/lib/api/FluxVersion.h...
+Preprocessing /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/lib/api/FluxVersionManifest.cpp...
+Parsing file /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/lib/api/FluxVersionManifest.cpp...
+Preprocessing /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/lib/api/FluxVersionManifest.h...
+Parsing file /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/lib/api/FluxVersionManifest.h...
+Reading /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/lib/api/README.md...
+Preprocessing /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/lib/managers/AdcManager.cpp...
+Parsing file /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/lib/managers/AdcManager.cpp...
+Preprocessing /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/lib/managers/AdcManager.h...
+Parsing file /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/lib/managers/AdcManager.h...
+Preprocessing /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/lib/managers/CommChannelsManager.cpp...
+Parsing file /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/lib/managers/CommChannelsManager.cpp...
+Preprocessing /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/lib/managers/CommChannelsManager.h...
+Parsing file /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/lib/managers/CommChannelsManager.h...
+Preprocessing /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/lib/managers/GpioManager.cpp...
+Parsing file /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/lib/managers/GpioManager.cpp...
+Preprocessing /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/lib/managers/GpioManager.h...
+Parsing file /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/lib/managers/GpioManager.h...
+Preprocessing /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/lib/managers/LedManager.cpp...
+Parsing file /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/lib/managers/LedManager.cpp...
+Preprocessing /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/lib/managers/LedManager.h...
+Parsing file /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/lib/managers/LedManager.h...
+Preprocessing /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/lib/managers/NvsManager.cpp...
+Parsing file /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/lib/managers/NvsManager.cpp...
+Preprocessing /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/lib/managers/NvsManager.h...
+Parsing file /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/lib/managers/NvsManager.h...
+Preprocessing /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/lib/managers/TemperatureManager.cpp...
+Parsing file /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/lib/managers/TemperatureManager.cpp...
+Preprocessing /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/lib/managers/TemperatureManager.h...
+Parsing file /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/lib/managers/TemperatureManager.h...
+Preprocessing /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/lib/managers/ValveManager.cpp...
+Parsing file /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/lib/managers/ValveManager.cpp...
+Preprocessing /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/lib/managers/ValveManager.h...
+Parsing file /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/lib/managers/ValveManager.h...
+Preprocessing /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/AdcManagerExample.cpp...
+Parsing file /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/AdcManagerExample.cpp...
+Preprocessing /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/Ads7952Example.cpp...
+Parsing file /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/Ads7952Example.cpp...
+Preprocessing /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/AlicatBasis2Example.cpp...
+Parsing file /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/AlicatBasis2Example.cpp...
+Preprocessing /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/CommChannelsManagerExample.cpp...
+Parsing file /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/CommChannelsManagerExample.cpp...
+Preprocessing /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/flux_api_test.cpp...
+Parsing file /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/flux_api_test.cpp...
+Preprocessing /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/flux_nvs_example.cpp...
+Parsing file /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/flux_nvs_example.cpp...
+Preprocessing /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/FluxApiExample.cpp...
+Parsing file /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/FluxApiExample.cpp...
+Preprocessing /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/gpio_adc_test.cpp...
+Parsing file /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/gpio_adc_test.cpp...
+Preprocessing /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/GpioManagerExample.cpp...
+Parsing file /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/GpioManagerExample.cpp...
+Preprocessing /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/led_temp_test.cpp...
+Parsing file /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/led_temp_test.cpp...
+Preprocessing /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/LedManagerExample.cpp...
+Parsing file /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/LedManagerExample.cpp...
+Preprocessing /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/manifold_valves_pressure_control/manifold_valves_pressure_control.cpp...
+Parsing file /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/manifold_valves_pressure_control/manifold_valves_pressure_control.cpp...
+Preprocessing /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/manifold_valves_pressure_control/ManifoldValves.h...
+Parsing file /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/manifold_valves_pressure_control/ManifoldValves.h...
+Preprocessing /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/manifold_valves_pressure_control/ManifoldValvesCatalog.h...
+Parsing file /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/manifold_valves_pressure_control/ManifoldValvesCatalog.h...
+Preprocessing /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/manifold_valves_pressure_control/ManifoldValvesControlThread.h...
+Parsing file /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/manifold_valves_pressure_control/ManifoldValvesControlThread.h...
+Preprocessing /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/manifold_valves_pressure_control/ManifoldValvesDiagnosticsThread.h...
+Parsing file /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/manifold_valves_pressure_control/ManifoldValvesDiagnosticsThread.h...
+Preprocessing /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/manifold_valves_pressure_control/ManifoldValvesSelfTest.h...
+Parsing file /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/manifold_valves_pressure_control/ManifoldValvesSelfTest.h...
+Preprocessing /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/manifold_valves_pressure_control/PressureSensor.cpp...
+Parsing file /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/manifold_valves_pressure_control/PressureSensor.cpp...
+Preprocessing /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/manifold_valves_pressure_control/PressureSensor.h...
+Parsing file /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/manifold_valves_pressure_control/PressureSensor.h...
+Preprocessing /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/manifold_valves_pressure_control/PressureSensorConfig.h...
+Parsing file /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/manifold_valves_pressure_control/PressureSensorConfig.h...
+Preprocessing /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/manifold_valves_pressure_control/PressureSensorThread.cpp...
+Parsing file /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/manifold_valves_pressure_control/PressureSensorThread.cpp...
+Preprocessing /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/manifold_valves_pressure_control/PressureSensorThread.h...
+Parsing file /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/manifold_valves_pressure_control/PressureSensorThread.h...
+Preprocessing /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/manifold_valves_pressure_control/ProportionalValve.h...
+Parsing file /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/manifold_valves_pressure_control/ProportionalValve.h...
+Reading /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/manifold_valves_pressure_control/README.md...
+Preprocessing /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/manifold_valves_pressure_control/SolenoidValve.h...
+Parsing file /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/manifold_valves_pressure_control/SolenoidValve.h...
+Preprocessing /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/manifold_valves_pressure_control/Valve.h...
+Parsing file /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/manifold_valves_pressure_control/Valve.h...
+Preprocessing /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/TemperatureManagerExample.cpp...
+Parsing file /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/TemperatureManagerExample.cpp...
+Preprocessing /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/TestFramework.h...
+Parsing file /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/TestFramework.h...
+Preprocessing /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/valve_cycling_test.cpp...
+Parsing file /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/valve_cycling_test.cpp...
+Preproc/home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/lib/api/FluxCpuAffinity.h:2: warning: Found non-existing group 'flux_api' for the command '@ingroup', ignoring command
+/home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/lib/managers/ValveManager.h:57: warning: Found non-existing group 'valve' for the command '@ingroup', ignoring command
+/home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/manifold_valves_pressure_control/README.md:1: warning: found more than one \mainpage comment block! (first occurrence: /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/lib/api/README.md, line 1), Skipping current block!
+/home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/docs/README.md:1: warning: found more than one \mainpage comment block! (first occurrence: /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/lib/api/README.md, line 1), Skipping current block!
+/home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/README.md:1: warning: found more than one \mainpage comment block! (first occurrence: /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/lib/api/README.md, line 1), Skipping current block!
+/home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/README.md:1: warning: found more than one \mainpage comment block! (first occurrence: /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/lib/api/README.md, line 1), Skipping current block!
+/home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/manifold_valves_pressure_control/Valve.h:206: warning: Found unknown command '@Browser'
+/home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/manifold_valves_pressure_control/ManifoldValvesSelfTest.h:1028: warning: Unsupported xml/html tag <cmath> found
+essing /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/ValveManagerExample.cpp...
+Parsing file /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/ValveManagerExample.cpp...
+Reading /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/docs/README.md...
+Reading /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/README.md...
+Reading /home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/README.md...
+Building macro definition list...
+Building group list...
+Building directory list...
+Building namespace list...
+Building file list...
+Building class list...
+Building concept list...
+Computing nesting relations for classes...
+Associating documentation with classes...
+Associating documentation with concepts...
+Associating documentation with modules...
+Building example list...
+Searching for enumerations...
+Searching for documented typedefs...
+Searching for members imported via using declarations...
+Searching for included using directives...
+Searching for documented variables...
+Building interface member list...
+Building member list...
+Searching for friends...
+Searching for documented defines...
+Computing class inheritance relations...
+Computing class usage relations...
+Flushing cached template relations that have become invalid...
+Computing class relations...
+Add enum values to enums...
+Searching for member function documentation...
+Creating members for template instances...
+Building page list...
+Search for main page...
+Computing page relations...
+Determining the scope of groups...
+Computing module relations...
+Sorting lists...
+Determining which enums are documented
+Computing member relations...
+Building full member lists recursively...
+Adding members to member groups.
+Computing member references...
+Inheriting documentation...
+Generating disk names...
+Adding source references...
+Adding xrefitems...
+Sorting member lists...
+Setting anonymous enum type...
+Computing dependencies between directories...
+Generating citations page...
+Counting members...
+Counting data structures...
+Resolving user defined references...
+Finding anchors and sections in the documentation...
+Transferring function references...
+Combining using relations...
+Adding members to index pages...
+Correcting members for VHDL...
+Computing tooltip texts...
+Generating style sheet...
+Generating search indices...
+Generating example documentation...
+Generating file sources...
+Parsing code for file AdcManagerExample.cpp...
+Parsing code for file Ads7952Example.cpp...
+Parsing code for file AlicatBasis2Example.cpp...
+Parsing code for file CommChannelsManagerExample.cpp...
+Parsing code for file flux_api_test.cpp...
+Parsing code for file flux_nvs_example.cpp...
+Parsing code for file FluxApiExample.cpp...
+Parsing code for file gpio_adc_test.cpp...
+Parsing code for file GpioManagerExample.cpp...
+Parsing code for file led_temp_test.cpp...
+Parsing code for file LedManagerExample.cpp...
+Parsing code for file manifold_valves_pressure_control.cpp...
+Generating code for file ManifoldValves.h...
+Generating code for file ManifoldValvesCatalog.h...
+Generating code for file ManifoldValvesControlThread.h...
+Generating code for file ManifoldValvesDiagnosticsThread.h...
+Generating code for file ManifoldValvesSelfTest.h...
+Parsing code for file PressureSensor.cpp...
+Generating code for file PressureSensor.h...
+Generating code for file PressureSensorConfig.h...
+Parsing code for file PressureSensorThread.cpp...
+Generating code for file PressureSensorThread.h...
+Generating code for file ProportionalValve.h...
+Generating code for file SolenoidValve.h...
+Generating code for file Valve.h...
+Parsing code for file TemperatureManagerExample.cpp...
+Generating code for file TestFramework.h...
+Parsing code for file valve_cycling_test.cpp...
+Parsing code for file ValveManagerExample.cpp...
+Parsing code for file Flux.cpp...
+Generating code for file Flux.h...
+Generating code for file FluxCpuAffinity.h...
+Generating code for file FluxVersion.h...
+Parsing code for file FluxVersionManifest.cpp...
+Generating code for file FluxVersionManifest.h...
+Parsing code for file README.md...
+Parsing code for file README.md...
+Parsing code for file README.md...
+Parsing code for file README.md...
+Parsing code for file README.md...
+Parsing code for file AdcManager.cpp...
+Generating code for file AdcManager.h...
+Parsing code for file CommChannelsManager.cpp...
+Generating code for file CommChannelsManager.h...
+Parsing code for file GpioManager.cpp...
+Generating code for file GpioManager.h...
+Parsing code for file LedManager.cpp...
+Generating code for file LedManager.h...
+Parsing code for file NvsManager.cpp...
+Generating code for file NvsManager.h...
+Parsing code for file TemperatureManager.cpp...
+Generating code for file TemperatureManager.h...
+Parsing code for file ValveManager.cpp...
+Generating code for file ValveManager.h...
+Generating file documentation...
+Generating docs for file AdcManagerExample.cpp...
+Generating call graph for function app_main
+Generating caller graph for function example_channel_registry
+Generating caller graph for function example_diagnostics
+Generating caller graph for function example_error_handling
+Generating caller graph for function example_monitoring_loop
+Generating caller graph for function example_multi_sample
+Generating caller graph for function example_ntc_raw_voltage
+Generating caller graph for function example_vbus_monitoring
+Generating docs for file Ads7952Example.cpp...
+Generating call graph for function app_main
+Generating caller graph for function example_channel_registry
+Generating caller graph for function example_monitoring_loop
+Generating caller graph for function example_multi_sample
+Generating caller graph for function example_scan_all_channels_manager
+Generating caller graph for function example_single_channel_read
+Generating docs for file AlicatBasis2Example.cpp...
+Generating call graph for function app_main
+Generating docs for file CommChannelsManagerExample.cpp...
+Generating call graph for function app_main
+Generating caller graph for function example_bus_access
+Generating call graph for function example_diagnostics
+Generating caller graph for function example_diagnostics
+Generating call graph for function example_error_handling
+Generating caller graph for function example_error_handling
+Generating call graph for function example_spi_device_access
+Generating caller graph for function example_spi_device_access
+Generating caller graph for function example_statistics_dump
+Generating docs for file flux_api_test.cpp...
+Generating call graph for function app_main
+Generating caller graph for function test_adc_read_channel
+Generating caller graph for function test_collect_manager_health
+Generating caller graph for function test_comms_get_last_error
+Generating caller graph for function test_comms_spi_available
+Generating caller graph for function test_comms_system_diagnostics
+Generating caller graph for function test_component_init_status
+Generating caller graph for function test_dump_statistics
+Generating caller graph for function test_ensure_initialized
+Generating caller graph for function test_get_system_diagnostics
+Generating caller graph for function test_gpio_contains
+Generating caller graph for function test_idempotent_init
+Generating caller graph for function test_init_time
+Generating caller graph for function test_is_initialized_after_init
+Generating caller graph for function test_led_get_brightness
+Generating caller graph for function test_led_get_color
+Generating caller graph for function test_led_set_status
+Generating caller graph for function test_perform_health_check
+Generating call graph for function test_singleton_access
+Generating caller graph for function test_singleton_access
+Generating caller graph for function test_system_uptime
+Generating caller graph for function test_system_version
+Generating caller graph for function test_temp_read_esp32
+Generating caller graph for function test_temp_read_ntc
+Generating caller graph for function test_valve_disable_all
+Generating caller graph for function test_valve_disable_channel
+Generating caller graph for function test_valve_enable_channel
+Generating caller graph for function test_valve_ensure_initialized
+Generating caller graph for function test_valve_is_channel_enabled
+Generating caller graph for function test_valve_proportional_current
+Generating docs for file flux_nvs_example.cpp...
+Generating call graph for function app_main
+Generating docs for file FluxApiExample.cpp...
+Generating call graph for function app_main
+Generating call graph for function phase_boot
+Generating caller graph for function phase_boot
+Generating caller graph for function phase_check_faults
+Generating caller graph for function phase_check_power
+Generating caller graph for function phase_health_monitoring
+Generating caller graph for function phase_shutdown
+Generating caller graph for function phase_validate_comms
+Generating call graph for function phase_valve_operation
+Generating caller graph for function phase_valve_operation
+Generating docs for file gpio_adc_test.cpp...
+Generating caller graph for function ADC
+Generating call graph for function app_main
+Generating caller graph for function GPIO
+Generating call graph for function test_adc_diagnostics
+Generating caller graph for function test_adc_diagnostics
+Generating call graph for function test_adc_ensure_initialized
+Generating caller graph for function test_adc_ensure_initialized
+Generating call graph for function test_adc_rapid_read_stress
+Generating caller graph for function test_adc_rapid_read_stress
+Generating call graph for function test_adc_read_invalid
+Generating caller graph for function test_adc_read_invalid
+Generating call graph for function test_adc_read_ntc
+Generating caller graph for function test_adc_read_ntc
+Generating call graph for function test_adc_read_vbus
+Generating caller graph for function test_adc_read_vbus
+Generating call graph for function test_adc_vbus_range_sanity
+Generating caller graph for function test_adc_vbus_range_sanity
+Generating call graph for function test_gpio_contains_invalid
+Generating caller graph for function test_gpio_contains_invalid
+Generating call graph for function test_gpio_contains_known_pins
+Generating caller graph for function test_gpio_contains_known_pins
+Generating call graph for function test_gpio_ensure_initialized
+Generating caller graph for function test_gpio_ensure_initialized
+Generating call graph for function test_gpio_rapid_toggle_stress
+Generating caller graph for function test_gpio_rapid_toggle_stress
+Generating call graph for function test_gpio_set_and_read
+Generating caller graph for function test_gpio_set_and_read
+Generating call graph for function test_gpio_toggle
+Generating caller graph for function test_gpio_toggle
+Generating docs for file GpioManagerExample.cpp...
+Generating call graph for function app_main
+Generating caller graph for function example_digital_input
+Generating caller graph for function example_digital_output
+Generating caller graph for function example_heartbeat_pattern
+Generating caller graph for function example_pin_configuration
+Generating caller graph for function example_pin_lookup
+Generating caller graph for function example_statistics
+Generating docs for file led_temp_test.cpp...
+Generating call graph for function app_main
+Generating caller graph for function LEDS
+Generating caller graph for function TEMP
+Generating call graph for function test_led_ensure_initialized
+Generating caller graph for function test_led_ensure_initialized
+Generating call graph for function test_led_get_brightness
+Generating caller graph for function test_led_get_brightness
+Generating call graph for function test_led_get_color
+Generating caller graph for function test_led_get_color
+Generating call graph for function test_led_set_status_error
+Generating caller graph for function test_led_set_status_error
+Generating call graph for function test_led_set_status_ok
+Generating caller graph for function test_led_set_status_ok
+Generating call graph for function test_led_set_status_warning
+Generating caller graph for function test_led_set_status_warning
+Generating call graph for function test_temp_diagnostics
+Generating caller graph for function test_temp_diagnostics
+Generating call graph for function test_temp_ensure_initi/home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/manifold_valves_pressure_control/ManifoldValves.h:5: warning: Found unknown command '@Browser'
+/home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/manifold_valves_pressure_control/ProportionalValve.h:5: warning: Found unknown command '@Browser'
+/home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/manifold_valves_pressure_control/SolenoidValve.h:6: warning: Found unknown command '@Browser'
+/home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/manifold_valves_pressure_control/Valve.h:5: warning: Found unknown command '@Browser'
+alized
+Generating caller graph for function test_temp_ensure_initialized
+Generating call graph for function test_temp_esp32_range_sanity
+Generating caller graph for function test_temp_esp32_range_sanity
+Generating call graph for function test_temp_rapid_read_stress
+Generating caller graph for function test_temp_rapid_read_stress
+Generating call graph for function test_temp_read_esp32_internal
+Generating caller graph for function test_temp_read_esp32_internal
+Generating call graph for function test_temp_read_invalid_sensor
+Generating caller graph for function test_temp_read_invalid_sensor
+Generating call graph for function test_temp_read_ntc
+Generating caller graph for function test_temp_read_ntc
+Generating docs for file LedManagerExample.cpp...
+Generating call graph for function app_main
+Generating call graph for function example_animations
+Generating caller graph for function example_animations
+Generating call graph for function example_basic_colors
+Generating caller graph for function example_basic_colors
+Generating call graph for function example_brightness
+Generating caller graph for function example_brightness
+Generating call graph for function example_color_palette
+Generating caller graph for function example_color_palette
+Generating call graph for function example_color_wheel
+Generating caller graph for function example_color_wheel
+Generating call graph for function example_diagnostics
+Generating caller graph for function example_diagnostics
+Generating caller graph for function example_status_indicators
+Generating call graph for function log_led_result
+Generating caller graph for function log_led_result
+Generating docs for file manifold_valves_pressure_control.cpp...
+Generating call graph for function app_main
+Generating call graph for function MakeSelfTestPlan
+Generating caller graph for function MakeSelfTestPlan
+Generating docs for file ManifoldValves.h...
+Generating docs for file ManifoldValvesCatalog.h...
+Generating docs for file ManifoldValvesControlThread.h...
+Generating docs for file ManifoldValvesDiagnosticsThread.h...
+Generating docs for file ManifoldValvesSelfTest.h...
+Generating docs for file PressureSensor.cpp...
+Generating docs for file PressureSensor.h...
+Generating docs for file PressureSensorConfig.h...
+Generating caller graph for function DirectionToString
+Generating caller graph for function GetRatiometricVoltageMax
+Generating caller graph for function GetRatiometricVoltageMin
+Generating docs for file PressureSensorThread.cpp...
+Generating docs for file PressureSensorThread.h...
+Generating docs for file ProportionalValve.h...
+Generating docs for file SolenoidValve.h...
+Generating docs for file Valve.h...
+Generating docs for file TemperatureManagerExample.cpp...
+Generating call graph for function app_main
+Generating caller graph for function example_basic_reading
+Generating caller graph for function example_convenience_methods
+Generating caller graph for function example_diagnostics
+Generating caller graph for function example_fahrenheit
+Generating caller graph for function example_monitoring_loop
+Generating call graph for function example_sensor_info
+Generating caller graph for function example_sensor_info
+Generating caller graph for function example_temperature_stats
+Generating caller graph for function example_thermal_protection
+Generating docs for file TestFramework.h...
+Generating caller graph for function cleanup_test_progress_indicator
+Generating call graph for function ensure_gpio14_initialized
+Generating caller graph for function ensure_gpio14_initialized
+Generating caller graph for function init_test_progress_indicator
+Generating call graph for function print_test_summary
+Generating caller graph for function print_test_summary
+Generating docs for file valve_cycling_test.cpp...
+Generating call graph for function app_main
+Generating call graph for function test_valve_cycle_all_solenoids
+Generating caller graph for function test_valve_cycle_all_solenoids
+Generating call graph for function test_valve_diagnostics
+Generating caller graph for function test_valve_diagnostics
+Generating call graph for function test_valve_disable_all
+Generating caller graph for function test_valve_disable_all
+Generating call graph for function test_valve_disable_all_after_stress
+Generating caller graph for function test_valve_disable_all_after_stress
+Generating call graph for function test_valve_disable_solenoid_ch0
+Generating caller graph for function test_valve_disable_solenoid_ch0
+Generating call graph for function test_valve_enable_solenoid_ch0
+Generating caller graph for function test_valve_enable_solenoid_ch0
+Generating call graph for function test_valve_ensure_initialized
+Generating caller graph for function test_valve_ensure_initialized
+Generating call graph for function test_valve_is_enabled_query
+Generating caller graph for function test_valve_is_enabled_query
+Generating call graph for function test_valve_proportional_set
+Generating caller graph for function test_valve_proportional_set
+Generating call graph for function test_valve_proportional_zero
+Generating caller graph for function test_valve_proportional_zero
+Generating call graph for function test_valve_rapid_cycle_stress
+Generating caller graph for function test_valve_rapid_cycle_stress
+Generating caller graph for function VALVES
+Generating docs for file ValveManagerExample.cpp...
+Generating call graph for function app_main
+Generating call graph for function example_bitmask_operations
+Generating caller graph for function example_bitmask_operations
+Generating caller graph for function example_channel_queries
+Generating caller graph for function example_diagnostics
+Generating caller graph for function example_direct_driver_access
+Generating call graph for function example_fault_management
+Generating caller graph for function example_fault_management
+Generating call graph for function example_proportional_current
+Generating caller graph for function example_proportional_current
+Generating call graph for function example_proportional_pwm_dither
+Generating caller graph for function example_proportional_pwm_dither
+Generating call graph for function example_solenoid_cdr
+Generating caller graph for function example_solenoid_cdr
+Generating call graph for function example_solenoid_vdr
+Generating caller graph for function example_solenoid_vdr
+Generating call graph for function log_valve_result
+Generating caller graph for function log_valve_result
+Generating docs for file Flux.cpp...
+Generating docs for file Flux.h...
+Generating call graph for function GetFlux
+Generating docs for file FluxCpuAffinity.h...
+Generating docs for file FluxVersion.h...
+Generating docs for file FluxVersionManifest.cpp...
+Generating docs for file FluxVersionManifest.h...
+Generating docs for file README.md...
+Generating docs for file README.md...
+Generating docs for file README.md...
+Generating docs for file README.md...
+Generating docs for file README.md...
+Generating docs for file AdcManager.cpp...
+Generating docs for file AdcManager.h...
+Generating call graph for function GetAdcManager
+Generating docs for file CommChannelsManager.cpp...
+Generating docs for file CommChannelsManager.h...
+Generating caller graph for function CommErrorToString
+Generating call graph for function GetCommChannelsManager
+Generating docs for file GpioManager.cpp...
+Generating docs for file GpioManager.h...
+Generating call graph for function GetGpioManager
+Generating docs for file LedManager.cpp...
+Generating docs for file LedManager.h...
+Generating call graph for function GetLedManager
+Generating caller graph for function LedAnimationToString
+Generating caller graph for function LedErrorToString
+Generating docs for file NvsManager.cpp...
+Generating docs for file NvsManager.h...
+Generating docs for file TemperatureManager.cpp...
+Generating docs for file TemperatureManager.h...
+Generating caller graph for function FluxTempSensorTypeToString
+Generating call graph for function GetTemperatureManager
+Generating docs for file ValveManager.cpp...
+Generating docs for file ValveManager.h...
+Generating call graph for function GetValveManager
+Generating caller graph for function HfValveErrOk
+Generating caller graph for function HfValveErrToString
+Generating caller graph for function MaxDriverStatusToValveError
+Generating caller graph for function TleDriverErrorToValveError
+Generating page documentation...
+Generating group documentation...
+Generating class documentation...
+Generating docs for compound AdcEntry...
+Generating docs for compound AdcManager...
+Generating caller graph for function AdcManager::Deinitialize
+Generating caller graph for function AdcManager::DumpStatistics
+Generating call graph for function AdcManager::EnsureInitialized
+Generating caller graph for function AdcManager::EnsureInitialized
+Generating caller graph for function AdcManager::GetInstance
+Generating call graph for function AdcManager::Initialize
+Generating caller graph for function AdcManager::Initialize
+Generating docs for compound AdcSystemDiagnostics...
+Generating docs for compound CalibrationConfig...
+Generating docs for compound CommChannelsManager...
+Generating caller graph for function CommChannelsManager::Deinitialize
+Generating caller graph for function CommChannelsManager::DumpStatistics
+Generating call graph for function CommChannelsManager::EnsureInitialized
+Generating caller graph for function CommChannelsManager::EnsureInitialized
+Generating caller graph for function CommChannelsManager::GetInstance
+Generating caller graph for function CommChannelsManager::Initialize
+Generating docs for nested compound CommChannelsManager::UartAcquireConfig...
+Generating docs for compound CommSystemDiagnostics...
+Generating docs for compound Flux...
+Generating caller graph for function Flux::CollectManagerHealth
+Generating call graph for function Flux::DumpSystemStatistics
+Generating call graph for function Flux::EnsureInitialized
+Generating caller graph for function Flux::GetInitializationTimeMs
+Generating caller graph for function Flux::GetInstance
+Generating caller graph for function Flux::GetSystemUptimeMs
+Generating call graph for function Flux::InitializeAdc
+Generating caller graph for function Flux::InitializeAdc
+Generating call graph for function Flux::InitializeAllComponents
+Generating caller graph for function Flux::InitializeAllComponents
+Generating call graph for function Flux::InitializeComms
+Generating caller graph for function Flux::InitializeComms
+Generating call graph for function Flux::InitializeGpio
+Generating caller graph for function Flux::InitializeGpio
+Generating call graph for function Flux::InitializeLeds
+Generating caller graph for function Flux::InitializeLeds
+Generating call graph for function Flux::InitializeNvs
+Generating caller graph for function Flux::InitializeNvs
+Generating call graph for function Flux::InitializeTemperature
+Generating caller graph for function Flux::InitializeTemperature
+Generating call graph for function Flux::InitializeValves
+Generating caller graph for function Flux::InitializeValves
+Generating call graph for function Flux::PerformHealthCheck
+Generating call graph for function Flux::Shutdown
+Generating call graph for function Flux::UpdateSystemDiagnostics
+Generating caller graph for function Flux::UpdateSystemDiagnostics
+Generating docs for compound FluxSystemDiagnostics...
+Generating docs for compound GpioEntry...
+Generating docs for compound GpioManager...
+Generating caller graph for function GpioManager::Deinitialize
+Generating caller graph for function GpioManager::DumpStatistics
+Generating call graph for function GpioManager::EnsureInitialized
+Generating caller graph for function GpioManager::EnsureInitialized
+Generating caller graph for function GpioManager::GetInstance
+Generating caller graph for function GpioManager::Initialize
+Generating docs for compound GpioSystemDiagnostics...
+Generating docs for compound LedColor...
+Generating caller graph for function LedColor::LedColor
+Generating call graph for function LedColor::FromRgb
+Generating caller graph for function LedColor::FromRgb
+Generating caller graph for function LedColor::ToRgb
+Generating docs for compound LedManager...
+Generating caller graph for function LedManager::ColorWheel
+Generating call graph for function LedManager::Deinitialize
+Generating caller gr/home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/manifold_valves_pressure_control/PressureSensorThread.h:25: warning: The following parameters of PressureSensorThread::PressureSensorThread(PressureSensorConfig *sensor_configs, std::size_t num_sensors, const CalibrationConfig &cal_config, SharedState shared_state, uint32_t sample_interval_ms, uint8_t avg_samples, float filter_cutoff_hz=100.0f) are not documented:
+  parameter 'sensor_configs'
+  parameter 'num_sensors'
+  parameter 'cal_config'
+  parameter 'shared_state'
+aph for function LedManager::Deinitialize
+Generating call graph for function LedManager::DumpStatistics
+Generating caller graph for function LedManager::DumpStatistics
+Generating call graph for function LedManager::EnsureInitialized
+Generating caller graph for function LedManager::EnsureInitialized
+Generating call graph for function LedManager::GetCurrentBrightnessPercent
+Generating caller graph for function LedManager::GetInstance
+Generating caller graph for function LedManager::GetLedGpioPin
+Generating caller graph for function LedManager::GetSystemUptimeMs
+Generating call graph for function LedManager::IndicateBoot
+Generating call graph for function LedManager::IndicateCalibration
+Generating call graph for function LedManager::IndicateError
+Generating call graph for function LedManager::IndicateReady
+Generating call graph for function LedManager::IndicateWarning
+Generating call graph for function LedManager::Initialize
+Generating caller graph for function LedManager::Initialize
+Generating caller graph for function LedManager::PercentToRaw
+Generating caller graph for function LedManager::RawToPercent
+Generating call graph for function LedManager::SetBrightness
+Generating caller graph for function LedManager::SetBrightnessRaw
+Generating call graph for function LedManager::SetColor
+Generating call graph for function LedManager::SetStatus
+Generating call graph for function LedManager::Shutdown
+Generating caller graph for function LedManager::Shutdown
+Generating call graph for function LedManager::StartAnimation
+Generating caller graph for function LedManager::StartAnimation
+Generating call graph for function LedManager::StopAnimation
+Generating caller graph for function LedManager::StopAnimation
+Generating call graph for function LedManager::TurnOff
+Generating caller graph for function LedManager::TurnOff
+Generating call graph for function LedManager::UpdateAnimation
+Generating call graph for function LedManager::UpdateAnimationStep
+Generating caller graph for function LedManager::UpdateAnimationStep
+Generating caller graph for function LedManager::UpdateLastError
+Generating caller graph for function LedManager::UpdateStatistics
+Generating docs for compound LedSystemDiagnostics...
+Generating docs for compound ManagerHealthEntry...
+Generating docs for compound ManagerHealthSnapshot...
+Generating docs for compound NvsManager...
+Generating caller graph for function NvsManager::Deinitialize
+Generating caller graph for function NvsManager::DumpStatistics
+Generating call graph for function NvsManager::EnsureInitialized
+Generating caller graph for function NvsManager::EnsureInitialized
+Generating caller graph for function NvsManager::SetLastError
+Generating docs for compound PressureSensor...
+Generating call graph for function PressureSensor::CalibrateSwap
+Generating caller graph for function PressureSensor::GetConfig
+Generating call graph for function PressureSensor::GetEffectiveVoltageMax
+Generating caller graph for function PressureSensor::GetEffectiveVoltageMax
+Generating call graph for function PressureSensor::GetEffectiveVoltageMin
+Generating caller graph for function PressureSensor::GetEffectiveVoltageMin
+Generating caller graph for function PressureSensor::GetErrorCount
+Generating call graph for function PressureSensor::GetExpectedAtmosphericVoltage
+Generating caller graph for function PressureSensor::GetSampleCount
+Generating caller graph for function PressureSensor::SetSwapped
+Generating call graph for function PressureSensor::ToggleSwap
+Generating docs for compound PressureSensorCalibrator...
+Generating caller graph for function PressureSensorCalibrator::ApplyVA
+Generating caller graph for function PressureSensorCalibrator::CalibrateAllZeros
+Generating call graph for function PressureSensorCalibrator::CalibrateVA
+Generating caller graph for function PressureSensorCalibrator::CalibrateVA
+Generating caller graph for function PressureSensorCalibrator::GetLastError
+Generating docs for compound PressureSensorConfig...
+Generating docs for compound PressureSensorThread...
+Generating call graph for function PressureSensorThread::Setup
+Generating docs for nested compound PressureSensorThread::SharedState...
+Generating docs for compound SwapCalibrationResult...
+Generating docs for compound TempEntry...
+Generating docs for compound TemperatureManager...
+Generating caller graph for function TemperatureManager::Deinitialize
+Generating call graph for function TemperatureManager::DumpStatistics
+Generating caller graph for function TemperatureManager::DumpStatistics
+Generating call graph for function TemperatureManager::EnsureInitialized
+Generating caller graph for function TemperatureManager::EnsureInitialized
+Generating caller graph for function TemperatureManager::GetInstance
+Generating call graph for function TemperatureManager::Initialize
+Generating caller graph for function TemperatureManager::Initialize
+Generating caller graph for function TemperatureManager::InitializeEsp32Internal
+Generating call graph for function TemperatureManager::InitializeMcp9700Thermistor
+Generating caller graph for function TemperatureManager::InitializeMcp9700Thermistor
+Generating call graph for function TemperatureManager::InitializeNtcThermistor
+Generating caller graph for function TemperatureManager::InitializeNtcThermistor
+Generating docs for compound TempSystemDiagnostics...
+Generating docs for compound TestResults...
+Generating caller graph for function TestResults::add_result
+Generating docs for compound TestTaskContext...
+Generating docs for compound TestTaskThread...
+Generating call graph for function TestTaskThread::Step
+Generating docs for compound ValveChannelInfo...
+Generating docs for compound ValveChannelState...
+Generating docs for compound ValveManager...
+Generating call graph for function ValveManager::ClearAllFaults
+Generating call graph for function ValveManager::ConfigureProportionalDither
+Generating caller graph for function ValveManager::ConfigureProportionalDither
+Generating call graph for function ValveManager::ConfigureProportionalPwm
+Generating caller graph for function ValveManager::ConfigureProportionalPwm
+Generating call graph for function ValveManager::ConfigureSolenoidCdr
+Generating caller graph for function ValveManager::ConfigureSolenoidCdr
+Generating call graph for function ValveManager::ConfigureSolenoidVdr
+Generating call graph for function ValveManager::DisableAllChannels
+Generating call graph for function ValveManager::DisableChannel
+Generating caller graph for function ValveManager::DisableChannel
+Generating caller graph for function ValveManager::DumpStatistics
+Generating call graph for function ValveManager::EnableChannel
+Generating caller graph for function ValveManager::EnableChannel
+Generating call graph for function ValveManager::EnableChannelsMask
+Generating call graph for function ValveManager::EnsureInitialized
+Generating caller graph for function ValveManager::EnsureInitialized
+Generating caller graph for function ValveManager::GetInstance
+Generating caller graph for function ValveManager::GetMax22200Handler
+Generating call graph for function ValveManager::GetProportionalFaults
+Generating caller graph for function ValveManager::GetProportionalFaults
+Generating call graph for function ValveManager::GetSolenoidFaults
+Generating caller graph for function ValveManager::GetSolenoidFaults
+Generating caller graph for function ValveManager::GetTle92466Handler
+Generating call graph for function ValveManager::HasFault
+Generating caller graph for function ValveManager::HasProportionalFault
+Generating caller graph for function ValveManager::HasSolenoidFault
+Generating call graph for function ValveManager::Initialize
+Generating caller graph for function ValveManager::Initialize
+Generating call graph for function ValveManager::InitializeMax22200
+Generating caller graph for function ValveManager::InitializeMax22200
+Generating call graph for function ValveManager::InitializeTle92466
+Generating caller graph for function ValveManager::InitializeTle92466
+Generating caller graph for function ValveManager::IsInitialized
+Generating call graph for function ValveManager::SetProportionalCurrent
+Generating caller graph for function ValveMana/home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/manifold_valves_pressure_control/Valve.h:53: warning: explicit link request to 'Snapshot()' could not be resolved
+/home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/manifold_valves_pressure_control/ManifoldValves.h:94: warning: Found unknown command '@Browser'
+ger::SetProportionalCurrent
+Generating docs for compound ValveSystemDiagnostics...
+Generating concept documentation...
+Generating module documentation...
+Generating namespace documentation...
+Generating docs for namespace anonymous_namespace{AlicatBasis2Example.cpp}
+Generating caller graph for function anonymous_namespace{AlicatBasis2Example.cpp}::BringUpUart
+Generating call graph for function anonymous_namespace{AlicatBasis2Example.cpp}::ConfigurationWalkthrough
+Generating caller graph for function anonymous_namespace{AlicatBasis2Example.cpp}::ConfigurationWalkthrough
+Generating caller graph for function anonymous_namespace{AlicatBasis2Example.cpp}::LogResult
+Generating call graph for function anonymous_namespace{AlicatBasis2Example.cpp}::MeasurementWindowDemo
+Generating caller graph for function anonymous_namespace{AlicatBasis2Example.cpp}::MeasurementWindowDemo
+Generating caller graph for function anonymous_namespace{AlicatBasis2Example.cpp}::PrintIdentity
+Generating caller graph for function anonymous_namespace{AlicatBasis2Example.cpp}::SetpointSourceName
+Generating docs for namespace anonymous_namespace{Flux.cpp}
+Generating docs for namespace anonymous_namespace{flux_nvs_example.cpp}
+Generating caller graph for function anonymous_namespace{flux_nvs_example.cpp}::LogErr
+Generating docs for namespace anonymous_namespace{TemperatureManager.cpp}
+Generating docs for namespace cfg
+Generating docs for namespace flux_hal
+Generating docs for namespace flux_version
+Generating docs for compound flux_version::Entry...
+Generating docs for compound flux_version::EntrySpan...
+Generating docs for namespace flux_version::anonymous_namespace{FluxVersionManifest.cpp}
+Generating docs for namespace LedColors
+Generating caller graph for function LedColors::BLACK
+Generating caller graph for function LedColors::BLUE
+Generating caller graph for function LedColors::CYAN
+Generating caller graph for function LedColors::GREEN
+Generating caller graph for function LedColors::MAGENTA
+Generating caller graph for function LedColors::ORANGE
+Generating caller graph for function LedColors::PURPLE
+Generating caller graph for function LedColors::RED
+Generating caller graph for function LedColors::WHITE
+Generating caller graph for function LedColors::YELLOW
+Generating docs for namespace manifold_valves
+Generating caller graph for function manifold_valves::SolenoidDriveModeToString
+Generating caller graph for function manifold_valves::ValveStateToString
+Generating docs for compound manifold_valves::ManifoldValves...
+Generating call graph for function manifold_valves::ManifoldValves::ManifoldValves
+Generating call graph for function manifold_valves::ManifoldValves::ConfigureGlobalDpm
+Generating caller graph for function manifold_valves::ManifoldValves::ForceReconfigureAll
+Generating caller graph for function manifold_valves::ManifoldValves::ForEachProportional
+Generating caller graph for function manifold_valves::ManifoldValves::ForEachSolenoid
+Generating caller graph for function manifold_valves::ManifoldValves::ForEachValve
+Generating caller graph for function manifold_valves::ManifoldValves::Get
+Generating caller graph for function manifold_valves::ManifoldValves::GetInstance
+Generating caller graph for function manifold_valves::ManifoldValves::MakeSolenoidArray
+Generating docs for compound manifold_valves::ManifoldValvesControlThread...
+Generating call graph for function manifold_valves::ManifoldValvesControlThread::Setup
+Generating call graph for function manifold_valves::ManifoldValvesControlThread::Step
+Generating docs for compound manifold_valves::ManifoldValvesDiagnosticsThread...
+Generating caller graph for function manifold_valves::ManifoldValvesDiagnosticsThread::GetSnapshot
+Generating caller graph for function manifold_valves::ManifoldValvesDiagnosticsThread::IterationCount
+Generating caller graph for function manifold_valves::ManifoldValvesDiagnosticsThread::ScrapeMax22200
+Generating caller graph for function manifold_valves::ManifoldValvesDiagnosticsThread::ScrapeTle92466
+Generating call graph for function manifold_valves::ManifoldValvesDiagn/home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/manifold_valves_pressure_control/ManifoldValvesSelfTest.h:1028: warning: Unsupported xml/html tag <cmath> found
+/home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/manifold_valves_pressure_control/ManifoldValvesSelfTest.h:1028: warning: Unsupported xml/html tag <cmath> found
+/home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/manifold_valves_pressure_control/Valve.h:206: warning: Found unknown command '@Browser'
+/home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/manifold_valves_pressure_control/Valve.h:206: warning: Found unknown command '@Browser'
+osticsThread::Step
+Generating docs for compound manifold_valves::ManifoldValvesSelfTest...
+Generating caller graph for function manifold_valves::ManifoldValvesSelfTest::ChannelHwIndex
+Generating caller graph for function manifold_valves::ManifoldValvesSelfTest::DwellBetweenValves
+Generating call graph for function manifold_valves::ManifoldValvesSelfTest::FormatProportionalFaults
+Generating caller graph for function manifold_valves::ManifoldValvesSelfTest::FormatProportionalFaults
+Generating caller graph for function manifold_valves::ManifoldValvesSelfTest::FormatSolenoidFaults
+Generating caller graph for function manifold_valves::ManifoldValvesSelfTest::IsqrtClamped
+Generating call graph for function manifold_valves::ManifoldValvesSelfTest::LogSolenoidSnapshot
+Generating caller graph for function manifold_valves::ManifoldValvesSelfTest::LogSolenoidSnapshot
+Generating caller graph for function manifold_valves::ManifoldValvesSelfTest::PrintParallelStress
+Generating call graph for function manifold_valves::ManifoldValvesSelfTest::PrintSummary
+Generating caller graph for function manifold_valves::ManifoldValvesSelfTest::PrintSummary
+Generating caller graph for function manifold_valves::ManifoldValvesSelfTest::PromptOperator
+Generating call graph for function manifold_valves::ManifoldValvesSelfTest::Run
+Generating caller graph for function manifold_valves::ManifoldValvesSelfTest::Run
+Generating call graph for function manifold_valves::ManifoldValvesSelfTest::RunParallelStress
+Generating caller graph for function manifold_valves::ManifoldValvesSelfTest::RunParallelStress
+Generating call graph for function manifold_valves::ManifoldValvesSelfTest::TestProportional
+Generating caller graph for function manifold_valves::ManifoldValvesSelfTest::TestProportional
+Generating call graph for function manifold_valves::ManifoldValvesSelfTest::TestSolenoid
+Generating caller graph for function manifold_valves::ManifoldValvesSelfTest::TestSolenoid
+Generating call graph for function manifold_valves::ManifoldValvesSelfTest::WaitForDiagPass
+Generating caller graph for function manifold_valves::ManifoldValvesSelfTest::WaitForDiagPass
+Generating docs for compound manifold_valves::Max22200ChannelFeatures...
+Generating docs for compound manifold_valves::ParallelChannelObservation...
+Generating docs for compound manifold_valves::ParallelChannelSummary...
+Generating docs for compound manifold_valves::ParallelStressPatternResult...
+Generating docs for compound manifold_valves::ProportionalDiagSnapshot...
+Generating docs for compound manifold_valves::ProportionalMapEntry...
+Generating docs for compound manifold_valves::ProportionalModelSpec...
+Generating docs for compound manifold_valves::ProportionalValve...
+Generating call graph for function manifold_valves::ProportionalValve::Apply
+Generating call graph for function manifold_valves::ProportionalValve::ApplyChannelFeatures
+Generating caller graph for function manifold_valves::ProportionalValve::ApplyChannelFeatures
+Generating caller graph for function manifold_valves::ProportionalValve::IsMapped
+Generating call graph for function manifold_valves::ProportionalValve::OnDiagnostics
+Generating caller graph for function manifold_valves::ProportionalValve::PositionToCurrentMa
+Generating call graph for function manifold_valves::ProportionalValve::Snapshot
+Generating docs for compound manifold_valves::SelfTestPlan...
+Generating caller graph for function manifold_valves::SelfTestPlan::All
+Generating docs for compound manifold_valves::SelfTestReport...
+Generating docs for compound manifold_valves::SelfTestResult...
+Generating docs for compound manifold_valves::SolenoidDiagSnapshot...
+Generating docs for compound manifold_valves::SolenoidMapEntry...
+Generating docs for compound manifold_valves::SolenoidModelSpec...
+Generating docs for compound manifold_valves::SolenoidValve...
+Generating call graph for function manifold_valves::SolenoidValve::Apply
+Generating call graph for function manifold_valves::SolenoidValve::ApplyChannelFeatures
+Generating caller graph for function manifold_valves::SolenoidValve::ApplyChan/home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/manifold_valves_pressure_control/Valve.h:206: warning: Found unknown command '@Browser'
+/home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/examples/esp32/main/manifold_valves_pressure_control/Valve.h:206: warning: Found unknown command '@Browser'
+/home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/lib/api/README.md:58: warning: unable to resolve reference to '/home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/lib/core/handlers/logger/README.md' for \ref command
+/home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/lib/api/README.md:310: warning: unable to resolve reference to '/home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/docs/hal/README.md' for \ref command
+/home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/lib/api/README.md:311: warning: unable to resolve reference to '/home/runner/work/hf-hal-flux-v1/hf-hal-flux-v1/docs/hal/managers-and-handlers.md' for \ref command
+nelFeatures
+Generating caller graph for function manifold_valves::SolenoidValve::DriveMode
+Generating call graph for function manifold_valves::SolenoidValve::OnDiagnostics
+Generating caller graph for function manifold_valves::SolenoidValve::OnDiagnostics
+Generating caller graph for function manifold_valves::SolenoidValve::PositionToCurrentMa
+Generating caller graph for function manifold_valves::SolenoidValve::SetDiagnosticTimestamp
+Generating call graph for function manifold_valves::SolenoidValve::Snapshot
+Generating caller graph for function manifold_valves::SolenoidValve::Snapshot
+Generating docs for compound manifold_valves::SubsystemFaultSnapshot...
+Generating docs for compound manifold_valves::Tle92466ChannelFeatures...
+Generating docs for compound manifold_valves::Valve...
+Generating caller graph for function manifold_valves::Valve::ConsumeDirty
+Generating caller graph for function manifold_valves::Valve::GetActualPosition
+Generating caller graph for function manifold_valves::Valve::GetApplyErrorCount
+Generating caller graph for function manifold_valves::Valve::GetFaultCount
+Generating caller graph for function manifold_valves::Valve::GetLastFaultTickMs
+Generating caller graph for function manifold_valves::Valve::GetState
+Generating caller graph for function manifold_valves::Valve::GetTargetPosition
+Generating call graph for function manifold_valves::Valve::IsActuallyEnergised
+Generating call graph for function manifold_valves::Valve::IsMapped
+Generating caller graph for function manifold_valves::Valve::Label
+Generating caller graph for function manifold_valves::Valve::ManagerChannel
+Generating caller graph for function manifold_valves::Valve::RecordApplyResult
+Generating caller graph for function manifold_valves::Valve::RecordFault
+Generating caller graph for function manifold_valves::Valve::RequestPosition
+Generating call graph for function manifold_valves::Valve::RequestState
+Generating caller graph for function manifold_valves::Valve::SetActualPosition
+Generating caller graph for function manifold_valves::Valve::SetState
+Generating graph info page...
+Generating directory documentation...
+Generating dependency graph for directory api
+Generating dependency graph for directory docs
+Generating dependency graph for directory esp32
+Generating dependency graph for directory examples
+Generating dependency graph for directory lib
+Generating dependency graph for directory main
+Generating dependency graph for directory managers
+Generating dependency graph for directory manifold_valves_pressure_control
+Generating index page...
+Generating main page...
+Generating page index...
+Generating topic index...
+Generating module index...
+Generating module member index...
+Generating namespace index...
+Generating namespace member index...
+Generating concept index...
+Generating annotated compound index...
+Generating alphabetical compound index...
+Generating hierarchical class index...
+Generating graphical class hierarchy...
+Generating member index...
+Generating file index...
+Generating file member index...
+Generating example index...
+finalizing index lists...
+writing tag file...
+Running plantuml with JAVA...
+Running dot...
+Generating dot graphs using 5 parallel threads...
+Running dot for graph 1/651
+Running dot for graph 2/651
+Running dot for graph 3/651
+Running dot for graph 4/651
+Running dot for graph 5/651
+Running dot for graph 6/651
+Running dot for graph 7/651
+Running dot for graph 8/651
+Running dot for graph 9/651
+Running dot for graph 10/651
+Running dot for graph 11/651
+Running dot for graph 12/651
+Running dot for graph 13/651
+Running dot for graph 14/651
+Running dot for graph 15/651
+Running dot for graph 16/651
+Running dot for graph 17/651
+Running dot for graph 18/651
+Running dot for graph 19/651
+Running dot for graph 20/651
+Running dot for graph 21/651
+Running dot for graph 22/651
+Running dot for graph 23/651
+Running dot for graph 24/651
+Running dot for graph 25/651
+Running dot for graph 26/651
+Running dot for graph 27/651
+Running dot for graph 28/651
+Running dot for graph 29/651
+Running dot for graph 30/651
+Running dot for graph 31/651
+Running dot for graph 32/651
+Running dot for graph 33/651
+Running dot for graph 34/651
+Running dot for graph 35/651
+Running dot for graph 36/651
+Running dot for graph 37/651
+Running dot for graph 38/651
+Running dot for graph 39/651
+Running dot for graph 40/651
+Running dot for graph 41/651
+Running dot for graph 42/651
+Running dot for graph 43/651
+Running dot for graph 44/651
+Running dot for graph 45/651
+Running dot for graph 46/651
+Running dot for graph 47/651
+Running dot for graph 48/651
+Running dot for graph 49/651
+Running dot for graph 50/651
+Running dot for graph 51/651
+Running dot for graph 52/651
+Running dot for graph 53/651
+Running dot for graph 54/651
+Running dot for graph 55/651
+Running dot for graph 56/651
+Running dot for graph 57/651
+Running dot for graph 58/651
+Running dot for graph 59/651
+Running dot for graph 60/651
+Running dot for graph 61/651
+Running dot for graph 62/651
+Running dot for graph 63/651
+Running dot for graph 64/651
+Running dot for graph 65/651
+Running dot for graph 66/651
+Running dot for graph 67/651
+Running dot for graph 68/651
+Running dot for graph 69/651
+Running dot for graph 70/651
+Running dot for graph 71/651
+Running dot for graph 72/651
+Running dot for graph 73/651
+Running dot for graph 74/651
+Running dot for graph 75/651
+Running dot for graph 76/651
+Running dot for graph 77/651
+Running dot for graph 78/651
+Running dot for graph 79/651
+Running dot for graph 80/651
+Running dot for graph 81/651
+Running dot for graph 82/651
+Running dot for graph 83/651
+Running dot for graph 84/651
+Running dot for graph 85/651
+Running dot for graph 86/651
+Running dot for graph 87/651
+Running dot for graph 88/651
+Running dot for graph 89/651
+Running dot for graph 90/651
+Running dot for graph 91/651
+Running dot for graph 92/651
+Running dot for graph 93/651
+Running dot for graph 94/651
+Running dot for graph 95/651
+Running dot for graph 96/651
+Running dot for graph 97/651
+Running dot for graph 98/651
+Running dot for graph 99/651
+Running dot for graph 100/651
+Running dot for graph 101/651
+Running dot for graph 102/651
+Running dot for graph 103/651
+Running dot for graph 104/651
+Running dot for graph 105/651
+Running dot for graph 106/651
+Running dot for graph 107/651
+Running dot for graph 108/651
+Running dot for graph 109/651
+Running dot for graph 110/651
+Running dot for graph 111/651
+Running dot for graph 112/651
+Running dot for graph 113/651
+Running dot for graph 114/651
+Running dot for graph 115/651
+Running dot for graph 116/651
+Running dot for graph 117/651
+Running dot for graph 118/651
+Running dot for graph 119/651
+Running dot for graph 120/651
+Running dot for graph 121/651
+Running dot for graph 122/651
+Running dot for graph 123/651
+Running dot for graph 124/651
+Running dot for graph 125/651
+Running dot for graph 126/651
+Running dot for graph 127/651
+Running dot for graph 128/651
+Running dot for graph 129/651
+Running dot for graph 130/651
+Running dot for graph 131/651
+Running dot for graph 132/651
+Running dot for graph 133/651
+Running dot for graph 134/651
+Running dot for graph 135/651
+Running dot for graph 136/651
+Running dot for graph 137/651
+Running dot for graph 138/651
+Running dot for graph 139/651
+Running dot for graph 140/651
+Running dot for graph 141/651
+Running dot for graph 142/651
+Running dot for graph 143/651
+Running dot for graph 144/651
+Running dot for graph 145/651
+Running dot for graph 146/651
+Running dot for graph 147/651
+Running dot for graph 148/651
+Running dot for graph 149/651
+Running dot for graph 150/651
+Running dot for graph 151/651
+Running dot for graph 152/651
+Running dot for graph 153/651
+Running dot for graph 154/651
+Running dot for graph 155/651
+Running dot for graph 156/651
+Running dot for graph 157/651
+Running dot for graph 158/651
+Running dot for graph 159/651
+Running dot for graph 160/651
+Running dot for graph 161/651
+Running dot for graph 162/651
+Running dot for graph 163/651
+Running dot for graph 164/651
+Running dot for graph 165/651
+Running dot for graph 166/651
+Running dot for graph 167/651
+Running dot for graph 168/651
+Running dot for graph 169/651
+Running dot for graph 170/651
+Running dot for graph 171/651
+Running dot for graph 172/651
+Running dot for graph 173/651
+Running dot for graph 174/651
+Running dot for graph 175/651
+Running dot for graph 176/651
+Running dot for graph 177/651
+Running dot for graph 178/651
+Running dot for graph 179/651
+Running dot for graph 180/651
+Running dot for graph 181/651
+Running dot for graph 182/651
+Running dot for graph 183/651
+Running dot for graph 184/651
+Running dot for graph 185/651
+Running dot for graph 186/651
+Running dot for graph 187/651
+Running dot for graph 188/651
+Running dot for graph 189/651
+Running dot for graph 190/651
+Running dot for graph 191/651
+Running dot for graph 192/651
+Running dot for graph 193/651
+Running dot for graph 194/651
+Running dot for graph 195/651
+Running dot for graph 196/651
+Running dot for graph 197/651
+Running dot for graph 198/651
+Running dot for graph 199/651
+Running dot for graph 200/651
+Running dot for graph 201/651
+Running dot for graph 202/651
+Running dot for graph 203/651
+Running dot for graph 204/651
+Running dot for graph 205/651
+Running dot for graph 206/651
+Running dot for graph 207/651
+Running dot for graph 208/651
+Running dot for graph 209/651
+Running dot for graph 210/651
+Running dot for graph 211/651
+Running dot for graph 212/651
+Running dot for graph 213/651
+Running dot for graph 214/651
+Running dot for graph 215/651
+Running dot for graph 216/651
+Running dot for graph 217/651
+Running dot for graph 218/651
+Running dot for graph 219/651
+Running dot for graph 220/651
+Running dot for graph 221/651
+Running dot for graph 222/651
+Running dot for graph 223/651
+Running dot for graph 224/651
+Running dot for graph 225/651
+Running dot for graph 226/651
+Running dot for graph 227/651
+Running dot for graph 228/651
+Running dot for graph 229/651
+Running dot for graph 230/651
+Running dot for graph 231/651
+Running dot for graph 232/651
+Running dot for graph 233/651
+Running dot for graph 234/651
+Running dot for graph 235/651
+Running dot for graph 236/651
+Running dot for graph 237/651
+Running dot for graph 238/651
+Running dot for graph 239/651
+Running dot for graph 240/651
+Running dot for graph 241/651
+Running dot for graph 242/651
+Running dot for graph 243/651
+Running dot for graph 244/651
+Running dot for graph 245/651
+Running dot for graph 246/651
+Running dot for graph 247/651
+Running dot for graph 248/651
+Running dot for graph 249/651
+Running dot for graph 250/651
+Running dot for graph 251/651
+Running dot for graph 252/651
+Running dot for graph 253/651
+Running dot for graph 254/651
+Running dot for graph 255/651
+Running dot for graph 256/651
+Running dot for graph 257/651
+Running dot for graph 258/651
+Running dot for graph 259/651
+Running dot for graph 260/651
+Running dot for graph 261/651
+Running dot for graph 262/651
+Running dot for graph 263/651
+Running dot for graph 264/651
+Running dot for graph 265/651
+Running dot for graph 266/651
+Running dot for graph 267/651
+Running dot for graph 268/651
+Running dot for graph 269/651
+Running dot for graph 270/651
+Running dot for graph 271/651
+Running dot for graph 272/651
+Running dot for graph 273/651
+Running dot for graph 274/651
+Running dot for graph 275/651
+Running dot for graph 276/651
+Running dot for graph 277/651
+Running dot for graph 278/651
+Running dot for graph 279/651
+Running dot for graph 280/651
+Running dot for graph 281/651
+Running dot for graph 282/651
+Running dot for graph 283/651
+Running dot for graph 284/651
+Running dot for graph 285/651
+Running dot for graph 286/651
+Running dot for graph 287/651
+Running dot for graph 288/651
+Running dot for graph 289/651
+Running dot for graph 290/651
+Running dot for graph 291/651
+Running dot for graph 292/651
+Running dot for graph 293/651
+Running dot for graph 294/651
+Running dot for graph 295/651
+Running dot for graph 296/651
+Running dot for graph 297/651
+Running dot for graph 298/651
+Running dot for graph 299/651
+Running dot for graph 300/651
+Running dot for graph 301/651
+Running dot for graph 302/651
+Running dot for graph 303/651
+Running dot for graph 304/651
+Running dot for graph 305/651
+Running dot for graph 306/651
+Running dot for graph 307/651
+Running dot for graph 308/651
+Running dot for graph 309/651
+Running dot for graph 310/651
+Running dot for graph 311/651
+Running dot for graph 312/651
+Running dot for graph 313/651
+Running dot for graph 314/651
+Running dot for graph 315/651
+Running dot for graph 316/651
+Running dot for graph 317/651
+Running dot for graph 318/651
+Running dot for graph 319/651
+Running dot for graph 320/651
+Running dot for graph 321/651
+Running dot for graph 322/651
+Running dot for graph 323/651
+Running dot for graph 324/651
+Running dot for graph 325/651
+Running dot for graph 326/651
+Running dot for graph 327/651
+Running dot for graph 328/651
+Running dot for graph 329/651
+Running dot for graph 330/651
+Running dot for graph 331/651
+Running dot for graph 332/651
+Running dot for graph 333/651
+Running dot for graph 334/651
+Running dot for graph 335/651
+Running dot for graph 336/651
+Running dot for graph 337/651
+Running dot for graph 338/651
+Running dot for graph 339/651
+Running dot for graph 340/651
+Running dot for graph 341/651
+Running dot for graph 342/651
+Running dot for graph 343/651
+Running dot for graph 344/651
+Running dot for graph 345/651
+Running dot for graph 346/651
+Running dot for graph 347/651
+Running dot for graph 348/651
+Running dot for graph 349/651
+Running dot for graph 350/651
+Running dot for graph 351/651
+Running dot for graph 352/651
+Running dot for graph 353/651
+Running dot for graph 354/651
+Running dot for graph 355/651
+Running dot for graph 356/651
+Running dot for graph 357/651
+Running dot for graph 358/651
+Running dot for graph 359/651
+Running dot for graph 360/651
+Running dot for graph 361/651
+Running dot for graph 362/651
+Running dot for graph 363/651
+Running dot for graph 364/651
+Running dot for graph 365/651
+Running dot for graph 366/651
+Running dot for graph 367/651
+Running dot for graph 368/651
+Running dot for graph 369/651
+Running dot for graph 370/651
+Running dot for graph 371/651
+Running dot for graph 372/651
+Running dot for graph 373/651
+Running dot for graph 374/651
+Running dot for graph 375/651
+Running dot for graph 376/651
+Running dot for graph 377/651
+Running dot for graph 378/651
+Running dot for graph 379/651
+Running dot for graph 380/651
+Running dot for graph 381/651
+Running dot for graph 382/651
+Running dot for graph 383/651
+Running dot for graph 384/651
+Running dot for graph 385/651
+Running dot for graph 386/651
+Running dot for graph 387/651
+Running dot for graph 388/651
+Running dot for graph 389/651
+Running dot for graph 390/651
+Running dot for graph 391/651
+Running dot for graph 392/651
+Running dot for graph 393/651
+Running dot for graph 394/651
+Running dot for graph 395/651
+Running dot for graph 396/651
+Running dot for graph 397/651
+Running dot for graph 398/651
+Running dot for graph 399/651
+Running dot for graph 400/651
+Running dot for graph 401/651
+Running dot for graph 402/651
+Running dot for graph 403/651
+Running dot for graph 404/651
+Running dot for graph 405/651
+Running dot for graph 406/651
+Running dot for graph 407/651
+Running dot for graph 408/651
+Running dot for graph 409/651
+Running dot for graph 410/651
+Running dot for graph 411/651
+Running dot for graph 412/651
+Running dot for graph 413/651
+Running dot for graph 414/651
+Running dot for graph 415/651
+Running dot for graph 416/651
+Running dot for graph 417/651
+Running dot for graph 418/651
+Running dot for graph 419/651
+Running dot for graph 420/651
+Running dot for graph 421/651
+Running dot for graph 422/651
+Running dot for graph 423/651
+Running dot for graph 424/651
+Running dot for graph 425/651
+Running dot for graph 426/651
+Running dot for graph 427/651
+Running dot for graph 428/651
+Running dot for graph 429/651
+Running dot for graph 430/651
+Running dot for graph 431/651
+Running dot for graph 432/651
+Running dot for graph 433/651
+Running dot for graph 434/651
+Running dot for graph 435/651
+Running dot for graph 436/651
+Running dot for graph 437/651
+Running dot for graph 438/651
+Running dot for graph 439/651
+Running dot for graph 440/651
+Running dot for graph 441/651
+Running dot for graph 442/651
+Running dot for graph 443/651
+Running dot for graph 444/651
+Running dot for graph 445/651
+Running dot for graph 446/651
+Running dot for graph 447/651
+Running dot for graph 448/651
+Running dot for graph 449/651
+Running dot for graph 450/651
+Running dot for graph 451/651
+Running dot for graph 452/651
+Running dot for graph 453/651
+Running dot for graph 454/651
+Running dot for graph 455/651
+Running dot for graph 456/651
+Running dot for graph 457/651
+Running dot for graph 458/651
+Running dot for graph 459/651
+Running dot for graph 460/651
+Running dot for graph 461/651
+Running dot for graph 462/651
+Running dot for graph 463/651
+Running dot for graph 464/651
+Running dot for graph 465/651
+Running dot for graph 466/651
+Running dot for graph 467/651
+Running dot for graph 468/651
+Running dot for graph 469/651
+Running dot for graph 470/651
+Running dot for graph 471/651
+Running dot for graph 472/651
+Running dot for graph 473/651
+Running dot for graph 474/651
+Running dot for graph 475/651
+Running dot for graph 476/651
+Running dot for graph 477/651
+Running dot for graph 478/651
+Running dot for graph 479/651
+Running dot for graph 480/651
+Running dot for graph 481/651
+Running dot for graph 482/651
+Running dot for graph 483/651
+Running dot for graph 484/651
+Running dot for graph 485/651
+Running dot for graph 486/651
+Running dot for graph 487/651
+Running dot for graph 488/651
+Running dot for graph 489/651
+Running dot for graph 490/651
+Running dot for graph 491/651
+Running dot for graph 492/651
+Running dot for graph 493/651
+Running dot for graph 494/651
+Running dot for graph 495/651
+Running dot for graph 496/651
+Running dot for graph 497/651
+Running dot for graph 498/651
+Running dot for graph 499/651
+Running dot for graph 500/651
+Running dot for graph 501/651
+Running dot for graph 502/651
+Running dot for graph 503/651
+Running dot for graph 504/651
+Running dot for graph 505/651
+Running dot for graph 506/651
+Running dot for graph 507/651
+Running dot for graph 508/651
+Running dot for graph 509/651
+Running dot for graph 510/651
+Running dot for graph 511/651
+Running dot for graph 512/651
+Running dot for graph 513/651
+Running dot for graph 514/651
+Running dot for graph 515/651
+Running dot for graph 516/651
+Running dot for graph 517/651
+Running dot for graph 518/651
+Running dot for graph 519/651
+Running dot for graph 520/651
+Running dot for graph 521/651
+Running dot for graph 522/651
+Running dot for graph 523/651
+Running dot for graph 524/651
+Running dot for graph 525/651
+Running dot for graph 526/651
+Running dot for graph 527/651
+Running dot for graph 528/651
+Running dot for graph 529/651
+Running dot for graph 530/651
+Running dot for graph 531/651
+Running dot for graph 532/651
+Running dot for graph 533/651
+Running dot for graph 534/651
+Running dot for graph 535/651
+Running dot for graph 536/651
+Running dot for graph 537/651
+Running dot for graph 538/651
+Running dot for graph 539/651
+Running dot for graph 540/651
+Running dot for graph 541/651
+Running dot for graph 542/651
+Running dot for graph 543/651
+Running dot for graph 544/651
+Running dot for graph 545/651
+Running dot for graph 546/651
+Running dot for graph 547/651
+Running dot for graph 548/651
+Running dot for graph 549/651
+Running dot for graph 550/651
+Running dot for graph 551/651
+Running dot for graph 552/651
+Running dot for graph 553/651
+Running dot for graph 554/651
+Running dot for graph 555/651
+Running dot for graph 556/651
+Running dot for graph 557/651
+Running dot for graph 558/651
+Running dot for graph 559/651
+Running dot for graph 560/651
+Running dot for graph 561/651
+Running dot for graph 562/651
+Running dot for graph 563/651
+Running dot for graph 564/651
+Running dot for graph 565/651
+Running dot for graph 566/651
+Running dot for graph 567/651
+Running dot for graph 568/651
+Running dot for graph 569/651
+Running dot for graph 570/651
+Running dot for graph 571/651
+Running dot for graph 572/651
+Running dot for graph 573/651
+Running dot for graph 574/651
+Running dot for graph 575/651
+Running dot for graph 576/651
+Running dot for graph 577/651
+Running dot for graph 578/651
+Running dot for graph 579/651
+Running dot for graph 580/651
+Running dot for graph 581/651
+Running dot for graph 582/651
+Running dot for graph 583/651
+Running dot for graph 584/651
+Running dot for graph 585/651
+Running dot for graph 586/651
+Running dot for graph 587/651
+Running dot for graph 588/651
+Running dot for graph 589/651
+Running dot for graph 590/651
+Running dot for graph 591/651
+Running dot for graph 592/651
+Running dot for graph 593/651
+Running dot for graph 594/651
+Running dot for graph 595/651
+Running dot for graph 596/651
+Running dot for graph 597/651
+Running dot for graph 598/651
+Running dot for graph 599/651
+Running dot for graph 600/651
+Running dot for graph 601/651
+Running dot for graph 602/651
+Running dot for graph 603/651
+Running dot for graph 604/651
+Running dot for graph 605/651
+Running dot for graph 606/651
+Running dot for graph 607/651
+Running dot for graph 608/651
+Running dot for graph 609/651
+Running dot for graph 610/651
+Running dot for graph 611/651
+Running dot for graph 612/651
+Running dot for graph 613/651
+Running dot for graph 614/651
+Running dot for graph 615/651
+Running dot for graph 616/651
+Running dot for graph 617/651
+Running dot for graph 618/651
+Running dot for graph 619/651
+Running dot for graph 620/651
+Running dot for graph 621/651
+Running dot for graph 622/651
+Running dot for graph 623/651
+Running dot for graph 624/651
+Running dot for graph 625/651
+Running dot for graph 626/651
+Running dot for graph 627/651
+Running dot for graph 628/651
+Running dot for graph 629/651
+Running dot for graph 630/651
+Running dot for graph 631/651
+Running dot for graph 632/651
+Running dot for graph 633/651
+Running dot for graph 634/651
+Running dot for graph 635/651
+Running dot for graph 636/651
+Running dot for graph 637/651
+Running dot for graph 638/651
+Running dot for graph 639/651
+Running dot for graph 640/651
+Running dot for graph 641/651
+Running dot for graph 642/651
+Running dot for graph 643/651
+Running dot for graph 644/651
+Running dot for graph 645/651
+Running dot for graph 646/651
+Running dot for graph 647/651
+Running dot for graph 648/651
+Running dot for graph 649/651
+Running dot for graph 650/651
+Running dot for graph 651/651
+Patching output file 1/750
+Patching output file 2/750
+Patching output file 3/750
+Patching output file 4/750
+Patching output file 5/750
+Patching output file 6/750
+Patching output file 7/750
+Patching output file 8/750
+Patching output file 9/750
+Patching output file 10/750
+Patching output file 11/750
+Patching output file 12/750
+Patching output file 13/750
+Patching output file 14/750
+Patching output file 15/750
+Patching output file 16/750
+Patching output file 17/750
+Patching output file 18/750
+Patching output file 19/750
+Patching output file 20/750
+Patching output file 21/750
+Patching output file 22/750
+Patching output file 23/750
+Patching output file 24/750
+Patching output file 25/750
+Patching output file 26/750
+Patching output file 27/750
+Patching output file 28/750
+Patching output file 29/750
+Patching output file 30/750
+Patching output file 31/750
+Patching output file 32/750
+Patching output file 33/750
+Patching output file 34/750
+Patching output file 35/750
+Patching output file 36/750
+Patching output file 37/750
+Patching output file 38/750
+Patching output file 39/750
+Patching output file 40/750
+Patching output file 41/750
+Patching output file 42/750
+Patching output file 43/750
+Patching output file 44/750
+Patching output file 45/750
+Patching output file 46/750
+Patching output file 47/750
+Patching output file 48/750
+Patching output file 49/750
+Patching output file 50/750
+Patching output file 51/750
+Patching output file 52/750
+Patching output file 53/750
+Patching output file 54/750
+Patching output file 55/750
+Patching output file 56/750
+Patching output file 57/750
+Patching output file 58/750
+Patching output file 59/750
+Patching output file 60/750
+Patching output file 61/750
+Patching output file 62/750
+Patching output file 63/750
+Patching output file 64/750
+Patching output file 65/750
+Patching output file 66/750
+Patching output file 67/750
+Patching output file 68/750
+Patching output file 69/750
+Patching output file 70/750
+Patching output file 71/750
+Patching output file 72/750
+Patching output file 73/750
+Patching output file 74/750
+Patching output file 75/750
+Patching output file 76/750
+Patching output file 77/750
+Patching output file 78/750
+Patching output file 79/750
+Patching output file 80/750
+Patching output file 81/750
+Patching output file 82/750
+Patching output file 83/750
+Patching output file 84/750
+Patching output file 85/750
+Patching output file 86/750
+Patching output file 87/750
+Patching output file 88/750
+Patching output file 89/750
+Patching output file 90/750
+Patching output file 91/750
+Patching output file 92/750
+Patching output file 93/750
+Patching output file 94/750
+Patching output file 95/750
+Patching output file 96/750
+Patching output file 97/750
+Patching output file 98/750
+Patching output file 99/750
+Patching output file 100/750
+Patching output file 101/750
+Patching output file 102/750
+Patching output file 103/750
+Patching output file 104/750
+Patching output file 105/750
+Patching output file 106/750
+Patching output file 107/750
+Patching output file 108/750
+Patching output file 109/750
+Patching output file 110/750
+Patching output file 111/750
+Patching output file 112/750
+Patching output file 113/750
+Patching output file 114/750
+Patching output file 115/750
+Patching output file 116/750
+Patching output file 117/750
+Patching output file 118/750
+Patching output file 119/750
+Patching output file 120/750
+Patching output file 121/750
+Patching output file 122/750
+Patching output file 123/750
+Patching output file 124/750
+Patching output file 125/750
+Patching output file 126/750
+Patching output file 127/750
+Patching output file 128/750
+Patching output file 129/750
+Patching output file 130/750
+Patching output file 131/750
+Patching output file 132/750
+Patching output file 133/750
+Patching output file 134/750
+Patching output file 135/750
+Patching output file 136/750
+Patching output file 137/750
+Patching output file 138/750
+Patching output file 139/750
+Patching output file 140/750
+Patching output file 141/750
+Patching output file 142/750
+Patching output file 143/750
+Patching output file 144/750
+Patching output file 145/750
+Patching output file 146/750
+Patching output file 147/750
+Patching output file 148/750
+Patching output file 149/750
+Patching output file 150/750
+Patching output file 151/750
+Patching output file 152/750
+Patching output file 153/750
+Patching output file 154/750
+Patching output file 155/750
+Patching output file 156/750
+Patching output file 157/750
+Patching output file 158/750
+Patching output file 159/750
+Patching output file 160/750
+Patching output file 161/750
+Patching output file 162/750
+Patching output file 163/750
+Patching output file 164/750
+Patching output file 165/750
+Patching output file 166/750
+Patching output file 167/750
+Patching output file 168/750
+Patching output file 169/750
+Patching output file 170/750
+Patching output file 171/750
+Patching output file 172/750
+Patching output file 173/750
+Patching output file 174/750
+Patching output file 175/750
+Patching output file 176/750
+Patching output file 177/750
+Patching output file 178/750
+Patching output file 179/750
+Patching output file 180/750
+Patching output file 181/750
+Patching output file 182/750
+Patching output file 183/750
+Patching output file 184/750
+Patching output file 185/750
+Patching output file 186/750
+Patching output file 187/750
+Patching output file 188/750
+Patching output file 189/750
+Patching output file 190/750
+Patching output file 191/750
+Patching output file 192/750
+Patching output file 193/750
+Patching output file 194/750
+Patching output file 195/750
+Patching output file 196/750
+Patching output file 197/750
+Patching output file 198/750
+Patching output file 199/750
+Patching output file 200/750
+Patching output file 201/750
+Patching output file 202/750
+Patching output file 203/750
+Patching output file 204/750
+Patching output file 205/750
+Patching output file 206/750
+Patching output file 207/750
+Patching output file 208/750
+Patching output file 209/750
+Patching output file 210/750
+Patching output file 211/750
+Patching output file 212/750
+Patching output file 213/750
+Patching output file 214/750
+Patching output file 215/750
+Patching output file 216/750
+Patching output file 217/750
+Patching output file 218/750
+Patching output file 219/750
+Patching output file 220/750
+Patching output file 221/750
+Patching output file 222/750
+Patching output file 223/750
+Patching output file 224/750
+Patching output file 225/750
+Patching output file 226/750
+Patching output file 227/750
+Patching output file 228/750
+Patching output file 229/750
+Patching output file 230/750
+Patching output file 231/750
+Patching output file 232/750
+Patching output file 233/750
+Patching output file 234/750
+Patching output file 235/750
+Patching output file 236/750
+Patching output file 237/750
+Patching output file 238/750
+Patching output file 239/750
+Patching output file 240/750
+Patching output file 241/750
+Patching output file 242/750
+Patching output file 243/750
+Patching output file 244/750
+Patching output file 245/750
+Patching output file 246/750
+Patching output file 247/750
+Patching output file 248/750
+Patching output file 249/750
+Patching output file 250/750
+Patching output file 251/750
+Patching output file 252/750
+Patching output file 253/750
+Patching output file 254/750
+Patching output file 255/750
+Patching output file 256/750
+Patching output file 257/750
+Patching output file 258/750
+Patching output file 259/750
+Patching output file 260/750
+Patching output file 261/750
+Patching output file 262/750
+Patching output file 263/750
+Patching output file 264/750
+Patching output file 265/750
+Patching output file 266/750
+Patching output file 267/750
+Patching output file 268/750
+Patching output file 269/750
+Patching output file 270/750
+Patching output file 271/750
+Patching output file 272/750
+Patching output file 273/750
+Patching output file 274/750
+Patching output file 275/750
+Patching output file 276/750
+Patching output file 277/750
+Patching output file 278/750
+Patching output file 279/750
+Patching output file 280/750
+Patching output file 281/750
+Patching output file 282/750
+Patching output file 283/750
+Patching output file 284/750
+Patching output file 285/750
+Patching output file 286/750
+Patching output file 287/750
+Patching output file 288/750
+Patching output file 289/750
+Patching output file 290/750
+Patching output file 291/750
+Patching output file 292/750
+Patching output file 293/750
+Patching output file 294/750
+Patching output file 295/750
+Patching output file 296/750
+Patching output file 297/750
+Patching output file 298/750
+Patching output file 299/750
+Patching output file 300/750
+Patching output file 301/750
+Patching output file 302/750
+Patching output file 303/750
+Patching output file 304/750
+Patching output file 305/750
+Patching output file 306/750
+Patching output file 307/750
+Patching output file 308/750
+Patching output file 309/750
+Patching output file 310/750
+Patching output file 311/750
+Patching output file 312/750
+Patching output file 313/750
+Patching output file 314/750
+Patching output file 315/750
+Patching output file 316/750
+Patching output file 317/750
+Patching output file 318/750
+Patching output file 319/750
+Patching output file 320/750
+Patching output file 321/750
+Patching output file 322/750
+Patching output file 323/750
+Patching output file 324/750
+Patching output file 325/750
+Patching output file 326/750
+Patching output file 327/750
+Patching output file 328/750
+Patching output file 329/750
+Patching output file 330/750
+Patching output file 331/750
+Patching output file 332/750
+Patching output file 333/750
+Patching output file 334/750
+Patching output file 335/750
+Patching output file 336/750
+Patching output file 337/750
+Patching output file 338/750
+Patching output file 339/750
+Patching output file 340/750
+Patching output file 341/750
+Patching output file 342/750
+Patching output file 343/750
+Patching output file 344/750
+Patching output file 345/750
+Patching output file 346/750
+Patching output file 347/750
+Patching output file 348/750
+Patching output file 349/750
+Patching output file 350/750
+Patching output file 351/750
+Patching output file 352/750
+Patching output file 353/750
+Patching output file 354/750
+Patching output file 355/750
+Patching output file 356/750
+Patching output file 357/750
+Patching output file 358/750
+Patching output file 359/750
+Patching output file 360/750
+Patching output file 361/750
+Patching output file 362/750
+Patching output file 363/750
+Patching output file 364/750
+Patching output file 365/750
+Patching output file 366/750
+Patching output file 367/750
+Patching output file 368/750
+Patching output file 369/750
+Patching output file 370/750
+Patching output file 371/750
+Patching output file 372/750
+Patching output file 373/750
+Patching output file 374/750
+Patching output file 375/750
+Patching output file 376/750
+Patching output file 377/750
+Patching output file 378/750
+Patching output file 379/750
+Patching output file 380/750
+Patching output file 381/750
+Patching output file 382/750
+Patching output file 383/750
+Patching output file 384/750
+Patching output file 385/750
+Patching output file 386/750
+Patching output file 387/750
+Patching output file 388/750
+Patching output file 389/750
+Patching output file 390/750
+Patching output file 391/750
+Patching output file 392/750
+Patching output file 393/750
+Patching output file 394/750
+Patching output file 395/750
+Patching output file 396/750
+Patching output file 397/750
+Patching output file 398/750
+Patching output file 399/750
+Patching output file 400/750
+Patching output file 401/750
+Patching output file 402/750
+Patching output file 403/750
+Patching output file 404/750
+Patching output file 405/750
+Patching output file 406/750
+Patching output file 407/750
+Patching output file 408/750
+Patching output file 409/750
+Patching output file 410/750
+Patching output file 411/750
+Patching output file 412/750
+Patching output file 413/750
+Patching output file 414/750
+Patching output file 415/750
+Patching output file 416/750
+Patching output file 417/750
+Patching output file 418/750
+Patching output file 419/750
+Patching output file 420/750
+Patching output file 421/750
+Patching output file 422/750
+Patching output file 423/750
+Patching output file 424/750
+Patching output file 425/750
+Patching output file 426/750
+Patching output file 427/750
+Patching output file 428/750
+Patching output file 429/750
+Patching output file 430/750
+Patching output file 431/750
+Patching output file 432/750
+Patching output file 433/750
+Patching output file 434/750
+Patching output file 435/750
+Patching output file 436/750
+Patching output file 437/750
+Patching output file 438/750
+Patching output file 439/750
+Patching output file 440/750
+Patching output file 441/750
+Patching output file 442/750
+Patching output file 443/750
+Patching output file 444/750
+Patching output file 445/750
+Patching output file 446/750
+Patching output file 447/750
+Patching output file 448/750
+Patching output file 449/750
+Patching output file 450/750
+Patching output file 451/750
+Patching output file 452/750
+Patching output file 453/750
+Patching output file 454/750
+Patching output file 455/750
+Patching output file 456/750
+Patching output file 457/750
+Patching output file 458/750
+Patching output file 459/750
+Patching output file 460/750
+Patching output file 461/750
+Patching output file 462/750
+Patching output file 463/750
+Patching output file 464/750
+Patching output file 465/750
+Patching output file 466/750
+Patching output file 467/750
+Patching output file 468/750
+Patching output file 469/750
+Patching output file 470/750
+Patching output file 471/750
+Patching output file 472/750
+Patching output file 473/750
+Patching output file 474/750
+Patching output file 475/750
+Patching output file 476/750
+Patching output file 477/750
+Patching output file 478/750
+Patching output file 479/750
+Patching output file 480/750
+Patching output file 481/750
+Patching output file 482/750
+Patching output file 483/750
+Patching output file 484/750
+Patching output file 485/750
+Patching output file 486/750
+Patching output file 487/750
+Patching output file 488/750
+Patching output file 489/750
+Patching output file 490/750
+Patching output file 491/750
+Patching output file 492/750
+Patching output file 493/750
+Patching output file 494/750
+Patching output file 495/750
+Patching output file 496/750
+Patching output file 497/750
+Patching output file 498/750
+Patching output file 499/750
+Patching output file 500/750
+Patching output file 501/750
+Patching output file 502/750
+Patching output file 503/750
+Patching output file 504/750
+Patching output file 505/750
+Patching output file 506/750
+Patching output file 507/750
+Patching output file 508/750
+Patching output file 509/750
+Patching output file 510/750
+Patching output file 511/750
+Patching output file 512/750
+Patching output file 513/750
+Patching output file 514/750
+Patching output file 515/750
+Patching output file 516/750
+Patching output file 517/750
+Patching output file 518/750
+Patching output file 519/750
+Patching output file 520/750
+Patching output file 521/750
+Patching output file 522/750
+Patching output file 523/750
+Patching output file 524/750
+Patching output file 525/750
+Patching output file 526/750
+Patching output file 527/750
+Patching output file 528/750
+Patching output file 529/750
+Patching output file 530/750
+Patching output file 531/750
+Patching output file 532/750
+Patching output file 533/750
+Patching output file 534/750
+Patching output file 535/750
+Patching output file 536/750
+Patching output file 537/750
+Patching output file 538/750
+Patching output file 539/750
+Patching output file 540/750
+Patching output file 541/750
+Patching output file 542/750
+Patching output file 543/750
+Patching output file 544/750
+Patching output file 545/750
+Patching output file 546/750
+Patching output file 547/750
+Patching output file 548/750
+Patching output file 549/750
+Patching output file 550/750
+Patching output file 551/750
+Patching output file 552/750
+Patching output file 553/750
+Patching output file 554/750
+Patching output file 555/750
+Patching output file 556/750
+Patching output file 557/750
+Patching output file 558/750
+Patching output file 559/750
+Patching output file 560/750
+Patching output file 561/750
+Patching output file 562/750
+Patching output file 563/750
+Patching output file 564/750
+Patching output file 565/750
+Patching output file 566/750
+Patching output file 567/750
+Patching output file 568/750
+Patching output file 569/750
+Patching output file 570/750
+Patching output file 571/750
+Patching output file 572/750
+Patching output file 573/750
+Patching output file 574/750
+Patching output file 575/750
+Patching output file 576/750
+Patching output file 577/750
+Patching output file 578/750
+Patching output file 579/750
+Patching output file 580/750
+Patching output file 581/750
+Patching output file 582/750
+Patching output file 583/750
+Patching output file 584/750
+Patching output file 585/750
+Patching output file 586/750
+Patching output file 587/750
+Patching output file 588/750
+Patching output file 589/750
+Patching output file 590/750
+Patching output file 591/750
+Patching output file 592/750
+Patching output file 593/750
+Patching output file 594/750
+Patching output file 595/750
+Patching output file 596/750
+Patching output file 597/750
+Patching output file 598/750
+Patching output file 599/750
+Patching output file 600/750
+Patching output file 601/750
+Patching output file 602/750
+Patching output file 603/750
+Patching output file 604/750
+Patching output file 605/750
+Patching output file 606/750
+Patching output file 607/750
+Patching output file 608/750
+Patching output file 609/750
+Patching output file 610/750
+Patching output file 611/750
+Patching output file 612/750
+Patching output file 613/750
+Patching output file 614/750
+Patching output file 615/750
+Patching output file 616/750
+Patching output file 617/750
+Patching output file 618/750
+Patching output file 619/750
+Patching output file 620/750
+Patching output file 621/750
+Patching output file 622/750
+Patching output file 623/750
+Patching output file 624/750
+Patching output file 625/750
+Patching output file 626/750
+Patching output file 627/750
+Patching output file 628/750
+Patching output file 629/750
+Patching output file 630/750
+Patching output file 631/750
+Patching output file 632/750
+Patching output file 633/750
+Patching output file 634/750
+Patching output file 635/750
+Patching output file 636/750
+Patching output file 637/750
+Patching output file 638/750
+Patching output file 639/750
+Patching output file 640/750
+Patching output file 641/750
+Patching output file 642/750
+Patching output file 643/750
+Patching output file 644/750
+Patching output file 645/750
+Patching output file 646/750
+Patching output file 647/750
+Patching output file 648/750
+Patching output file 649/750
+Patching output file 650/750
+Patching output file 651/750
+Patching output file 652/750
+Patching output file 653/750
+Patching output file 654/750
+Patching output file 655/750
+Patching output file 656/750
+Patching output file 657/750
+Patching output file 658/750
+Patching output file 659/750
+Patching output file 660/750
+Patching output file 661/750
+Patching output file 662/750
+Patching output file 663/750
+Patching output file 664/750
+Patching output file 665/750
+Patching output file 666/750
+Patching output file 667/750
+Patching output file 668/750
+Patching output file 669/750
+Patching output file 670/750
+Patching output file 671/750
+Patching output file 672/750
+Patching output file 673/750
+Patching output file 674/750
+Patching output file 675/750
+Patching output file 676/750
+Patching output file 677/750
+Patching output file 678/750
+Patching output file 679/750
+Patching output file 680/750
+Patching output file 681/750
+Patching output file 682/750
+Patching output file 683/750
+Patching output file 684/750
+Patching output file 685/750
+Patching output file 686/750
+Patching output file 687/750
+Patching output file 688/750
+Patching output file 689/750
+Patching output file 690/750
+Patching output file 691/750
+Patching output file 692/750
+Patching output file 693/750
+Patching output file 694/750
+Patching output file 695/750
+Patching output file 696/750
+Patching output file 697/750
+Patching output file 698/750
+Patching output file 699/750
+Patching output file 700/750
+Patching output file 701/750
+Patching output file 702/750
+Patching output file 703/750
+Patching output file 704/750
+Patching output file 705/750
+Patching output file 706/750
+Patching output file 707/750
+Patching output file 708/750
+Patching output file 709/750
+Patching output file 710/750
+Patching output file 711/750
+Patching output file 712/750
+Patching output file 713/750
+Patching output file 714/750
+Patching output file 715/750
+Patching output file 716/750
+Patching output file 717/750
+Patching output file 718/750
+Patching output file 719/750
+Patching output file 720/750
+Patching output file 721/750
+Patching output file 722/750
+Patching output file 723/750
+Patching output file 724/750
+Patching output file 725/750
+Patching output file 726/750
+Patching output file 727/750
+Patching output file 728/750
+Patching output file 729/750
+Patching output file 730/750
+Patching output file 731/750
+Patching output file 732/750
+Patching output file 733/750
+Patching output file 734/750
+Patching output file 735/750
+Patching output file 736/750
+Patching output file 737/750
+Patching output file 738/750
+Patching output file 739/750
+Patching output file 740/750
+Patching output file 741/750
+Patching output file 742/750
+Patching output file 743/750
+Patching output file 744/750
+Patching output file 745/750
+Patching output file 746/750
+Patching output file 747/750
+Patching output file 748/750
+Patching output file 749/750
+Patching output file 750/750
+type lookup cache used 3835/65536 hits=14996 misses=4270
+symbol lookup cache used 4688/65536 hits=23726 misses=4688
+finished...

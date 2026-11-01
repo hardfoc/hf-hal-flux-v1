@@ -1,0 +1,19 @@
+<map id="app_main" name="app_main">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,140,91,168"/>
+<area shape="rect" id="Node000002" href="$CommChannelsManagerExample_8cpp.html#a5b28c515f1afaa57015ed32caf1ecc3a" title=" " alt="" coords="153,5,312,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="55,138,87,92,110,66,137,44,151,38,148,42,140,48,114,70,91,95,60,141"/>
+<area shape="rect" id="Node000003" href="$CommChannelsManagerExample_8cpp.html#a299758709c807c14cf018f60c4841dc3" title=" " alt="" coords="153,57,312,85"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="67,138,99,116,138,95,160,89,156,92,140,100,102,121,71,141"/>
+<area shape="rect" id="Node000005" href="$CommChannelsManagerExample_8cpp.html#a1e528ad00f340a225c8eea464b122044" title=" " alt="" coords="143,109,322,137"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="90,144,133,138,129,142,92,149"/>
+<area shape="rect" id="Node000006" href="$CommChannelsManagerExample_8cpp.html#a4adedb1339a33c7f2510d2e7811d7cfa" title=" " alt="" coords="156,161,310,206"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="91,158,142,167,138,170,92,163"/>
+<area shape="rect" id="Node000007" href="$CommChannelsManagerExample_8cpp.html#aee9898e173c580172dd667099ba456e2" title=" " alt="" coords="139,229,327,257"/>
+<area shape="poly" id="edge8_Node000001_Node000007" title=" " alt="" coords="65,165,99,191,140,215,155,223,150,224,137,220,96,196,65,171"/>
+<area shape="rect" id="Node000008" href="$classFlux.html#a4bbee39ff1da8e9359edb151e4ee3cda" title="Access the singleton instance (Meyers singleton, thread&#45;safe)." alt="" coords="165,281,300,309"/>
+<area shape="poly" id="edge9_Node000001_Node000008" title=" " alt="" coords="57,166,90,216,113,243,140,266,153,276,148,275,137,271,109,247,86,219,56,171"/>
+<area shape="rect" id="Node000004" href="$CommChannelsManager_8h.html#a25a5e19b4a3affa3e7dd45e6cd250557" title="Convert CommError to a human&#45;readable string." alt="" coords="375,109,522,137"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="293,83,376,104,371,106,294,88"/>
+<area shape="poly" id="edge5_Node000005_Node000004" title=" " alt="" coords="322,121,362,122,357,124,323,126"/>
+<area shape="poly" id="edge7_Node000006_Node000004" title=" " alt="" coords="310,159,384,141,379,143,311,164"/>
+</map>

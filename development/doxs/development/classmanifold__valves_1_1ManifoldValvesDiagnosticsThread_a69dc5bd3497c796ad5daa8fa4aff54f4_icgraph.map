@@ -1,0 +1,20 @@
+<map id="manifold_valves::ManifoldValvesDiagnosticsThread::IterationCount" name="manifold_valves::ManifoldValvesDiagnosticsThread::IterationCount">
+<area shape="rect" id="Node000001" title=" " alt="" coords="945,15,1139,77"/>
+<area shape="rect" id="Node000002" href="$manifold__valves__pressure__control_8cpp.html#a630544a7f0a2cc40d8a7fefab7e2fe70" title=" " alt="" coords="5,32,91,60"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="927,31,896,30,752,17,639,10,526,9,381,14,221,28,92,43,90,38,220,22,381,9,526,3,639,4,752,12,897,25,932,31"/>
+<area shape="rect" id="Node000003" href="$classmanifold__valves_1_1ManifoldValvesSelfTest.html#af7007dfd27637e49b8de7efdd32e30b0" title=" " alt="" coords="381,24,617,69"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="927,47,618,49,617,44,932,45"/>
+<area shape="rect" id="Node000005" href="$classmanifold__valves_1_1ManifoldValvesSelfTest.html#a8b01d2640285fc27668a6519d03d3fa2" title=" " alt="" coords="665,84,897,129"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="932,72,881,86,880,81,927,73"/>
+<area shape="rect" id="Node000004" href="$classmanifold__valves_1_1ManifoldValvesSelfTest.html#addef632a632864e37101d4bc54db12b2" title="Run the configured self&#45;test plan synchronously on the caller." alt="" coords="139,84,333,129"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="381,74,334,87,332,82,386,72"/>
+<area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="147,80,92,62,91,57,152,77"/>
+<area shape="poly" id="edge7_Node000005_Node000003" title=" " alt="" coords="655,80,607,72,607,67,661,80"/>
+<area shape="poly" id="edge6_Node000005_Node000004" title=" " alt="" coords="648,108,333,109,333,104,652,104"/>
+<area shape="rect" id="Node000006" href="$classmanifold__valves_1_1ManifoldValvesSelfTest.html#ace42f4bbbd7b67b70e2c76b98004017c" title=" " alt="" coords="385,144,613,189"/>
+<area shape="poly" id="edge8_Node000005_Node000006" title=" " alt="" coords="661,132,608,146,607,141,656,133"/>
+<area shape="rect" id="Node000007" href="$classmanifold__valves_1_1ManifoldValvesSelfTest.html#ae70c300b5543e3e9c01628a77bcb30b8" title=" " alt="" coords="396,213,602,258"/>
+<area shape="poly" id="edge10_Node000005_Node000007" title=" " alt="" coords="736,137,680,172,618,203,587,215,586,210,616,198,677,168,731,138"/>
+<area shape="poly" id="edge9_Node000006_Node000004" title=" " alt="" coords="381,140,333,131,333,126,386,140"/>
+<area shape="poly" id="edge11_Node000007_Node000004" title=" " alt="" coords="393,207,380,203,317,168,265,131,267,126,319,163,382,199,398,208"/>
+</map>

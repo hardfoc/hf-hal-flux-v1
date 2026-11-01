@@ -1,0 +1,5 @@
+<map id="flux_version::EntrySpan" name="flux_version::EntrySpan">
+<area shape="rect" id="Node000001" title="Read&#45;only view over a contiguous run of Entry records." alt="" coords="5,98,180,126"/>
+<area shape="rect" id="Node000002" href="$structflux__version_1_1Entry.html" title=" " alt="" coords="21,5,164,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="95,47,95,98,90,97,90,50"/>
+</map>

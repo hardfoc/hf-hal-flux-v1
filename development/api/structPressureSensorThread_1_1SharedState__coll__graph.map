@@ -1,0 +1,13 @@
+<map id="PressureSensorThread::SharedState" name="PressureSensorThread::SharedState">
+<area shape="rect" id="Node000001" title=" " alt="" coords="83,242,250,286"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="21,132,173,160"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="98,173,103,196,111,216,134,241,128,241,107,219,98,197,96,178"/>
+<area shape="rect" id="Node000003" href="$classPressureSensor.html" title="Reads raw ADC voltage and converts to engineering pressure units." alt="" coords="198,132,319,160"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="248,172,219,219,195,243,192,239,215,216,243,175"/>
+<area shape="rect" id="Node000004" href="$structPressureSensorConfig.html" title="Pressure sensor transfer function configuration." alt="" coords="5,5,168,33"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="115,40,205,106,241,131,236,132,202,110,115,45"/>
+<area shape="rect" id="Node000005" href="$structCalibrationConfig.html" title="Calibration parameters for ratiometric sensors." alt="" coords="192,5,325,33"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="260,46,261,132,256,131,257,51"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="350,5,503,33"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="409,43,379,79,341,110,296,134,294,129,338,106,375,75,405,46"/>
+</map>

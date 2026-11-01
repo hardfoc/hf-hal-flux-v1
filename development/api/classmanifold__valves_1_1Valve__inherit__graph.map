@@ -1,0 +1,7 @@
+<map id="manifold_valves::Valve" name="manifold_valves::Valve">
+<area shape="rect" id="Node000001" title="Common state owned by every valve — base for SolenoidValve / ProportionalValve." alt="" coords="142,5,315,33"/>
+<area shape="rect" id="Node000002" href="$classmanifold__valves_1_1ProportionalValve.html" title=" " alt="" coords="5,81,222,126"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="200,41,145,83,143,78,195,43"/>
+<area shape="rect" id="Node000003" href="$classmanifold__valves_1_1SolenoidValve.html" title=" " alt="" coords="246,81,440,126"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="260,40,315,80,310,80,258,45"/>
+</map>

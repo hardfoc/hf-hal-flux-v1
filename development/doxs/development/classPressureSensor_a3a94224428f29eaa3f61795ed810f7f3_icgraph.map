@@ -1,0 +1,5 @@
+<map id="PressureSensor::GetEffectiveVoltageMin" name="PressureSensor::GetEffectiveVoltageMin">
+<area shape="rect" id="Node000001" title="Get effective voltage_min accounting for ratiometric scaling." alt="" coords="266,5,475,50"/>
+<area shape="rect" id="Node000002" href="$classPressureSensor.html#a1da36b52bf2b875585625468931e8a83" title="Get the expected voltage at atmospheric (midpoint)." alt="" coords="5,5,218,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="247,28,218,30,218,25,253,28"/>
+</map>

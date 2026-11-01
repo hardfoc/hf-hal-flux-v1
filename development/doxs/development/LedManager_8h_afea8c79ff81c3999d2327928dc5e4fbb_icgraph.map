@@ -1,0 +1,21 @@
+<map id="LedErrorToString" name="LedErrorToString">
+<area shape="rect" id="Node000001" title="Convert a LedError to a human&#45;readable C&#45;string." alt="" coords="627,83,755,110"/>
+<area shape="rect" id="Node000002" href="$LedManagerExample_8cpp.html#a2306b3689c1f99ec573ee375a708fe7b" title=" " alt="" coords="416,5,569,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="637,77,530,36,531,31,642,77"/>
+<area shape="rect" id="Node000004" href="$LedManagerExample_8cpp.html#ad8363214ca64e804a34524f4ee739b10" title="Helper: log an LED error result." alt="" coords="436,83,549,110"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="609,97,549,99,549,94,614,96"/>
+<area shape="rect" id="Node000007" href="$classLedManager.html#a2dc2c5f9181410493ab66b14e6c40788" title="Turn off the LED and release driver resources." alt="" coords="406,135,579,162"/>
+<area shape="poly" id="edge8_Node000001_Node000007" title=" " alt="" coords="623,114,549,137,548,131,618,115"/>
+<area shape="rect" id="Node000003" href="$LedManagerExample_8cpp.html#a630544a7f0a2cc40d8a7fefab7e2fe70" title=" " alt="" coords="23,43,109,70"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="398,19,292,23,175,34,110,47,108,42,174,29,292,18,403,17"/>
+<area shape="rect" id="Node000005" href="$LedManagerExample_8cpp.html#af7eff1672cda655ced56ae448d9a3a65" title=" " alt="" coords="187,43,346,70"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="419,84,346,73,346,68,424,84"/>
+<area shape="rect" id="Node000006" href="$LedManagerExample_8cpp.html#ab94e64917a282228f3b53025e9c9adcb" title=" " alt="" coords="184,95,349,122"/>
+<area shape="poly" id="edge6_Node000004_Node000006" title=" " alt="" coords="418,101,350,107,349,101,423,100"/>
+<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="170,58,110,59,108,54,174,55"/>
+<area shape="poly" id="edge7_Node000006_Node000003" title=" " alt="" coords="193,92,109,70,109,65,197,89"/>
+<area shape="rect" id="Node000008" href="$classLedManager.html#a4c571368a2d02ce4dc616b6881878d4c" title="Alias for Shutdown()." alt="" coords="175,147,358,174"/>
+<area shape="poly" id="edge9_Node000007_Node000008" title=" " alt="" coords="393,154,359,158,358,153,388,154"/>
+<area shape="rect" id="Node000009" href="$classFlux.html#a381c21e10f3556ecc16df4b4f2ead006" title="Shut down all subsystems in reverse initialisation order." alt="" coords="5,147,127,174"/>
+<area shape="poly" id="edge10_Node000008_Node000009" title=" " alt="" coords="157,161,127,163,127,158,162,160"/>
+</map>

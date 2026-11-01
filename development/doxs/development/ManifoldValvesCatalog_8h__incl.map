@@ -1,0 +1,24 @@
+<map id="ManifoldValvesCatalog.h" name="ManifoldValvesCatalog.h">
+<area shape="rect" id="Node000001" title="Compile&#45;time catalog of all WH bench valves and their datasheet specs." alt="" coords="233,5,417,33"/>
+<area shape="rect" id="Node000002" href="$ValveManager_8h.html" title="Unified valve management system for the HardFOC Flux V1 platform." alt="" coords="297,81,492,109"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="338,31,374,70,369,69,337,36"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,165,61,193"/>
+<area shape="poly" id="edge10_Node000001_Node000003" title=" " alt="" coords="296,35,205,83,69,160,67,155,202,79,300,32"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="84,165,150,193"/>
+<area shape="poly" id="edge11_Node000001_Node000005" title=" " alt="" coords="310,35,147,158,144,154,305,32"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="926,165,1022,193"/>
+<area shape="poly" id="edge12_Node000001_Node000007" title=" " alt="" coords="392,31,624,81,769,115,914,154,926,160,921,160,912,159,767,121,623,86,392,36"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="294,108,188,128,129,142,73,159,69,161,67,156,71,154,128,137,187,122,299,105"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="361,165,428,193"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="396,107,397,151,392,148,392,111"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="329,110,251,132,163,159,158,161,156,156,161,154,250,127,334,109"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="452,165,528,193"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="411,107,466,155,461,155,409,112"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="492,99,688,117,801,133,914,154,929,160,923,160,912,159,801,138,687,122,492,104"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="552,165,655,193"/>
+<area shape="poly" id="edge7_Node000002_Node000008" title=" " alt="" coords="428,107,559,159,553,159,427,112"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="679,157,902,201"/>
+<area shape="poly" id="edge8_Node000002_Node000009" title=" " alt="" coords="458,107,673,153,668,153,458,112"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="174,157,337,201"/>
+<area shape="poly" id="edge9_Node000002_Node000010" title=" " alt="" coords="375,108,307,151,304,146,370,110"/>
+</map>

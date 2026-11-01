@@ -1,0 +1,7 @@
+<map id="manifold_valves::SelfTestPlan" name="manifold_valves::SelfTestPlan">
+<area shape="rect" id="Node000001" title="Per&#45;valve enable mask + tunable knobs for the boot self&#45;test." alt="" coords="166,98,382,126"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,257,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="165,39,255,97,250,98,163,44"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="280,5,555,33"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="389,41,339,76,299,100,297,95,336,72,384,43"/>
+</map>

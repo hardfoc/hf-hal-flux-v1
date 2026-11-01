@@ -1,0 +1,1382 @@
+
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+
+  <link rel="stylesheet" href="/hf-hal-flux-v1/development/assets/css/just-the-docs-default.css">
+
+  <link rel="stylesheet" href="/hf-hal-flux-v1/development/assets/css/just-the-docs-head-nav.css" id="jtd-head-nav-stylesheet">
+
+  <style id="jtd-nav-activation">
+  
+
+    
+    .site-nav > ul.nav-list:first-child > li:not(:nth-child(20)) > a,
+    .site-nav > ul.nav-list:first-child > li > ul > li a {
+      background-image: none;
+    }
+
+    .site-nav > ul.nav-list:not(:first-child) a,
+    .site-nav li.external a {
+      background-image: none;
+    }
+
+    .site-nav > ul.nav-list:first-child > li:nth-child(20) > a {
+      font-weight: 600;
+      text-decoration: none;
+    }.site-nav > ul.nav-list:first-child > li:nth-child(20) > button svg {
+      transform: rotate(-90deg);
+    }.site-nav > ul.nav-list:first-child > li.nav-list-item:nth-child(20) > ul.nav-list {
+      display: block;
+    }
+  </style>
+
+  
+
+  
+    <script src="/hf-hal-flux-v1/development/assets/js/vendor/lunr.min.js"></script>
+  
+
+  <script src="/hf-hal-flux-v1/development/assets/js/just-the-docs.js"></script>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+
+
+  <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Manifold valves &amp; pressure sensor application | HardFOC Flux V1 HAL (hf-hal-flux-v1) - development</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="Manifold valves &amp; pressure sensor application" />
+<meta name="author" content="hardfoc" />
+<meta property="og:locale" content="en" />
+<meta name="description" content="Unified HAL API for the HardFOC Flux valve-control platform. Manages 6 subsystems: comms, GPIO, valves, ADC, LEDs, temperature." />
+<meta property="og:description" content="Unified HAL API for the HardFOC Flux valve-control platform. Manages 6 subsystems: comms, GPIO, valves, ADC, LEDs, temperature." />
+<link rel="canonical" href="https://hardfoc.github.io/hf-hal-flux-v1/development/examples/esp32/main/manifold_valves_pressure_control/" />
+<meta property="og:url" content="https://hardfoc.github.io/hf-hal-flux-v1/development/examples/esp32/main/manifold_valves_pressure_control/" />
+<meta property="og:site_name" content="HardFOC Flux V1 HAL (hf-hal-flux-v1) - development" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Manifold valves &amp; pressure sensor application" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","author":{"@type":"Person","name":"hardfoc","url":"https://github.com/hardfoc"},"description":"Unified HAL API for the HardFOC Flux valve-control platform. Manages 6 subsystems: comms, GPIO, valves, ADC, LEDs, temperature.","headline":"Manifold valves &amp; pressure sensor application","url":"https://hardfoc.github.io/hf-hal-flux-v1/development/examples/esp32/main/manifold_valves_pressure_control/"}</script>
+<!-- End Jekyll SEO tag -->
+
+
+  <!-- Custom head content for hf-hal-flux-v1 docs -->
+
+<!-- Doxygen API docs stylesheet (when generated) -->
+<link rel="stylesheet" href="/hf-hal-flux-v1/development/assets/css/custom.css" onerror="this.remove()">
+
+<!-- Doxygen-awesome theme integration -->
+<style>
+  /* Doxygen iframe integration */
+  .doxygen-embed {
+    width: 100%;
+    min-height: 600px;
+    border: 1px solid var(--color-border-default, #e1e4e8);
+    border-radius: 6px;
+  }
+
+  /* Code block enhancements */
+  pre.highlight {
+    border-radius: 6px;
+    border: 1px solid var(--color-border-default, #e1e4e8);
+  }
+
+  /* Badge styles for cross-references */
+  .hal-badge {
+    display: inline-block;
+    padding: 0.15rem 0.5rem;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    background-color: #0366d6;
+    color: white;
+    vertical-align: middle;
+  }
+</style>
+
+
+</head>
+
+<body>
+  <a class="skip-to-main" href="#main-content">Skip to main content</a>
+  <svg xmlns="http://www.w3.org/2000/svg" class="d-none">
+  <symbol id="svg-link" viewBox="0 0 24 24">
+  <title>Link</title>
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-link">
+    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+  </svg>
+</symbol>
+
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+  <title>Menu</title>
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-menu">
+    <line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line>
+  </svg>
+</symbol>
+
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+  <title>Expand</title>
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+    <polyline points="9 18 15 12 9 6"></polyline>
+  </svg>
+</symbol>
+
+  <!-- Feather. MIT License: https://github.com/feathericons/feather/blob/master/LICENSE -->
+<symbol id="svg-external-link" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link">
+  <title id="svg-external-link-title">(external link)</title>
+  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line>
+</symbol>
+
+  
+    <symbol id="svg-doc" viewBox="0 0 24 24">
+  <title>Document</title>
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file">
+    <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline>
+  </svg>
+</symbol>
+
+    <symbol id="svg-search" viewBox="0 0 24 24">
+  <title>Search</title>
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search">
+    <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+  </svg>
+</symbol>
+
+  
+  
+    <!-- Bootstrap Icons. MIT License: https://github.com/twbs/icons/blob/main/LICENSE.md -->
+<symbol id="svg-copy" viewBox="0 0 16 16">
+  <title>Copy</title>
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard" viewBox="0 0 16 16">
+    <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/>
+    <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/>
+  </svg>
+</symbol>
+<symbol id="svg-copied" viewBox="0 0 16 16">
+  <title>Copied</title>
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard-check-fill" viewBox="0 0 16 16">
+    <path d="M6.5 0A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3Zm3 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3Z"/>
+    <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1A2.5 2.5 0 0 1 9.5 5h-3A2.5 2.5 0 0 1 4 2.5v-1Zm6.854 7.354-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 0 1 .708-.708L7.5 10.793l2.646-2.647a.5.5 0 0 1 .708.708Z"/>
+  </svg>
+</symbol>
+
+  
+</svg>
+
+  
+    <header class="side-bar">
+  <div class="site-header">
+    <a href="/hf-hal-flux-v1/development/" class="site-title lh-tight">
+  HardFOC Flux V1 HAL (hf-hal-flux-v1) - development
+
+</a>
+    <button id="menu-button" class="site-button btn-reset" aria-label="Menu" aria-expanded="false">
+      <svg viewBox="0 0 24 24" class="icon" aria-hidden="true"><use xlink:href="#svg-menu"></use></svg>
+    </button>
+  </div>
+
+  <nav aria-label="Main" id="site-nav" class="site-nav">
+  
+  
+    <ul class="nav-list"><li class="nav-list-item"><a href="/hf-hal-flux-v1/development/lib/core/README.html" class="nav-list-link">HardFOC Core Platform</a></li><li class="nav-list-item"><a href="/hf-hal-flux-v1/development/" class="nav-list-link">HardFOC ESP-IDF Project Tools</a></li><li class="nav-list-item"><a href="/hf-hal-flux-v1/development/lib/api/README.html" class="nav-list-link">Flux API — Unified HardFOC Platform Interface</a></li><li class="nav-list-item"><a href="/hf-hal-flux-v1/development/lib/api/" class="nav-list-link">Flux API — Unified HardFOC Platform Interface</a></li><li class="nav-list-item"><a href="/hf-hal-flux-v1/development/examples/esp32/docs/README.html" class="nav-list-link">Flux ESP32 examples — full index</a></li><li class="nav-list-item"><a href="/hf-hal-flux-v1/development/examples/esp32/docs/" class="nav-list-link">Flux ESP32 examples — full index</a></li><li class="nav-list-item"><a href="/hf-hal-flux-v1/development/docs/hal/architecture.html" class="nav-list-link">Flux HAL — architecture (as implemented)</a></li><li class="nav-list-item"><a href="/hf-hal-flux-v1/development/docs/hal/README.html" class="nav-list-link">Flux HAL — documentation hub</a></li><li class="nav-list-item"><a href="/hf-hal-flux-v1/development/docs/hal/" class="nav-list-link">Flux HAL — documentation hub</a></li><li class="nav-list-item"><a href="/hf-hal-flux-v1/development/docs/hal/managers-and-handlers.html" class="nav-list-link">Flux — managers and hf-core handlers</a></li><li class="nav-list-item"><a href="/hf-hal-flux-v1/development/docs/component-handlers/README.html" class="nav-list-link">Former location: docs/component-handlers/</a></li><li class="nav-list-item"><a href="/hf-hal-flux-v1/development/docs/component-handlers/" class="nav-list-link">Former location: docs/component-handlers/</a></li><li class="nav-list-item"><a href="/hf-hal-flux-v1/development/docs/driver-handlers/README.html" class="nav-list-link">Former location: docs/driver-handlers/</a></li><li class="nav-list-item"><a href="/hf-hal-flux-v1/development/docs/driver-handlers/" class="nav-list-link">Former location: docs/driver-handlers/</a></li><li class="nav-list-item"><a href="/hf-hal-flux-v1/development/examples/esp32/README.html" class="nav-list-link">HardFOC Flux HAL — ESP32 Examples</a></li><li class="nav-list-item"><a href="/hf-hal-flux-v1/development/examples/esp32/" class="nav-list-link">HardFOC Flux HAL — ESP32 Examples</a></li><li class="nav-list-item"><a href="/hf-hal-flux-v1/development/DOCUMENTATION_INDEX.html" class="nav-list-link">HardFOC Flux HAL — documentation index</a></li><li class="nav-list-item"><a href="/hf-hal-flux-v1/development/README.html" class="nav-list-link">HardFOC Flux V1 – Hardware Abstraction Layer</a></li><li class="nav-list-item"><a href="/hf-hal-flux-v1/development/examples/esp32/main/manifold_valves_pressure_control/README.html" class="nav-list-link">Manifold valves &amp; pressure sensor application</a></li><li class="nav-list-item"><a href="/hf-hal-flux-v1/development/examples/esp32/main/manifold_valves_pressure_control/" class="nav-list-link">Manifold valves &amp; pressure sensor application</a></li></ul>
+  
+</nav>
+
+
+<div class="d-md-block d-none site-footer">
+  
+  
+    This site uses <a href="https://github.com/just-the-docs/just-the-docs">Just the Docs</a>, a documentation theme for Jekyll.
+  
+  </div>
+</header>
+
+  
+  <div class="main" id="top">
+    <div id="main-header" class="main-header">
+  
+    
+
+<div class="search" role="search">
+  <div class="search-input-wrap">
+    <input type="text" id="search-input" class="search-input" tabindex="0" placeholder="Search HardFOC Flux V1 HAL (hf-hal-flux-v1) - development" autocomplete="off">
+    <label for="search-input" class="search-label">
+      <span class="sr-only">Search HardFOC Flux V1 HAL (hf-hal-flux-v1) - development</span>
+      <svg viewBox="0 0 24 24" class="search-icon" aria-hidden="true"><use xlink:href="#svg-search"></use></svg>
+    </label>
+  </div>
+  <div id="search-results" class="search-results"></div>
+</div>
+
+  
+  
+  
+    <nav aria-label="Auxiliary" class="aux-nav">
+  <ul class="aux-nav-list">
+    
+      <li class="aux-nav-list-item">
+        <a href="/hf-hal-flux-v1/development/api/index.html" class="site-button"
+          
+          target="_blank" rel="noopener noreferrer"
+          
+        >
+          📖 API Reference
+        </a>
+      </li>
+    
+      <li class="aux-nav-list-item">
+        <a href="https://github.com/hardfoc/hf-hal-flux-v1" class="site-button"
+          
+          target="_blank" rel="noopener noreferrer"
+          
+        >
+          GitHub
+        </a>
+      </li>
+    
+      <li class="aux-nav-list-item">
+        <a href="https://github.com/hardfoc/hf-hal-flux-v1/issues" class="site-button"
+          
+          target="_blank" rel="noopener noreferrer"
+          
+        >
+          Issues
+        </a>
+      </li>
+    
+  </ul>
+</nav>
+
+  
+</div>
+
+    <div class="main-content-wrap">
+      
+      <div id="main-content" class="main-content">
+        <main>
+          
+            <h1 id="manifold-valves--pressure-sensor-application">
+  
+  
+    <a href="#manifold-valves--pressure-sensor-application" class="anchor-heading" aria-labelledby="manifold-valves--pressure-sensor-application"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> Manifold valves &amp; pressure sensor application
+  
+  
+</h1>
+    
+
+<p>This example is the WH bench-test acquisition + actuation stack. It owns:</p>
+
+<ul>
+  <li><strong>8 Honeywell SSC TruStability</strong> ratiometric pressure transducers on the
+ADS7952 12-bit SPI ADC.</li>
+  <li><strong>7 Parker C15 / C21 / SRS / VSO</strong> valves driven through the <strong>MAX22200</strong>
+octal solenoid driver (6 binary hit/hold + 1 pseudo-proportional).</li>
+  <li><strong>6 Parker VSO / VSO MaxFlow / LM-Pro</strong> precision proportional valves
+driven through the <strong>TLE92466ED</strong> 6-channel current-controlled driver.</li>
+</ul>
+
+<p>A boot-time <strong>valve self-test</strong> exercises every catalog entry one at a time
+(solenoids ON/OFF, proportionals 0 → full → 0) and reports per-channel
+faults from the underlying drivers — see §6.</p>
+
+<p>Everything hangs off the existing Flux V1 HAL — this folder contributes the
+<strong>application-level abstractions</strong> (named valves, datasheet-driven
+profiles, lock-free positional API, dedicated control + diagnostics
+threads, full per-driver fault decoding).</p><hr />
+<h2 id="1-architecture-overview">
+  
+  
+    <a href="#1-architecture-overview" class="anchor-heading" aria-labelledby="1-architecture-overview"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> 1. Architecture overview
+  
+  
+</h2>
+    
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code><div class="table-wrapper"><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+</pre></td><td class="rouge-code"><pre>┌────────────────────────────────────────────────────────────────────┐
+│  Application / control-loop threads (any rate)                     │
+│   - PressureSensor::GetPressureFiltered()      lock-free atomic    │
+│   - ManifoldValves::Get(SolenoidId).RequestState/RequestPosition    │
+│   - ManifoldValves::Get(ProportionalId).RequestPosition             │
+│   - .GetActualPosition() / .GetState() / .Snapshot()  lock-free    │
+└────────────────────────────────────────────────────────────────────┘
+          │                                         │
+          ▼                                         ▼
+┌──────────────────────────────┐   ┌──────────────────────────────┐
+│ PressureSensorThread (1 kHz) │   │ ManifoldValvesControlThread (100 Hz)│
+│  - Auto-1 batched ADS7952    │   │  - ConsumeDirty() per valve  │
+│  - Per-channel single-pole   │   │  - Apply() → ValveManager    │
+│    IIR + atomic publish      │   │  - Updates actual_position   │
+└──────────────────────────────┘   └──────────────────────────────┘
+                              │
+                              ▼
+┌────────────────────────────────────────────────────────────────────┐
+│ ManifoldValvesDiagnosticsThread (10 Hz)                                        │
+│  - Per-valve OnDiagnostics() → per-channel snapshot                │
+│  - MAX22200 STATUS register   → SubsystemFaultSnapshot.max_*       │
+│  - TLE92466 FaultReport       → SubsystemFaultSnapshot.tle_*       │
+│  - Aggregates lock-free SubsystemFaultSnapshot for the app         │
+└────────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌────────────────────────────────────────────────────────────────────┐
+│ Flux::ValveManager  +  Flux::AdcManager  +  Flux::CommChannels     │
+│  - MAX22200 (SOL_CH0..SOL_CH5)   ← all 6 solenoids                 │
+│  - TLE92466ED (PROP_CH0..PROP_CH5) ← all 6 precision proportionals │
+│  - ADS7952 (SPI3)                  ← pressure ADC                  │
+└────────────────────────────────────────────────────────────────────┘
+</pre></td></tr></tbody></table></div></code></pre></div></div>
+<h3 id="11-why-three-threads">
+  
+  
+    <a href="#11-why-three-threads" class="anchor-heading" aria-labelledby="11-why-three-threads"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> 1.1 Why three threads?
+  
+  
+</h3>
+    
+
+<div class="table-wrapper"><table>
+  <thead>
+    <tr>
+      <th>Thread</th>
+      <th>Period</th>
+      <th>Job</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Pressure sampling</td>
+      <td>1 ms</td>
+      <td>Match the SSC ASIC’s 1 kHz pressure update; produce filtered atomic snapshots that any control loop can consume lock-free.</td>
+    </tr>
+    <tr>
+      <td>Valve control</td>
+      <td>10 ms</td>
+      <td>Push every dirty valve setpoint to MAX22200 / TLE92466ED. Doing this at 100 Hz keeps SPI traffic low while still feeling instant to a 500 Hz outer control loop.</td>
+    </tr>
+    <tr>
+      <td>Diagnostics</td>
+      <td>100 ms</td>
+      <td>Read per-channel + global driver-IC fault registers and surface a comprehensive <code class="language-plaintext highlighter-rouge">SubsystemFaultSnapshot</code> so the application doesn’t ever have to do multi-register SPI reads itself.</td>
+    </tr>
+  </tbody>
+</table></div>
+
+<p>This separation means the control loop <strong>never</strong> has to read fault
+registers itself — that’s the diagnostics thread’s responsibility — and
+the diagnostics thread <strong>never</strong> delays the application’s set/get path.</p><hr />
+<h2 id="2-pressure-sensors">
+  
+  
+    <a href="#2-pressure-sensors" class="anchor-heading" aria-labelledby="2-pressure-sensors"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> 2. Pressure sensors
+  
+  
+</h2>
+    
+
+<p>Honeywell SSC TruStability sensors output <strong>10 % – 90 % of V_supply</strong> over
+the configured pressure range (transfer function “A”), with output clipping
+limits at 2.5 % / 97.5 %. Resolution ≥ 0.03 % FSS, accuracy ±0.25 % FSS
+BFSL, total error band ±2 % FSS, ASIC update ≈ 1 kHz, response ≈ 1 ms.</p>
+
+<p>Bench wiring:</p>
+
+<div class="table-wrapper"><table>
+  <thead>
+    <tr>
+      <th>Channel</th>
+      <th>Label</th>
+      <th>Range</th>
+      <th>Direction</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>CH0</td>
+      <td>DPS_LOW</td>
+      <td>±0.18 PSI</td>
+      <td>Differential</td>
+    </tr>
+    <tr>
+      <td>CH1</td>
+      <td>DPS_HIGH</td>
+      <td>±2.32 PSI</td>
+      <td>Differential</td>
+    </tr>
+    <tr>
+      <td>CH2</td>
+      <td>PMS</td>
+      <td>0 – 5 PSI</td>
+      <td>Positive</td>
+    </tr>
+    <tr>
+      <td>CH3</td>
+      <td>PLS_LOW</td>
+      <td>0 – 15 PSI</td>
+      <td>Positive</td>
+    </tr>
+    <tr>
+      <td>CH4</td>
+      <td>PLS_HIGH</td>
+      <td>0 – 150 PSI</td>
+      <td>Positive</td>
+    </tr>
+    <tr>
+      <td>CH5</td>
+      <td>RLS</td>
+      <td>0 → -30 PSI</td>
+      <td>Negative (vacuum)</td>
+    </tr>
+    <tr>
+      <td>CH6</td>
+      <td>PWS2</td>
+      <td>0 – 1 PSI</td>
+      <td>Positive</td>
+    </tr>
+    <tr>
+      <td>CH7</td>
+      <td>PWS1</td>
+      <td>0 – 1 PSI</td>
+      <td>Positive</td>
+    </tr>
+  </tbody>
+</table></div>
+
+<p>Pipeline: 1 kHz Auto-1 batched ADS7952 read → per-channel single-pole IIR
+LPF (default fc = 100 Hz at fs = 1 kHz) → atomic publish. Lock-free
+<code class="language-plaintext highlighter-rouge">PressureSensor::GetPressureFiltered()</code> for control loops.</p><hr />
+<h2 id="3-valves">
+  
+  
+    <a href="#3-valves" class="anchor-heading" aria-labelledby="3-valves"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> 3. Valves
+  
+  
+</h2>
+    
+<h3 id="31-driver-ic-capabilities-what-we-expose">
+  
+  
+    <a href="#31-driver-ic-capabilities-what-we-expose" class="anchor-heading" aria-labelledby="31-driver-ic-capabilities-what-we-expose"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> 3.1 Driver-IC capabilities (what we expose)
+  
+  
+</h3>
+    
+<h4 id="max22200-octal-solenoid-driver-8-channels--using-6">
+  
+  
+    <a href="#max22200-octal-solenoid-driver-8-channels--using-6" class="anchor-heading" aria-labelledby="max22200-octal-solenoid-driver-8-channels--using-6"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> MAX22200 (octal solenoid driver, 8 channels — using 6)
+  
+  
+</h4>
+    
+
+<div class="table-wrapper"><table>
+  <thead>
+    <tr>
+      <th>Capability</th>
+      <th>Use here</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>CDR (Current Drive Regulation)</strong> — 7-bit current ladder per channel</td>
+      <td>Hit &amp; hold currents on every BinaryHitHold solenoid; sustained current on the SEV pseudo-proportional.</td>
+    </tr>
+    <tr>
+      <td><strong>VDR (Voltage / PWM Duty Regulation)</strong></td>
+      <td>Available via <code class="language-plaintext highlighter-rouge">ValveManager::ConfigureSolenoidVdr</code> — not used today.</td>
+    </tr>
+    <tr>
+      <td><strong>Per-channel feature gates</strong> (CFG_CH register)</td>
+      <td>All four exposed via <code class="language-plaintext highlighter-rouge">Max22200ChannelFeatures</code>: <code class="language-plaintext highlighter-rouge">slew_rate_control</code> (cleaner edges, lower EMI), <code class="language-plaintext highlighter-rouge">open_load_detection</code>, <code class="language-plaintext highlighter-rouge">plunger_movement_detection</code>, <code class="language-plaintext highlighter-rouge">hit_current_check</code>.</td>
+    </tr>
+    <tr>
+      <td><strong>DPM (Detection of Plunger Movement)</strong> — global algorithm (CFG_DPM)</td>
+      <td><code class="language-plaintext highlighter-rouge">ManifoldValves::ConfigureGlobalDpm(start_ma, dip_ma, debounce_ms)</code> configures ISTART / IPTH / TDEB. Per-channel DPM_EN bits set from the catalog’s feature gate.</td>
+    </tr>
+    <tr>
+      <td><strong>Per-channel faults</strong> (FAULT register)</td>
+      <td><code class="language-plaintext highlighter-rouge">SolenoidValve::Snapshot()</code> returns <code class="language-plaintext highlighter-rouge">overcurrent</code>, <code class="language-plaintext highlighter-rouge">hit_not_reached</code>, <code class="language-plaintext highlighter-rouge">open_load</code>, <code class="language-plaintext highlighter-rouge">plunger_movement_fault</code> plus sticky counters.</td>
+    </tr>
+    <tr>
+      <td><strong>Global health</strong> (STATUS register)</td>
+      <td><code class="language-plaintext highlighter-rouge">ManifoldValvesDiagnosticsThread::SubsystemFaultSnapshot.max_*</code> carries OVT, COMER, UVM, the global OCP/OLF/HHF/DPM bits and the active-channels mask.</td>
+    </tr>
+  </tbody>
+</table></div>
+<h4 id="tle92466ed-six-channel-current-controlled-6-channels--using-all-6">
+  
+  
+    <a href="#tle92466ed-six-channel-current-controlled-6-channels--using-all-6" class="anchor-heading" aria-labelledby="tle92466ed-six-channel-current-controlled-6-channels--using-all-6"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> TLE92466ED (six-channel current-controlled, 6 channels — using all 6)
+  
+  
+</h4>
+    
+
+<div class="table-wrapper"><table>
+  <thead>
+    <tr>
+      <th>Capability</th>
+      <th>Use here</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Closed-loop current control</strong></td>
+      <td><code class="language-plaintext highlighter-rouge">ValveManager::SetProportionalCurrent</code> per valve, called every dirty Apply.</td>
+    </tr>
+    <tr>
+      <td><strong>PWM frequency</strong> (mantissa+exponent encoded)</td>
+      <td>Each valve’s <code class="language-plaintext highlighter-rouge">pwm_hz</code> from the model spec is pushed once via <code class="language-plaintext highlighter-rouge">ValveManager::ConfigureProportionalPwm</code>.</td>
+    </tr>
+    <tr>
+      <td><strong>Dither</strong> (step size + steps + flat period)</td>
+      <td>Pushed once via <code class="language-plaintext highlighter-rouge">ValveManager::ConfigureProportionalDither</code> for VSO-class valves. LM-Pro skips dither (it’s a linear motor).</td>
+    </tr>
+    <tr>
+      <td><strong>Slew rate / diagnostic current / open-load threshold / OLSG warning</strong></td>
+      <td>Configured via <code class="language-plaintext highlighter-rouge">tle92466ed::ChannelConfig</code> from <code class="language-plaintext highlighter-rouge">Tle92466ChannelFeatures</code>.</td>
+    </tr>
+    <tr>
+      <td><strong>Per-channel diagnostics</strong></td>
+      <td><code class="language-plaintext highlighter-rouge">ProportionalValve::Snapshot()</code> carries every flag from <code class="language-plaintext highlighter-rouge">tle92466ed::ChannelDiagnostics</code>: <code class="language-plaintext highlighter-rouge">overcurrent</code>, <code class="language-plaintext highlighter-rouge">short_to_ground</code>, <code class="language-plaintext highlighter-rouge">open_load</code>, <code class="language-plaintext highlighter-rouge">over_temperature</code>, <code class="language-plaintext highlighter-rouge">open_load_short_ground</code>, <code class="language-plaintext highlighter-rouge">ot_warning</code>, <code class="language-plaintext highlighter-rouge">current_regulation_warning</code>, <code class="language-plaintext highlighter-rouge">pwm_regulation_warning</code>, <code class="language-plaintext highlighter-rouge">olsg_warning</code>, plus live measurements <code class="language-plaintext highlighter-rouge">average_current_raw</code>, <code class="language-plaintext highlighter-rouge">duty_cycle_raw</code>, <code class="language-plaintext highlighter-rouge">vbat_feedback_raw</code>.</td>
+    </tr>
+    <tr>
+      <td><strong>Global health</strong> (FaultReport)</td>
+      <td><code class="language-plaintext highlighter-rouge">ManifoldValvesDiagnosticsThread::SubsystemFaultSnapshot.tle_*</code> carries VBAT/VIO/VDD UV/OV, central OT warning/error, clock fault, SPI watchdog, POR/reset events, register/OTP ECC errors, supply-NOK summaries.</td>
+    </tr>
+  </tbody>
+</table></div>
+<h3 id="32-bench-mapping">
+  
+  
+    <a href="#32-bench-mapping" class="anchor-heading" aria-labelledby="32-bench-mapping"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> 3.2 Bench mapping
+  
+  
+</h3>
+    
+
+<p><strong>Solenoids (MAX22200, channels 0–7):</strong></p>
+
+<div class="table-wrapper"><table>
+  <thead>
+    <tr>
+      <th>OUTn</th>
+      <th>ID</th>
+      <th>Drive mode</th>
+      <th>Model</th>
+      <th>Datasheet currents (24 V)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>SOL_CH0</td>
+      <td><em>spare</em></td>
+      <td><em>unconnected</em></td>
+      <td>—</td>
+      <td>—</td>
+    </tr>
+    <tr>
+      <td>SOL_CH1</td>
+      <td>OLV_2</td>
+      <td>BinaryHitHold</td>
+      <td>Parker C21 (R = 235 Ω)</td>
+      <td>hit 102 mA / hold 51 mA / hit 100 ms</td>
+    </tr>
+    <tr>
+      <td>SOL_CH2</td>
+      <td>VEV</td>
+      <td>BinaryHitHold</td>
+      <td>Parker C15 ≥0.040″ (R = 361 Ω)</td>
+      <td>hit  66 mA / hold 33 mA / hit 100 ms</td>
+    </tr>
+    <tr>
+      <td>SOL_CH3</td>
+      <td>OLV_1</td>
+      <td>BinaryHitHold</td>
+      <td>Parker C21</td>
+      <td>same as OLV_2</td>
+    </tr>
+    <tr>
+      <td><strong>SOL_CH4</strong></td>
+      <td><strong>SEV</strong></td>
+      <td><strong>VariableCurrent</strong></td>
+      <td><strong>Parker VSO (R = 274 Ω)</strong></td>
+      <td><strong>0..66 mA proportional via 7-bit CDR ladder</strong></td>
+    </tr>
+    <tr>
+      <td>SOL_CH5</td>
+      <td>GDV</td>
+      <td>BinaryHitHold</td>
+      <td>Parker SRS 0.5 W (R = 1152 Ω)</td>
+      <td>hit  21 mA / hold 10 mA / hit  30 ms</td>
+    </tr>
+    <tr>
+      <td>SOL_CH6</td>
+      <td>ORV</td>
+      <td>BinaryHitHold</td>
+      <td>Parker C15 ≥0.040″</td>
+      <td>hit  66 mA / hold 33 mA / hit 100 ms</td>
+    </tr>
+    <tr>
+      <td>SOL_CH7</td>
+      <td>AVV</td>
+      <td>BinaryHitHold</td>
+      <td>Parker C15 ≥0.040″</td>
+      <td>same as ORV</td>
+    </tr>
+  </tbody>
+</table></div>
+
+<p><strong>Proportionals (TLE92466ED, channels 0–5):</strong></p>
+
+<blockquote>
+  <p>The TLE92466ED PWM frequency is capped at 4 kHz by the chip itself (datasheet
+<code class="language-plaintext highlighter-rouge">PERIOD::kSpecMaxFrequency</code>). The catalog therefore drives every model at
+4 kHz; the driver clamps and warns if you ever request more. LM-Pro keeps a
+tiny “telemetry” dither (1 mA @ 50 Hz) so the chip’s <code class="language-plaintext highlighter-rouge">FB_I_AVG</code> / <code class="language-plaintext highlighter-rouge">FB_DC</code>
+averagers are populated — see <code class="language-plaintext highlighter-rouge">hf-tle92466ed-driver/docs/troubleshooting.md</code>.</p>
+</blockquote>
+
+<div class="table-wrapper"><table>
+  <thead>
+    <tr>
+      <th>OUTn</th>
+      <th>ID</th>
+      <th>Model</th>
+      <th>Full-flow current</th>
+      <th>PWM</th>
+      <th>Dither</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>PROP_CH0</td>
+      <td>FRV</td>
+      <td>Parker VSO MaxFlow 24 V</td>
+      <td>66 mA</td>
+      <td>4 kHz</td>
+      <td>4 mA @ 200 Hz</td>
+    </tr>
+    <tr>
+      <td>PROP_CH1</td>
+      <td>SPV_L</td>
+      <td>Parker VSO 24 V</td>
+      <td>66 mA</td>
+      <td>4 kHz</td>
+      <td>4 mA @ 200 Hz</td>
+    </tr>
+    <tr>
+      <td>PROP_CH2</td>
+      <td>FCV</td>
+      <td>Parker VSO MaxFlow 24 V</td>
+      <td>66 mA</td>
+      <td>4 kHz</td>
+      <td>4 mA @ 200 Hz</td>
+    </tr>
+    <tr>
+      <td>PROP_CH3</td>
+      <td>LSV</td>
+      <td>Parker VSO MaxFlow 24 V</td>
+      <td>66 mA</td>
+      <td>4 kHz</td>
+      <td>4 mA @ 200 Hz</td>
+    </tr>
+    <tr>
+      <td>PROP_CH4</td>
+      <td>SPV_H</td>
+      <td>Parker LM-Pro 24 V</td>
+      <td>115 mA</td>
+      <td>4 kHz</td>
+      <td>1 mA @ 50 Hz (telemetry)</td>
+    </tr>
+    <tr>
+      <td>PROP_CH5</td>
+      <td>GFV</td>
+      <td>Parker LM-Pro 24 V</td>
+      <td>115 mA</td>
+      <td>4 kHz</td>
+      <td>1 mA @ 50 Hz (telemetry)</td>
+    </tr>
+  </tbody>
+</table></div>
+<h3 id="33-sev--pseudo-proportional-via-max22200">
+  
+  
+    <a href="#33-sev--pseudo-proportional-via-max22200" class="anchor-heading" aria-labelledby="33-sev--pseudo-proportional-via-max22200"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> 3.3 SEV — pseudo-proportional via MAX22200
+  
+  
+</h3>
+    
+
+<p>SEV is a Parker VSO proportional valve, but because precise control is not
+required at this site we route it through MAX22200 instead of taking up a
+TLE92466ED channel. The driver mode is <code class="language-plaintext highlighter-rouge">VariableCurrent</code>:</p>
+
+<ul>
+  <li>Every Apply() pushes <code class="language-plaintext highlighter-rouge">ConfigureSolenoidCdr(target_ma, target_ma, hit_time = 0)</code>.</li>
+  <li>With <code class="language-plaintext highlighter-rouge">hit_time = 0</code> the MAX22200 skips the hit phase; the channel runs
+at a steady current equal to the requested setpoint.</li>
+  <li>Resolution is 7-bit (≈ 128 steps over 0..IFS); for SEV’s 0..66 mA range
+that’s ~0.5 mA per step — more than enough for opening-percentage
+control.</li>
+  <li>DPM and HHF are disabled for SEV (no hit phase to check; the dip
+signature DPM looks for is for binary on/off solenoids).</li>
+</ul>
+<h3 id="34-per-valve-atomic-state-valveh">
+  
+  
+    <a href="#34-per-valve-atomic-state-valveh" class="anchor-heading" aria-labelledby="34-per-valve-atomic-state-valveh"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> 3.4 Per-valve atomic state (<code class="language-plaintext highlighter-rouge">Valve.h</code>)
+  
+  
+</h3>
+    
+
+<p>Every valve carries:</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code><div class="table-wrapper"><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+</pre></td><td class="rouge-code"><pre>target_pos_         atomic&lt;float&gt;     — last setpoint requested (0..1)
+target_dirty_       atomic&lt;bool&gt;      — pending application?
+actual_pos_         atomic&lt;float&gt;     — last position the control thread set
+state_              atomic&lt;ValveState&gt;— Idle / Active / Faulted / …
+last_error_         atomic&lt;hf_valve_err_t&gt;
+apply_count_        atomic&lt;uint32_t&gt;
+apply_error_count_  atomic&lt;uint32_t&gt;
+fault_count_        atomic&lt;uint32_t&gt;
+last_fault_tick_ms_ atomic&lt;uint64_t&gt;
+</pre></td></tr></tbody></table></div></code></pre></div></div>
+
+<p>All <code class="language-plaintext highlighter-rouge">Get*</code> accessors use <code class="language-plaintext highlighter-rouge">memory_order_acquire</code>; the control / diagnostics
+threads use <code class="language-plaintext highlighter-rouge">memory_order_release</code> on their writes. A single load yields a
+self-consistent snapshot — control loops never need a mutex.</p>
+<h3 id="35-application-api">
+  
+  
+    <a href="#35-application-api" class="anchor-heading" aria-labelledby="35-application-api"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> 3.5 Application API
+  
+  
+</h3>
+    
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><div class="table-wrapper"><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+</pre></td><td class="rouge-code"><pre><span class="k">auto</span><span class="o">&amp;</span> <span class="n">sys</span> <span class="o">=</span> <span class="n">manifold_valves</span><span class="o">::</span><span class="n">ManifoldValves</span><span class="o">::</span><span class="n">GetInstance</span><span class="p">();</span>
+
+<span class="c1">// Binary solenoid:</span>
+<span class="n">sys</span><span class="p">.</span><span class="n">Get</span><span class="p">(</span><span class="n">manifold_valves</span><span class="o">::</span><span class="n">SolenoidId</span><span class="o">::</span><span class="n">OLV_1</span><span class="p">).</span><span class="n">RequestState</span><span class="p">(</span><span class="nb">true</span><span class="p">);</span>
+<span class="kt">bool</span> <span class="n">actual_on</span> <span class="o">=</span> <span class="n">sys</span><span class="p">.</span><span class="n">Get</span><span class="p">(</span><span class="n">manifold_valves</span><span class="o">::</span><span class="n">SolenoidId</span><span class="o">::</span><span class="n">OLV_1</span><span class="p">).</span><span class="n">IsActuallyEnergised</span><span class="p">();</span>
+
+<span class="c1">// Pseudo-proportional solenoid (SEV via MAX22200 CDR):</span>
+<span class="n">sys</span><span class="p">.</span><span class="n">Get</span><span class="p">(</span><span class="n">manifold_valves</span><span class="o">::</span><span class="n">SolenoidId</span><span class="o">::</span><span class="n">SEV</span><span class="p">).</span><span class="n">RequestPosition</span><span class="p">(</span><span class="mf">0.42</span><span class="n">f</span><span class="p">);</span>   <span class="c1">// 0..1</span>
+
+<span class="c1">// Precision proportional (TLE92466ED):</span>
+<span class="n">sys</span><span class="p">.</span><span class="n">Get</span><span class="p">(</span><span class="n">manifold_valves</span><span class="o">::</span><span class="n">ProportionalId</span><span class="o">::</span><span class="n">FCV</span><span class="p">).</span><span class="n">RequestPosition</span><span class="p">(</span><span class="mf">0.42</span><span class="n">f</span><span class="p">);</span>
+<span class="kt">float</span> <span class="n">actual</span> <span class="o">=</span> <span class="n">sys</span><span class="p">.</span><span class="n">Get</span><span class="p">(</span><span class="n">manifold_valves</span><span class="o">::</span><span class="n">ProportionalId</span><span class="o">::</span><span class="n">FCV</span><span class="p">).</span><span class="n">GetActualPosition</span><span class="p">();</span>
+
+<span class="c1">// Per-valve diagnostic snapshot:</span>
+<span class="k">auto</span> <span class="n">sol_snap</span> <span class="o">=</span> <span class="n">sys</span><span class="p">.</span><span class="n">Get</span><span class="p">(</span><span class="n">manifold_valves</span><span class="o">::</span><span class="n">SolenoidId</span><span class="o">::</span><span class="n">OLV_1</span><span class="p">).</span><span class="n">Snapshot</span><span class="p">();</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">sol_snap</span><span class="p">.</span><span class="n">plunger_movement_fault</span><span class="p">)</span> <span class="p">{</span> <span class="cm">/* handle stuck valve */</span> <span class="p">}</span>
+
+<span class="k">auto</span> <span class="n">pro_snap</span> <span class="o">=</span> <span class="n">sys</span><span class="p">.</span><span class="n">Get</span><span class="p">(</span><span class="n">manifold_valves</span><span class="o">::</span><span class="n">ProportionalId</span><span class="o">::</span><span class="n">FCV</span><span class="p">).</span><span class="n">Snapshot</span><span class="p">();</span>
+<span class="kt">uint16_t</span> <span class="n">avg_current</span> <span class="o">=</span> <span class="n">pro_snap</span><span class="p">.</span><span class="n">average_current_raw</span><span class="p">;</span>   <span class="c1">// live measured</span>
+
+<span class="c1">// Subsystem-wide health (run by ManifoldValvesDiagnosticsThread):</span>
+<span class="k">auto</span> <span class="n">sub</span> <span class="o">=</span> <span class="n">valve_diag</span><span class="p">.</span><span class="n">GetSnapshot</span><span class="p">();</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">sub</span><span class="p">.</span><span class="n">tle_vbat_uv</span> <span class="o">||</span> <span class="n">sub</span><span class="p">.</span><span class="n">max_undervoltage</span><span class="p">)</span> <span class="p">{</span> <span class="cm">/* supply problem */</span> <span class="p">}</span>
+</pre></td></tr></tbody></table></div></code></pre></div></div>
+
+<p>All <code class="language-plaintext highlighter-rouge">Request*</code> and <code class="language-plaintext highlighter-rouge">Get*</code> calls are lock-free. The actual SPI traffic
+happens on the next iteration of the control / diagnostics threads.</p><hr />
+<h2 id="4-diagnostics-for-medical-device-safety">
+  
+  
+    <a href="#4-diagnostics-for-medical-device-safety" class="anchor-heading" aria-labelledby="4-diagnostics-for-medical-device-safety"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> 4. Diagnostics for medical-device safety
+  
+  
+</h2>
+    
+
+<p>The diagnostics thread surfaces every flag the chip can publish — not just
+“any fault” booleans. This is what allows the application layer to make
+informed safety decisions:</p>
+<h3 id="41-active-diagnostics--react-in-software">
+  
+  
+    <a href="#41-active-diagnostics--react-in-software" class="anchor-heading" aria-labelledby="41-active-diagnostics--react-in-software"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> 4.1 Active diagnostics — react in software
+  
+  
+</h3>
+    
+
+<div class="table-wrapper"><table>
+  <thead>
+    <tr>
+      <th>Signal</th>
+      <th>Meaning</th>
+      <th>Recommended response</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Solenoid.plunger_movement_fault</code></td>
+      <td>Plunger did not move under load</td>
+      <td>Mark valve mechanically stuck; alarm; safe-state the system.</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Solenoid.hit_not_reached</code></td>
+      <td>HIT current never achieved within tHIT</td>
+      <td>Coil drift, supply sag or open coil. Re-attempt; alarm if persistent.</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Solenoid.open_load</code></td>
+      <td>No load current path</td>
+      <td>Disconnected coil or wire. Disable channel, alarm.</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Solenoid.overcurrent</code></td>
+      <td>Short to supply or shorted coil</td>
+      <td>Disable immediately; latch.</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Proportional.short_to_ground</code></td>
+      <td>Short to ground</td>
+      <td>Latched fault.</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Proportional.over_temperature</code></td>
+      <td>Channel die over-temp</td>
+      <td>Reduce setpoint; back-off duty; alarm.</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Proportional.current_regulation_warning</code></td>
+      <td>Loop can’t track current setpoint</td>
+      <td>Investigate wiring, supply, dither tuning.</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Subsystem.tle_vbat_uv</code> / <code class="language-plaintext highlighter-rouge">_ov</code></td>
+      <td>Supply rail UV/OV</td>
+      <td>Stop actuating; raise system alarm.</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Subsystem.tle_spi_wd_error</code></td>
+      <td>SPI watchdog tripped</td>
+      <td>Communication is failing; latch and re-init.</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Subsystem.tle_reg_ecc_err</code> / <code class="language-plaintext highlighter-rouge">tle_otp_ecc_err</code></td>
+      <td>Register / OTP memory error</td>
+      <td>Treat as hard failure; latch.</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Subsystem.max_undervoltage</code> (UVM)</td>
+      <td>MAX22200 supply UV at boot or runtime</td>
+      <td>Re-read STATUS at init clears it; runtime UV is an alarm.</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Subsystem.max_communication_error</code></td>
+      <td>SPI error detected by MAX22200</td>
+      <td>Re-init; alarm if persistent.</td>
+    </tr>
+  </tbody>
+</table></div>
+<h3 id="42-preventive-features-configured-at-startup">
+  
+  
+    <a href="#42-preventive-features-configured-at-startup" class="anchor-heading" aria-labelledby="42-preventive-features-configured-at-startup"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> 4.2 Preventive features (configured at startup)
+  
+  
+</h3>
+    
+
+<ul>
+  <li><strong>Slew-rate control</strong> enabled by default on every solenoid → cleaner
+switching edges, lower EMI, less acoustic clicking.</li>
+  <li><strong>Open-load detection</strong> enabled on every channel → catches a
+disconnected coil before it hides a real safety event.</li>
+  <li><strong>Hit-current check (HHF)</strong> enabled on every binary solenoid → if the
+hit current isn’t reached within tHIT we know the solenoid never
+energised.</li>
+  <li><strong>DPM (plunger movement)</strong> enabled on all 5 binary cartridge solenoids.
+Tuned via <code class="language-plaintext highlighter-rouge">ConfigureGlobalDpm(30 mA, 8 mA, 0.5 ms)</code> at boot — adjust
+per the actual mechanical signature.</li>
+  <li><strong>OLSG warning</strong> on every TLE92466 channel → early indication of
+open-load / short-to-ground precursors.</li>
+  <li><strong>CRC + SPI watchdog + clock watchdog</strong> on TLE92466ED globally
+(configured by <code class="language-plaintext highlighter-rouge">Flux::ValveManager</code> on init).</li>
+</ul><hr />
+<h2 id="5-failure--degraded-mode-behaviour">
+  
+  
+    <a href="#5-failure--degraded-mode-behaviour" class="anchor-heading" aria-labelledby="5-failure--degraded-mode-behaviour"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> 5. Failure / degraded-mode behaviour
+  
+  
+</h2>
+    
+
+<p>If <code class="language-plaintext highlighter-rouge">Flux::ValveManager</code> fails to bring up either driver IC (the WH bench
+in its current state shows exactly this — the hardware isn’t connected):</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">ValveManager::IsInitialized()</code> returns <code class="language-plaintext highlighter-rouge">false</code>.</li>
+  <li><code class="language-plaintext highlighter-rouge">ManifoldValvesControlThread</code> keeps stepping but skips <code class="language-plaintext highlighter-rouge">Apply()</code> calls.</li>
+  <li><code class="language-plaintext highlighter-rouge">ManifoldValvesDiagnosticsThread</code> reports <code class="language-plaintext highlighter-rouge">manager_ready = false</code> and zeroes the
+per-driver readiness flags / fault snapshots.</li>
+  <li>All <code class="language-plaintext highlighter-rouge">Valve::Get*</code> accessors keep returning the last-published soft
+state (<code class="language-plaintext highlighter-rouge">Uninitialized</code> / 0 / <code class="language-plaintext highlighter-rouge">VALVE_SUCCESS</code>).</li>
+</ul>
+
+<p>This means an outer control loop can be developed and unit-tested against
+the same atomic API even when the valve hardware isn’t wired up.</p><hr />
+<h2 id="6-boot-self-test-manifoldvalvesselftest">
+  
+  
+    <a href="#6-boot-self-test-manifoldvalvesselftest" class="anchor-heading" aria-labelledby="6-boot-self-test-manifoldvalvesselftest"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> 6. Boot self-test (<code class="language-plaintext highlighter-rouge">ManifoldValvesSelfTest</code>)
+  
+  
+</h2>
+    
+
+<p>Every boot, after the pressure thread is calibrated and the valve control +
+diagnostics threads are running, the application calls
+<code class="language-plaintext highlighter-rouge">ManifoldValvesSelfTest::Run()</code>. This single function:</p>
+
+<ol>
+  <li><strong>Walks every solenoid in the catalog</strong> (<code class="language-plaintext highlighter-rouge">SolenoidId::OLV_2 → AVV</code>) and:
+    <ul>
+      <li>Prints a banner (“Connect ONLY SOL ‘<label>’ …”) with a configurable
+prompt countdown so the operator can move the manifold tube.</label></li>
+      <li>Cycles the channel <code class="language-plaintext highlighter-rouge">solenoid_cycles</code> × (ON <code class="language-plaintext highlighter-rouge">solenoid_on_ms</code> / OFF
+<code class="language-plaintext highlighter-rouge">solenoid_off_ms</code>) — exact same test pattern as the
+<code class="language-plaintext highlighter-rouge">c21_cycle_test.cpp</code> example in the MAX22200 driver.</li>
+      <li>After each ON/OFF transition waits two full diagnostics-thread sweeps
+and logs a per-channel snapshot (<code class="language-plaintext highlighter-rouge">tgt</code>, <code class="language-plaintext highlighter-rouge">act</code>, state, OCP / HHF / OLF /
+DPM flags, sticky <code class="language-plaintext highlighter-rouge">fc</code>).</li>
+    </ul>
+  </li>
+  <li><strong>Walks every proportional in the catalog</strong> (<code class="language-plaintext highlighter-rouge">ProportionalId::FRV → GFV</code>)
+and:
+    <ul>
+      <li>Prompts the operator (same pattern).</li>
+      <li>Ramps <code class="language-plaintext highlighter-rouge">0 → full-flow → 0</code> in <code class="language-plaintext highlighter-rouge">proportional_steps</code> increments with a
+<code class="language-plaintext highlighter-rouge">proportional_settle_ms</code> settle between each setpoint — same pattern as
+the <code class="language-plaintext highlighter-rouge">lm_pro_cycle_test.cpp</code> example in the TLE92466ED driver.</li>
+      <li>Logs the chip’s live telemetry at every step: commanded current,
+<code class="language-plaintext highlighter-rouge">FB_I_AVG</code> raw, <code class="language-plaintext highlighter-rouge">FB_DC</code> raw, <code class="language-plaintext highlighter-rouge">last_err</code>, every fault flag and every
+warning.</li>
+    </ul>
+  </li>
+  <li><strong>Aggregates a per-valve PASS/FAIL</strong> based on:
+    <ul>
+      <li><code class="language-plaintext highlighter-rouge">apply_error_count_</code> delta (ANY non-success Apply during the cycle).</li>
+      <li><code class="language-plaintext highlighter-rouge">fault_count_</code> delta (any per-channel fault flag set during the cycle).</li>
+      <li>The most recent diagnostic snapshot (<code class="language-plaintext highlighter-rouge">Snapshot::any_fault()</code>).
+The summary block at the end prints OK / FAIL plus a one-line fault
+description for each valve.</li>
+    </ul>
+  </li>
+</ol>
+<h3 id="61-operator-workflow-on-a-manifold-limited-rig">
+  
+  
+    <a href="#61-operator-workflow-on-a-manifold-limited-rig" class="anchor-heading" aria-labelledby="61-operator-workflow-on-a-manifold-limited-rig"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> 6.1 Operator workflow on a manifold-limited rig
+  
+  
+</h3>
+    
+
+<p>The bench can only mechanically attach <strong>one valve to the manifold at a
+time</strong>. The defaults (<code class="language-plaintext highlighter-rouge">prompt_wait_ms = 3000</code>, <code class="language-plaintext highlighter-rouge">inter_valve_pause_ms = 4000</code>)
+are tuned for that workflow:</p>
+
+<div class="table-wrapper"><table>
+  <thead>
+    <tr>
+      <th>Phase</th>
+      <th>Duration</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Per-valve operator prompt</td>
+      <td>3 s</td>
+    </tr>
+    <tr>
+      <td>Per-valve test (solenoid)</td>
+      <td>~12 s (3 × on/off cycles)</td>
+    </tr>
+    <tr>
+      <td>Per-valve test (proportional)</td>
+      <td>~5 s   (22 ramp setpoints × 0.15 s)</td>
+    </tr>
+    <tr>
+      <td>Pause between valves</td>
+      <td>4 s</td>
+    </tr>
+    <tr>
+      <td><strong>Full sweep</strong> (7 sol + 6 prop)</td>
+      <td><strong>≈ 3 min</strong></td>
+    </tr>
+  </tbody>
+</table></div>
+
+<p>Tweak the constants in <code class="language-plaintext highlighter-rouge">MakeSelfTestPlan()</code> at the top of
+<code class="language-plaintext highlighter-rouge">manifold_valves_pressure_control.cpp</code> to:</p>
+<ul>
+  <li>skip valves that are not yet stocked (set the <code class="language-plaintext highlighter-rouge">enable_*</code> flag to <code class="language-plaintext highlighter-rouge">false</code>);</li>
+  <li>shorten / lengthen the pulse profiles or ramp resolution;</li>
+  <li>disable the operator prompt (<code class="language-plaintext highlighter-rouge">prompt_wait_ms = 0</code>) for fully unattended
+runs.</li>
+</ul>
+
+<p>To skip the self-test entirely set
+<code class="language-plaintext highlighter-rouge">kRunSelfTestAtBoot = false</code> at the top of the same file.</p>
+<h3 id="62-what-the-self-test-catches">
+  
+  
+    <a href="#62-what-the-self-test-catches" class="anchor-heading" aria-labelledby="62-what-the-self-test-catches"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> 6.2 What the self-test catches
+  
+  
+</h3>
+    
+
+<p>The self-test is the cheapest way to <strong>catch a stuck plunger, an unconnected
+coil, a damaged driver IC, or an audibly dead solenoid</strong> before the rig
+starts running pressure-control loops. Specifically:</p>
+
+<div class="table-wrapper"><table>
+  <thead>
+    <tr>
+      <th>Symptom</th>
+      <th>Catalog check that surfaces it</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Coil disconnected / connector reversed</td>
+      <td><code class="language-plaintext highlighter-rouge">open_load</code> / <code class="language-plaintext highlighter-rouge">open_load_short_ground</code> flag, <code class="language-plaintext highlighter-rouge">last_err = "Open load detected"</code></td>
+    </tr>
+    <tr>
+      <td>Coil shorted to GND</td>
+      <td><code class="language-plaintext highlighter-rouge">short_to_ground</code> flag (TLE92466ED)</td>
+    </tr>
+    <tr>
+      <td>Plunger stuck in valve seat</td>
+      <td><code class="language-plaintext highlighter-rouge">plunger_movement_fault</code> (MAX22200 DPM)</td>
+    </tr>
+    <tr>
+      <td>Solenoid hit current never reached</td>
+      <td><code class="language-plaintext highlighter-rouge">hit_not_reached</code> (MAX22200 HHF)</td>
+    </tr>
+    <tr>
+      <td>TLE chip not in correct mode</td>
+      <td><code class="language-plaintext highlighter-rouge">last_err = "Operation not allowed in mode"</code> (Apply-time error count)</td>
+    </tr>
+    <tr>
+      <td>Supply browning out</td>
+      <td><code class="language-plaintext highlighter-rouge">SubsystemFaultSnapshot.max_undervoltage</code> / <code class="language-plaintext highlighter-rouge">tle_vbat_uv</code></td>
+    </tr>
+    <tr>
+      <td>TLE PWM regulation can’t track</td>
+      <td><code class="language-plaintext highlighter-rouge">pwm_regulation_warning</code></td>
+    </tr>
+    <tr>
+      <td>TLE current loop can’t track</td>
+      <td><code class="language-plaintext highlighter-rouge">current_regulation_warning</code></td>
+    </tr>
+    <tr>
+      <td>Over-temperature, ECC error</td>
+      <td><code class="language-plaintext highlighter-rouge">over_temperature</code> / <code class="language-plaintext highlighter-rouge">ot_warning</code> / <code class="language-plaintext highlighter-rouge">tle_reg_ecc_err</code></td>
+    </tr>
+  </tbody>
+</table></div>
+
+<blockquote>
+  <p>⚠️  <strong>Configuration-Mode round-trip:</strong> Each <code class="language-plaintext highlighter-rouge">ProportionalValve</code> enters
+Configuration Mode, pushes its <code class="language-plaintext highlighter-rouge">ChannelConfig</code> + PWM + dither, then
+re-enters Mission Mode. This is required because the TLE92466ED rejects
+any <code class="language-plaintext highlighter-rouge">CH_x_CTRL</code> write while in Mission Mode and the handler enters
+Mission Mode at init time. Skipping this round-trip is what produced the
+infamous “every Apply returns Operation-not-allowed-in-mode” symptom.</p>
+</blockquote><hr />
+<h2 id="7-extension-recipes">
+  
+  
+    <a href="#7-extension-recipes" class="anchor-heading" aria-labelledby="7-extension-recipes"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> 7. Extension recipes
+  
+  
+</h2>
+    
+<h3 id="61-add-a-binary-solenoid">
+  
+  
+    <a href="#61-add-a-binary-solenoid" class="anchor-heading" aria-labelledby="61-add-a-binary-solenoid"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> 6.1 Add a binary solenoid
+  
+  
+</h3>
+    
+
+<ol>
+  <li>Add an enumerator in <code class="language-plaintext highlighter-rouge">manifold_valves::SolenoidId</code> before <code class="language-plaintext highlighter-rouge">Count</code>.</li>
+  <li>Append a row in <code class="language-plaintext highlighter-rouge">kSolenoidMap</code> referencing one of the <code class="language-plaintext highlighter-rouge">kSpec*</code> model
+structs and an unused <code class="language-plaintext highlighter-rouge">ValveChannel::SOL_CHn</code>.</li>
+</ol>
+<h3 id="62-add-a-pseudo-proportional-via-max22200">
+  
+  
+    <a href="#62-add-a-pseudo-proportional-via-max22200" class="anchor-heading" aria-labelledby="62-add-a-pseudo-proportional-via-max22200"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> 6.2 Add a pseudo-proportional via MAX22200
+  
+  
+</h3>
+    
+
+<p>Same as above, but:</p>
+<ul>
+  <li>pick <code class="language-plaintext highlighter-rouge">SolenoidDriveMode::VariableCurrent</code>,</li>
+  <li>use a model spec with <code class="language-plaintext highlighter-rouge">full_flow_current_ma</code> set and
+<code class="language-plaintext highlighter-rouge">hit_current_ma = hold_current_ma = 0</code>,</li>
+  <li>disable <code class="language-plaintext highlighter-rouge">plunger_movement_detection</code> and <code class="language-plaintext highlighter-rouge">hit_current_check</code> in the
+channel features (the current waveform in continuous-current mode is
+not what those algorithms were designed for).</li>
+</ul>
+<h3 id="63-add-a-precision-proportional">
+  
+  
+    <a href="#63-add-a-precision-proportional" class="anchor-heading" aria-labelledby="63-add-a-precision-proportional"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> 6.3 Add a precision proportional
+  
+  
+</h3>
+    
+
+<ol>
+  <li>Add an enumerator in <code class="language-plaintext highlighter-rouge">manifold_valves::ProportionalId</code> before <code class="language-plaintext highlighter-rouge">Count</code> (TLE92466
+has 6 channels — if you exceed that you need a second IC).</li>
+  <li>Append a row in <code class="language-plaintext highlighter-rouge">kProportionalMap</code> with the right model spec and
+feature gates.</li>
+</ol>
+<h3 id="64-use-a-different-model">
+  
+  
+    <a href="#64-use-a-different-model" class="anchor-heading" aria-labelledby="64-use-a-different-model"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> 6.4 Use a different model
+  
+  
+</h3>
+    
+
+<p>Edit (or add) a <code class="language-plaintext highlighter-rouge">SolenoidModelSpec</code> / <code class="language-plaintext highlighter-rouge">ProportionalModelSpec</code> literal at
+the top of <code class="language-plaintext highlighter-rouge">ManifoldValvesCatalog.h</code>, then point the relevant table row at it.
+Only the catalog file changes.</p>
+<h3 id="65-re-tune-diagnostics">
+  
+  
+    <a href="#65-re-tune-diagnostics" class="anchor-heading" aria-labelledby="65-re-tune-diagnostics"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> 6.5 Re-tune diagnostics
+  
+  
+</h3>
+    
+
+<ul>
+  <li>DPM parameters: <code class="language-plaintext highlighter-rouge">ManifoldValves::ConfigureGlobalDpm(start, dip, debounce)</code>.
+Default 30 mA / 8 mA / 0.5 ms tuned for the C21 hold band; adjust per
+the actual mechanical signature.</li>
+  <li>Per-channel feature gates: edit the <code class="language-plaintext highlighter-rouge">Max22200ChannelFeatures</code> /
+<code class="language-plaintext highlighter-rouge">Tle92466ChannelFeatures</code> row in the bench map.</li>
+  <li>Diagnostics thread cadence: <code class="language-plaintext highlighter-rouge">ManifoldValvesDiagnosticsThread::SetPeriodMs(n)</code> —
+default 100 ms, drop to 20 ms for closer monitoring or raise to 500 ms
+to lighten SPI load.</li>
+</ul><hr />
+<h2 id="8-files-in-this-folder">
+  
+  
+    <a href="#8-files-in-this-folder" class="anchor-heading" aria-labelledby="8-files-in-this-folder"><svg viewBox="0 0 16 16" aria-hidden="true"><use xlink:href="#svg-link"></use></svg></a> 8. Files in this folder
+  
+  
+</h2>
+    
+
+<div class="table-wrapper"><table>
+  <thead>
+    <tr>
+      <th>File</th>
+      <th>Purpose</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">manifold_valves_pressure_control.cpp</code></td>
+      <td>App entry: brings up Flux, calibrates pressure sensors, configures DPM, starts control + diagnostics threads.</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">PressureSensorConfig.h</code></td>
+      <td>Sensor enums + ratiometric range + calibration config types.</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">PressureSensor.{h,cpp}</code></td>
+      <td>Per-channel pressure sensor: IIR filter, atomic publish.</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">PressureSensorThread.{h,cpp}</code></td>
+      <td>1 kHz BaseThread + Auto-1 ADS7952 batch read.</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">ManifoldValvesCatalog.h</code></td>
+      <td>Compile-time enums + Parker valve datasheet specs + bench map + per-channel diagnostic feature gates.</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">Valve.h</code></td>
+      <td>Base valve class (atomic state, dirty flag, snapshot types).</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">SolenoidValve.h</code></td>
+      <td>MAX22200-driven valve — handles BinaryHitHold and VariableCurrent modes; decodes per-channel OCP/HHF/OLF/DPM.</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">ProportionalValve.h</code></td>
+      <td>TLE92466ED-driven precision proportional; full per-channel ChannelDiagnostics surfacing.</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">ManifoldValves.h</code></td>
+      <td>Singleton container, O(1) lookup, iteration helpers, <code class="language-plaintext highlighter-rouge">ConfigureGlobalDpm</code>.</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">ManifoldValvesControlThread.h</code></td>
+      <td>100 Hz BaseThread that pushes dirty setpoints.</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">ManifoldValvesDiagnosticsThread.h</code></td>
+      <td>10 Hz BaseThread; per-valve + per-driver-IC fault decoding into <code class="language-plaintext highlighter-rouge">SubsystemFaultSnapshot</code>.</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">ManifoldValvesSelfTest.h</code></td>
+      <td>Boot-time per-valve cycler — solenoid ON/OFF and proportional 0→full→0 ramps with full diagnostic capture. Header-only; configured from <code class="language-plaintext highlighter-rouge">MakeSelfTestPlan()</code> in the app entry.</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">README.md</code></td>
+      <td>This document.</td>
+    </tr>
+  </tbody>
+</table></div>
+
+          
+
+          
+            
+          
+        </main>
+        
+<hr>
+<footer>
+  
+
+  <!-- Custom footer for hf-hal-flux-v1 docs -->
+<div class="site-footer">
+  <p>
+    <strong>HF HAL Flux v1</strong> — Motor control HAL for ESP32-C6
+    &middot;
+    <a href="https://github.com/hardfoc/hf-hal-flux-v1">GitHub</a>
+    &middot;
+    <a href="/hf-hal-flux-v1/development/LICENSE">License (GPL v3)</a>
+  </p>
+  <p>
+    <small>
+      Built with <a href="https://just-the-docs.com">Just the Docs</a>
+      &middot;
+      Powered by <a href="https://pages.github.com">GitHub Pages</a>
+    </small>
+  </p>
+</div>
+
+
+  <div class="d-md-none mt-4 fs-2">
+    
+    
+      This site uses <a href="https://github.com/just-the-docs/just-the-docs">Just the Docs</a>, a documentation theme for Jekyll.
+    
+  </div>
+</footer>
+
+      </div>
+    </div>
+    
+      
+<button id="search-button" class="search-button btn-reset" aria-label="Focus on search">
+  <svg viewBox="0 0 24 24" class="icon" aria-hidden="true"><use xlink:href="#svg-search"></use></svg>
+</button>
+
+
+<div class="search-overlay"></div>
+
+    
+  </div>
+
+  
+</body>
+</html>
+

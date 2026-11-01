@@ -1,0 +1,15 @@
+<map id="LedManager::IndicateWarning" name="LedManager::IndicateWarning">
+<area shape="rect" id="Node000001" title="Show the warning indicator (yellow blink)." alt="" coords="5,109,220,137"/>
+<area shape="rect" id="Node000002" href="$classLedManager.html#a6e36bf7b11956c56582ce34da47d08ba" title="Start a named animation with an optional base colour." alt="" coords="268,109,475,137"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="220,121,254,122,249,124,221,126"/>
+<area shape="rect" id="Node000003" href="$namespaceLedColors.html#ae2a97d61b4ffac876640780401177e7f" title="Pure blue." alt="" coords="532,5,660,33"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="397,106,522,43,537,40,542,38,524,48,399,111"/>
+<area shape="rect" id="Node000004" href="$namespaceLedColors.html#a10b798abecc127d3529e0fa597426e6a" title="Pure green." alt="" coords="527,57,665,85"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="434,106,521,88,516,90,435,111"/>
+<area shape="rect" id="Node000005" href="$namespaceLedColors.html#a967d5a1dfb0d78523c126b564050f55c" title="Purple." alt="" coords="524,109,668,137"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="475,121,512,123,506,124,476,126"/>
+<area shape="rect" id="Node000006" href="$namespaceLedColors.html#af4d56375fdebf6240c7690d7f8e8f1fe" title="Pure red." alt="" coords="536,161,656,189"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="435,135,524,158,518,158,434,140"/>
+<area shape="rect" id="Node000007" href="$namespaceLedColors.html#a884ae4aac5589990c381e97c734283d8" title="Yellow." alt="" coords="523,213,669,241"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="399,135,524,198,542,208,537,207,522,203,398,140"/>
+</map>
