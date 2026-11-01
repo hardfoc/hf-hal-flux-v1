@@ -1,0 +1,95 @@
+# ValveManager
+
+The reason the board exists. One API for fourteen valve channels on two different driver chips: eight on/off
+solenoid channels on the MAX22200 and six proportional channels on the TLE92466ED. Source:
+[`ValveManager.h`](../../lib/managers/ValveManager.h).
+
+## Channels
+
+| `ValveChannel` | Chip | Hardware channel | Control |
+| --- | --- | --- | --- |
+| `SOL_CH0` ... `SOL_CH7` | MAX22200 | 0-7 | On / off with a hit phase and a hold phase, set by current (CDR) or by duty (VDR) |
+| `PROP_CH0` ... `PROP_CH5` | TLE92466ED | 0-5 | Regulated coil current in mA, with PWM frequency and dither |
+
+The table is `kValveChannelMap` in the header; `FindChannel("SOL_CH3")` turns a name into a channel.
+
+## API
+
+| Call | Channels | Notes |
+| --- | --- | --- |
+| `EnableChannel(ch)`, `DisableChannel(ch)` | all | Switch one output |
+| `EnableChannelsMask(uint16_t mask)` | all | Bits 0-7 solenoids, bits 8-13 proportional |
+| `DisableAllChannels()` | all | |
+| `IsChannelEnabled(ch)` | all | From the manager's channel state |
+| `ConfigureSolenoidCdr(ch, hit_ma, hold_ma, hit_time_ms)` | solenoid | Current drive: hit current, hold current, hit time |
+| `ConfigureSolenoidVdr(ch, hit_duty_pct, hold_duty_pct, hit_time_ms)` | solenoid | Voltage (duty) drive |
+| `SetProportionalCurrent(ch, current_ma)` | proportional | Set-point of the current regulator |
+| `ConfigureProportionalPwm(ch, frequency_hz)` | proportional | Must be > 0 |
+| `ConfigureProportionalDither(ch, amplitude_ma, frequency_hz)` | proportional | Small oscillation that reduces valve stiction |
+| `HasFault()`, `HasSolenoidFault()`, `HasProportionalFault()`, `ClearAllFaults()` | | |
+| `GetSolenoidFaults(max22200::FaultStatus&)`, `GetProportionalFaults(tle92466ed::FaultReport&)` | | Chip-level fault detail |
+| `GetChannelState(ch)` | all | `ValveChannelState`: enabled, configured, current, duty, PWM, dither, counters |
+| `GetMax22200Handler()`, `GetTle92466Handler()` | | The handlers, for chip features not wrapped here (`nullptr` if that chip failed) |
+
+All of them return `hf_valve_err_t` (or `bool`); calling a solenoid-only call on a proportional channel returns
+`VALVE_ERR_CHANNEL_TYPE_MISMATCH`.
+
+## Example: one solenoid and one proportional valve
+
+```cpp
+#include "api/Flux.h"
+#include "esp_log.h"
+#include "managers/ValveManager.h"
+
+auto& flux = Flux::GetInstance();
+if (flux.EnsureInitialized() && flux.valves.IsInitialized()) {
+    auto& valves = flux.valves;
+
+    // Solenoid: 800 mA for 50 ms to pull in, then hold at 200 mA.
+    hf_valve_err_t err = valves.ConfigureSolenoidCdr(ValveChannel::SOL_CH0, 800, 200, 50.0f);
+    if (HfValveErrOk(err)) {
+        err = valves.EnableChannel(ValveChannel::SOL_CH0);
+    }
+
+    // Proportional: 200 Hz PWM, 400 mA set-point.
+    (void)valves.ConfigureProportionalPwm(ValveChannel::PROP_CH0, 200.0f);
+    if (HfValveErrOk(valves.EnableChannel(ValveChannel::PROP_CH0))) {
+        (void)valves.SetProportionalCurrent(ValveChannel::PROP_CH0, 400);
+    }
+
+    if (!HfValveErrOk(err)) {
+        ESP_LOGE("app", "valve: %s", HfValveErrToString(err));
+    }
+}
+```
+
+The [`valve_manager_example`](../examples/index.md) and `valve_cycling_test` apps go further.
+
+## What start-up does
+
+`EnsureInitialized()` brings up comms and GPIO, then tries each chip on its own, so one missing chip never blocks
+the other:
+
+1. **TLE92466ED**: creates the handler, enters mission mode, drives its enable pin, clears the feedback freeze so
+   the per-channel feedback registers update, and sets the supply under- / over-voltage trips to 19 V / 29 V for the
+   24 V valve rail.
+2. **MAX22200**: creates the handler with a 15 kΩ reference resistor (full-scale current 1000 mA).
+
+It succeeds if either chip works and logs which one is missing. Use `GetSystemDiagnostics()` to see
+`max22200_initialized` and `tle92466_initialized`.
+
+## Diagnostics
+
+`GetSystemDiagnostics(ValveSystemDiagnostics&)`: which chips are up, configured and active channels, total
+activations and errors. `GetChannelState(ch)` gives per-channel counters. `DumpStatistics()` logs both.
+
+## Pitfalls
+
+- **Configure, then enable.** A solenoid enabled before `ConfigureSolenoidCdr/Vdr` runs with whatever its
+  channel registers hold.
+- **Currents are limited by the chip setup.** The MAX22200 full scale is 1000 mA with this board's reference
+  resistor; a set-point above it cannot be reached.
+- **`GetLastError()` is not updated.** Use each call's return value (see [Errors](../architecture/errors.md)).
+- **`Flux::Shutdown()` does not turn valves off.** Call `DisableAllChannels()` first.
+- **Valve supply off** looks like a working chip on SPI with no coil current. Check the 24 V rail and
+  `GetProportionalFaults()` (the TLE92466ED reports supply under-voltage).
