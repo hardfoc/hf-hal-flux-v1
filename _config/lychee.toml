@@ -13,4 +13,17 @@ exclude = [
   '^https://hardfoc\.github\.io/hf-hal-flux-v1/.*',
   '^https://github\.com/hardfoc/hf-core-drivers.*',
   '^https://github\.com/hardfoc/hf-core-utils.*',
+  # hf-development-handbook is a private repository: it is not checked out in
+  # CI (update = none in .gitmodules) and returns 404 to anonymous requests.
+  '^https://github\.com/hardfoc/hf-development-handbook.*',
+  '/docs/hf-development-handbook/',
+]
+
+# Only check this repository's own Markdown. Submodules are checked out so that
+# links into them resolve, but their documentation is checked in their own repos.
+exclude_path = [
+  '^lib/core/',
+  '^examples/esp32/scripts/',
+  '^_config/doxygen-extensions/',
+  '^docs/hf-development-handbook/',
 ]

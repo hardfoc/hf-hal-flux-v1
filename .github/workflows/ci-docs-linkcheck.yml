@@ -13,4 +13,6 @@ jobs:
     uses: hardfoc/hf-general-ci-tools/.github/workflows/ru-docs-linkcheck.yml@main
     with:
       paths: "docs/** *.md **/*.md"
+      # Check out submodules so links into lib/core etc. resolve.
+      checkout_recursive: true
       config_file: "_config/lychee.toml"
