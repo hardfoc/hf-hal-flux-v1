@@ -1,0 +1,22 @@
+var searchData=
+[
+  ['va_5fcalibrated_5f_0',['va_calibrated_',['../classPressureSensorCalibrator.html#a71e781cd42f93f2a1adf8b96c9f87d22',1,'PressureSensorCalibrator']]],
+  ['va_5fmax_5fvalid_1',['va_max_valid',['../structCalibrationConfig.html#ac853a509ad1067937c908f0032ffb67d',1,'CalibrationConfig']]],
+  ['va_5fmin_5fvalid_2',['va_min_valid',['../structCalibrationConfig.html#a93268ebb471143c7ee9c86e0f05e0b18',1,'CalibrationConfig']]],
+  ['va_5fnominal_3',['va_nominal',['../structCalibrationConfig.html#a46ce2e3916423f860b16da92adf38052',1,'CalibrationConfig']]],
+  ['valve_5ftotal_5fapply_5ferrors_4',['valve_total_apply_errors',['../structmanifold__valves_1_1SubsystemFaultSnapshot.html#abbf8845d10159f0aba9e1bc6c8c9d2a4',1,'manifold_valves::SubsystemFaultSnapshot']]],
+  ['valve_5ftotal_5ffaults_5',['valve_total_faults',['../structmanifold__valves_1_1SubsystemFaultSnapshot.html#ac76edd7eba429d5411fc7f0d045c6fc7',1,'manifold_valves::SubsystemFaultSnapshot']]],
+  ['valves_6',['valves',['../classFlux.html#a997a164b11b16cdf6a4f51b5deb98bad',1,'Flux']]],
+  ['valves_5finitialized_7',['valves_initialized',['../structFluxSystemDiagnostics.html#a05da4f9f91b7f901e79c06d1ce519645',1,'FluxSystemDiagnostics']]],
+  ['valves_5finitialized_5f_8',['valves_initialized_',['../classFlux.html#ac7c6c6c2bcc0e3d50c02410ea0507d66',1,'Flux']]],
+  ['vbat_5ffeedback_5fraw_9',['vbat_feedback_raw',['../structmanifold__valves_1_1ProportionalDiagSnapshot.html#ab33af740ed967f9f4873f71208bf0c94',1,'manifold_valves::ProportionalDiagSnapshot']]],
+  ['vbat_5ffeedback_5fraw_5f_10',['vbat_feedback_raw_',['../classmanifold__valves_1_1ProportionalValve.html#a04a3658f7689b893456649271d2649b2',1,'manifold_valves::ProportionalValve']]],
+  ['vbat_5funder_5fvoltage_5fseen_11',['vbat_under_voltage_seen',['../structmanifold__valves_1_1ParallelStressPatternResult.html#ac57cada29f37cb75d14be6b18f141217',1,'manifold_valves::ParallelStressPatternResult']]],
+  ['version_12',['version',['../structflux__version_1_1Entry.html#a5219cbe7a99ada601c533b4b9842f32a',1,'flux_version::Entry']]],
+  ['voltage_5fdivider_13',['voltage_divider',['../structAdcEntry.html#a0ff1d6881f8fe31a7fae12cec9f916f6',1,'AdcEntry']]],
+  ['voltage_5ffilt_5fatomic_5f_14',['voltage_filt_atomic_',['../classPressureSensor.html#aeffa38032212850d50d8268153b3b189',1,'PressureSensor']]],
+  ['voltage_5ffilt_5fstate_5f_15',['voltage_filt_state_',['../classPressureSensor.html#afc98a0797c8d78fff600a67bd2ecda34',1,'PressureSensor']]],
+  ['voltage_5fmax_16',['voltage_max',['../structPressureSensorConfig.html#a9c9ac94b56a78f0ef527570a12bace8e',1,'PressureSensorConfig']]],
+  ['voltage_5fmin_17',['voltage_min',['../structPressureSensorConfig.html#a5b3a90b68066d0033427d20247be59d0',1,'PressureSensorConfig']]],
+  ['vref_5fnominal_18',['vref_nominal',['../structCalibrationConfig.html#a52955fbacfb59260356eb5136736a7c6',1,'CalibrationConfig']]]
+];

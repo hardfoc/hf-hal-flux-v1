@@ -1,0 +1,11 @@
+<map id="TemperatureManager::Initialize" name="TemperatureManager::Initialize">
+<area shape="rect" id="Node000001" title=" " alt="" coords="931,5,1091,50"/>
+<area shape="rect" id="Node000002" href="$classTemperatureManager.html#abacecf9ec508cefbff22be8aec0a85cb" title="Initialise the temperature subsystem if not already initialised." alt="" coords="722,5,883,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="913,28,883,30,883,25,918,28"/>
+<area shape="rect" id="Node000003" href="$classFlux.html#a4157554ef34d3f8b49d07f9f535e28d8" title=" " alt="" coords="479,14,674,42"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="704,28,675,30,675,25,709,28"/>
+<area shape="rect" id="Node000004" href="$classFlux.html#a0d67fb153ddebb59c51eb20ad311cb32" title=" " alt="" coords="219,14,431,42"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="461,28,432,30,431,25,466,28"/>
+<area shape="rect" id="Node000005" href="$classFlux.html#a6c011c136a43dd2d9859dcf7d56571e8" title="Ensure all Flux subsystems are properly initialized." alt="" coords="5,14,171,42"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="200,28,171,30,171,25,206,27"/>
+</map>

@@ -1,0 +1,11 @@
+<map id="TestFramework.h" name="TestFramework.h">
+<area shape="rect" id="Node000001" title="Shared testing framework for ESP32 comprehensive test suites." alt="" coords="245,5,377,33"/>
+<area shape="rect" id="Node000002" href="$flux__api__test_8cpp.html" title="Comprehensive Flux HAL API test suite for ESP32 (noexcept)" alt="" coords="5,81,137,109"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="255,40,115,83,113,78,253,35"/>
+<area shape="rect" id="Node000003" href="$gpio__adc__test_8cpp.html" title="GPIO &amp; ADC focused test for Flux ESP32." alt="" coords="160,81,299,109"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="288,43,245,83,243,78,283,44"/>
+<area shape="rect" id="Node000004" href="$led__temp__test_8cpp.html" title="LED &amp; Temperature focused test for Flux ESP32." alt="" coords="323,81,464,109"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="338,41,382,81,376,80,336,46"/>
+<area shape="rect" id="Node000005" href="$valve__cycling__test_8cpp.html" title="Valve manager focused cycling test for ESP32." alt="" coords="489,81,658,109"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="373,35,529,80,524,81,372,40"/>
+</map>

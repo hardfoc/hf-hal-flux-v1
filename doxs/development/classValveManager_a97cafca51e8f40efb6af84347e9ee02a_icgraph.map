@@ -1,0 +1,5 @@
+<map id="ValveManager::GetProportionalFaults" name="ValveManager::GetProportionalFaults">
+<area shape="rect" id="Node000001" title="Retrieve the TLE92466ED fault report." alt="" coords="270,5,494,50"/>
+<area shape="rect" id="Node000002" href="$classmanifold__valves_1_1ProportionalValve.html#a035087995b600c40519bb8eb2cf6cadf" title="Refresh per&#45;valve diagnostics from the driver IC." alt="" coords="5,5,222,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="252,28,222,30,222,25,257,28"/>
+</map>

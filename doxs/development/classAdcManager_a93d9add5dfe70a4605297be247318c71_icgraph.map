@@ -1,0 +1,12 @@
+<map id="AdcManager::EnsureInitialized" name="AdcManager::EnsureInitialized">
+<area shape="rect" id="Node000001" title="Initialise the ADC subsystem if not already initialised." alt="" coords="693,5,912,33"/>
+<area shape="rect" id="Node000002" href="$classAdcManager.html#a3561cebd5b27e351c066236543a0bc59" title=" " alt="" coords="479,5,645,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="675,28,646,30,646,25,680,28"/>
+<area shape="rect" id="Node000003" href="$classFlux.html#a99371decae4e60cd6db9c40ec38c76d5" title=" " alt="" coords="494,57,631,85"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="723,37,630,59,629,54,718,37"/>
+<area shape="poly" id="edge2_Node000002_Node000001" title=" " alt="" coords="661,8,695,10,690,10,661,13"/>
+<area shape="rect" id="Node000004" href="$classFlux.html#a0d67fb153ddebb59c51eb20ad311cb32" title=" " alt="" coords="219,57,431,85"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="475,71,432,74,431,69,480,71"/>
+<area shape="rect" id="Node000005" href="$classFlux.html#a6c011c136a43dd2d9859dcf7d56571e8" title="Ensure all Flux subsystems are properly initialized." alt="" coords="5,57,171,85"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="200,71,171,74,171,69,206,71"/>
+</map>

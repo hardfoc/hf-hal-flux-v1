@@ -1,0 +1,9 @@
+<map id="example_solenoid_vdr" name="example_solenoid_vdr">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,32,174,60"/>
+<area shape="rect" id="Node000002" href="$ValveManagerExample_8cpp.html#a1adc375ca8066a47d1642ce384f5a5dd" title="Helper: log a valve error result." alt="" coords="222,32,350,60"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="174,43,209,45,203,46,174,48"/>
+<area shape="rect" id="Node000003" href="$ValveManager_8h.html#ae6cff86821790a19053b6f8423493fe7" title="Check if a valve error code indicates success." alt="" coords="415,5,523,33"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="350,34,397,30,402,29,351,39"/>
+<area shape="rect" id="Node000004" href="$ValveManager_8h.html#a255db5fbbcc6babf9a239474d3363b4c" title="Convert hf_valve_err_t to a human&#45;readable description string." alt="" coords="398,57,540,85"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="350,52,385,59,380,59,350,57"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="manifold_valves::ManifoldValves::ForceReconfigureAll" name="manifold_valves::ManifoldValves::ForceReconfigureAll">
+<area shape="rect" id="Node000001" title="Force the next Apply() on every valve to push full configuration first." alt="" coords="255,5,456,50"/>
+<area shape="rect" id="Node000002" href="$classmanifold__valves_1_1ManifoldValvesControlThread.html#a8b71590b0230c49d45bc353c1684c4e9" title=" " alt="" coords="5,5,207,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="236,28,207,30,207,25,242,27"/>
+</map>

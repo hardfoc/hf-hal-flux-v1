@@ -1,0 +1,17 @@
+<map id="manifold_valves::ProportionalValve::ApplyChannelFeatures" name="manifold_valves::ProportionalValve::ApplyChannelFeatures">
+<area shape="rect" id="Node000001" title="Push the model&#39;s per&#45;channel configuration features (open&#45;load detection, slew rate,..." alt="" coords="5,147,222,191"/>
+<area shape="rect" id="Node000002" href="$classValveManager.html#af5d3ff48227b50d552714d1827984748" title="Configure dither for a proportional channel." alt="" coords="286,5,549,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="142,144,199,105,269,67,307,54,303,57,271,71,202,109,146,148"/>
+<area shape="rect" id="Node000003" href="$ValveManager_8h.html#a07104dd82857d7cb8af8bf459645484c" title="Map TLE92466ED DriverError to the unified hf_valve_err_t domain." alt="" coords="613,74,806,102"/>
+<area shape="poly" id="edge8_Node000001_Node000003" title=" " alt="" coords="165,144,215,125,269,110,354,97,441,88,600,84,595,86,442,93,355,102,270,116,217,130,168,148"/>
+<area shape="rect" id="Node000004" href="$classValveManager.html#add98de24d3088ed72710ffc02d366e68" title="Configure PWM frequency for a proportional channel." alt="" coords="270,124,565,152"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="221,156,261,153,256,156,223,161"/>
+<area shape="rect" id="Node000005" href="$classValveManager.html#a0fe999d6f6c8c521ff33a374e3f05a33" title="Get the TLE92466ED handler for advanced proportional operations." alt="" coords="315,176,520,221"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="222,177,301,186,297,188,223,182"/>
+<area shape="rect" id="Node000006" href="$classmanifold__valves_1_1ProportionalValve.html#af397f49fd0b2c5b463ea4b6ea59b678a" title=" " alt="" coords="309,245,526,290"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="165,189,271,230,299,241,293,241,269,236,164,195"/>
+<area shape="rect" id="Node000007" href="$classmanifold__valves_1_1Valve.html#a72e5192b5412af32962c760b8f3ca6dd" title=" " alt="" coords="331,315,504,359"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="135,189,193,246,230,275,271,300,318,320,313,320,268,305,227,279,190,250,134,194"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="529,48,626,70,621,71,530,53"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="501,121,613,104,608,106,502,126"/>
+</map>

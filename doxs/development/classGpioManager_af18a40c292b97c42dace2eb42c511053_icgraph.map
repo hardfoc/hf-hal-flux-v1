@@ -1,0 +1,21 @@
+<map id="GpioManager::GetInstance" name="GpioManager::GetInstance">
+<area shape="rect" id="Node000001" title="Access the singleton instance (Meyers singleton, thread&#45;safe)." alt="" coords="1414,87,1609,114"/>
+<area shape="rect" id="Node000002" href="$GpioManager_8h.html#a71b14f2be8c33e3bef4212f8e768b768" title="Convenience accessor — equivalent to GpioManager::GetInstance()." alt="" coords="1212,5,1343,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1453,81,1319,36,1320,31,1458,81"/>
+<area shape="rect" id="Node000003" href="$classValveManager.html#a8351cec1ba13df5f82b88c59b5ed5fd1" title=" " alt="" coords="962,116,1140,144"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="1396,91,1296,91,1188,98,1141,106,1097,118,1096,113,1140,101,1188,93,1296,86,1402,91"/>
+<area shape="rect" id="Node000008" href="$classValveManager.html#a65a366456425166815040d2415d534d9" title=" " alt="" coords="1188,108,1366,152"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="1401,114,1367,121,1366,116,1396,115"/>
+<area shape="rect" id="Node000009" href="$classValveManager.html#a3f22e9630f0367e73f28487aa375f664" title=" " alt="" coords="1188,177,1366,222"/>
+<area shape="poly" id="edge9_Node000001_Node000009" title=" " alt="" coords="1468,121,1367,167,1338,179,1337,174,1365,162,1462,122"/>
+<area shape="rect" id="Node000004" href="$classValveManager.html#a7a708a5ebc126913968db54b7629aff9" title="Ensure the valve manager system is initialized." alt="" coords="683,116,914,144"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="943,130,914,132,914,127,949,130"/>
+<area shape="rect" id="Node000005" href="$classFlux.html#af36707264a8180cfeb4f7a31247ad66b" title=" " alt="" coords="479,116,635,144"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="665,130,636,132,636,127,670,130"/>
+<area shape="rect" id="Node000006" href="$classFlux.html#a0d67fb153ddebb59c51eb20ad311cb32" title=" " alt="" coords="219,116,431,144"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="461,130,432,132,431,127,466,130"/>
+<area shape="rect" id="Node000007" href="$classFlux.html#a6c011c136a43dd2d9859dcf7d56571e8" title="Ensure all Flux subsystems are properly initialized." alt="" coords="5,116,171,144"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="200,131,172,132,171,127,205,129"/>
+<area shape="poly" id="edge8_Node000008_Node000003" title=" " alt="" coords="1169,130,1141,132,1141,127,1175,130"/>
+<area shape="poly" id="edge10_Node000009_Node000003" title=" " alt="" coords="1185,171,1099,147,1099,142,1190,172"/>
+</map>

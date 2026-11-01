@@ -1,0 +1,13 @@
+<map id="example_animations" name="example_animations">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,84,164,112"/>
+<area shape="rect" id="Node000002" href="$namespaceLedColors.html#af9d26cde1f08d7494de4a09b05454862" title="Cyan." alt="" coords="217,5,345,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="119,81,211,43,231,38,226,40,213,48,121,86"/>
+<area shape="rect" id="Node000003" href="$namespaceLedColors.html#a10b798abecc127d3529e0fa597426e6a" title="Pure green." alt="" coords="212,57,350,85"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="163,85,199,82,194,84,165,90"/>
+<area shape="rect" id="Node000004" href="$LedManagerExample_8cpp.html#ad8363214ca64e804a34524f4ee739b10" title="Helper: log an LED error result." alt="" coords="225,109,337,137"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="164,105,212,113,207,115,164,111"/>
+<area shape="rect" id="Node000006" href="$namespaceLedColors.html#af4d56375fdebf6240c7690d7f8e8f1fe" title="Pure red." alt="" coords="221,161,341,189"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="122,110,213,146,231,155,226,155,211,151,121,115"/>
+<area shape="rect" id="Node000005" href="$LedManager_8h.html#afea8c79ff81c3999d2327928dc5e4fbb" title="Convert a LedError to a human&#45;readable C&#45;string." alt="" coords="398,109,525,137"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="337,121,385,123,380,123,338,126"/>
+</map>

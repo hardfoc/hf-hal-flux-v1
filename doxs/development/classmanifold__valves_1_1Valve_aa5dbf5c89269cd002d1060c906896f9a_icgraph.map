@@ -1,0 +1,9 @@
+<map id="manifold_valves::Valve::RecordFault" name="manifold_valves::Valve::RecordFault">
+<area shape="rect" id="Node000001" title=" " alt="" coords="540,40,713,85"/>
+<area shape="rect" id="Node000002" href="$classmanifold__valves_1_1ProportionalValve.html#a035087995b600c40519bb8eb2cf6cadf" title="Refresh per&#45;valve diagnostics from the driver IC." alt="" coords="276,5,492,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="522,48,493,46,493,41,527,48"/>
+<area shape="rect" id="Node000003" href="$classmanifold__valves_1_1SolenoidValve.html#a33cb5f1ffa196229208e6071d57edfbc" title="Refresh per&#45;valve diagnostics from the driver IC." alt="" coords="287,75,480,119"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="527,77,481,86,481,81,522,77"/>
+<area shape="rect" id="Node000004" href="$classmanifold__valves_1_1ManifoldValvesDiagnosticsThread.html#a54d9c54c6185d5ad06d6cd5a487b250b" title=" " alt="" coords="5,75,228,119"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="269,97,228,100,228,94,274,97"/>
+</map>

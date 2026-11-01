@@ -1,0 +1,5 @@
+<map id="ValveManager::ConfigureSolenoidCdr" name="ValveManager::ConfigureSolenoidCdr">
+<area shape="rect" id="Node000001" title="Configure a solenoid channel with CDR (current drive regulation)." alt="" coords="247,14,509,42"/>
+<area shape="rect" id="Node000002" href="$classmanifold__valves_1_1SolenoidValve.html#ad7486ef4737a16cb1a91d3d7f34f18d3" title="Apply the current setpoint to the underlying driver IC." alt="" coords="5,5,199,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="228,28,199,30,199,25,234,27"/>
+</map>

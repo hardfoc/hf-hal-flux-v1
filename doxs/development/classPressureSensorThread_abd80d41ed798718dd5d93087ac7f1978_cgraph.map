@@ -1,0 +1,13 @@
+<map id="PressureSensorThread::Setup" name="PressureSensorThread::Setup">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,109,172,154"/>
+<area shape="rect" id="Node000002" href="$classPressureSensorCalibrator.html#afd8ce7201dbf2f3fe686c4d70a72a117" title="Apply calibrated VA to all sensors." alt="" coords="220,5,405,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="128,107,219,60,236,55,231,58,221,65,131,111"/>
+<area shape="rect" id="Node000003" href="$classPressureSensorCalibrator.html#a61c88fda7617ae2be251edce6f4ca161" title="Perform zero calibration on all sensors." alt="" coords="220,75,405,119"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="171,116,207,113,202,115,173,121"/>
+<area shape="rect" id="Node000004" href="$classPressureSensorCalibrator.html#aaa1fbe21fe6918091e281dc36f7d664c" title="Perform VA calibration using atmospheric sensors." alt="" coords="220,144,405,189"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="172,142,207,149,202,150,173,147"/>
+<area shape="rect" id="Node000006" href="$classPressureSensorCalibrator.html#a36f36520e4d3941506e926d6b3cdd84c" title="Get last calibration error message." alt="" coords="220,213,405,258"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="130,152,221,199,236,207,231,207,219,203,129,157"/>
+<area shape="rect" id="Node000005" href="$classPressureSensor.html#afb21c6573e75eb818a7c47dd6310fe9d" title=" " alt="" coords="453,152,646,180"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="405,164,440,166,435,167,406,169"/>
+</map>

@@ -1,0 +1,90 @@
+<map id="app_main" name="app_main">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,565,91,593"/>
+<area shape="rect" id="Node000002" href="$PressureSensorConfig_8h.html#a375539d989ef61df7de5485ef8426cf8" title="Get direction string for logging." alt="" coords="173,5,306,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="47,565,52,462,65,305,76,223,92,148,112,85,123,61,137,43,160,28,157,32,141,46,128,64,117,87,97,149,82,224,70,306,57,462,52,565"/>
+<area shape="rect" id="Node000003" href="$classmanifold__valves_1_1SolenoidValve.html#a84238efdbcfdbe406c5e1fff071a6e30" title=" " alt="" coords="143,57,336,102"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="48,565,55,474,71,339,82,268,97,203,115,149,137,112,142,109,139,114,141,115,120,152,102,205,88,269,76,340,60,475,53,565"/>
+<area shape="rect" id="Node000004" href="$classmanifold__valves_1_1Valve.html#ae9b2b4a9fb7ed1dfad811c9bd27eebba" title="Snapshot of the actual position the control thread last managed to set." alt="" coords="153,126,326,171"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="48,565,57,486,75,372,101,258,118,213,137,182,142,179,140,184,141,185,122,215,106,259,80,373,62,487,53,565"/>
+<area shape="rect" id="Node000005" href="$classPressureSensor.html#afd709727151f6f7d9323df468e80521e" title=" " alt="" coords="148,196,331,240"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="46,565,48,508,58,424,69,378,85,332,108,289,137,251,142,248,140,252,141,254,112,292,90,335,74,380,63,425,53,508,52,565"/>
+<area shape="rect" id="Node000006" href="$classmanifold__valves_1_1ManifoldValves.html#a2a4a7130b479172859b6184f0bae39b5" title="Singleton access (single shared instance for the application)." alt="" coords="142,265,336,310"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="47,565,53,519,66,453,93,383,112,349,137,320,143,317,141,321,141,324,117,352,98,385,71,455,58,520,53,565"/>
+<area shape="rect" id="Node000007" href="$classFlux.html#a4bbee39ff1da8e9359edb151e4ee3cda" title="Access the singleton instance (Meyers singleton, thread&#45;safe)." alt="" coords="172,333,307,361"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="49,564,56,526,72,474,98,419,116,394,137,372,159,360,156,364,140,376,120,397,103,422,77,476,61,527,54,565"/>
+<area shape="rect" id="Node000008" href="$classValveManager.html#a365395c793edae3fa9b13e5939cf9297" title="Return the singleton ValveManager instance." alt="" coords="139,385,340,413"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="51,565,61,534,79,496,104,456,137,422,146,418,143,423,140,427,108,460,83,499,66,536,56,566"/>
+<area shape="rect" id="Node000009" href="$classPressureSensor.html#a648985748f6fe880dd9a789c1b935c89" title=" " alt="" coords="139,437,340,482"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="60,564,94,531,137,498,162,486,159,491,140,503,97,535,65,566"/>
+<area shape="rect" id="Node000010" href="$classmanifold__valves_1_1ManifoldValvesDiagnosticsThread.html#adafbf931fb82693bfa3d21f3ea758534" title="Lock&#45;free read of the latest subsystem&#45;wide health snapshot." alt="" coords="730,626,925,687"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="56,591,89,639,112,663,140,681,186,694,247,701,321,703,401,701,568,688,717,671,713,674,569,693,401,706,321,709,247,707,185,699,138,686,109,667,85,642,57,596"/>
+<area shape="rect" id="Node000011" href="$classmanifold__valves_1_1Valve.html#af248149499c0b5edba104053d2a5f994" title=" " alt="" coords="153,557,326,602"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="89,577,139,577,135,581,93,581"/>
+<area shape="rect" id="Node000012" href="$classmanifold__valves_1_1Valve.html#ad00042f68aa8db577fe725c6e3d9e9b0" title="Snapshot of the last setpoint the app pushed (may not yet be applied)." alt="" coords="153,626,326,671"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="84,591,140,611,159,619,155,622,138,616,87,596"/>
+<area shape="rect" id="Node000013" href="$ValveManager_8h.html#a255db5fbbcc6babf9a239474d3363b4c" title="Convert hf_valve_err_t to a human&#45;readable description string." alt="" coords="1039,1299,1182,1326"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="50,590,57,710,70,895,81,993,96,1084,116,1160,128,1189,141,1212,199,1285,256,1340,315,1378,377,1406,444,1425,519,1440,697,1473,771,1489,831,1499,859,1499,888,1495,921,1487,957,1473,1002,1446,1039,1410,1070,1372,1092,1341,1096,1338,1074,1375,1043,1413,1005,1450,960,1478,922,1492,889,1501,859,1504,830,1504,770,1494,696,1478,518,1446,443,1430,375,1411,312,1383,253,1344,195,1289,136,1215,123,1192,111,1161,91,1085,76,994,65,896,51,711,50,596"/>
+<area shape="rect" id="Node000014" href="$classmanifold__valves_1_1ManifoldValvesDiagnosticsThread.html#a69dc5bd3497c796ad5daa8fa4aff54f4" title=" " alt="" coords="1013,694,1208,755"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="76,563,106,551,138,542,371,492,468,472,559,459,649,456,742,467,844,495,960,542,1002,569,1038,604,1067,643,1089,680,1084,679,1062,646,1034,608,999,573,957,547,842,500,741,473,648,462,559,464,469,477,372,497,139,547,108,556,80,566"/>
+<area shape="rect" id="Node000015" href="$classmanifold__valves_1_1Valve.html#a616c4988f28a98f64f2c9b99b8a8d6b7" title=" " alt="" coords="153,797,326,842"/>
+<area shape="poly" id="edge14_Node000001_Node000015" title=" " alt="" coords="51,591,62,630,78,681,103,736,120,761,141,783,145,787,140,789,137,786,116,764,99,738,73,683,57,632,52,596"/>
+<area shape="rect" id="Node000016" href="$manifold__valves__pressure__control_8cpp.html#a0d8081522a38665ec3b240c93d9a425f" title=" " alt="" coords="172,745,307,773"/>
+<area shape="poly" id="edge15_Node000001_Node000016" title=" " alt="" coords="54,591,85,656,109,693,140,725,160,738,155,740,137,729,105,697,81,659,54,596"/>
+<area shape="rect" id="Node000018" href="$classmanifold__valves_1_1ManifoldValvesSelfTest.html#addef632a632864e37101d4bc54db12b2" title="Run the configured self&#45;test plan synchronously on the caller." alt="" coords="142,989,336,1034"/>
+<area shape="poly" id="edge17_Node000001_Node000018" title=" " alt="" coords="52,591,85,703,110,778,141,853,177,919,215,975,210,977,173,921,136,855,105,780,80,704,53,596"/>
+<area shape="rect" id="Node000028" href="$classmanifold__valves_1_1SolenoidValve.html#a2ef26943cfea4d2d9b4657f08da5b5ea" title="Lock&#45;free per&#45;channel diagnostic snapshot (updated by diagnostics thread)." alt="" coords="731,1109,924,1154"/>
+<area shape="poly" id="edge47_Node000001_Node000028" title=" " alt="" coords="51,591,63,682,81,816,107,951,123,1006,141,1044,192,1115,217,1140,244,1161,306,1194,389,1223,461,1245,521,1255,549,1255,578,1249,647,1224,663,1211,671,1196,679,1179,695,1164,719,1153,714,1156,698,1168,683,1183,676,1199,667,1215,650,1228,580,1255,549,1260,520,1261,460,1250,387,1228,303,1199,241,1166,214,1144,188,1118,136,1047,118,1008,102,952,76,817,58,683,51,596"/>
+<area shape="rect" id="Node000038" href="$namespacemanifold__valves.html#a4938951605bcc9a5f54af3d11a9bf3d8" title=" " alt="" coords="1007,1473,1214,1518"/>
+<area shape="poly" id="edge49_Node000001_Node000038" title=" " alt="" coords="50,591,61,754,78,1010,91,1142,105,1259,122,1348,131,1378,141,1396,184,1440,232,1477,284,1507,340,1530,398,1548,459,1561,521,1569,584,1573,708,1570,825,1557,930,1539,1014,1522,1019,1521,931,1544,826,1563,708,1575,584,1578,521,1574,458,1566,397,1553,338,1535,281,1512,229,1481,180,1444,137,1399,126,1380,117,1350,100,1260,85,1143,73,1011,56,754,50,596"/>
+<area shape="rect" id="Node000039" href="$namespacemanifold__valves.html#a230b48bd705295f21b68d5f4a2a5216d" title=" " alt="" coords="143,1589,336,1634"/>
+<area shape="poly" id="edge48_Node000001_Node000039" title=" " alt="" coords="50,591,59,783,75,1094,87,1255,102,1398,120,1508,130,1546,141,1568,150,1580,145,1579,136,1571,125,1547,115,1509,97,1399,82,1255,70,1094,54,783,50,596"/>
+<area shape="rect" id="Node000017" href="$structmanifold__valves_1_1SelfTestPlan.html#a703a3a6e47db20fb68409225800976cd" title="Default: enable everything." alt="" coords="424,721,612,766"/>
+<area shape="poly" id="edge16_Node000016_Node000017" title=" " alt="" coords="306,753,411,748,406,751,309,758"/>
+<area shape="rect" id="Node000019" href="$classmanifold__valves_1_1ManifoldValvesSelfTest.html#a00831ab4a22a7e20b9cb9776905325ff" title=" " alt="" coords="388,1169,648,1214"/>
+<area shape="poly" id="edge18_Node000018_Node000019" title=" " alt="" coords="257,1031,313,1093,349,1126,389,1154,401,1162,396,1163,387,1159,346,1130,309,1097,258,1037"/>
+<area shape="rect" id="Node000020" href="$classmanifold__valves_1_1ManifoldValves.html#abf298718ced77823a4431dd726bcacea" title=" " alt="" coords="730,970,925,1015"/>
+<area shape="poly" id="edge19_Node000018_Node000020" title=" " alt="" coords="336,1006,717,994,713,998,337,1011"/>
+<area shape="rect" id="Node000021" href="$classmanifold__valves_1_1ManifoldValvesSelfTest.html#a1805079dde417ef7bf199d71da2f5a8f" title=" " alt="" coords="410,790,626,835"/>
+<area shape="poly" id="edge20_Node000018_Node000021" title=" " alt="" coords="253,987,306,916,343,878,387,845,399,840,396,844,389,849,347,882,310,920,257,990"/>
+<area shape="rect" id="Node000023" href="$classmanifold__valves_1_1ManifoldValvesSelfTest.html#af13dad1d9149cbf2b9e5d83639059206" title=" " alt="" coords="404,929,632,974"/>
+<area shape="poly" id="edge22_Node000018_Node000023" title=" " alt="" coords="335,988,399,976,395,979,338,992"/>
+<area shape="rect" id="Node000024" href="$classmanifold__valves_1_1ManifoldValvesSelfTest.html#af7007dfd27637e49b8de7efdd32e30b0" title=" " alt="" coords="400,860,636,904"/>
+<area shape="poly" id="edge23_Node000018_Node000024" title=" " alt="" coords="268,987,322,949,387,914,406,908,403,912,389,919,325,954,272,990"/>
+<area shape="rect" id="Node000031" href="$classmanifold__valves_1_1ManifoldValvesSelfTest.html#a8b01d2640285fc27668a6519d03d3fa2" title=" " alt="" coords="712,1040,943,1084"/>
+<area shape="poly" id="edge46_Node000018_Node000031" title=" " alt="" coords="336,1017,698,1049,695,1052,337,1022"/>
+<area shape="rect" id="Node000032" href="$classmanifold__valves_1_1ManifoldValvesSelfTest.html#ace42f4bbbd7b67b70e2c76b98004017c" title=" " alt="" coords="404,1100,632,1144"/>
+<area shape="poly" id="edge35_Node000018_Node000032" title=" " alt="" coords="285,1031,389,1078,428,1093,423,1095,387,1083,286,1037"/>
+<area shape="rect" id="Node000035" href="$classmanifold__valves_1_1ManifoldValvesSelfTest.html#ae70c300b5543e3e9c01628a77bcb30b8" title=" " alt="" coords="416,1289,621,1334"/>
+<area shape="poly" id="edge40_Node000018_Node000035" title=" " alt="" coords="253,1031,308,1121,346,1174,390,1224,425,1254,464,1280,458,1281,422,1258,386,1228,342,1178,303,1124,252,1037"/>
+<area shape="rect" id="Node000022" href="$classmanifold__valves_1_1ManifoldValvesSelfTest.html#adbd97a46e178242c5fa863a53c2aad57" title=" " alt="" coords="707,557,948,602"/>
+<area shape="poly" id="edge21_Node000021_Node000022" title=" " alt="" coords="625,791,646,776,661,756,668,737,670,696,671,654,679,633,694,612,701,609,698,613,698,616,683,635,676,655,675,696,674,738,666,759,650,780,629,795"/>
+<area shape="poly" id="edge26_Node000024_Node000010" title=" " alt="" coords="631,857,646,845,660,829,667,812,671,777,674,741,681,722,694,704,719,687,715,691,698,708,685,725,679,742,676,778,672,813,665,831,650,849,635,861"/>
+<area shape="poly" id="edge28_Node000024_Node000014" title=" " alt="" coords="628,857,647,845,657,834,663,822,669,796,675,771,682,759,695,748,718,737,748,729,825,719,913,715,1000,718,995,720,913,721,826,724,749,734,720,742,698,752,686,762,680,773,674,798,668,824,662,837,650,849,632,861"/>
+<area shape="poly" id="edge24_Node000024_Node000020" title=" " alt="" coords="621,902,650,914,665,925,674,935,684,946,698,956,719,966,713,967,695,960,680,950,670,939,661,929,647,919,622,907"/>
+<area shape="rect" id="Node000025" href="$classmanifold__valves_1_1Valve.html#a4b1b60c98c86646fb2cd3a81d38eb7a5" title=" " alt="" coords="741,762,914,807"/>
+<area shape="poly" id="edge25_Node000024_Node000025" title=" " alt="" coords="615,857,647,845,671,831,695,817,728,807,723,810,697,822,674,835,649,850,618,861"/>
+<area shape="rect" id="Node000026" href="$classmanifold__valves_1_1ManifoldValvesSelfTest.html#a6230a5f20af83283d9b3f96fb0ceb74a" title="Integer sqrt for variance → stddev (avoids pulling &lt;cmath&gt; for one call)." alt="" coords="722,832,933,876"/>
+<area shape="poly" id="edge27_Node000024_Node000026" title=" " alt="" coords="636,869,709,863,705,866,638,874"/>
+<area shape="rect" id="Node000027" href="$classmanifold__valves_1_1Valve.html#a7fe05d7dd0fa6bd49f61e2baafe601ab" title="Request a normalised position 0..1. @Browser For binary solenoids this is interpreted as 0 → off,..." alt="" coords="741,901,914,946"/>
+<area shape="poly" id="edge29_Node000024_Node000027" title=" " alt="" coords="636,895,728,909,723,911,638,900"/>
+<area shape="poly" id="edge30_Node000024_Node000028" title=" " alt="" coords="634,902,650,915,667,937,675,961,675,1007,675,1051,682,1073,698,1095,719,1112,714,1112,694,1098,677,1076,670,1052,670,1007,670,962,662,940,646,918,634,907"/>
+<area shape="poly" id="edge33_Node000024_Node000031" title=" " alt="" coords="631,902,650,914,663,928,670,943,675,971,680,999,686,1012,698,1025,704,1031,698,1031,694,1029,682,1015,675,1001,670,972,665,944,658,931,647,919,631,907"/>
+<area shape="rect" id="Node000029" href="$classmanifold__valves_1_1Valve.html#a86a8da66e88b8fb5a48ff63d2a1ad82c" title=" " alt="" coords="1024,1144,1197,1188"/>
+<area shape="poly" id="edge31_Node000028_Node000029" title=" " alt="" coords="924,1140,1011,1153,1006,1154,925,1146"/>
+<area shape="rect" id="Node000030" href="$classmanifold__valves_1_1Valve.html#a67b72f484234a2a95ffcf64e934e7402" title=" " alt="" coords="1024,1074,1197,1119"/>
+<area shape="poly" id="edge32_Node000028_Node000030" title=" " alt="" coords="924,1117,1011,1108,1006,1110,925,1122"/>
+<area shape="poly" id="edge34_Node000031_Node000014" title=" " alt="" coords="940,1037,957,1025,986,998,1011,967,1051,897,1079,828,1097,773,1100,768,1084,830,1056,900,1015,970,989,1001,960,1029,943,1041"/>
+<area shape="poly" id="edge39_Node000032_Node000031" title=" " alt="" coords="632,1097,699,1086,694,1088,634,1102"/>
+<area shape="rect" id="Node000033" href="$classmanifold__valves_1_1ManifoldValvesSelfTest.html#a54459016828b36deaccfc5992c754440" title="Map a ValveChannel to its 0&#45;based hardware index within the chip." alt="" coords="711,1264,944,1308"/>
+<area shape="poly" id="edge36_Node000032_Node000033" title=" " alt="" coords="630,1142,650,1154,662,1166,669,1179,675,1203,681,1227,687,1238,698,1249,704,1255,699,1255,695,1253,683,1241,676,1229,670,1205,664,1181,657,1169,647,1159,630,1147"/>
+<area shape="rect" id="Node000034" href="$classmanifold__valves_1_1ManifoldValvesSelfTest.html#a4a3ffc886e1eb71456195d0579650983" title=" " alt="" coords="703,1178,952,1239"/>
+<area shape="poly" id="edge37_Node000032_Node000034" title=" " alt="" coords="605,1142,649,1154,708,1172,703,1173,648,1159,606,1147"/>
+<area shape="poly" id="edge38_Node000034_Node000013" title=" " alt="" coords="927,1237,960,1249,1064,1292,1059,1292,958,1254,927,1243"/>
+<area shape="poly" id="edge45_Node000035_Node000031" title=" " alt="" coords="567,1286,609,1260,646,1224,657,1207,663,1191,667,1158,673,1127,681,1110,694,1095,698,1095,702,1092,698,1098,685,1113,678,1128,672,1159,668,1192,662,1209,650,1228,612,1264,570,1291"/>
+<area shape="poly" id="edge41_Node000035_Node000033" title=" " alt="" coords="621,1300,698,1296,693,1297,622,1305"/>
+<area shape="rect" id="Node000036" href="$classmanifold__valves_1_1ManifoldValvesSelfTest.html#af68d7eb84098a94a908174b168d8ff19" title=" " alt="" coords="715,1332,940,1394"/>
+<area shape="poly" id="edge42_Node000035_Node000036" title=" " alt="" coords="621,1326,702,1341,697,1342,621,1331"/>
+<area shape="rect" id="Node000037" href="$classmanifold__valves_1_1ManifoldValvesSelfTest.html#acfd7737ecff5c1aa99f3a8d37e771655" title=" " alt="" coords="696,1418,959,1463"/>
+<area shape="poly" id="edge43_Node000035_Node000037" title=" " alt="" coords="556,1331,622,1368,697,1403,718,1413,713,1413,695,1408,619,1373,556,1337"/>
+<area shape="poly" id="edge44_Node000037_Node000038" title=" " alt="" coords="946,1461,994,1472,989,1472,946,1466"/>
+</map>

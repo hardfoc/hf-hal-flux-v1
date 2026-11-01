@@ -1,0 +1,16 @@
+<map id="manifold_valves::ProportionalValve::OnDiagnostics" name="manifold_valves::ProportionalValve::OnDiagnostics">
+<area shape="rect" id="Node000001" title="Refresh per&#45;valve diagnostics from the driver IC." alt="" coords="5,160,222,205"/>
+<area shape="rect" id="Node000002" href="$classValveManager.html#a97cafca51e8f40efb6af84347e9ee02a" title="Retrieve the TLE92466ED fault report." alt="" coords="270,5,494,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="139,158,197,113,268,67,298,55,294,58,271,71,200,117,143,161"/>
+<area shape="rect" id="Node000003" href="$ValveManager_8h.html#a07104dd82857d7cb8af8bf459645484c" title="Map TLE92466ED DriverError to the unified hf_valve_err_t domain." alt="" coords="542,44,735,72"/>
+<area shape="poly" id="edge7_Node000001_Node000003" title=" " alt="" coords="155,157,209,132,269,110,334,94,402,81,529,66,524,68,402,86,336,99,270,116,211,137,159,162"/>
+<area shape="rect" id="Node000004" href="$classValveManager.html#a0fe999d6f6c8c521ff33a374e3f05a33" title="Get the TLE92466ED handler for advanced proportional operations." alt="" coords="279,125,484,170"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="221,166,266,162,262,164,223,171"/>
+<area shape="rect" id="Node000005" href="$classmanifold__valves_1_1ProportionalValve.html#af397f49fd0b2c5b463ea4b6ea59b678a" title=" " alt="" coords="274,195,490,239"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="222,194,261,200,256,202,223,199"/>
+<area shape="rect" id="Node000006" href="$classmanifold__valves_1_1Valve.html#aa5dbf5c89269cd002d1060c906896f9a" title=" " alt="" coords="295,264,468,309"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="162,203,271,249,292,258,286,259,269,254,162,208"/>
+<area shape="rect" id="Node000007" href="$classmanifold__valves_1_1Valve.html#a18870f99fe4799f56085cc648f67b083" title=" " alt="" coords="295,333,468,378"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="135,203,193,261,231,292,271,319,284,327,278,327,268,323,228,296,190,265,134,208"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="494,39,529,44,524,46,495,44"/>
+</map>

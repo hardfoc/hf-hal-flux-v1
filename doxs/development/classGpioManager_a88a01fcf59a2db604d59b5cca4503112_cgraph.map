@@ -1,0 +1,5 @@
+<map id="GpioManager::EnsureInitialized" name="GpioManager::EnsureInitialized">
+<area shape="rect" id="Node000001" title="Register all GPIO pins and initialise drivers (idempotent)." alt="" coords="5,5,230,33"/>
+<area shape="rect" id="Node000002" href="$classGpioManager.html#a71081920f92fb76254ccd258ec539c9e" title=" " alt="" coords="278,5,450,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="230,17,265,19,259,19,230,22"/>
+</map>

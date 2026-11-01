@@ -1,0 +1,7 @@
+<map id="log_valve_result" name="log_valve_result">
+<area shape="rect" id="Node000001" title="Helper: log a valve error result." alt="" coords="5,32,134,60"/>
+<area shape="rect" id="Node000002" href="$ValveManager_8h.html#ae6cff86821790a19053b6f8423493fe7" title="Check if a valve error code indicates success." alt="" coords="199,5,307,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="133,34,186,28,181,30,135,39"/>
+<area shape="rect" id="Node000003" href="$ValveManager_8h.html#a255db5fbbcc6babf9a239474d3363b4c" title="Convert hf_valve_err_t to a human&#45;readable description string." alt="" coords="182,57,324,85"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="134,52,169,59,163,59,134,57"/>
+</map>

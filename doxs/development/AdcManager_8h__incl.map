@@ -1,0 +1,21 @@
+<map id="AdcManager.h" name="AdcManager.h">
+<area shape="rect" id="Node000001" title="ADC management for the HardFOC Flux V1 platform." alt="" coords="356,5,470,33"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,106,61,134"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="353,22,295,27,223,37,147,55,74,83,55,97,52,93,72,79,145,50,222,32,295,22,358,20"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="85,106,152,134"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="354,27,263,47,212,63,164,83,143,98,140,93,161,79,210,58,262,42,359,25"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="175,106,240,134"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="368,33,310,56,253,83,232,98,230,94,250,79,308,51,363,34"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="264,106,340,134"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="401,32,329,98,327,94,396,34"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="365,106,461,134"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="415,31,415,93,411,90,411,35"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="485,81,664,160"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="435,31,501,73,495,72,433,36"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="688,81,864,160"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="470,29,562,49,675,80,670,80,561,54,470,34"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="888,106,991,134"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="470,18,552,21,654,31,766,49,877,79,912,98,907,97,875,83,765,54,653,36,551,27,470,23"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="1016,81,1199,160"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="470,19,569,23,699,33,848,51,1004,81,999,81,848,56,699,38,568,29,470,24"/>
+</map>

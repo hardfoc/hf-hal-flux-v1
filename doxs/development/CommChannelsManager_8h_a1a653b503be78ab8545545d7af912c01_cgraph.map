@@ -1,0 +1,5 @@
+<map id="GetCommChannelsManager" name="GetCommChannelsManager">
+<area shape="rect" id="Node000001" title="Convenience accessor — equivalent to CommChannelsManager::GetInstance()." alt="" coords="5,14,210,42"/>
+<area shape="rect" id="Node000002" href="$classCommChannelsManager.html#ad1249df1c4ece9e2468d4b4536d237ae" title="Return the singleton CommChannelsManager instance." alt="" coords="258,5,439,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="210,25,244,27,239,28,210,30"/>
+</map>

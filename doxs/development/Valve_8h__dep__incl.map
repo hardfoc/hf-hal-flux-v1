@@ -1,0 +1,22 @@
+<map id="Valve.h" name="Valve.h">
+<area shape="rect" id="Node000001" title="Base class for all WH bench valves — atomic state, lock&#45;free API." alt="" coords="302,5,371,33"/>
+<area shape="rect" id="Node000002" href="$ProportionalValve_8h.html" title="TLE92466ED&#45;driven precision proportional valve." alt="" coords="182,81,331,109"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="309,46,273,82,269,79,313,42"/>
+<area shape="rect" id="Node000008" href="$SolenoidValve_8h.html" title="MAX22200&#45;driven solenoid valve — supports both BinaryHitHold and VariableCurrent (pseudo&#45;proportional..." alt="" coords="355,81,481,109"/>
+<area shape="poly" id="edge11_Node000001_Node000008" title=" " alt="" coords="362,41,406,80,401,81,362,46"/>
+<area shape="rect" id="Node000003" href="$ManifoldValves_8h.html" title="Compile&#45;time&#45;fixed container for every WH bench valve." alt="" coords="270,157,403,184"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="282,117,325,156,320,157,282,122"/>
+<area shape="rect" id="Node000004" href="$ManifoldValvesControlThread_8h.html" title="BaseThread that pushes pending valve setpoints to the driver ICs." alt="" coords="5,325,231,353"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="303,195,252,234,135,327,132,322,248,230,307,192"/>
+<area shape="rect" id="Node000005" href="$manifold__valves__pressure__control_8cpp.html" title="Manifold test bench: pressure sensor calibration and high&#45;rate monitoring." alt="" coords="198,401,390,445"/>
+<area shape="poly" id="edge10_Node000003_Node000005" title=" " alt="" coords="316,195,305,215,297,233,287,278,285,325,292,401,287,399,280,325,282,278,291,232,300,212,312,199"/>
+<area shape="rect" id="Node000006" href="$ManifoldValvesDiagnosticsThread_8h.html" title="BaseThread that polls valve + driver&#45;IC + ADC diagnostics." alt="" coords="306,232,503,277"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="358,194,389,232,384,231,357,199"/>
+<area shape="rect" id="Node000007" href="$ManifoldValvesSelfTest_8h.html" title="Boot&#45;time self&#45;test that exercises every WH bench valve in sequence and surfaces any per&#45;valve diagno..." alt="" coords="356,325,541,353"/>
+<area shape="poly" id="edge9_Node000003_Node000007" title=" " alt="" coords="418,176,447,183,473,194,498,210,517,231,524,243,525,254,518,278,497,306,472,327,469,322,493,303,513,276,520,254,519,244,513,234,494,214,471,199,445,188,419,181"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="161,357,250,399,245,401,159,362"/>
+<area shape="poly" id="edge8_Node000006_Node000005" title=" " alt="" coords="376,287,347,327,324,365,305,402,302,398,319,363,342,323,371,290"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="425,288,444,325,439,324,422,293"/>
+<area shape="poly" id="edge7_Node000007_Node000005" title=" " alt="" coords="413,360,336,403,334,398,408,361"/>
+<area shape="poly" id="edge12_Node000008_Node000003" title=" " alt="" coords="394,117,353,158,349,154,390,121"/>
+</map>

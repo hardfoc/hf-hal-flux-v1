@@ -1,0 +1,5 @@
+<map id="manifold_valves::ManifoldValvesSelfTest::FormatProportionalFaults" name="manifold_valves::ManifoldValvesSelfTest::FormatProportionalFaults">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,254,67"/>
+<area shape="rect" id="Node000002" href="$ValveManager_8h.html#a255db5fbbcc6babf9a239474d3363b4c" title="Convert hf_valve_err_t to a human&#45;readable description string." alt="" coords="302,22,444,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="254,34,289,36,284,36,254,39"/>
+</map>

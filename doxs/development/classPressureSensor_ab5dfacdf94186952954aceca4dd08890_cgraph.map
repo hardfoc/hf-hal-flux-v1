@@ -1,0 +1,5 @@
+<map id="PressureSensor::GetEffectiveVoltageMax" name="PressureSensor::GetEffectiveVoltageMax">
+<area shape="rect" id="Node000001" title="Get effective voltage_max accounting for ratiometric scaling." alt="" coords="5,5,215,50"/>
+<area shape="rect" id="Node000002" href="$PressureSensorConfig_8h.html#aa4e304d0a37c95aedbbd34e8a6c74b5e" title="Calculate voltage_max for a ratiometric sensor given actual VA." alt="" coords="263,14,460,42"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="215,25,250,27,244,28,215,30"/>
+</map>

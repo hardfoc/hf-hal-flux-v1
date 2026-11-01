@@ -1,0 +1,5 @@
+<map id="ManifoldValvesSelfTest.h" name="ManifoldValvesSelfTest.h">
+<area shape="rect" id="Node000001" title="Boot&#45;time self&#45;test that exercises every WH bench valve in sequence and surfaces any per&#45;valve diagno..." alt="" coords="9,5,194,33"/>
+<area shape="rect" id="Node000002" href="$manifold__valves__pressure__control_8cpp.html" title="Manifold test bench: pressure sensor calibration and high&#45;rate monitoring." alt="" coords="5,81,198,126"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="103,47,104,81,99,79,100,51"/>
+</map>

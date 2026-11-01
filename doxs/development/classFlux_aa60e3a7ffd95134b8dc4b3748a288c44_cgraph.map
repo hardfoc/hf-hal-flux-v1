@@ -1,0 +1,7 @@
+<map id="Flux::InitializeGpio" name="Flux::InitializeGpio">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,149,33"/>
+<area shape="rect" id="Node000002" href="$classGpioManager.html#a88a01fcf59a2db604d59b5cca4503112" title="Register all GPIO pins and initialise drivers (idempotent)." alt="" coords="197,5,421,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="149,17,184,19,178,19,149,22"/>
+<area shape="rect" id="Node000003" href="$classGpioManager.html#a71081920f92fb76254ccd258ec539c9e" title=" " alt="" coords="469,5,641,33"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="422,17,456,19,451,19,422,22"/>
+</map>

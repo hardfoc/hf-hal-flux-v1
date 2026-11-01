@@ -1,0 +1,7 @@
+<map id="manifold_valves::ProportionalValve::Snapshot" name="manifold_valves::ProportionalValve::Snapshot">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,40,222,85"/>
+<area shape="rect" id="Node000002" href="$classmanifold__valves_1_1Valve.html#a86a8da66e88b8fb5a48ff63d2a1ad82c" title=" " alt="" coords="270,5,443,50"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="222,44,257,42,252,43,223,49"/>
+<area shape="rect" id="Node000003" href="$classmanifold__valves_1_1Valve.html#a67b72f484234a2a95ffcf64e934e7402" title=" " alt="" coords="270,75,443,119"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="222,75,257,82,252,83,222,81"/>
+</map>

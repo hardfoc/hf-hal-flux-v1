@@ -1,0 +1,5 @@
+<map id="example_sensor_info" name="example_sensor_info">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,166,33"/>
+<area shape="rect" id="Node000002" href="$TemperatureManager_8h.html#a9bb4ad5afd19eebe59111f20b539aa46" title="Convert FluxTempSensorType to a human&#45;readable string." alt="" coords="214,5,424,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="166,17,201,19,195,19,166,22"/>
+</map>

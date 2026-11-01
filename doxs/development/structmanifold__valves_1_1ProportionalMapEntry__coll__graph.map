@@ -1,0 +1,12 @@
+<map id="manifold_valves::ProportionalMapEntry" name="manifold_valves::ProportionalMapEntry">
+<area shape="rect" id="Node000001" title="Mapping row associating a named proportional with a Flux driver channel and per&#45;channel diagnostic ga..." alt="" coords="751,45,967,89"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="220,17,344,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="359,20,368,19,404,19,525,22,645,30,727,42,753,48,747,48,726,47,644,35,525,27,404,24,368,24,360,25"/>
+<area shape="rect" id="Node000004" href="$structmanifold__valves_1_1ProportionalModelSpec.html" title="Datasheet&#45;driven proportional model record (TLE92466ED)." alt="" coords="428,45,645,89"/>
+<area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="359,39,431,51,425,52,359,45"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,9,171,53"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="186,29,222,30,217,32,187,34"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="660,64,753,67,748,67,661,70"/>
+<area shape="rect" id="Node000005" href="$structmanifold__valves_1_1Tle92466ChannelFeatures.html" title="Which TLE92466ED per&#45;channel diagnostic features should be enabled." alt="" coords="438,114,635,159"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="650,109,749,90,754,90,651,115"/>
+</map>
