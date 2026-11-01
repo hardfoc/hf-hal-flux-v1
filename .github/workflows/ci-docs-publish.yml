@@ -23,4 +23,3 @@ jobs:
       doxygen_config: "_config/Doxyfile"
       jekyll_config: "_config/_config.yml"
       jekyll_layouts_dir: "_config/_layouts"
-      jekyll_includes_dir: "_config/_includes"
