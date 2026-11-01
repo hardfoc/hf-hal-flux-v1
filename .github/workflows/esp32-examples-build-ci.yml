@@ -56,7 +56,7 @@ jobs:
 
   build:
     needs: validate
-    uses: hardfoc/hf-espidf-ci-tools/.github/workflows/ru-build.yml@main
+    uses: hardfoc/hf-espidf-ci-tools/.github/workflows/ru-build.yml@fix/free-runner-disk
     with:
       project_dir: ${{ needs.validate.outputs.project_dir }}
       project_tools_dir: ${{ needs.validate.outputs.tools_dir }}
