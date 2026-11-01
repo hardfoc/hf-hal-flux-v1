@@ -12,6 +12,13 @@ on:
         default: false
         type: boolean
 
+# ru-build.yml requests these; a called workflow can only receive permissions
+# the caller grants.
+permissions:
+  contents: read
+  actions: read
+  pull-requests: write
+
 env:
   PROJECT_DIR: examples/esp32
   TOOLS_DIR: examples/esp32/scripts
