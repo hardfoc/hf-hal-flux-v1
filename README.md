@@ -1,248 +1,90 @@
-# HardFOC Flux V1 – Hardware Abstraction Layer
+# HardFOC Flux V1 HAL
 
-ESP32 HAL for the **HardFOC Flux V1** valve-control board. Drives solenoid valves (MAX22200) and proportional valves (TLE92466ED) through a unified, stack-based manager architecture.
+Hardware abstraction layer for the **HardFOC Flux V1** valve control board: an ESP32-S3 driving eight solenoid
+valves (MAX22200), six proportional valves (TLE92466ED), twelve external analog inputs (ADS7952), temperatures, CAN
+and a status LED, through one `Flux` object.
 
-## Engineering handbook
+[![ESP32 Examples Build CI](https://github.com/hardfoc/hf-hal-flux-v1/actions/workflows/esp32-examples-build-ci.yml/badge.svg?branch=main)](https://github.com/hardfoc/hf-hal-flux-v1/actions/workflows/esp32-examples-build-ci.yml)
+[![Docs Publish CI](https://github.com/hardfoc/hf-hal-flux-v1/actions/workflows/ci-docs-publish.yml/badge.svg?branch=main)](https://github.com/hardfoc/hf-hal-flux-v1/actions/workflows/ci-docs-publish.yml)
+[![Documentation](https://img.shields.io/badge/docs-hardfoc.github.io-3b38c4)](https://hardfoc.github.io/hf-hal-flux-v1/)
+[![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](LICENSE)
 
-Cross-HAL **coding standards, architecture, CMake contract, testing, and agent playbooks** live in the [hf-development-handbook](https://github.com/hardfoc/hf-development-handbook) Git submodule at [`docs/hf-development-handbook/`](docs/hf-development-handbook/). After clone, run `git submodule update --init --recursive`. Start from [`docs/hf-development-handbook/README.md`](docs/hf-development-handbook/README.md).
-
-**Flux HAL doc hub (this repo):** [`docs/hal/README.md`](docs/hal/README.md) — architecture, manager map, and links to [`examples/esp32/docs/README.md`](examples/esp32/docs/README.md) for every `APP_TYPE`. Short index: [`DOCUMENTATION_INDEX.md`](DOCUMENTATION_INDEX.md).
-
----
-
-## Board Overview
-
-| Feature                | Detail                                           |
-|------------------------|--------------------------------------------------|
-| **MCU**                | ESP32                                            |
-| **Solenoid Driver**    | MAX22200 – 8-channel octal serial-controlled     |
-| **Proportional Driver**| TLE92466ED – 6-channel low-side switch           |
-| **Status LED**         | WS2812 (NeoPixel), 1 LED, RMT channel 0         |
-| **Temperature**        | 10 kΩ NTC thermistor (B=3950) + ESP32 internal   |
-| **Voltage Monitor**    | VBUS via 11× resistor divider on ADC1_CH0        |
-| **Communication**      | CAN/TWAI (500 kbps), I²C (400 kHz), SPI2 host   |
-
----
-
-## Pin Map
-
-### SPI Bus (SPI2 – shared)
-
-| Signal | GPIO |
-|--------|------|
-| MOSI   | 6    |
-| MISO   | 7    |
-| SCLK   | 2    |
-
-### MAX22200 (Solenoid Driver)
-
-| Signal  | GPIO |
-|---------|------|
-| CS      | 18   |
-| ENABLE  | 11   |
-| CMD     | 10   |
-| FAULT_N | 5    |
-
-### TLE92466ED (Proportional Driver)
-
-| Signal  | GPIO |
-|---------|------|
-| CS      | 19   |
-| RESN    | 16   |
-| EN      | 17   |
-| FAULT_N | 8    |
-
-### CAN / TWAI
-
-| Signal | GPIO |
-|--------|------|
-| TX     | 14   |
-| RX     | 15   |
-
-### I²C
-
-| Signal | GPIO |
-|--------|------|
-| SDA    | 21   |
-| SCL    | 22   |
-
-### Analog
-
-| Channel           | GPIO | ADC       | Divider |
-|--------------------|------|-----------|---------|
-| NTC Thermistor     | 4    | ADC1_CH4  | 1.0×    |
-| VBUS Monitor       | 0    | ADC1_CH0  | 11.0×   |
-
-### LED
-
-| Signal  | GPIO |
-|---------|------|
-| WS2812  | 3    |
-
----
+**Documentation: <https://hardfoc.github.io/hf-hal-flux-v1/>**
 
 ## Architecture
 
-```
-┌──────────────────────────────────────────────┐
-│                   Flux API                   │   Unified singleton entry point
-│               (Flux.h / Flux.cpp)            │
-├──────────┬──────────┬──────────┬─────────────┤
-│ CommChan │ GpioMgr  │ ValveMgr │ AdcMgr      │
-│ Manager  │          │          │             │   Managers
-│          │          │          │ LedMgr      │
-│          │          │          │ TempMgr     │
-├──────────┴──────────┴──────────┴─────────────┤
-│              Handler Layer (core)            │   Max22200Handler, Tle92466edHandler,
-│                                              │   NtcTemperatureHandler, WS2812, Logger
-├──────────────────────────────────────────────┤
-│           Interface Wrappers (core)          │   EspSpi, EspI2c, EspGpio, EspAdc, EspCan,
-│                                              │   EspTemperature, EspNvs, EspLogger
-└──────────────────────────────────────────────┘
+Your application talks to the `Flux` facade; each layer calls only the one below it.
+
+```mermaid
+flowchart TB
+  app["Your application<br/>app_main(), tasks"]
+  facade["Flux facade<br/>Flux::GetInstance(), EnsureInitialized()"]
+  managers["Managers (lib/managers)<br/>Comms, NVS, GPIO, Valves, ADC, LEDs, Temperature"]
+  handlers["hf-core handlers<br/>Max22200, Tle92466ed, Ads7952, Ntc, Mcp9700"]
+  drivers["Chip drivers (hf-core-drivers)"]
+  wrap["Interface wrap: BaseSpi, BaseGpio, BaseAdc, BaseCan ...<br/>ESP-IDF on the ESP32-S3"]
+  app --> facade --> managers --> handlers --> drivers --> wrap
 ```
 
-### Design Principles
+The site explains each layer: [architecture](https://hardfoc.github.io/hf-hal-flux-v1/latest/architecture/),
+[managers](https://hardfoc.github.io/hf-hal-flux-v1/latest/managers/),
+[hardware and pin map](https://hardfoc.github.io/hf-hal-flux-v1/latest/hardware/).
 
-- **Stack-based allocations** – Fixed-size `std::array` registries, `constexpr` mapping tables, linear scans for small-N lookups. Heap allocation only where ESP-IDF driver APIs require it (handler construction, WS2812 RMT buffer).
-- **Singleton managers** – Each manager is a Meyers singleton, initialized lazily on first access through `Flux::EnsureInitialized()`.
-- **CRTP SPI adapters** – External driver handlers use the Curiously Recurring Template Pattern for zero-overhead polymorphism.
-- **X-MACRO pin config** – All pin/ADC definitions live in `hf_functional_pin_config_flux_v1.hpp`, auto-generating enums, string tables, and mapping arrays.
-- **Shared `core/` submodule** – Handlers, interface wrappers, and utilities are symlinked from the Vortex HAL's core.
+## Quick start
 
----
+You need ESP-IDF release/v5.5 (`esp32s3` target) and a Flux V1 board on USB.
 
-## Managers
+```bash
+git clone --recurse-submodules https://github.com/hardfoc/hf-hal-flux-v1.git
+cd hf-hal-flux-v1/examples/esp32
+./scripts/build_app.sh flux_api_test Release
+./scripts/flash_app.sh flash_monitor flux_api_test Release
+```
 
-### CommChannelsManager
+The log shows one row per manager (`OK`, `WARN` or `FAIL`). Step by step, with how to tell each step worked:
+[Get started](https://hardfoc.github.io/hf-hal-flux-v1/latest/getting-started/).
 
-Initialises the shared SPI2 bus with two devices (MAX22200 @ Mode 0/10 MHz, TLE92466ED @ Mode 1/5 MHz) and CAN/TWAI at 500 kbps. Provides lazy `AcquireUart()` for serial sensors (BASIS-2, FDO2). Also exposes an opt-in `AcquireUsbSerialJtag()` accessor for the ESP32-S3 native-USB CDC-ACM/JTAG console — gated by the CMake flag `HF_CORE_ENABLE_USB_SERIAL_JTAG` (OFF by default; returns `nullptr` when disabled). Authoritative API: [`lib/managers/CommChannelsManager.h`](lib/managers/CommChannelsManager.h); see also [`docs/hal/managers-and-handlers.md`](docs/hal/managers-and-handlers.md).
-
-### GpioManager
-
-Manages ESP32 GPIOs only (no I/O expander). Reads pin definitions from the X-MACRO pin config and registers GPIO + USER category pins. Provides name-based and enum-based access.
-
-### ValveManager
-
-Unified interface to both valve drivers:
-
-- **Solenoid channels** (`SOL_CH0`–`SOL_CH7`): MAX22200 enable/disable, CDR/VDR current configuration, chopping frequency.
-- **Proportional channels** (`PROP_CH0`–`PROP_CH5`): TLE92466ED current setpoint (mA), PWM frequency, soft-start.
-- Fault detection, channel diagnostics, combined status reporting.
-
-### AdcManager
-
-Two-channel ESP32 ADC1 manager:
-- NTC thermistor raw/voltage readings (voltage divider = 1.0×)
-- VBUS monitor with 11× divider compensation
-
-### LedManager
-
-WS2812 LED with animation engine:
-- Solid, blink, breathe, rainbow animations
-- Status indicators: boot (blue blink), ready (green), warning (yellow blink), error (red fast-blink), calibrating (cyan breathe)
-
-### TemperatureManager
-
-Dual-source temperature monitoring:
-- ESP32 internal die sensor
-- NTC thermistor via ADC, using `NtcTemperatureHandler` (10 kΩ, B=3950, 10 kΩ pull-up)
-- `GetSystemTemperatureStats()` for aggregate min/max/average
-
----
-
-## API Changes (v2.0.0)
-
-| Area | Change |
-|------|--------|
-| **Diagnostics types** | `FluxAdcDiagnostics` → `AdcSystemDiagnostics`, `FluxTempDiagnostics` → `TempSystemDiagnostics` |
-| **Return types** | `GetSystemDiagnostics()` returns typed error codes (`hf_adc_err_t`, `hf_valve_err_t`, `hf_gpio_err_t`) instead of `bool` |
-| **Temperature** | `ReadTemperatureCelsius()` etc. return `TemperatureError` instead of `bool` |
-| **Error tracking** | All managers now expose `GetLastError()` |
-| **GPIO diagnostics** | New `GpioSystemDiagnostics` struct with interrupt counting |
-| **GPIO interrupts** | `EnableInterrupt()`, `DisableInterrupt()`, `RegisterInterruptCallback()`, `GetInterruptCount()` |
-| **Lifecycle** | `Flux::Shutdown()` for graceful reverse-order teardown |
-| **Convenience** | `GetFlux()` free function (equivalent to `Flux::GetInstance()`), `GetCommChannelsManager()` |
-
----
-
-## Quick Start
+## Use it
 
 ```cpp
 #include "api/Flux.h"
+#include "managers/ValveManager.h"
 
-void app_main() {
-    auto& flux = hf::hal::flux::GetFlux();
-    flux.EnsureInitialized();
+extern "C" void app_main() {
+    auto& flux = Flux::GetInstance();
+    if (!flux.EnsureInitialized()) {
+        return;  // NVS, comms or GPIO failed
+    }
 
-    // Enable solenoid channel 0
-    flux.valves.EnableChannel(ValveManager::ValveChannel::SOL_CH0);
+    // Solenoid valve: 800 mA for 50 ms to pull in, then hold at 200 mA.
+    if (HfValveErrOk(flux.valves.ConfigureSolenoidCdr(ValveChannel::SOL_CH0, 800, 200, 50.0f))) {
+        (void)flux.valves.EnableChannel(ValveChannel::SOL_CH0);
+    }
 
-    // Set proportional valve current
-    flux.valves.SetProportionalCurrent(
-        ValveManager::ValveChannel::PROP_CH0, 500);  // 500 mA
-
-    // Read board temperature
-    float temp = 0.0f;
-    flux.temp.ReadTemperatureCelsius("NTC_THERMISTOR", temp);
-
-    // Set LED to solid green
-    flux.leds.SetAnimation(LedManager::LedAnimation::SOLID,
-                           {0, 255, 0});
-
-    // Print system info
-    flux.DumpSystemStatistics();
+    float board_c = 0.0f;
+    (void)flux.temp.ReadNtcTemperature(board_c);
+    (void)flux.leds.IndicateReady();
 }
 ```
 
----
+## Repository layout
 
-## Build
+| Path | Contents |
+| --- | --- |
+| `lib/api` | The `Flux` facade, version information, CPU affinity constants |
+| `lib/managers` | One manager per board function |
+| `lib/core` | hf-core submodule: handlers, chip drivers, interface wrap, the pin map (`hf-pincfg`) |
+| `examples/esp32` | Buildable example and test apps ([catalogue](https://hardfoc.github.io/hf-hal-flux-v1/latest/examples/)) |
+| `docs` | The documentation site (MkDocs); figures and tables are generated from the code |
+| `_config` | Doxygen, lint and link-check configuration |
 
-This component is designed for the ESP-IDF build system (v5.0+). Add it to your project's `components/` directory or reference it via `EXTRA_COMPONENT_DIRS`:
+## Contributing
 
-```cmake
-set(EXTRA_COMPONENT_DIRS
-    "/path/to/hf-all-hals/hf-hal-flux-v1"
-)
-```
-
-Target: `esp32c6`
-
-```bash
-idf.py set-target esp32c6
-idf.py build
-```
-
----
-
-## Directory Structure
-
-```
-hf-hal-flux-v1/
-├── CMakeLists.txt              # ESP-IDF component build
-├── idf_component.yml           # Component manifest
-├── README.md                   # This file
-├── LICENSE
-├── lib/
-│   ├── api/
-│   │   ├── Flux.h              # Unified API singleton
-│   │   ├── Flux.cpp
-│   │   └── FluxVersion.h       # Version constants
-│   ├── managers/
-│   │   ├── CommChannelsManager.h/.cpp
-│   │   ├── GpioManager.h/.cpp
-│   │   ├── ValveManager.h/.cpp
-│   │   ├── AdcManager.h/.cpp
-│   │   ├── LedManager.h/.cpp
-│   │   └── TemperatureManager.h/.cpp
-│   └── core/ -> ../../hf-hal-vortex-v1/lib/core  (symlink)
-│       ├── handlers/            # Max22200, Tle92466ed, NTC, WS2812, Logger
-│       ├── hf-core-drivers/     # ESP32 interface wrappers + external drivers
-│       └── hf-core-utils/       # RTOS wrappers, CAN utils, general utilities
-```
-
----
+Pull requests run the example build, C++ lint and analysis, Markdown and YAML lint, and the docs checks; see
+[Testing and CI](https://hardfoc.github.io/hf-hal-flux-v1/latest/guides/testing-and-ci/). If you change a pin, an
+example or a manager's dependencies, run `python3 tools/docs/gen.py` and `python3 tools/figkit/build.py` and commit
+the result.
 
 ## License
 
-See [LICENSE](LICENSE).
+GPL-3.0. See [LICENSE](LICENSE).
