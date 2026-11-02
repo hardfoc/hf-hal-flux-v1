@@ -1,0 +1,5 @@
+<map id="flux::bsp::host::SetSpiResponder" name="flux::bsp::host::SetSpiResponder">
+<area shape="rect" id="Node000001" title="Install a responder for the device whose chip select is cs (applied when it is created)." alt="" coords="5,5,236,31"/>
+<area shape="rect" id="Node000002" href="$namespaceflux_1_1bsp_1_1host.html#a79ec305c5f5a1256367455c82efe859c" title="The fake for chip select cs, or nullptr when no such device exists." alt="" coords="284,5,503,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="236,15,271,15,271,21,236,21"/>
+</map>

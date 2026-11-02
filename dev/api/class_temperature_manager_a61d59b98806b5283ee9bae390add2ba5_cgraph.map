@@ -1,0 +1,7 @@
+<map id="TemperatureManager::InitializeEsp32Internal" name="TemperatureManager::InitializeEsp32Internal">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,23,180,63"/>
+<area shape="rect" id="Node000002" href="$namespaceflux_1_1bsp.html#ac8a1e8afebae0edb027c2240888857cf" title="Create the MCU die&#45;temperature sensor (not initialised). nullptr if the family has none." alt="" coords="232,5,464,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="180,32,218,28,219,34,181,37"/>
+<area shape="rect" id="Node000003" href="$namespaceflux_1_1bsp.html#aba1f8874565d7430e392a0b242af57ec" title="Destroy the die&#45;temperature sensor." alt="" coords="228,55,468,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="180,49,214,52,214,57,180,54"/>
+</map>

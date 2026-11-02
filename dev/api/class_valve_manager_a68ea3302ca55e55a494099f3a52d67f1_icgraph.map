@@ -1,0 +1,5 @@
+<map id="ValveManager::Deinitialize" name="ValveManager::Deinitialize">
+<area shape="rect" id="Node000001" title="Turn every channel off, release both driver handlers and reset to uninitialised." alt="" coords="176,5,373,31"/>
+<area shape="rect" id="Node000002" href="$class_flux.html#a381c21e10f3556ecc16df4b4f2ead006" title="Shut down all subsystems in reverse initialisation order." alt="" coords="5,5,128,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="162,21,128,21,128,15,162,15"/>
+</map>

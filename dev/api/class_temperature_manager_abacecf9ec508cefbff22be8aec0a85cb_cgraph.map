@@ -1,0 +1,26 @@
+<map id="TemperatureManager::EnsureInitialized" name="TemperatureManager::EnsureInitialized">
+<area shape="rect" id="Node000001" title="Initialise the temperature subsystem if not already initialised." alt="" coords="5,172,167,212"/>
+<area shape="rect" id="Node000002" href="$class_temperature_manager.html#affefc5063769540fccf0f63b255281a9" title=" " alt="" coords="215,172,376,212"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="167,189,201,189,201,195,167,195"/>
+<area shape="rect" id="Node000003" href="$class_adc_manager.html#ae3d2137cd97edce8f97092d5b4a6d1d1" title="Return the singleton AdcManager instance." alt="" coords="713,51,903,77"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="303,171,320,138,346,98,380,59,401,43,423,29,467,13,514,5,561,3,608,6,695,23,763,44,762,49,694,28,607,11,561,8,514,10,468,18,425,34,404,47,384,63,350,101,325,140,308,173"/>
+<area shape="rect" id="Node000004" href="$class_temperature_manager.html#a61d59b98806b5283ee9bae390add2ba5" title=" " alt="" coords="445,172,619,212"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="377,189,431,189,431,195,377,195"/>
+<area shape="rect" id="Node000007" href="$class_temperature_manager.html#aef9e7888e394cba4b66931419e1790ab" title=" " alt="" coords="424,44,640,84"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="317,169,364,131,423,94,438,86,441,91,425,98,367,135,320,174"/>
+<area shape="rect" id="Node000008" href="$class_temperature_manager.html#a48a4292dbf5a5f12e5a2d7a2b5546621" title=" " alt="" coords="443,108,621,148"/>
+<area shape="poly" id="edge8_Node000002_Node000008" title=" " alt="" coords="369,169,444,149,445,154,371,174"/>
+<area shape="rect" id="Node000009" href="$class_adc_manager.html#a0f327ab6ee0c3b00fcb9431830d6c0af" title="Check whether the ADC subsystem has been initialised." alt="" coords="439,237,625,262"/>
+<area shape="poly" id="edge10_Node000002_Node000009" title=" " alt="" coords="376,209,425,221,464,231,462,236,423,226,375,214"/>
+<area shape="rect" id="Node000010" href="$class_temperature_manager.html#a503f6b4c9bfe61aa47f9655b2c92f668" title=" " alt="" coords="451,287,613,327"/>
+<area shape="poly" id="edge11_Node000002_Node000010" title=" " alt="" coords="324,210,370,241,425,272,442,279,440,284,423,277,367,246,321,214"/>
+<area shape="rect" id="Node000011" href="$namespaceflux_1_1hal.html#ab4504a1b2b5bf4af2617ffe9dc591813" title="Short name of a ManagerError, for logs and diagnostics." alt="" coords="465,351,599,377"/>
+<area shape="poly" id="edge13_Node000002_Node000011" title=" " alt="" coords="310,210,356,273,388,308,425,336,452,348,450,353,423,341,384,312,351,277,306,214"/>
+<area shape="rect" id="Node000005" href="$namespaceflux_1_1bsp.html#ac8a1e8afebae0edb027c2240888857cf" title="Create the MCU die&#45;temperature sensor (not initialised). nullptr if the family has none." alt="" coords="692,179,924,205"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="619,189,678,189,678,195,619,195"/>
+<area shape="rect" id="Node000006" href="$namespaceflux_1_1bsp.html#aba1f8874565d7430e392a0b242af57ec" title="Destroy the die&#45;temperature sensor." alt="" coords="688,261,928,286"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="601,209,752,254,750,259,600,214"/>
+<area shape="poly" id="edge7_Node000007_Node000003" title=" " alt="" coords="640,61,700,61,700,67,640,67"/>
+<area shape="poly" id="edge9_Node000008_Node000003" title=" " alt="" coords="618,105,738,77,739,82,620,110"/>
+<area shape="poly" id="edge12_Node000010_Node000006" title=" " alt="" coords="612,294,689,285,690,290,613,299"/>
+</map>

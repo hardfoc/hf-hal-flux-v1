@@ -1,0 +1,11 @@
+<map id="LedColor::ToRgb" name="LedColor::ToRgb">
+<area shape="rect" id="Node000001" title="Pack into a 24&#45;bit 0xRRGGBB integer." alt="" coords="579,31,705,56"/>
+<area shape="rect" id="Node000002" href="$class_led_manager.html#a3f6f38b32b2d369fee7bbd66cd722b93" title="Log current LED state and statistics to the console." alt="" coords="299,5,509,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="565,38,509,32,509,27,565,33"/>
+<area shape="rect" id="Node000004" href="$class_led_manager.html#a1e4f703fea5db47a9bcbcbb32d6e573c" title=" " alt="" coords="277,55,531,80"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="565,54,530,57,529,52,564,48"/>
+<area shape="rect" id="Node000003" href="$class_flux.html#ac85a6ad26883360e0c3ea2c702b6fc11" title="Log a comprehensive system summary to the console." alt="" coords="14,5,221,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="285,21,221,21,221,15,285,15"/>
+<area shape="rect" id="Node000005" href="$class_led_manager.html#a0357a6834f7f65e77a37536f357932d5" title="Advance the animation by one tick. Call periodically (~50 ms)." alt="" coords="5,55,229,80"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="264,70,230,70,230,65,264,65"/>
+</map>

@@ -1,0 +1,25 @@
+var searchData=
+[
+  ['access_5fcount_0',['access_count',['../struct_gpio_entry.html#a620457ba9b1b0589ba914cd4013dd5f2',1,'GpioEntry::access_count'],['../struct_adc_entry.html#acd74549f37bea096076c1b3e914b3e81',1,'AdcEntry::access_count']]],
+  ['activation_5fcount_1',['activation_count',['../struct_valve_channel_state.html#a6e03a3d0da83297db90780086a9878b4',1,'ValveChannelState']]],
+  ['active_5fchannels_2',['active_channels',['../struct_valve_system_diagnostics.html#ae1d58706cead7add4b2348a22ebdcb24',1,'ValveSystemDiagnostics']]],
+  ['active_5fstate_3',['active_state',['../structflux_1_1bsp_1_1_gpio_spec.html#a54c2331b610ae4fb9b0fbc2c7765028e',1,'flux::bsp::GpioSpec']]],
+  ['adc_4',['adc',['../class_flux.html#a2301f74e74b1dfb4cebf42fff1740f10',1,'Flux::adc'],['../structflux_1_1bsp_1_1anonymous__namespace_02_flux_platform_bind_host_8cpp_03_1_1_host_state.html#ad3c162b5eb91dd3fc047e4c2ec8f5a48',1,'flux::bsp::anonymous_namespace{FluxPlatformBindHost.cpp}::HostState::adc']]],
+  ['adc_5ffail_5',['adc_fail',['../structflux_1_1bsp_1_1anonymous__namespace_02_flux_platform_bind_host_8cpp_03_1_1_host_state.html#a2ba3180795efe42034abedf755699f3a',1,'flux::bsp::anonymous_namespace{FluxPlatformBindHost.cpp}::HostState']]],
+  ['adc_5finitialized_6',['adc_initialized',['../struct_flux_system_diagnostics.html#abac9d07abb2225526a2983cbe241f96b',1,'FluxSystemDiagnostics']]],
+  ['adc_5finitialized_5f_7',['adc_initialized_',['../class_flux.html#ad5d457bd25b17a696913b92e0dad5bca',1,'Flux']]],
+  ['adc_5fmask_8',['adc_mask',['../structflux_1_1bsp_1_1anonymous__namespace_02_flux_platform_bind_host_8cpp_03_1_1_host_state.html#a5156905cd80df210c6b8f271205dc72b',1,'flux::bsp::anonymous_namespace{FluxPlatformBindHost.cpp}::HostState']]],
+  ['adc_5funit_9',['adc_unit',['../struct_adc_entry.html#a20a4229cb67d990678c8c681873ec72f',1,'AdcEntry']]],
+  ['ads7952_5fdevice_5fcount_5f_10',['ads7952_device_count_',['../class_adc_manager.html#a20317d8ca220071d3b650a8e145e2511',1,'AdcManager']]],
+  ['ads7952_5fhandlers_5f_11',['ads7952_handlers_',['../class_adc_manager.html#a80abec941304a7959cb9af17bec42ab5',1,'AdcManager']]],
+  ['ads7952_5fready_12',['ads7952_ready',['../struct_flux_hal_diagnostics.html#a9a6ecc7011761dcd6b04a036204613c9',1,'FluxHalDiagnostics']]],
+  ['all_5fhealthy_13',['all_healthy',['../struct_manager_health_snapshot.html#aab15ba44d783e5daf3d250493160eb1f',1,'ManagerHealthSnapshot::all_healthy'],['../struct_flux_hal_diagnostics.html#a3102fb896e0de48e64ed2dce641092d9',1,'FluxHalDiagnostics::all_healthy']]],
+  ['all_5fmanagers_5fup_14',['all_managers_up',['../struct_flux_hal_diagnostics.html#a591d79cb047cbd73b2dc80f50096a749',1,'FluxHalDiagnostics']]],
+  ['animation_5factive_15',['animation_active',['../struct_led_system_diagnostics.html#a037482476a3ec83b4cff0aca2229ed17',1,'LedSystemDiagnostics']]],
+  ['animation_5fcycles_16',['animation_cycles',['../struct_led_system_diagnostics.html#ae391afd26b2f1b057183b70f2bc1cb56',1,'LedSystemDiagnostics']]],
+  ['animation_5fcycles_5f_17',['animation_cycles_',['../class_led_manager.html#a9c05c671506dc630806a9ed9f26d67c3',1,'LedManager']]],
+  ['animation_5fdirection_5f_18',['animation_direction_',['../class_led_manager.html#aa2665256eb6a5c976171951cdeb367ec',1,'LedManager']]],
+  ['animation_5fstep_5f_19',['animation_step_',['../class_led_manager.html#a225c3a92fafcafbf3c8d3ff837dc11d4',1,'LedManager']]],
+  ['animation_5fupdate_5finterval_20',['ANIMATION_UPDATE_INTERVAL',['../class_led_manager.html#ad6fbb313275ab50c5eb644de31995701',1,'LedManager']]],
+  ['app_5f_21',['app_',['../class_nvs_manager.html#ac279fdbde3e077eb3150332e1487535c',1,'NvsManager']]]
+];

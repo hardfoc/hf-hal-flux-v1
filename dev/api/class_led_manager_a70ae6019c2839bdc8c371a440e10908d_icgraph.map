@@ -1,0 +1,9 @@
+<map id="LedManager::TurnOff" name="LedManager::TurnOff">
+<area shape="rect" id="Node000001" title="Turn the LED off (set colour to black)." alt="" coords="631,5,787,31"/>
+<area shape="rect" id="Node000002" href="$class_led_manager.html#a2dc2c5f9181410493ab66b14e6c40788" title="Turn off the LED and release driver resources." alt="" coords="408,5,583,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="617,21,583,21,583,15,617,15"/>
+<area shape="rect" id="Node000003" href="$class_led_manager.html#a4c571368a2d02ce4dc616b6881878d4c" title="Alias for Shutdown()." alt="" coords="176,5,360,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="394,21,360,21,360,15,394,15"/>
+<area shape="rect" id="Node000004" href="$class_flux.html#a381c21e10f3556ecc16df4b4f2ead006" title="Shut down all subsystems in reverse initialisation order." alt="" coords="5,5,128,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="162,21,129,21,129,15,162,15"/>
+</map>

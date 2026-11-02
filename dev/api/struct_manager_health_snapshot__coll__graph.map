@@ -1,0 +1,5 @@
+<map id="ManagerHealthSnapshot" name="ManagerHealthSnapshot">
+<area shape="rect" id="Node000001" title="Aggregated health snapshot across all Flux managers." alt="" coords="5,93,188,119"/>
+<area shape="rect" id="Node000002" href="$struct_manager_health_entry.html" title="Per&#45;manager health entry for unified error aggregation." alt="" coords="19,5,175,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="99,45,99,93,94,93,94,45"/>
+</map>

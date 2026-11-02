@@ -1,0 +1,5 @@
+<map id="LedColor::FromRgb" name="LedColor::FromRgb">
+<area shape="rect" id="Node000001" title="Unpack from a 24&#45;bit 0xRRGGBB integer." alt="" coords="5,5,151,31"/>
+<area shape="rect" id="Node000002" href="$struct_led_color.html#affb23f6393ce5f38d2c922522ff6c317" title="Default&#45;construct black (0, 0, 0)." alt="" coords="199,5,343,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="151,15,185,15,185,21,151,21"/>
+</map>

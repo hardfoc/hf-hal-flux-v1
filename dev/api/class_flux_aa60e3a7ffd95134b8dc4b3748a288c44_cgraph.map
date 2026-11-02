@@ -1,0 +1,14 @@
+<map id="Flux::InitializeGpio" name="Flux::InitializeGpio">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,56,149,81"/>
+<area shape="rect" id="Node000002" href="$class_gpio_manager.html#a88a01fcf59a2db604d59b5cca4503112" title="Register all GPIO pins and initialise drivers (idempotent)." alt="" coords="197,56,423,81"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="150,66,183,66,183,71,150,71"/>
+<area shape="rect" id="Node000003" href="$class_gpio_manager.html#a71081920f92fb76254ccd258ec539c9e" title=" " alt="" coords="471,56,644,81"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="423,66,457,66,457,71,423,71"/>
+<area shape="rect" id="Node000004" href="$namespaceflux_1_1bsp.html#a26c01dd86384f55f056c457237ea38dc" title="Create the GPIO object for slot. No hardware access until the object is initialised." alt="" coords="720,5,879,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="619,53,724,31,725,36,620,58"/>
+<area shape="rect" id="Node000005" href="$namespaceflux_1_1bsp.html#afac5377c3dce5148341624e6573fa36b" title="Destroy the GPIO object in slot (releases the pin)." alt="" coords="955,81,1121,107"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="644,71,941,86,941,92,644,76"/>
+<area shape="rect" id="Node000006" href="$class_gpio_manager.html#ae88d40d145606f638c64bca174b06376" title=" " alt="" coords="692,107,907,132"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="620,79,725,101,724,106,619,84"/>
+<area shape="poly" id="edge6_Node000006_Node000005" title=" " alt="" coords="907,105,941,102,941,107,907,111"/>
+</map>
