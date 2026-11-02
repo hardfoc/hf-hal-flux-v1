@@ -617,6 +617,8 @@
       
         
       
+        
+      
     
     
     
@@ -672,6 +674,34 @@
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../bindings/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Platform bindings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
               
             
               
@@ -887,6 +917,8 @@
       
         
       
+        
+      
     
     
     
@@ -903,7 +935,7 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_6" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_7" >
         
           
           <div class="md-nav__link md-nav__container">
@@ -925,14 +957,14 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_3_6" id="__nav_3_6_label" tabindex="">
+              <label class="md-nav__link " for="__nav_3_7" id="__nav_3_7_label" tabindex="">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_6_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_6">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_7">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -1015,6 +1047,34 @@
     
   
     ADR 0003: The hf-pincfg X-macro table is the single source of pin truth
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0004-platform-bindings/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR 0004: Create MCU objects in a per-family platform binding; keep managers MCU-free
   
 
     
@@ -1842,7 +1902,7 @@ that holds the lock may call another method of the same manager.</p>
    animation step is 50 ms).</li>
 </ol>
 <h2 id="cpu-affinity">CPU affinity<a class="headerlink" href="#cpu-affinity" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/8af3903fff194cf3d941605901566a7f8c5dafe3/lib/api/FluxCpuAffinity.h"><code>FluxCpuAffinity.h</code></a> names the logical cores your tasks should use on the
+<p><a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/3e4f2098195acb4737cae7ba59dc95a3dffc3a42/lib/api/FluxCpuAffinity.h"><code>FluxCpuAffinity.h</code></a> names the logical cores your tasks should use on the
 dual-core ESP32-S3: <code>flux_hal::kFluxCpuHostIo</code> (0) for host, system and communication work and
 <code>flux_hal::kFluxCpuRealtime</code> (1) for high-rate loops such as pressure control. <code>kFluxCpuNoAffinity</code> (-1) lets the
 scheduler choose. Pass them to <code>BaseThread</code> or <code>os_thread_create_pinned</code>.</p>

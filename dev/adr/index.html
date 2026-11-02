@@ -617,6 +617,8 @@
       
         
       
+        
+      
     
     
     
@@ -672,6 +674,34 @@
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/bindings/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Platform bindings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
               
             
               
@@ -809,6 +839,8 @@
       
         
       
+        
+      
     
     
     
@@ -825,7 +857,7 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_6" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_7" checked>
         
           
           <div class="md-nav__link md-nav__container">
@@ -847,14 +879,14 @@
             </a>
             
               
-              <label class="md-nav__link md-nav__link--active" for="__nav_3_6" id="__nav_3_6_label" tabindex="">
+              <label class="md-nav__link md-nav__link--active" for="__nav_3_7" id="__nav_3_7_label" tabindex="">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_6_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_3_6">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_7_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3_7">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -937,6 +969,34 @@
     
   
     ADR 0003: The hf-pincfg X-macro table is the single source of pin truth
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="0004-platform-bindings/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR 0004: Create MCU objects in a per-family platform binding; keep managers MCU-free
   
 
     
@@ -1654,7 +1714,7 @@
 <h1 id="decisions">Decisions<a class="headerlink" href="#decisions" title="Permanent link">&para;</a></h1>
 <p>Architecture decision records (ADRs): one page per decision that shapes the code, with its context, the options
 considered and the consequences. A record is not rewritten after it is accepted; a later record supersedes it. The
-same three decisions apply to the Vortex V1 HAL, which is built the same way.</p>
+same decisions apply to the Vortex V1 HAL, which is built the same way.</p>
 <table>
 <thead>
 <tr>
@@ -1667,7 +1727,7 @@ same three decisions apply to the Vortex V1 HAL, which is built the same way.</p
 <tr>
 <td><a href="0001-mcu-agnostic-boundary/">0001</a></td>
 <td>Keep the MCU behind the interface wrap; only managers know the board</td>
-<td>Accepted</td>
+<td>Accepted; construction site superseded by 0004</td>
 </tr>
 <tr>
 <td><a href="0002-static-allocation/">0002</a></td>
@@ -1677,6 +1737,11 @@ same three decisions apply to the Vortex V1 HAL, which is built the same way.</p
 <tr>
 <td><a href="0003-pin-map-ownership/">0003</a></td>
 <td>The hf-pincfg X-macro table is the single source of pin truth</td>
+<td>Accepted</td>
+</tr>
+<tr>
+<td><a href="0004-platform-bindings/">0004</a></td>
+<td>Create MCU objects in a per-family platform binding; keep managers MCU-free</td>
 <td>Accepted</td>
 </tr>
 </tbody>

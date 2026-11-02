@@ -615,6 +615,8 @@
       
         
       
+        
+      
     
     
     
@@ -667,6 +669,34 @@
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/bindings/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Platform bindings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
               
             
               
@@ -802,6 +832,8 @@
       
         
       
+        
+      
     
     
     
@@ -815,7 +847,7 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_6" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_7" >
         
           
           <div class="md-nav__link md-nav__container">
@@ -837,14 +869,14 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_3_6" id="__nav_3_6_label" tabindex="0">
+              <label class="md-nav__link " for="__nav_3_7" id="__nav_3_7_label" tabindex="0">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_6_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_6">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_7">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -927,6 +959,34 @@
     
   
     ADR 0003: The hf-pincfg X-macro table is the single source of pin truth
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0004-platform-bindings/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR 0004: Create MCU objects in a per-family platform binding; keep managers MCU-free
   
 
     
@@ -1769,7 +1829,7 @@
 
 <h1 id="testing-and-ci">Testing and CI<a class="headerlink" href="#testing-and-ci" title="Permanent link">&para;</a></h1>
 <p>What runs on a pull request, what each check means, and how to run it on your machine first. All workflows are in
-<a href="https://github.com/hardfoc/hf-hal-flux-v1/tree/8af3903fff194cf3d941605901566a7f8c5dafe3/.github/workflows"><code>.github/workflows</code></a>; most call reusable workflows in
+<a href="https://github.com/hardfoc/hf-hal-flux-v1/tree/3e4f2098195acb4737cae7ba59dc95a3dffc3a42/.github/workflows"><code>.github/workflows</code></a>; most call reusable workflows in
 <a href="https://github.com/hardfoc/hf-general-ci-tools">hf-general-ci-tools</a> or
 <a href="https://github.com/hardfoc/hf-espidf-ci-tools">hf-espidf-ci-tools</a>.</p>
 <h2 id="workflows">Workflows<a class="headerlink" href="#workflows" title="Permanent link">&para;</a></h2>
@@ -1826,6 +1886,12 @@
 <td>yamllint, config <code>_config/.yamllint</code></td>
 </tr>
 <tr>
+<td>HAL Boundary CI</td>
+<td><code>ci-hal-boundary.yml</code></td>
+<td>push, pull request</td>
+<td><code>tools/lint/lint_hal_boundary.sh</code> (no ESP-IDF, FreeRTOS or <code>Esp*</code> code outside <code>lib/managers/bsp_bind/&lt;family&gt;/</code>; shrink-only allowlist checked against the PR base); host build of the managers against <code>bsp_bind/host</code></td>
+</tr>
+<tr>
 <td>Release</td>
 <td><code>release.yml</code></td>
 <td><code>v*</code> tags</td>
@@ -1839,18 +1905,22 @@ There are no host unit tests in this repository yet.</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Build one example (needs ESP-IDF, see Get started)</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nb">cd</span><span class="w"> </span>examples/esp32<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>./scripts/build_app.sh<span class="w"> </span>flux_api_test<span class="w"> </span>Release<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>../..
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># Format check</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>clang-format<span class="w"> </span>--style<span class="o">=</span>file:_config/.clang-format<span class="w"> </span>--dry-run<span class="w"> </span>--Werror<span class="w"> </span>lib/managers/*.cpp<span class="w"> </span>lib/managers/*.h
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="c1"># Docs: drift checks, then the strict site build (the pin map needs lib/core and hf-pincfg)</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>python3<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"git+https://github.com/hardfoc/hf-general-ci-tools@v1#subdirectory=packages/hardfoc-mkdocs-theme"</span>
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>hardfoc-docs<span class="w"> </span>gen<span class="w"> </span>--check
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>hardfoc-docs<span class="w"> </span>figures<span class="w"> </span>--check
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>mkdocs<span class="w"> </span>build<span class="w"> </span>--strict
-</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>
-</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="c1"># Markdown and YAML lint</span>
-</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>npx<span class="w"> </span>markdownlint-cli2<span class="w"> </span>--config<span class="w"> </span>_config/.markdownlint.json<span class="w"> </span><span class="s2">"docs/**/*.md"</span><span class="w"> </span>README.md
-</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>yamllint<span class="w"> </span>-c<span class="w"> </span>_config/.yamllint<span class="w"> </span>.github/workflows<span class="w"> </span>mkdocs.yml
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># HAL boundary lint and the host build of the managers (no ESP-IDF needed)</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>tools/lint/lint_hal_boundary.sh
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>cmake<span class="w"> </span>-S<span class="w"> </span>tests/host<span class="w"> </span>-B<span class="w"> </span>build/host<span class="w"> </span>-G<span class="w"> </span>Ninja<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>cmake<span class="w"> </span>--build<span class="w"> </span>build/host
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="c1"># Format check</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>clang-format<span class="w"> </span>--style<span class="o">=</span>file:_config/.clang-format<span class="w"> </span>--dry-run<span class="w"> </span>--Werror<span class="w"> </span>lib/managers/*.cpp<span class="w"> </span>lib/managers/*.h
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="c1"># Docs: drift checks, then the strict site build (the pin map needs lib/core and hf-pincfg)</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>python3<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"git+https://github.com/hardfoc/hf-general-ci-tools@v1#subdirectory=packages/hardfoc-mkdocs-theme"</span>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>hardfoc-docs<span class="w"> </span>gen<span class="w"> </span>--check
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>hardfoc-docs<span class="w"> </span>figures<span class="w"> </span>--check
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>mkdocs<span class="w"> </span>build<span class="w"> </span>--strict
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="c1"># Markdown and YAML lint</span>
+</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>npx<span class="w"> </span>markdownlint-cli2<span class="w"> </span>--config<span class="w"> </span>_config/.markdownlint.json<span class="w"> </span><span class="s2">"docs/**/*.md"</span><span class="w"> </span>README.md
+</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>yamllint<span class="w"> </span>-c<span class="w"> </span>_config/.yamllint<span class="w"> </span>.github/workflows<span class="w"> </span>mkdocs.yml
 </span></code></pre></div>
 <h2 id="when-the-docs-checks-fail">When the docs checks fail<a class="headerlink" href="#when-the-docs-checks-fail" title="Permanent link">&para;</a></h2>
 <table>

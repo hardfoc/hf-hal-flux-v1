@@ -615,6 +615,8 @@
       
         
       
+        
+      
     
     
     
@@ -667,6 +669,34 @@
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/bindings/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Platform bindings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
               
             
               
@@ -802,6 +832,8 @@
       
         
       
+        
+      
     
     
     
@@ -815,7 +847,7 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_6" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_7" >
         
           
           <div class="md-nav__link md-nav__container">
@@ -837,14 +869,14 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_3_6" id="__nav_3_6_label" tabindex="0">
+              <label class="md-nav__link " for="__nav_3_7" id="__nav_3_7_label" tabindex="0">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_6_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_6">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_7">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -927,6 +959,34 @@
     
   
     ADR 0003: The hf-pincfg X-macro table is the single source of pin truth
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0004-platform-bindings/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR 0004: Create MCU objects in a per-family platform binding; keep managers MCU-free
   
 
     
@@ -1774,7 +1834,9 @@ nothing here is a promise of a date.</p>
 <ul>
 <li>One <code>Flux</code> facade and seven managers covering every chip on the board (<a href="../managers/">Managers</a>).</li>
 <li>Pin map, examples catalogue and figures generated from the code, checked in CI (<a href="../testing/">Testing and CI</a>).</li>
-<li>Builds for the ESP32-S3 with ESP-IDF release/v5.5.</li>
+<li>Builds for the ESP32-S3 with ESP-IDF release/v5.5. ESP-IDF code is confined to the platform binding
+  (<code>lib/managers/bsp_bind/esp32s3</code>), checked by a boundary lint, and the managers also build on a host
+  (<a href="../architecture/bindings/">Platform bindings</a>).</li>
 </ul>
 <h2 id="next-close-the-known-gaps">Next: close the known gaps<a class="headerlink" href="#next-close-the-known-gaps" title="Permanent link">&para;</a></h2>
 <table>
@@ -1810,11 +1872,6 @@ nothing here is a promise of a date.</p>
 <td>No host unit tests</td>
 <td>-</td>
 <td>Logic such as channel resolution and error mapping is only tested on hardware</td>
-</tr>
-<tr>
-<td>ESP-IDF calls in the facade and LED manager</td>
-<td><code>Flux.cpp</code>, <code>LedManager.*</code></td>
-<td>Leaks across the MCU boundary (<a href="../adr/0001-mcu-agnostic-boundary/">ADR 0001</a>)</td>
 </tr>
 </tbody>
 </table>

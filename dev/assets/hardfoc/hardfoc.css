@@ -140,10 +140,29 @@
   --md-accent-fg-color--transparent: #5eead41a;
 }
 
-/* Fonts: Inter / JetBrains Mono when loaded (main.html), the platform's UI fonts until then. */
+/* Fonts: Inter / JetBrains Mono when loaded (main.html). Until then a local face with Inter's metrics (Arial or its
+   metric twins, scaled), so text does not move when Inter arrives (no layout shift from the font swap). */
+@font-face {
+  font-family: "Inter Fallback";
+  src: local("Arial"), local("ArialMT"), local("Liberation Sans"), local("Arimo"), local("Helvetica");
+  size-adjust: 107.06%;
+  ascent-override: 90.49%;
+  descent-override: 22.56%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: "JetBrains Mono Fallback";
+  src: local("Courier New"), local("CourierNewPSMT"), local("Liberation Mono"), local("Cousine");
+  size-adjust: 100%;
+  ascent-override: 102%;
+  descent-override: 30%;
+  line-gap-override: 0%;
+}
+
 :root {
-  --md-text-font: "Inter";             /* Material appends its system-font fallbacks */
-  --md-code-font: "JetBrains Mono";
+  --md-text-font: "Inter", "Inter Fallback";               /* Material appends its system-font fallbacks */
+  --md-code-font: "JetBrains Mono", "JetBrains Mono Fallback";
 }
 
 /* Links inside running text are underlined, not told apart by colour alone (WCAG 1.4.1). */

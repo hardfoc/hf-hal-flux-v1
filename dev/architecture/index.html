@@ -16,7 +16,7 @@
         <link rel="prev" href="../hardware/pin-map/">
       
       
-        <link rel="next" href="initialization/">
+        <link rel="next" href="bindings/">
       
       
         
@@ -617,6 +617,8 @@
       
         
       
+        
+      
     
     
     
@@ -672,6 +674,34 @@
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="bindings/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Platform bindings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
               
             
               
@@ -807,6 +837,8 @@
       
         
       
+        
+      
     
     
     
@@ -823,7 +855,7 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_6" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_7" >
         
           
           <div class="md-nav__link md-nav__container">
@@ -845,14 +877,14 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_3_6" id="__nav_3_6_label" tabindex="">
+              <label class="md-nav__link " for="__nav_3_7" id="__nav_3_7_label" tabindex="">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_6_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_6">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_7">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -935,6 +967,34 @@
     
   
     ADR 0003: The hf-pincfg X-macro table is the single source of pin truth
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adr/0004-platform-bindings/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR 0004: Create MCU objects in a per-family platform binding; keep managers MCU-free
   
 
     
@@ -1682,16 +1742,17 @@
 <h1 id="architecture">Architecture<a class="headerlink" href="#architecture" title="Permanent link">&para;</a></h1>
 <p>How the Flux V1 HAL is put together. The short version: your code talks to one object, <code>Flux</code>; <code>Flux</code> holds one
 manager per board function; managers own hf-core handlers; handlers wrap chip drivers; drivers reach the hardware
-only through the interface classes of the internal interface wrap, which sit on ESP-IDF.</p>
+only through the interface classes of the internal interface wrap. The objects behind those interfaces are created
+by a platform binding, one per MCU family, which is the only code that includes ESP-IDF.</p>
 <figure class="hf-figure">
-<img src="../diagrams/hal-layers.svg#only-light" alt="Layer stack of the Flux V1 HAL: application, the Flux facade, 7 managers, 5 hf-core handlers, 6 chip drivers, and the interface wrap on ESP-IDF and the ESP32-S3." width="1200" loading="lazy"><img src="../diagrams/hal-layers.dark.svg#only-dark" alt="Layer stack of the Flux V1 HAL: application, the Flux facade, 7 managers, 5 hf-core handlers, 6 chip drivers, and the interface wrap on ESP-IDF and the ESP32-S3." width="1200" loading="lazy">
+<img src="../diagrams/hal-layers.svg#only-light" alt="Layer stack of the Flux V1 HAL: application, the Flux facade, 7 MCU-free managers, 5 hf-core handlers, 6 chip drivers, the interface classes, and the platform binding that creates their ESP32 implementations on ESP-IDF and the ESP32-S3." width="1200" loading="lazy"><img src="../diagrams/hal-layers.dark.svg#only-dark" alt="Layer stack of the Flux V1 HAL: application, the Flux facade, 7 MCU-free managers, 5 hf-core handlers, 6 chip drivers, the interface classes, and the platform binding that creates their ESP32 implementations on ESP-IDF and the ESP32-S3." width="1200" loading="lazy">
 <figcaption>Flux V1 HAL, layer by layer</figcaption>
 </figure>
 
 <details class="hf-figure-desc">
 <summary>Figure description and sources</summary>
-<p>From top to bottom, each layer only calls the one under it. Your application asks the facade singleton for the managers. The managers (one per board function) own the hf-core handlers, which wrap one chip driver each; a manager may also use a driver directly. Drivers talk to hardware only through the interface classes of the internal interface wrap, whose ESP32 implementations sit on ESP-IDF. Every name in a band is read from the code: the managers from the facade's member references, the handlers, drivers and interface classes from the managers' and handlers' #include lines.</p>
-<p>Drawn from: <a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/8af3903fff194cf3d941605901566a7f8c5dafe3/lib/api/Flux.h"><code>lib/api/Flux.h</code></a> <code>Flux (manager references)</code>; <a href="https://github.com/hardfoc/hf-hal-flux-v1/tree/8af3903fff194cf3d941605901566a7f8c5dafe3/lib/managers"><code>lib/managers</code></a> <code>#includes</code>; <a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/8af3903fff194cf3d941605901566a7f8c5dafe3/lib/core/handlers"><code>lib/core/handlers</code></a> <code>#includes</code>; figure module <a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/8af3903fff194cf3d941605901566a7f8c5dafe3/docs/diagrams/figures/hal-layers.py"><code>docs/diagrams/figures/hal-layers.py</code></a>.</p>
+<p>From top to bottom, each layer only calls the one under it. Your application asks the facade singleton for the managers. The managers (one per board function) own the hf-core handlers, which wrap one chip driver each. The managers are MCU-free: the platform binding of the MCU family (bsp_bind/esp32s3 on this board) creates the objects behind the interface classes, the ESP32 implementations that sit on ESP-IDF, and is the only HAL code that includes ESP-IDF. Drivers talk to hardware only through the interface classes. Every name in a band is read from the code: the managers from the facade's member references, the handlers, drivers and interface classes from the managers', handlers' and binding's #include lines.</p>
+<p>Drawn from: <a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/3e4f2098195acb4737cae7ba59dc95a3dffc3a42/lib/api/Flux.h"><code>lib/api/Flux.h</code></a> <code>Flux (manager references)</code>; <a href="https://github.com/hardfoc/hf-hal-flux-v1/tree/3e4f2098195acb4737cae7ba59dc95a3dffc3a42/lib/managers"><code>lib/managers</code></a> <code>#includes</code>; <a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/3e4f2098195acb4737cae7ba59dc95a3dffc3a42/lib/core/handlers"><code>lib/core/handlers</code></a> <code>#includes</code>; <a href="https://github.com/hardfoc/hf-hal-flux-v1/tree/3e4f2098195acb4737cae7ba59dc95a3dffc3a42/lib/managers/bsp_bind"><code>lib/managers/bsp_bind</code></a> <code>#includes</code>; figure module <a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/3e4f2098195acb4737cae7ba59dc95a3dffc3a42/docs/diagrams/figures/hal-layers.py"><code>docs/diagrams/figures/hal-layers.py</code></a>.</p>
 </details>
 <h2 id="the-layers">The layers<a class="headerlink" href="#the-layers" title="Permanent link">&para;</a></h2>
 <table>
@@ -1706,21 +1767,27 @@ only through the interface classes of the internal interface wrap, which sit on 
 <tbody>
 <tr>
 <td>Application</td>
-<td>your project, <a href="https://github.com/hardfoc/hf-hal-flux-v1/tree/8af3903fff194cf3d941605901566a7f8c5dafe3/examples/esp32"><code>examples/esp32</code></a></td>
+<td>your project, <a href="https://github.com/hardfoc/hf-hal-flux-v1/tree/3e4f2098195acb4737cae7ba59dc95a3dffc3a42/examples/esp32"><code>examples/esp32</code></a></td>
 <td>Tasks, control loops, protocols</td>
 <td>Always</td>
 </tr>
 <tr>
 <td>Facade</td>
-<td><a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/8af3903fff194cf3d941605901566a7f8c5dafe3/lib/api/Flux.h"><code>lib/api/Flux.h</code></a></td>
+<td><a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/3e4f2098195acb4737cae7ba59dc95a3dffc3a42/lib/api/Flux.h"><code>lib/api/Flux.h</code></a></td>
 <td>One singleton; brings the managers up in order; system diagnostics</td>
 <td>Always: <code>Flux::GetInstance()</code></td>
 </tr>
 <tr>
 <td>Managers</td>
-<td><a href="https://github.com/hardfoc/hf-hal-flux-v1/tree/8af3903fff194cf3d941605901566a7f8c5dafe3/lib/managers"><code>lib/managers</code></a></td>
-<td>One per board function (valves, ADC, temperature, ...); know the board's wiring from the pin map</td>
+<td><a href="https://github.com/hardfoc/hf-hal-flux-v1/tree/3e4f2098195acb4737cae7ba59dc95a3dffc3a42/lib/managers"><code>lib/managers</code></a></td>
+<td>One per board function (valves, ADC, temperature, ...); know the board's wiring from the pin map; MCU-free</td>
 <td>Almost always: <code>flux.valves</code>, <code>flux.adc</code>, ...</td>
+</tr>
+<tr>
+<td>Platform binding</td>
+<td><a href="https://github.com/hardfoc/hf-hal-flux-v1/tree/3e4f2098195acb4737cae7ba59dc95a3dffc3a42/lib/managers/bsp_bind"><code>lib/managers/bsp_bind</code></a></td>
+<td>Turns the managers' plain-data specs into <code>Base*</code> objects; <code>esp32s3/</code> is the only ESP-IDF code in the HAL</td>
+<td>When porting to another MCU (<a href="bindings/">Platform bindings</a>)</td>
 </tr>
 <tr>
 <td>hf-core handlers</td>
@@ -1737,16 +1804,18 @@ only through the interface classes of the internal interface wrap, which sit on 
 <tr>
 <td>Interface wrap</td>
 <td><code>lib/core/hf-core-drivers/internal/hf-internal-interface-wrap</code></td>
-<td><code>BaseSpi</code>, <code>BaseGpio</code>, <code>BaseAdc</code>, ... and their ESP32 implementations (<code>EspSpi</code>, <code>EspGpio</code>, ...)</td>
+<td><code>BaseSpi</code>, <code>BaseGpio</code>, <code>BaseAdc</code>, ... and their ESP32 implementations (<code>EspSpi</code>, <code>EspGpio</code>, ...), which only the binding names</td>
 <td>When porting to another MCU</td>
 </tr>
 </tbody>
 </table>
 <p>The rule that holds the design together: <strong>a layer only calls the layer below it.</strong> The managers are the only code
 that knows Flux V1 exists; handlers and drivers are shared with other HardFOC boards. Why the line is drawn there is
-recorded in <a href="../adr/0001-mcu-agnostic-boundary/">ADR 0001</a>.</p>
+recorded in <a href="../adr/0001-mcu-agnostic-boundary/">ADR 0001</a>; why the MCU objects are created in a binding and not
+in the managers is <a href="../adr/0004-platform-bindings/">ADR 0004</a>, and a lint in CI keeps it that way.</p>
 <h2 id="read-on">Read on<a class="headerlink" href="#read-on" title="Permanent link">&para;</a></h2>
 <ul>
+<li><a href="bindings/">Platform bindings</a>: what the binding creates, the families, and the boundary lint.</li>
 <li><a href="initialization/">Initialisation</a>: the order the managers come up and what happens when one fails.</li>
 <li><a href="ownership/">Ownership</a>: which manager creates which handler, and how memory is allocated.</li>
 <li><a href="threading/">Threading</a>: which calls are safe from several tasks.</li>
@@ -1806,13 +1875,13 @@ recorded in <a href="../adr/0001-mcu-agnostic-boundary/">ADR 0001</a>.</p>
         
         
           
-          <a href="initialization/" class="md-footer__link md-footer__link--next" aria-label="Next: Initialisation">
+          <a href="bindings/" class="md-footer__link md-footer__link--next" aria-label="Next: Platform bindings">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Initialisation
+                Platform bindings
               </div>
             </div>
             <div class="md-footer__button md-icon">

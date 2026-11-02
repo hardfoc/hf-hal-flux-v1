@@ -49,11 +49,19 @@
          <lastmod>2026-11-02</lastmod>
     </url>
     <url>
+         <loc>https://hardfoc.github.io/hf-hal-flux-v1/latest/adr/0004-platform-bindings/</loc>
+         <lastmod>2026-11-02</lastmod>
+    </url>
+    <url>
          <loc>https://hardfoc.github.io/hf-hal-flux-v1/latest/adr/template/</loc>
          <lastmod>2026-11-02</lastmod>
     </url>
     <url>
          <loc>https://hardfoc.github.io/hf-hal-flux-v1/latest/architecture/</loc>
+         <lastmod>2026-11-02</lastmod>
+    </url>
+    <url>
+         <loc>https://hardfoc.github.io/hf-hal-flux-v1/latest/architecture/bindings/</loc>
          <lastmod>2026-11-02</lastmod>
     </url>
     <url>

@@ -1,7 +1,0 @@
-<map id="LedManager::Initialize" name="LedManager::Initialize">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,172,56"/>
-<area shape="rect" id="Node000002" href="$class_led_manager.html#ac6bff1fceb7eab43ee606dd3807d3d47" title=" " alt="" coords="241,5,448,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="172,32,227,27,228,32,173,38"/>
-<area shape="rect" id="Node000003" href="$class_led_manager.html#aec49368647c9b09857ea1b775d655e5e" title=" " alt="" coords="220,55,469,80"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="173,48,206,52,206,57,172,54"/>
-</map>

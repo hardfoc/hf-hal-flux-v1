@@ -617,6 +617,8 @@
       
         
       
+        
+      
     
     
     
@@ -669,6 +671,34 @@
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/bindings/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Platform bindings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
               
             
               
@@ -804,6 +834,8 @@
       
         
       
+        
+      
     
     
     
@@ -817,7 +849,7 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_6" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_7" >
         
           
           <div class="md-nav__link md-nav__container">
@@ -839,14 +871,14 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_3_6" id="__nav_3_6_label" tabindex="0">
+              <label class="md-nav__link " for="__nav_3_7" id="__nav_3_7_label" tabindex="0">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_6_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_6">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_7">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -929,6 +961,34 @@
     
   
     ADR 0003: The hf-pincfg X-macro table is the single source of pin truth
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0004-platform-bindings/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR 0004: Create MCU objects in a per-family platform binding; keep managers MCU-free
   
 
     
@@ -1776,7 +1836,7 @@
 
 <h1 id="nvsmanager">NvsManager<a class="headerlink" href="#nvsmanager" title="Permanent link">&para;</a></h1>
 <p>Gives the application three separate key-value stores in the ESP32's NVS flash partition, so calibration data,
-configuration and ordinary application data never collide. Source: <a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/8af3903fff194cf3d941605901566a7f8c5dafe3/lib/managers/NvsManager.h"><code>NvsManager.h</code></a>.</p>
+configuration and ordinary application data never collide. Source: <a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/3e4f2098195acb4737cae7ba59dc95a3dffc3a42/lib/managers/NvsManager.h"><code>NvsManager.h</code></a>.</p>
 <table>
 <thead>
 <tr>
@@ -1803,7 +1863,7 @@ configuration and ordinary application data never collide. Source: <a href="http
 </tr>
 </tbody>
 </table>
-<p>Each accessor returns a <code>BaseNvs&amp;</code> (the interface class; the ESP32 implementation is <code>EspNvs</code>).</p>
+<p>Each accessor returns a <code>BaseNvs&amp;</code> (the interface class; on the ESP32-S3 the platform binding backs it with <code>EspNvs</code>).</p>
 <h2 id="api">API<a class="headerlink" href="#api" title="Permanent link">&para;</a></h2>
 <table>
 <thead>

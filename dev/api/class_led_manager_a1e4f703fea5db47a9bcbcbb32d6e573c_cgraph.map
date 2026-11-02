@@ -1,9 +1,0 @@
-<map id="LedManager::UpdateAnimationStep" name="LedManager::UpdateAnimationStep">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,55,259,80"/>
-<area shape="rect" id="Node000002" href="$class_led_manager.html#a6af5cc51dbd544ee3e3c5f7c6ccb1368" title="Map a 0–255 wheel position to a rainbow RGB colour." alt="" coords="315,5,500,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="203,52,322,31,323,36,204,57"/>
-<area shape="rect" id="Node000003" href="$class_led_manager.html#a826467b3b04221aea43588f1f0e70937" title=" " alt="" coords="307,55,508,80"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="259,65,293,65,293,70,259,70"/>
-<area shape="rect" id="Node000004" href="$struct_led_color.html#a5d1972e2bcb71b4bd4c885fa12ba609c" title="Pack into a 24&#45;bit 0xRRGGBB integer." alt="" coords="344,104,471,129"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="204,77,331,100,330,106,203,83"/>
-</map>

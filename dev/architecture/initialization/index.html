@@ -13,7 +13,7 @@
         <link rel="canonical" href="https://hardfoc.github.io/hf-hal-flux-v1/latest/architecture/initialization/">
       
       
-        <link rel="prev" href="../">
+        <link rel="prev" href="../bindings/">
       
       
         <link rel="next" href="../ownership/">
@@ -617,6 +617,8 @@
       
         
       
+        
+      
     
     
     
@@ -672,6 +674,34 @@
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../bindings/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Platform bindings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
               
             
               
@@ -909,6 +939,8 @@
       
         
       
+        
+      
     
     
     
@@ -925,7 +957,7 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_6" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_7" >
         
           
           <div class="md-nav__link md-nav__container">
@@ -947,14 +979,14 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_3_6" id="__nav_3_6_label" tabindex="">
+              <label class="md-nav__link " for="__nav_3_7" id="__nav_3_7_label" tabindex="">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_6_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3_6">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_7">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -1037,6 +1069,34 @@
     
   
     ADR 0003: The hf-pincfg X-macro table is the single source of pin truth
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0004-platform-bindings/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR 0004: Create MCU objects in a per-family platform binding; keep managers MCU-free
   
 
     
@@ -1825,11 +1885,11 @@
 <details class="hf-figure-desc">
 <summary>Figure description and sources</summary>
 <p>Left to right, then the second row. The facade initialises the managers one at a time, in the order of the calls in its init function. The first group is required: if any of them fails, EnsureInitialized() returns false and the application should not continue. The second group is best effort: a failure there is logged as a warning, the manager stays unavailable and the system reports itself as degraded, so a bench with only some chips fitted still comes up. The order and the required / best-effort split are read from the init function, which returns false only in the required branches.</p>
-<p>Drawn from: <a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/8af3903fff194cf3d941605901566a7f8c5dafe3/lib/api/Flux.cpp"><code>lib/api/Flux.cpp</code></a> <code>Flux::InitializeAllComponents</code>; figure module <a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/8af3903fff194cf3d941605901566a7f8c5dafe3/docs/diagrams/figures/init-order.py"><code>docs/diagrams/figures/init-order.py</code></a>.</p>
+<p>Drawn from: <a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/3e4f2098195acb4737cae7ba59dc95a3dffc3a42/lib/api/Flux.cpp"><code>lib/api/Flux.cpp</code></a> <code>Flux::InitializeAllComponents</code>; figure module <a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/3e4f2098195acb4737cae7ba59dc95a3dffc3a42/docs/diagrams/figures/init-order.py"><code>docs/diagrams/figures/init-order.py</code></a>.</p>
 </details>
 <h2 id="the-order">The order<a class="headerlink" href="#the-order" title="Permanent link">&para;</a></h2>
 <!-- generated: init-order -->
-<p>From <a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/8af3903fff194cf3d941605901566a7f8c5dafe3/lib/api/Flux.cpp"><code>Flux.cpp</code></a>
+<p>From <a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/3e4f2098195acb4737cae7ba59dc95a3dffc3a42/lib/api/Flux.cpp"><code>Flux.cpp</code></a>
 (<code>Flux::InitializeAllComponents</code>); do not edit.</p>
 <table>
 <thead>
@@ -1922,7 +1982,7 @@ works, but going through <code>Flux::EnsureInitialized()</code> gives you the lo
 <p><code>Flux::Shutdown()</code> de-initialises the managers in reverse order (temperature, LEDs, ADC, GPIO, comms, NVS).</p>
 <div class="admonition warning">
 <p class="admonition-title">Valves are not de-initialised by <code>Shutdown()</code></p>
-<p><code>Flux::Shutdown()</code> skips <code>ValveManager</code> (see the comment in <a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/8af3903fff194cf3d941605901566a7f8c5dafe3/lib/api/Flux.cpp"><code>Flux.cpp</code></a>). Disable the
+<p><code>Flux::Shutdown()</code> skips <code>ValveManager</code> (see the comment in <a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/3e4f2098195acb4737cae7ba59dc95a3dffc3a42/lib/api/Flux.cpp"><code>Flux.cpp</code></a>). Disable the
 valve channels yourself (<code>flux.valves.DisableAllChannels()</code>) before shutting down.</p>
 </div>
 
@@ -1962,7 +2022,7 @@ valve channels yourself (<code>flux.valves.DisableAllChannels()</code>) before s
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../" class="md-footer__link md-footer__link--prev" aria-label="Previous: Architecture">
+          <a href="../bindings/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Platform bindings">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -1972,7 +2032,7 @@ valve channels yourself (<code>flux.valves.DisableAllChannels()</code>) before s
                 Previous
               </span>
               <div class="md-ellipsis">
-                Architecture
+                Platform bindings
               </div>
             </div>
           </a>
