@@ -71,7 +71,7 @@ static void example_bus_access() {
     auto& comms = FLUX_API.comms;
 
     // I2C bus -- reserved for future expansion on Flux
-    EspI2cBus* i2c = comms.GetI2cBus();
+    BaseI2c* i2c = comms.GetI2cBus();
     ESP_LOGI(TAG, "I2C bus: %s", i2c ? "available" : "not configured");
 
     // CAN/TWAI bus -- available for valve network communication

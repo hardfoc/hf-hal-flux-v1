@@ -1,11 +1,12 @@
 """The layers of the HAL, top to bottom, with what is in each one today.
 
 Reads: From top to bottom, each layer only calls the one under it. Your application asks the facade singleton for
-the managers. The managers (one per board function) own the hf-core handlers, which wrap one chip driver each; a
-manager may also use a driver directly. Drivers talk to hardware only through the interface classes of the
-internal interface wrap, whose ESP32 implementations sit on ESP-IDF. Every name in a band is read from the code:
-the managers from the facade's member references, the handlers, drivers and interface classes from the managers'
-and handlers' #include lines.
+the managers. The managers (one per board function) own the hf-core handlers, which wrap one chip driver each. The
+managers are MCU-free: the platform binding of the MCU family (bsp_bind/esp32s3 on this board) creates the
+objects behind the interface classes, the ESP32 implementations that sit on ESP-IDF, and is the only HAL code that
+includes ESP-IDF. Drivers talk to hardware only through the interface classes. Every name in a band is read from
+the code: the managers from the facade's member references, the handlers, drivers and interface classes from the
+managers', handlers' and binding's #include lines.
 """
 
 import hal_extract as hx
@@ -13,13 +14,16 @@ from hardfoc_mkdocs_theme.figkit import Fig
 
 
 def data():
-    f, d = hx.facade(), hx.dependencies()
+    f, d, b = hx.facade(), hx.dependencies(), hx.bindings()
+    family = next((k for k in b["families"] if k != "host"), "")
+    fam = b["families"].get(family, {"classes": [], "drivers": []})
     handlers = sorted({h for m in d["managers"].values() for h in m["handlers"]})
     handler_classes = sorted(
         p.stem for h in handlers for p in (hx.ROOT / hx.BOARD["handlers_dir"] / h).glob("*Handler.h")
     )
     drivers = sorted({x for h in handlers for x in d["handler_drivers"].get(h, [])}
-                     | {x for m in d["managers"].values() for x in m["drivers"]})
+                     | {x for m in d["managers"].values() for x in m["drivers"]}
+                     | set(fam["drivers"]))
     iface = sorted({i for m in d["managers"].values() for i in m["interfaces"] if i.startswith("Base")})
     return {
         "board": hx.BOARD["name"],
@@ -29,7 +33,9 @@ def data():
         "handlers": handler_classes,
         "drivers": drivers,
         "interfaces": iface,
-        "sources": f["sources"][:1] + d["sources"],
+        "binding": f"bsp_bind/{family} on ESP-IDF",
+        "binding_classes": fam["classes"],
+        "sources": f["sources"][:1] + d["sources"] + b["sources"],
     }
 
 
@@ -38,8 +44,9 @@ def build(data):
         "hal-layers",
         f"{data['board']} HAL, layer by layer",
         alt=f"Layer stack of the {data['board']} HAL: application, the {data['facade']} facade, "
-        f"{len(data['managers'])} managers, {len(data['handlers'])} hf-core handlers, {len(data['drivers'])} chip "
-        f"drivers, and the interface wrap on ESP-IDF and the {data['mcu']}.",
+        f"{len(data['managers'])} MCU-free managers, {len(data['handlers'])} hf-core handlers, "
+        f"{len(data['drivers'])} chip drivers, the interface classes, and the platform binding that creates their "
+        f"ESP32 implementations on ESP-IDF and the {data['mcu']}.",
         width=1200,
         kicker="Architecture",
         subtitle="Each layer calls only the one below it. Every name is read from the code.",
@@ -53,7 +60,8 @@ def build(data):
         ("Managers", "lib/managers", data["managers"], "blue"),
         ("hf-core handlers", "lib/core/handlers", data["handlers"], "teal"),
         ("Chip drivers", "hf-core-drivers", [f"{d}-driver" for d in data["drivers"]], "violet"),
-        ("Interface wrap", f"ESP-IDF on {data['mcu']}", data["interfaces"], "amber"),
+        ("Interface classes", "hf-internal-interface-wrap", data["interfaces"], "amber"),
+        ("Platform binding", data["binding"], data["binding_classes"], "slate"),
     ]
     y = 0
     gap = 22

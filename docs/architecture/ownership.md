@@ -10,7 +10,8 @@ during its own initialisation.
   <img src="../diagrams/manager-dependencies.svg"
     alt="Graph from each manager to the hf-core handlers it uses and from each handler to the chip driver it
     wraps: ValveManager to the MAX22200 and TLE92466ED handlers, AdcManager to the ADS7952 handler,
-    TemperatureManager to the NTC and MCP9700 handlers, and LedManager directly to the WS2812 driver.">
+    TemperatureManager to the NTC and MCP9700 handlers. CommChannelsManager, GpioManager, LedManager and
+    NvsManager use no handler.">
 </picture>
 <!-- /figure -->
 
@@ -22,12 +23,12 @@ From the `#include` lines of
 
 | Manager | Uses managers | hf-core handlers (driver) | Drivers used directly | Interface classes |
 | --- | --- | --- | --- | --- |
-| [`AdcManager`](../../lib/managers/AdcManager.h) | `CommChannelsManager` | `ads7952` (hf-ads7952) | - | `BaseAdc`, `EspAdc` |
-| [`CommChannelsManager`](../../lib/managers/CommChannelsManager.h) | - | - | - | `BaseCan`, `BaseSpi`, `BaseUart`, `BaseUsbSerialJtag`, `EspCan`, `EspSpi`, `EspUart`, `EspUsbSerialJtag` |
-| [`GpioManager`](../../lib/managers/GpioManager.h) | - | - | - | `BaseGpio`, `EspGpio` |
-| [`LedManager`](../../lib/managers/LedManager.h) | - | - | `hf-ws2812-rmt` | - |
-| [`NvsManager`](../../lib/managers/NvsManager.h) | - | - | - | `BaseNvs`, `EspNvs` |
-| [`TemperatureManager`](../../lib/managers/TemperatureManager.h) | `AdcManager` | `mcp9700` (hf-mcp9700), `ntc` (hf-ntc-thermistor) | - | `BaseTemperature`, `EspTemperature` |
+| [`AdcManager`](../../lib/managers/AdcManager.h) | `CommChannelsManager` | `ads7952` (hf-ads7952) | - | `BaseAdc` |
+| [`CommChannelsManager`](../../lib/managers/CommChannelsManager.h) | - | - | - | `BaseCan`, `BaseSpi`, `BaseUart`, `BaseUsbSerialJtag` |
+| [`GpioManager`](../../lib/managers/GpioManager.h) | - | - | - | `BaseGpio` |
+| [`LedManager`](../../lib/managers/LedManager.h) | - | - | - | - |
+| [`NvsManager`](../../lib/managers/NvsManager.h) | - | - | - | `BaseNvs` |
+| [`TemperatureManager`](../../lib/managers/TemperatureManager.h) | `AdcManager` | `mcp9700` (hf-mcp9700), `ntc` (hf-ntc-thermistor) | - | `BaseTemperature` |
 | [`ValveManager`](../../lib/managers/ValveManager.h) | `CommChannelsManager`, `GpioManager` | `max22200` (hf-max22200), `tle92466ed` (hf-tle92466ed) | - | - |
 <!-- /generated -->
 
@@ -45,14 +46,14 @@ From the `#include` lines of
 
 | Object | Owner | Created | Notes |
 | --- | --- | --- | --- |
-| Valve SPI bus, ADC SPI bus, CAN controller | `CommChannelsManager` | In its `EnsureInitialized()` | Held in `std::unique_ptr`; other managers borrow raw `BaseSpi*` / `BaseCan*` pointers |
-| UART ports | `CommChannelsManager` | On the first `AcquireUart()` for a port | Up to `kMaxUartPorts` (3), cached for later calls |
-| One `EspGpio` per GPIO-category pin | `GpioManager` | In its `EnsureInitialized()` | Fixed table sized from the pin map |
+| Valve SPI bus, ADC SPI bus, CAN controller | `CommChannelsManager` | In its `EnsureInitialized()` | Objects in the platform binding's static slots; other managers borrow raw `BaseSpi*` / `BaseCan*` pointers |
+| UART ports | `CommChannelsManager` | On the first `AcquireUart()` for a port | Up to `kMaxUartPorts` (3), binding slots, cached for later calls |
+| One GPIO object per GPIO-category pin | `GpioManager` | In its `EnsureInitialized()` | Binding slot per functional pin; fixed table sized from the pin map |
 | `Max22200Handler`, `Tle92466edHandler` | `ValveManager` | In its `EnsureInitialized()` | Each borrows an SPI device from comms and its control pins from `GpioManager` |
-| `EspAdc` (ADC1), one `Ads7952Handler` per ADS7952 device | `AdcManager` | In its `EnsureInitialized()` | Channels registered from the pin map |
-| `EspTemperature`, `NtcTemperatureHandler`, `Mcp9700TemperatureHandler` | `TemperatureManager` | In its `EnsureInitialized()` | The two thermistor handlers borrow ADC channels from `AdcManager` |
-| WS2812 strip and animator | `LedManager` | In its `EnsureInitialized()` | Uses the WS2812 driver directly, without an hf-core handler |
-| Three NVS namespaces (`flux`, `flux_cal`, `flux_cfg`) | `NvsManager` | Members, opened in its `EnsureInitialized()` | `App()`, `Calibration()`, `Config()` return them as `BaseNvs&` |
+| MCU ADC (ADC1), one `Ads7952Handler` per ADS7952 device | `AdcManager` | In its `EnsureInitialized()` | ADC1 in a binding slot; channels registered from the pin map |
+| MCU die sensor, `NtcTemperatureHandler`, `Mcp9700TemperatureHandler` | `TemperatureManager` | In its `EnsureInitialized()` | Die sensor in a binding slot; the two thermistor handlers borrow ADC channels from `AdcManager` |
+| WS2812 strip | `LedManager` | In its `EnsureInitialized()` | The binding drives the WS2812 RMT driver (`LedStrip*`); the manager keeps the animation state |
+| Three NVS namespaces (`flux`, `flux_cal`, `flux_cfg`) | `NvsManager` | Binding slots, referenced at construction, opened in its `EnsureInitialized()` | `App()`, `Calibration()`, `Config()` return them as `BaseNvs&` |
 
 A borrowed pointer stays valid for as long as its owner is initialised, which in practice is the whole program.
 Do not keep a pointer across a `Shutdown()` / `Deinitialize()`.
@@ -60,6 +61,7 @@ Do not keep a pointer across a `Shutdown()` / `Deinitialize()`.
 ## Memory
 
 The managers use fixed-size `std::array` tables, sized at compile time from the pin map, for everything that has a
-known count (pins, ADC channels, valve channels, SPI devices). Bus objects, handlers and drivers are created on the
-heap once, during initialisation, and held for the program's lifetime. The details, and the places where this is
+known count (pins, ADC channels, valve channels, SPI devices). Pin, bus, port, NVS and LED objects live in the
+platform binding's static slots ([Platform bindings](bindings.md)). The hf-core handlers are created on the heap
+once, during initialisation, and held for the program's lifetime. The details, and the places where this is
 not strictly true, are in [ADR 0002](../adr/0002-static-allocation.md).

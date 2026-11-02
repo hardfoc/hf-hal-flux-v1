@@ -7,7 +7,9 @@ nothing here is a promise of a date.
 
 - One `Flux` facade and seven managers covering every chip on the board ([Managers](managers/index.md)).
 - Pin map, examples catalogue and figures generated from the code, checked in CI ([Testing and CI](testing.md)).
-- Builds for the ESP32-S3 with ESP-IDF release/v5.5.
+- Builds for the ESP32-S3 with ESP-IDF release/v5.5. ESP-IDF code is confined to the platform binding
+  (`lib/managers/bsp_bind/esp32s3`), checked by a boundary lint, and the managers also build on a host
+  ([Platform bindings](architecture/bindings.md)).
 
 ## Next: close the known gaps
 
@@ -18,7 +20,6 @@ nothing here is a promise of a date.
 | `Flux::GetSystemWarnings()` is always empty | `Flux.h` | Nothing calls the internal `AddSystemWarning()` |
 | GPIO pins all start as outputs | `GpioManager.cpp` | Fault inputs are outputs until `ValveManager` reconfigures them |
 | No host unit tests | - | Logic such as channel resolution and error mapping is only tested on hardware |
-| ESP-IDF calls in the facade and LED manager | `Flux.cpp`, `LedManager.*` | Leaks across the MCU boundary ([ADR 0001](adr/0001-mcu-agnostic-boundary.md)) |
 
 ## Later: new transports and MCUs
 

@@ -57,8 +57,9 @@ Status
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="diagrams/hal-layers.dark.svg">
   <img src="diagrams/hal-layers.svg"
-    alt="Layer stack of the Flux V1 HAL: application, the Flux facade, 7 managers, 5 hf-core handlers, 6 chip
-    drivers, and the interface wrap on ESP-IDF and the ESP32-S3.">
+    alt="Layer stack of the Flux V1 HAL: application, the Flux facade, 7 MCU-free managers, 5 hf-core
+    handlers, 6 chip drivers, the interface classes, and the platform binding that creates their ESP32
+    implementations on ESP-IDF and the ESP32-S3.">
 </picture>
 <!-- /figure -->
 

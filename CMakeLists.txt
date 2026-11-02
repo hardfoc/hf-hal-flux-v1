@@ -72,10 +72,22 @@ set(MANAGER_SOURCES
     "${HF_HAL_ROOT}/lib/managers/TemperatureManager.cpp"
 )
 
+# Platform binding (lib/managers/bsp_bind): the only HAL sources allowed to use
+# ESP-IDF, FreeRTOS or Esp* types. Exactly one MCU family is linked; the host
+# test build (tests/host) links bsp_bind/host instead.
+if(HF_CORE_MCU STREQUAL "ESP32")
+    set(BSP_BIND_SOURCES
+        "${HF_HAL_ROOT}/lib/managers/bsp_bind/esp32s3/FluxPlatformBindEsp32s3.cpp"
+    )
+else()
+    message(FATAL_ERROR "[hf-hal-flux] No bsp_bind family for HF_CORE_MCU=${HF_CORE_MCU}")
+endif()
+
 # Combine HAL + core sources
 set(HF_HAL_SRCS
     ${API_SOURCES}
     ${MANAGER_SOURCES}
+    ${BSP_BIND_SOURCES}
     ${HF_CORE_SOURCES}
 )
 
@@ -195,8 +207,9 @@ target_compile_options(${COMPONENT_LIB} PRIVATE
     $<$<COMPILE_LANGUAGE:CXX>:-Wno-overloaded-virtual>
 )
 
-# WS2812 Kconfig defaults — PUBLIC because ws2812 headers are transitively
-# included via LedManager → ws2812_cpp.hpp → ws2812_control.h
+# WS2812 Kconfig defaults. Only the ESP32-S3 binding includes the ws2812
+# headers now; the definitions stay PUBLIC so an application that includes the
+# driver directly sees the same values.
 target_compile_definitions(${COMPONENT_LIB} PUBLIC
     CONFIG_WS2812_NUM_LEDS=1
     CONFIG_WS2812_LED_TYPE_RGB=1

@@ -16,9 +16,7 @@
     },
     "LedManager": {
       "handlers": [],
-      "drivers": [
-        "hf-ws2812-rmt"
-      ]
+      "drivers": []
     },
     "NvsManager": {
       "handlers": [],

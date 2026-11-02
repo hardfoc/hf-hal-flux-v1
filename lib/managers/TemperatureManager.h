@@ -28,7 +28,6 @@
 #include <string_view>
 
 #include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/base/BaseTemperature.h"
-#include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/mcu/esp32/EspTemperature.h"
 #include "handlers/mcp9700/Mcp9700TemperatureHandler.h"
 #include "handlers/ntc/NtcTemperatureHandler.h"
 #include "handlers/logger/Logger.h"
@@ -303,8 +302,9 @@ private:
     size_t registered_count_{0};
     uint64_t init_time_ms_{0};  ///< Timestamp (ms) when Initialize() completed
 
-    // Sensor driver instances — heap-allocated via unique_ptr (singleton lifetime)
-    std::unique_ptr<EspTemperature> esp32_temp_;
+    // Sensor driver instances. The MCU die sensor is owned by the platform binding;
+    // the handlers are heap-allocated via unique_ptr at init (singleton lifetime).
+    BaseTemperature* die_temp_{nullptr};
     std::unique_ptr<NtcTemperatureHandler> ntc_handler_;
     std::unique_ptr<Mcp9700TemperatureHandler> mcp9700_handler_;
 

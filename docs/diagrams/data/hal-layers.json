@@ -36,9 +36,21 @@
     "BaseUart",
     "BaseUsbSerialJtag"
   ],
+  "binding": "bsp_bind/esp32s3 on ESP-IDF",
+  "binding_classes": [
+    "EspAdc",
+    "EspCan",
+    "EspGpio",
+    "EspNvs",
+    "EspSpi",
+    "EspTemperature",
+    "EspUart",
+    "EspUsbSerialJtag"
+  ],
   "sources": [
     "lib/api/Flux.h:Flux (manager references)",
     "lib/managers:#includes",
-    "lib/core/handlers:#includes"
+    "lib/core/handlers:#includes",
+    "lib/managers/bsp_bind:#includes"
   ]
 }

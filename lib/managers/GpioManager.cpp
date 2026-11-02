@@ -8,11 +8,15 @@
  */
 
 #include "GpioManager.h"
+#include "bsp_bind/FluxPlatformBind.h"
 #include "handlers/logger/Logger.h"
 #include "handlers/logger/LogDecorators.h"
 #include "core/hf-core-utils/hf-utils-rtos-wrap/include/OsUtility.h"
 
 static constexpr const char* TAG = "FluxGpio";
+
+static_assert(static_cast<size_t>(HfFunctionalGpioPin::HF_FUNCTIONAL_GPIO_COUNT) <= flux::bsp::kMaxGpioSlots,
+              "flux::bsp::kMaxGpioSlots must cover every functional GPIO");
 
 //==============================================================================
 // SINGLETON
@@ -59,7 +63,7 @@ bool GpioManager::Initialize() noexcept {
             continue;
         }
 
-        // Only ESP32 internal pins for the Flux board GPIO manager
+        // Only MCU pins for the Flux board GPIO manager
         if (mapping.chip_type != static_cast<uint8_t>(HfGpioChipType::ESP32_INTERNAL)) {
             continue;
         }
@@ -67,7 +71,7 @@ bool GpioManager::Initialize() noexcept {
         auto& entry = entries_[i];
         entry.functional_pin = static_cast<HfFunctionalGpioPin>(i);
 
-        // Configure the EspGpio driver from the mapping data
+        // Configure the GPIO from the mapping data
         hf_gpio_direction_t direction = hf_gpio_direction_t::HF_GPIO_DIRECTION_OUTPUT;
 
         hf_gpio_pull_mode_t pull_mode;
@@ -87,17 +91,19 @@ bool GpioManager::Initialize() noexcept {
             ? hf_gpio_active_state_t::HF_GPIO_ACTIVE_LOW
             : hf_gpio_active_state_t::HF_GPIO_ACTIVE_HIGH;
 
-        entry.driver = std::make_unique<EspGpio>(
-            static_cast<hf_pin_num_t>(mapping.physical_pin),
-            direction, active_state, output_mode, pull_mode);
+        const flux::bsp::GpioSpec spec{static_cast<hf_pin_num_t>(mapping.physical_pin),
+                                       direction, active_state, output_mode, pull_mode};
+        entry.driver = flux::bsp::CreateGpio(i, spec);
 
-        if (entry.driver->EnsureInitialized()) {
+        if (entry.driver != nullptr && entry.driver->EnsureInitialized()) {
             entry.registered = true;
             ++registered_count_;
             Logger::GetInstance().Info(TAG, "  %-28.*s GPIO%-3d %-7s",
                                       static_cast<int>(mapping.name.size()), mapping.name.data(),
                                       mapping.physical_pin, "OK");
         } else {
+            flux::bsp::DestroyGpio(i);
+            entry.driver = nullptr;
             Logger::GetInstance().Error(TAG, "  %-28.*s GPIO%-3d %-7s",
                                        static_cast<int>(mapping.name.size()), mapping.name.data(),
                                        mapping.physical_pin, "FAIL");
@@ -126,14 +132,14 @@ BaseGpio* GpioManager::Get(std::string_view name) noexcept {
     if (!initialized_.load(std::memory_order_acquire)) return nullptr;
     size_t idx = FindByName(name);
     if (idx == kInvalidIndex) return nullptr;
-    return entries_[idx].driver.get();
+    return entries_[idx].driver;
 }
 
 BaseGpio* GpioManager::Get(HfFunctionalGpioPin pin) noexcept {
     if (!initialized_.load(std::memory_order_acquire)) return nullptr;
     size_t idx = static_cast<size_t>(pin);
     if (idx >= kMaxEntries || !entries_[idx].registered) return nullptr;
-    return entries_[idx].driver.get();
+    return entries_[idx].driver;
 }
 
 bool GpioManager::Contains(std::string_view name) const noexcept {
@@ -275,7 +281,8 @@ bool GpioManager::Deinitialize() noexcept {
 
     // Clear all entries
     for (size_t i = 0; i < HF_GPIO_MAPPING_SIZE; ++i) {
-        entries_[i].driver.reset();
+        flux::bsp::DestroyGpio(i);
+        entries_[i].driver = nullptr;
         entries_[i].registered = false;
         entries_[i].access_count = 0;
         entries_[i].error_count = 0;
@@ -291,7 +298,7 @@ bool GpioManager::Deinitialize() noexcept {
 }
 
 //==============================================================================
-// INTERRUPT STUBS (ESP32 internal GPIOs — basic support)
+// INTERRUPT SUPPORT (MCU GPIOs — basic support)
 //==============================================================================
 
 hf_gpio_err_t GpioManager::ConfigureInterrupt(std::string_view name,
@@ -316,6 +323,6 @@ hf_gpio_err_t GpioManager::DisableInterrupt(std::string_view name) noexcept {
 }
 
 bool GpioManager::SupportsInterrupts(std::string_view name) const noexcept {
-    // All ESP32 internal GPIOs support interrupts
+    // All MCU GPIOs support interrupts
     return FindByName(name) != kInvalidIndex;
 }

@@ -2,14 +2,14 @@
  * @file LedManager.h
  * @brief LED management for the HardFOC Flux V1 platform (single WS2812).
  *
- * @details Identical hardware to Vortex: a single WS2812 LED on GPIO3 using
- *          the RMT peripheral. Provides solid/blink/breath/rainbow animations
- *          plus convenience status-indication methods (boot, ready, error…).
+ * @details Identical hardware to Vortex: a single WS2812 LED on GPIO3. Provides
+ *          solid/blink/breath/rainbow animations plus convenience status-indication
+ *          methods (boot, ready, error…).
  *
- *          Follows the same stack-friendly singleton pattern as the other
- *          Flux managers. The WS2812Strip and WS2812Animator are heap-
- *          allocated because they are driver objects whose sizes depend on
- *          RMT configuration, but everything else is value-type.
+ *          The strip itself (the WS2812 RMT driver on the ESP32-S3) lives in the
+ *          platform binding (`bsp_bind/FluxPlatformBind.h`, `LedStrip*`), in static
+ *          storage; this manager holds only the animation state, so the header is
+ *          MCU-free.
  *
  * @author HardFOC Team
  * @date 2026
@@ -19,15 +19,13 @@
 #ifndef FLUX_LED_MANAGER_H_
 #define FLUX_LED_MANAGER_H_
 
-#include "core/hf-core-drivers/external/hf-ws2812-rmt-driver/inc/ws2812_cpp.hpp"
-#include "core/hf-core-drivers/external/hf-ws2812-rmt-driver/inc/ws2812_effects.hpp"
+#include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/base/HardwareTypes.h"
 #include "handlers/logger/Logger.h"
 #include "RtosMutex.h"
 #include "core/hf-core-drivers/internal/hf-pincfg/src/hf_functional_pin_config_flux_v1.hpp"
 
 #include <cstdint>
 #include <atomic>
-#include <memory>
 
 //==============================================================================
 // LED ERROR CODES
@@ -189,7 +187,7 @@ struct LedSystemDiagnostics {
 
 /**
  * @class LedManager
- * @brief Singleton that drives the on-board WS2812 LED via ESP-IDF RMT.
+ * @brief Singleton that drives the on-board WS2812 status LED.
  *
  * @details Controls a single WS2812 NeoPixel LED on GPIO3.  Provides:
  *   - Solid-colour, blink, breathe, and rainbow animations
@@ -394,7 +392,7 @@ public:
     void DumpStatistics() const noexcept;
 
     /** @brief GPIO pin the LED strip is attached to. */
-    [[nodiscard]] gpio_num_t GetCurrentGpioPin() const noexcept { return current_led_gpio_; }
+    [[nodiscard]] hf_pin_num_t GetCurrentGpioPin() const noexcept { return current_led_gpio_; }
 
     /** @brief Number of LEDs in the strip (always 1 on Flux V1). */
     [[nodiscard]] uint32_t GetLedCount() const noexcept { return kNumLeds; }
@@ -419,19 +417,19 @@ private:
         return static_cast<uint8_t>((static_cast<uint32_t>(raw) * 100) / max_brightness_);
     }
 
-    [[nodiscard]] static gpio_num_t GetLedGpioPin() noexcept {
+    [[nodiscard]] static hf_pin_num_t GetLedGpioPin() noexcept {
         const auto* mapping = GetGpioMapping(HfFunctionalGpioPin::WS2812_LED_DAT);
         if (mapping && mapping->chip_type == static_cast<uint8_t>(HfGpioChipType::ESP32_INTERNAL)) {
-            return static_cast<gpio_num_t>(mapping->physical_pin);
+            return static_cast<hf_pin_num_t>(mapping->physical_pin);
         }
-        return GPIO_NUM_3;  // Fallback
+        return kFallbackLedPin;
     }
 
     //==========================================================================
     // CONSTANTS
     //==========================================================================
 
-    static constexpr int    DEFAULT_RMT_CHANNEL         = 0;
+    static constexpr hf_pin_num_t kFallbackLedPin       = 3;    ///< Board default if the pin map lacks the LED
     static constexpr uint32_t kNumLeds                  = 1;
     static constexpr uint8_t  DEFAULT_MAX_BRIGHTNESS    = 255;
     static constexpr uint32_t ANIMATION_UPDATE_INTERVAL = 50;   // ms
@@ -445,8 +443,7 @@ private:
     std::atomic<bool> is_initialized_{false};
     mutable RtosMutex mutex_;
 
-    std::unique_ptr<WS2812Strip>     led_strip_;
-    std::unique_ptr<WS2812Animator>  led_animator_;
+    bool strip_ready_{false};  ///< The binding's strip was started by Initialize()
 
     LedAnimation current_animation_{LedAnimation::OFF};
     LedColor     current_color_{LedColors::BLACK};
@@ -462,7 +459,7 @@ private:
     std::atomic<uint32_t> animation_cycles_{0};
     std::atomic<LedError> last_error_{LedError::SUCCESS};
     uint64_t     system_start_time_{0};
-    gpio_num_t   current_led_gpio_{GPIO_NUM_3};
+    hf_pin_num_t current_led_gpio_{kFallbackLedPin};
 };
 
 //==============================================================================

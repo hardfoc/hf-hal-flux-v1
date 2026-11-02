@@ -16,6 +16,7 @@ What runs on a pull request, what each check means, and how to run it on your ma
 | Docs Link Check CI | `ci-docs-linkcheck.yml` | push, pull request | lychee over the Markdown files, config `_config/lychee.toml` |
 | Markdown Lint CI | `ci-markdown-lint.yml` | push, pull request | markdownlint, config `_config/.markdownlint.json` |
 | YAML Lint CI | `ci-yaml-lint.yml` | push, pull request | yamllint, config `_config/.yamllint` |
+| HAL Boundary CI | `ci-hal-boundary.yml` | push, pull request | `tools/lint/lint_hal_boundary.sh` (no ESP-IDF, FreeRTOS or `Esp*` code outside `lib/managers/bsp_bind/<family>/`; shrink-only allowlist checked against the PR base); host build of the managers against `bsp_bind/host` |
 | Release | `release.yml` | `v*` tags | Builds the release artifacts |
 
 The examples are integration tests: they run on a board, not in CI. CI proves they compile; a person flashes them.
@@ -26,6 +27,10 @@ There are no host unit tests in this repository yet.
 ```bash
 # Build one example (needs ESP-IDF, see Get started)
 cd examples/esp32 && ./scripts/build_app.sh flux_api_test Release && cd ../..
+
+# HAL boundary lint and the host build of the managers (no ESP-IDF needed)
+tools/lint/lint_hal_boundary.sh
+cmake -S tests/host -B build/host -G Ninja && cmake --build build/host
 
 # Format check
 clang-format --style=file:_config/.clang-format --dry-run --Werror lib/managers/*.cpp lib/managers/*.h
