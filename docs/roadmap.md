@@ -15,8 +15,6 @@ nothing here is a promise of a date.
 
 | Gap | Where | Why it matters |
 | --- | --- | --- |
-| `ValveManager` and `AdcManager` never record their last error | `ValveManager.cpp`, `AdcManager.cpp` | The health snapshot reports them healthy after a failed call ([Errors](architecture/errors.md)) |
-| `Flux::Shutdown()` skips `ValveManager` | `Flux.cpp` | Valves stay as they were on shutdown ([Initialisation](architecture/initialization.md)) |
 | `Flux::GetSystemWarnings()` is always empty | `Flux.h` | Nothing calls the internal `AddSystemWarning()` |
 | GPIO pins all start as outputs | `GpioManager.cpp` | Fault inputs are outputs until `ValveManager` reconfigures them |
 | No host unit tests | - | Logic such as channel resolution and error mapping is only tested on hardware |

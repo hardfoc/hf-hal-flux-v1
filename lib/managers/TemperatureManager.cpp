@@ -11,7 +11,6 @@
 #include "bsp_bind/FluxPlatformBind.h"
 #include "AdcManager.h"
 #include "core/hf-core-drivers/internal/hf-pincfg/src/hf_functional_pin_config_flux_v1.hpp"
-#include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/utils/memory_utils.h"
 #include "core/hf-core-utils/hf-utils-rtos-wrap/include/OsUtility.h"
 
 #include <algorithm>
@@ -55,25 +54,78 @@ bool TemperatureManager::EnsureInitialized() noexcept {
     MutexLockGuard lock(mutex_);
     if (initialized_.load(std::memory_order_acquire)) return true;
     bool ok = Initialize();
+    if (!ok) {
+        last_error_.store(TemperatureError::INITIALIZATION_FAILED, std::memory_order_release);
+    }
     initialized_.store(ok, std::memory_order_release);
     return ok;
+}
+
+bool TemperatureManager::IsSensorReady(FluxTempSensorType type) const noexcept {
+    switch (type) {
+        case FluxTempSensorType::ESP32_INTERNAL:     return die_temp_ != nullptr;
+        case FluxTempSensorType::NTC_THERMISTOR:     return ntc_handler_.has_value();
+        case FluxTempSensorType::MCP9700_THERMISTOR: return mcp9700_handler_.has_value();
+        default:                                     return false;
+    }
+}
+
+void TemperatureManager::ReleaseLocked() noexcept {
+    for (size_t i = 0; i < registered_count_; ++i) {
+        entries_[i] = TempEntry{};
+    }
+    registered_count_ = 0;
+    mcp9700_handler_.reset();
+    ntc_handler_.reset();
+    if (die_temp_ != nullptr) {
+        flux::bsp::DestroyDieTemperature();
+        die_temp_ = nullptr;
+    }
 }
 
 bool TemperatureManager::Initialize() noexcept {
     Logger::GetInstance().Info(TAG, "Initializing Flux temperature manager");
 
+    // A previous failed attempt may have left some sensors up; start from nothing.
+    ReleaseLocked();
     init_time_ms_ = os_get_elapsed_time_msec();
 
     bool esp_ok = InitializeEsp32Internal();
     bool ntc_ok = InitializeNtcThermistor();
+#if defined(HARDFOC_MCP9700_SUPPORT)
     bool mcp_ok = InitializeMcp9700Thermistor();
+    constexpr bool kMcpFitted = true;
+#else
+    bool mcp_ok = false;
+    constexpr bool kMcpFitted = false;
+#endif
 
     Logger::GetInstance().Info(TAG,
-                              "Temperature manager initialized (ESP32=%s, NTC=%s, MCP9700=%s, sensors=%zu)",
-                              esp_ok ? "OK" : "FAIL", ntc_ok ? "OK" : "FAIL", mcp_ok ? "OK" : "FAIL",
-                              registered_count_);
+                              "Temperature sensors: ESP32=%s, NTC=%s, MCP9700=%s (sensors=%zu)",
+                              esp_ok ? "OK" : "FAIL", ntc_ok ? "OK" : "FAIL",
+                              kMcpFitted ? (mcp_ok ? "OK" : "FAIL") : "not built", registered_count_);
 
-    return esp_ok || ntc_ok || mcp_ok;
+    if (esp_ok && ntc_ok && (mcp_ok || !kMcpFitted)) {
+        manager_error_.store(flux::hal::ManagerError::None, std::memory_order_release);
+        return true;
+    }
+
+    // The one degraded-capable manager: thermal readings have a designed fallback chain
+    // (MCP9700 -> NTC -> die sensor), so the manager runs with what came up, but never
+    // reports healthy: the error is recorded, IsDegraded() is true and diagnostics say
+    // which sensor is missing. With no sensor at all it fails closed.
+    const bool adc_down = !AdcManager::GetInstance().IsInitialized();
+    const flux::hal::ManagerError err =
+        (adc_down && esp_ok) ? flux::hal::ManagerError::DependencyNotReady : flux::hal::ManagerError::HardwareFault;
+    manager_error_.store(err, std::memory_order_release);
+    if (registered_count_ > 0) {
+        Logger::GetInstance().Warn(TAG, "Temperature manager DEGRADED (%s): running on %zu sensor(s)",
+                                   flux::hal::ToString(err), registered_count_);
+        return true;
+    }
+    Logger::GetInstance().Error(TAG, "Temperature manager NOT initialised: no sensor came up (%s)",
+                                flux::hal::ToString(err));
+    return false;
 }
 
 bool TemperatureManager::InitializeEsp32Internal() noexcept {
@@ -128,11 +180,7 @@ bool TemperatureManager::InitializeNtcThermistor() noexcept {
     ntc_cfg.beta_value                         = 3950.0f;
     ntc_cfg.reference_voltage                  = 3.3f;
 
-    ntc_handler_ = hf::utils::make_unique_nothrow<NtcTemperatureHandler>(adc_driver, ntc_cfg);
-    if (!ntc_handler_) {
-        Logger::GetInstance().Error(TAG, "Failed to allocate NTC handler");
-        return false;
-    }
+    ntc_handler_.emplace(adc_driver, ntc_cfg);
 
     if (!ntc_handler_->EnsureInitialized()) {
         Logger::GetInstance().Error(TAG, "NTC handler initialization failed");
@@ -176,12 +224,7 @@ bool TemperatureManager::InitializeMcp9700Thermistor() noexcept {
         return false;
     }
 
-    mcp9700_handler_ = hf::utils::make_unique_nothrow<Mcp9700TemperatureHandler>(
-        adc_driver, mapping->physical_channel, "MCP9700_THERMISTOR");
-    if (!mcp9700_handler_) {
-        Logger::GetInstance().Error(TAG, "Failed to allocate MCP9700 handler");
-        return false;
-    }
+    mcp9700_handler_.emplace(adc_driver, mapping->physical_channel, "MCP9700_THERMISTOR");
 
     if (!mcp9700_handler_->EnsureInitialized()) {
         Logger::GetInstance().Error(TAG, "MCP9700 handler initialization failed");
@@ -243,8 +286,12 @@ TemperatureError TemperatureManager::ReadTemperatureCelsius(std::string_view nam
 
     switch (entry.sensor_type) {
         case FluxTempSensorType::ESP32_INTERNAL: sensor = die_temp_; break;
-        case FluxTempSensorType::NTC_THERMISTOR: sensor = ntc_handler_.get(); break;
-        case FluxTempSensorType::MCP9700_THERMISTOR: sensor = mcp9700_handler_.get(); break;
+        case FluxTempSensorType::NTC_THERMISTOR:
+            sensor = ntc_handler_.has_value() ? &*ntc_handler_ : nullptr;
+            break;
+        case FluxTempSensorType::MCP9700_THERMISTOR:
+            sensor = mcp9700_handler_.has_value() ? &*mcp9700_handler_ : nullptr;
+            break;
         default: {
             last_error_.store(TemperatureError::SENSOR_NOT_FOUND, std::memory_order_release);
             return TemperatureError::SENSOR_NOT_FOUND;
@@ -360,7 +407,7 @@ TemperatureError TemperatureManager::GetSystemDiagnostics(TempSystemDiagnostics&
     diag.total_operations = diag.successful_operations + diag.failed_operations;
     diag.system_uptime_ms = (init_time_ms_ > 0) ? (os_get_elapsed_time_msec() - init_time_ms_) : 0;
     diag.last_error = last_error_.load(std::memory_order_acquire);
-    diag.system_healthy = (diag.failed_operations == 0) && (registered_count_ > 0);
+    diag.system_healthy = initialized_.load(std::memory_order_acquire) && !IsDegraded() && (diag.failed_operations == 0);
     return TemperatureError::SUCCESS;
 }
 
@@ -386,23 +433,11 @@ void TemperatureManager::DumpStatistics() const noexcept {
 
 bool TemperatureManager::Deinitialize() noexcept {
     MutexLockGuard lock(mutex_);
-    if (!initialized_.load(std::memory_order_acquire)) return true;
-
-    Logger::GetInstance().Info(TAG, "Deinitializing Flux Temperature manager");
-
-    // Clear all entries
-    for (size_t i = 0; i < registered_count_; ++i) {
-        entries_[i].registered = false;
-        entries_[i].read_count = 0;
-        entries_[i].error_count = 0;
+    if (initialized_.load(std::memory_order_acquire)) {
+        Logger::GetInstance().Info(TAG, "Deinitializing Flux Temperature manager");
     }
-    registered_count_ = 0;
-
-    mcp9700_handler_.reset();
-    ntc_handler_.reset();
-    flux::bsp::DestroyDieTemperature();
-    die_temp_ = nullptr;
-
+    ReleaseLocked();
     initialized_.store(false, std::memory_order_release);
+    manager_error_.store(flux::hal::ManagerError::NotInitialized, std::memory_order_release);
     return true;
 }

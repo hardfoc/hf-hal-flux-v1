@@ -2,7 +2,7 @@
 
 | | |
 | --- | --- |
-| Status | Accepted (records the current design, with the exceptions listed) |
+| Status | Accepted; the allowance for heap-allocated handlers is superseded by [ADR 0005](0005-no-heap-fail-closed.md) |
 | Date | 2026-11-01 |
 
 ## Context

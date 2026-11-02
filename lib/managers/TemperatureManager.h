@@ -24,7 +24,7 @@
 #include <array>
 #include <atomic>
 #include <cstdint>
-#include <memory>
+#include <optional>
 #include <string_view>
 
 #include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/base/BaseTemperature.h"
@@ -32,6 +32,7 @@
 #include "handlers/ntc/NtcTemperatureHandler.h"
 #include "handlers/logger/Logger.h"
 #include "RtosMutex.h"
+#include "flux_hal/flux_hal_types.hpp"
 
 //==============================================================================
 // TEMPERATURE ERROR CODES
@@ -202,6 +203,30 @@ public:
      */
     [[nodiscard]] TemperatureError GetLastError() const noexcept { return last_error_.load(std::memory_order_acquire); }
 
+    /**
+     * @brief Lifecycle / bind error of the last `EnsureInitialized()` (shared catalog).
+     * @return `ManagerError::None` when initialised; otherwise why bring-up failed.
+     */
+    [[nodiscard]] flux::hal::ManagerError GetManagerError() const noexcept {
+        return manager_error_.load(std::memory_order_acquire);
+    }
+
+    /**
+     * @brief Whether one sensor came up during the last bring-up attempt (valid for diagnosis
+     *        even when the manager failed closed).
+     */
+    [[nodiscard]] bool IsSensorReady(FluxTempSensorType type) const noexcept;
+
+    /**
+     * @brief Initialised with at least one fitted sensor missing.
+     * @details The temperature manager is the one manager allowed to run degraded: its sensors are
+     *          independent monitors with a fallback chain (MCP9700, NTC, die sensor). When degraded,
+     *          `GetManagerError()` holds the reason and diagnostics never report it healthy.
+     */
+    [[nodiscard]] bool IsDegraded() const noexcept {
+        return IsInitialized() && GetManagerError() != flux::hal::ManagerError::None;
+    }
+
     //==========================================================================
     // TEMPERATURE READING
     //==========================================================================
@@ -285,6 +310,7 @@ private:
     ~TemperatureManager() = default;
 
     bool Initialize() noexcept;
+    void ReleaseLocked() noexcept;
     bool InitializeEsp32Internal() noexcept;
     bool InitializeNtcThermistor() noexcept;
     bool InitializeMcp9700Thermistor() noexcept;
@@ -303,13 +329,14 @@ private:
     uint64_t init_time_ms_{0};  ///< Timestamp (ms) when Initialize() completed
 
     // Sensor driver instances. The MCU die sensor is owned by the platform binding;
-    // the handlers are heap-allocated via unique_ptr at init (singleton lifetime).
+    // the two thermistor handlers are members, constructed in place at bring-up (no heap).
     BaseTemperature* die_temp_{nullptr};
-    std::unique_ptr<NtcTemperatureHandler> ntc_handler_;
-    std::unique_ptr<Mcp9700TemperatureHandler> mcp9700_handler_;
+    std::optional<NtcTemperatureHandler> ntc_handler_;
+    std::optional<Mcp9700TemperatureHandler> mcp9700_handler_;
 
     std::atomic<bool> initialized_{false};
     std::atomic<TemperatureError> last_error_{TemperatureError::SUCCESS};
+    std::atomic<flux::hal::ManagerError> manager_error_{flux::hal::ManagerError::NotInitialized};
     mutable RtosMutex mutex_;
 };
 

@@ -2,7 +2,9 @@
 
 A manager owns one function of the board. You reach each one through the `Flux` object (`flux.valves`) or its own
 `GetInstance()`; both give the same singleton. All managers share the same shape: `EnsureInitialized()`,
-`IsInitialized()`, `GetLastError()`, `GetSystemDiagnostics(...)` and `DumpStatistics()`.
+`IsInitialized()`, `GetManagerError()` (bring-up, shared catalog), `GetLastError()` (last failed operation),
+`GetSystemDiagnostics(...)` and `DumpStatistics()`. Managers fail closed: a manager is initialised only when every
+part it owns came up ([Errors and diagnostics](../architecture/errors.md)).
 
 | Member | Manager | Does | Start-up |
 | --- | --- | --- | --- |

@@ -22,6 +22,7 @@
 #include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/base/HardwareTypes.h"
 #include "handlers/logger/Logger.h"
 #include "RtosMutex.h"
+#include "flux_hal/flux_hal_types.hpp"
 #include "core/hf-core-drivers/internal/hf-pincfg/src/hf_functional_pin_config_flux_v1.hpp"
 
 #include <cstdint>
@@ -247,6 +248,14 @@ public:
      */
     [[nodiscard]] LedError GetLastError() const noexcept { return last_error_.load(std::memory_order_acquire); }
 
+    /**
+     * @brief Lifecycle / bind error of the last `EnsureInitialized()` (shared catalog).
+     * @return `ManagerError::None` when initialised; otherwise why bring-up failed.
+     */
+    [[nodiscard]] flux::hal::ManagerError GetManagerError() const noexcept {
+        return manager_error_.load(std::memory_order_acquire);
+    }
+
     //==========================================================================
     // BASIC LED OPERATIONS
     //==========================================================================
@@ -458,6 +467,7 @@ private:
     std::atomic<uint32_t> failed_operations_{0};
     std::atomic<uint32_t> animation_cycles_{0};
     std::atomic<LedError> last_error_{LedError::SUCCESS};
+    std::atomic<flux::hal::ManagerError> manager_error_{flux::hal::ManagerError::NotInitialized};
     uint64_t     system_start_time_{0};
     hf_pin_num_t current_led_gpio_{kFallbackLedPin};
 };

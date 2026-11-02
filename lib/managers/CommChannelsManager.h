@@ -34,6 +34,7 @@ class BaseI2c;
 #include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/base/BaseUart.h"
 #include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/base/BaseUsbSerialJtag.h"
 #include "RtosMutex.h"
+#include "flux_hal/flux_hal_types.hpp"
 
 //==============================================================================
 // COMM CHANNELS ERROR CODES
@@ -162,6 +163,22 @@ public:
      * @return Last CommError set by any API call
      */
     [[nodiscard]] CommError GetLastError() const noexcept { return last_error_.load(std::memory_order_acquire); }
+
+    /**
+     * @brief Lifecycle / bind error of the last `EnsureInitialized()` (shared catalog).
+     * @details Required set (fail-closed): the valve SPI bus and both valve chip selects. The
+     *          pressure bus and CAN are reported by IsPressureBusReady() / IsCanReady(); their
+     *          users (AdcManager, the application) fail closed on them.
+     */
+    [[nodiscard]] flux::hal::ManagerError GetManagerError() const noexcept {
+        return manager_error_.load(std::memory_order_acquire);
+    }
+
+    /** @brief The pressure SPI bus and its ADS7952 chip select are up. */
+    [[nodiscard]] bool IsPressureBusReady() const noexcept { return spi3_bus_valid_; }
+
+    /** @brief The CAN controller object exists (configured, not started). */
+    [[nodiscard]] bool IsCanReady() const noexcept { return can_bus_valid_; }
 
     /**
      * @brief Fill a diagnostics snapshot with current system state.
@@ -304,6 +321,7 @@ private:
     ~CommChannelsManager() = default;
 
     bool Initialize() noexcept;
+    void ReleaseLocked() noexcept;
 
     //==========================================================================
     // HARDWARE RESOURCES — objects live in the platform binding (bsp_bind);
@@ -331,6 +349,7 @@ private:
 
     std::atomic<bool> initialized_{false};
     std::atomic<CommError> last_error_{CommError::SUCCESS};
+    std::atomic<flux::hal::ManagerError> manager_error_{flux::hal::ManagerError::NotInitialized};
     mutable RtosMutex mutex_;
 
     void UpdateLastError(CommError error) noexcept {

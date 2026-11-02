@@ -20,6 +20,7 @@
 #include <cstdint>
 
 #include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/base/BaseNvs.h"
+#include "flux_hal/flux_hal_types.hpp"
 
 /**
  * @class NvsManager
@@ -53,6 +54,14 @@ public:
     /** @brief Last NVS error from the most recent failing operation (any region). */
     [[nodiscard]] hf_nvs_err_t GetLastError() const noexcept { return last_error_; }
 
+    /**
+     * @brief Lifecycle / bind error of the last `EnsureInitialized()` (shared catalog).
+     * @return `ManagerError::None` when initialised; otherwise why bring-up failed.
+     */
+    [[nodiscard]] flux::hal::ManagerError GetManagerError() const noexcept {
+        return manager_error_.load(std::memory_order_acquire);
+    }
+
     /** @brief General application storage (`flux` namespace). */
     [[nodiscard]] BaseNvs& App() noexcept { return app_; }
 
@@ -76,6 +85,7 @@ private:
 
     std::atomic<bool> initialized_{false};
     hf_nvs_err_t last_error_{hf_nvs_err_t::NVS_SUCCESS};
+    std::atomic<flux::hal::ManagerError> manager_error_{flux::hal::ManagerError::NotInitialized};
 };
 
 #endif // FLUX_NVS_MANAGER_H_

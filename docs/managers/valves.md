@@ -67,16 +67,19 @@ The [`valve_manager_example`](../examples/index.md) and `valve_cycling_test` app
 
 ## What start-up does
 
-`EnsureInitialized()` brings up comms and GPIO, then tries each chip on its own, so one missing chip never blocks
-the other:
+`EnsureInitialized()` brings up comms and GPIO, then tries each chip on its own, so the log names every missing
+chip:
 
 1. **TLE92466ED**: creates the handler, enters mission mode, drives its enable pin, clears the feedback freeze so
    the per-channel feedback registers update, and sets the supply under- / over-voltage trips to 19 V / 29 V for the
    24 V valve rail.
 2. **MAX22200**: creates the handler with a 15 kΩ reference resistor (full-scale current 1000 mA).
 
-It succeeds if either chip works and logs which one is missing. Use `GetSystemDiagnostics()` to see
-`max22200_initialized` and `tle92466_initialized`.
+It succeeds only if **both** chips work (fail-closed, [ADR 0005](../adr/0005-no-heap-fail-closed.md)). Otherwise
+`IsInitialized()` stays `false`, every channel call returns `VALVE_ERR_NOT_INITIALIZED`, and `GetManagerError()`
+says `HardwareFault` (a chip did not answer) or `BindFailed` (its SPI device or control pins are missing).
+`IsBankReady(ValveDriverType::MAX22200 / TLE92466)` says which chip came up; that chip's handler accessor stays
+non-null for diagnosis. Both handlers are members of the manager, constructed in place: no heap.
 
 ## Diagnostics
 
@@ -89,7 +92,8 @@ activations and errors. `GetChannelState(ch)` gives per-channel counters. `DumpS
   channel registers hold.
 - **Currents are limited by the chip setup.** The MAX22200 full scale is 1000 mA with this board's reference
   resistor; a set-point above it cannot be reached.
-- **`GetLastError()` is not updated.** Use each call's return value (see [Errors](../architecture/errors.md)).
-- **`Flux::Shutdown()` does not turn valves off.** Call `DisableAllChannels()` first.
+- **One chip missing means no valve manager.** A bench with only one driver fitted gets the other bank only through
+  its handler, for diagnosis.
+- **`GetLastError()`** holds the last failed call; it is not cleared by a later success.
 - **Valve supply off** looks like a working chip on SPI with no coil current. Check the 24 V rail and
   `GetProportionalFaults()` (the TLE92466ED reports supply under-voltage).

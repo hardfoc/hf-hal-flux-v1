@@ -12,9 +12,10 @@
 #include "GpioManager.h"
 #include "handlers/logger/Logger.h"
 #include "core/hf-core-drivers/internal/hf-pincfg/src/hf_functional_pin_config_flux_v1.hpp"
-#include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/utils/memory_utils.h"
 
 static constexpr const char* TAG = "FluxValve";
+
+using flux::hal::ManagerError;
 
 //==============================================================================
 // SINGLETON
@@ -43,61 +44,76 @@ bool ValveManager::EnsureInitialized() noexcept {
     }
     auto result = Initialize();
     if (HfValveErrOk(result)) {
+        manager_error_.store(ManagerError::None, std::memory_order_release);
         initialized_.store(true, std::memory_order_release);
+    } else {
+        (void)Record(result);
     }
     return HfValveErrOk(result);
+}
+
+bool ValveManager::IsBankReady(ValveDriverType bank) const noexcept {
+    switch (bank) {
+        case ValveDriverType::MAX22200: return max22200_valid_;
+        case ValveDriverType::TLE92466: return tle92466_valid_;
+        default:                        return false;
+    }
 }
 
 hf_valve_err_t ValveManager::Initialize() noexcept {
     Logger::GetInstance().Info(TAG, "Initializing Flux valve manager");
 
+    // A previous failed attempt may have left one bank up; start from nothing.
+    ReleaseDriversLocked();
+
     // Ensure comms and GPIO are ready
     auto& comms = CommChannelsManager::GetInstance();
     if (!comms.EnsureInitialized()) {
         Logger::GetInstance().Error(TAG, "CommChannels not initialized — cannot init valves");
-        return hf_valve_err_t::VALVE_ERR_DEPENDENCY_NOT_READY;
+        manager_error_.store(ManagerError::DependencyNotReady, std::memory_order_release);
+        return Record(hf_valve_err_t::VALVE_ERR_DEPENDENCY_NOT_READY);
     }
 
     auto& gpio = GpioManager::GetInstance();
     if (!gpio.EnsureInitialized()) {
         Logger::GetInstance().Error(TAG, "GPIO manager not initialized — cannot init valves");
-        return hf_valve_err_t::VALVE_ERR_DEPENDENCY_NOT_READY;
+        manager_error_.store(ManagerError::DependencyNotReady, std::memory_order_release);
+        return Record(hf_valve_err_t::VALVE_ERR_DEPENDENCY_NOT_READY);
     }
 
     // ── Initialize each driver independently ─────────────────────────────
-    // Both share SPI3_HOST but use separate CS lines and GPIO controls.
-    // One driver's failure must never block the other from attempting init.
+    // Both share the valve SPI bus but use separate CS lines and GPIO controls.
+    // Both are attempted even if the first fails, so the log and
+    // IsBankReady() name every missing part, not just the first.
 
     Logger::GetInstance().Info(TAG, "--- [1/2] Attempting TLE92466ED proportional driver ---");
-    bool tle_ok = InitializeTle92466();
-    Logger::GetInstance().Info(TAG, "--- [1/2] TLE92466ED result: %s ---", tle_ok ? "OK" : "FAIL");
+    const ManagerError tle_err = InitializeTle92466();
+    Logger::GetInstance().Info(TAG, "--- [1/2] TLE92466ED result: %s ---", flux::hal::ToString(tle_err));
 
     Logger::GetInstance().Info(TAG, "--- [2/2] Attempting MAX22200 solenoid driver ---");
-    bool max_ok = InitializeMax22200();
-    Logger::GetInstance().Info(TAG, "--- [2/2] MAX22200 result: %s ---", max_ok ? "OK" : "FAIL");
+    const ManagerError max_err = InitializeMax22200();
+    Logger::GetInstance().Info(TAG, "--- [2/2] MAX22200 result: %s ---", flux::hal::ToString(max_err));
 
-    // ── Evaluate combined results ────────────────────────────────────────
-    Logger::GetInstance().Info(TAG, "Valve driver summary: TLE92466=%s, MAX22200=%s",
-                              tle_ok ? "OK" : "FAIL", max_ok ? "OK" : "FAIL");
-
-    if (tle_ok && max_ok) {
+    // ── Fail closed: every fitted bank must be up ────────────────────────
+    if (tle_err == ManagerError::None && max_err == ManagerError::None) {
         Logger::GetInstance().Info(TAG, "Both valve drivers operational");
         return hf_valve_err_t::VALVE_SUCCESS;
     }
-    if (max_ok) {
-        Logger::GetInstance().Warn(TAG, "Operating with MAX22200 only (solenoid channels available)");
-        return hf_valve_err_t::VALVE_SUCCESS;
-    }
-    if (tle_ok) {
-        Logger::GetInstance().Warn(TAG, "Operating with TLE92466ED only (proportional channels available)");
-        return hf_valve_err_t::VALVE_SUCCESS;
-    }
 
-    Logger::GetInstance().Error(TAG, "No valve drivers available — valve subsystem non-functional");
-    return hf_valve_err_t::VALVE_ERR_DRIVER_NOT_AVAILABLE;
+    // A missing bus or pin is a bind failure; otherwise a chip did not answer.
+    const ManagerError err = (tle_err == ManagerError::BindFailed || max_err == ManagerError::BindFailed)
+                                 ? ManagerError::BindFailed
+                                 : ManagerError::HardwareFault;
+    manager_error_.store(err, std::memory_order_release);
+    Logger::GetInstance().Error(TAG,
+        "Valve manager NOT initialised (fail-closed): TLE92466ED=%s, MAX22200=%s. Every channel operation is "
+        "refused; a bank that came up is reachable through its handler accessor for diagnosis only.",
+        flux::hal::ToString(tle_err), flux::hal::ToString(max_err));
+    return (err == ManagerError::BindFailed) ? hf_valve_err_t::VALVE_ERR_DRIVER_NOT_AVAILABLE
+                                             : hf_valve_err_t::VALVE_ERR_HARDWARE_FAULT;
 }
 
-bool ValveManager::InitializeMax22200() noexcept {
+ManagerError ValveManager::InitializeMax22200() noexcept {
     Logger::GetInstance().Info(TAG, "Initializing MAX22200 solenoid driver");
 
     auto& comms = CommChannelsManager::GetInstance();
@@ -107,7 +123,7 @@ bool ValveManager::InitializeMax22200() noexcept {
     BaseSpi* spi = comms.GetSpiDevice(SpiDeviceId::MAX22200_SOLENOID_DRIVER);
     if (!spi) {
         Logger::GetInstance().Error(TAG, "MAX22200 SPI device not available");
-        return false;
+        return ManagerError::BindFailed;
     }
 
     // Get control GPIOs
@@ -117,8 +133,8 @@ bool ValveManager::InitializeMax22200() noexcept {
 
     if (!enable_gpio || !cmd_gpio) {
         Logger::GetInstance().Error(TAG, "MAX22200 control GPIOs not available (EN=%p, CMD=%p)",
-                                   enable_gpio, cmd_gpio);
-        return false;
+                                   static_cast<void*>(enable_gpio), static_cast<void*>(cmd_gpio));
+        return ManagerError::BindFailed;
     }
 
     // Set fault pin as input
@@ -126,12 +142,8 @@ bool ValveManager::InitializeMax22200() noexcept {
         fault_gpio->SetDirection(hf_gpio_direction_t::HF_GPIO_DIRECTION_INPUT);
     }
 
-    // Create handler via unique_ptr (singleton lifetime, no fragmentation risk)
-    max22200_ = hf::utils::make_unique_nothrow<Max22200Handler>(*spi, *enable_gpio, *cmd_gpio, fault_gpio);
-    if (!max22200_) {
-        Logger::GetInstance().Error(TAG, "Failed to allocate MAX22200 handler");
-        return false;
-    }
+    // Construct the handler in place (member storage, no heap)
+    max22200_.emplace(*spi, *enable_gpio, *cmd_gpio, fault_gpio);
 
     // Configure board settings
     max22200::BoardConfig board_cfg(15.0f, false); // 15kΩ RREF, HFS=0 → IFS=1000mA
@@ -139,15 +151,15 @@ bool ValveManager::InitializeMax22200() noexcept {
     if (max22200_->Initialize(board_cfg) != max22200::DriverStatus::OK) {
         Logger::GetInstance().Error(TAG, "MAX22200 driver initialization failed");
         max22200_.reset();
-        return false;
+        return ManagerError::HardwareFault;
     }
 
     max22200_valid_ = true;
     Logger::GetInstance().Info(TAG, "MAX22200 initialized successfully (8 solenoid channels)");
-    return true;
+    return ManagerError::None;
 }
 
-bool ValveManager::InitializeTle92466() noexcept {
+ManagerError ValveManager::InitializeTle92466() noexcept {
     Logger::GetInstance().Info(TAG, "Initializing TLE92466ED proportional driver");
 
     auto& comms = CommChannelsManager::GetInstance();
@@ -157,7 +169,7 @@ bool ValveManager::InitializeTle92466() noexcept {
     BaseSpi* spi = comms.GetSpiDevice(SpiDeviceId::TLE92466_LOWSIDE_DRIVER);
     if (!spi) {
         Logger::GetInstance().Error(TAG, "TLE92466ED SPI device not available");
-        return false;
+        return ManagerError::BindFailed;
     }
 
     // Get control GPIOs
@@ -167,8 +179,8 @@ bool ValveManager::InitializeTle92466() noexcept {
 
     if (!resn_gpio || !en_gpio) {
         Logger::GetInstance().Error(TAG, "TLE92466ED control GPIOs not available (RESN=%p, EN=%p)",
-                                   resn_gpio, en_gpio);
-        return false;
+                                   static_cast<void*>(resn_gpio), static_cast<void*>(en_gpio));
+        return ManagerError::BindFailed;
     }
 
     // Set fault pin as input
@@ -176,19 +188,14 @@ bool ValveManager::InitializeTle92466() noexcept {
         fault_gpio->SetDirection(hf_gpio_direction_t::HF_GPIO_DIRECTION_INPUT);
     }
 
-    // Create handler via unique_ptr (singleton lifetime, no fragmentation risk)
-    tle92466_ = hf::utils::make_unique_nothrow<Tle92466edHandler>(*spi, *resn_gpio, *en_gpio, fault_gpio);
-    if (!tle92466_) {
-        Logger::GetInstance().Error(TAG, "Failed to allocate TLE92466ED handler");
-        return false;
-    }
+    // Construct the handler in place (member storage, no heap)
+    tle92466_.emplace(*spi, *resn_gpio, *en_gpio, fault_gpio);
 
     if (!tle92466_->Initialize()) {
         Logger::GetInstance().Error(TAG, "TLE92466ED driver initialization failed");
         tle92466_.reset();
-        return false;
+        return ManagerError::HardwareFault;
     }
-
     // Enter mission mode for normal operation
     if (!tle92466_->EnterMissionMode()) {
         Logger::GetInstance().Warn(TAG, "TLE92466ED failed to enter mission mode");
@@ -253,7 +260,7 @@ bool ValveManager::InitializeTle92466() noexcept {
 
     tle92466_valid_ = true;
     Logger::GetInstance().Info(TAG, "TLE92466ED initialized successfully (6 proportional channels)");
-    return true;
+    return ManagerError::None;
 }
 
 //==============================================================================
@@ -276,12 +283,12 @@ bool ValveManager::ResolveChannel(ValveChannel channel,
 
 hf_valve_err_t ValveManager::EnableChannel(ValveChannel channel) noexcept {
     if (!initialized_.load(std::memory_order_acquire))
-        return hf_valve_err_t::VALVE_ERR_NOT_INITIALIZED;
+        return Record(hf_valve_err_t::VALVE_ERR_NOT_INITIALIZED);
 
     ValveDriverType type;
     uint8_t hw_ch;
     if (!ResolveChannel(channel, type, hw_ch))
-        return hf_valve_err_t::VALVE_ERR_INVALID_CHANNEL;
+        return Record(hf_valve_err_t::VALVE_ERR_INVALID_CHANNEL);
 
     MutexLockGuard lock(mutex_);
     hf_valve_err_t result;
@@ -293,7 +300,7 @@ hf_valve_err_t ValveManager::EnableChannel(ValveChannel channel) noexcept {
         result = dr.has_value() ? hf_valve_err_t::VALVE_SUCCESS
                                 : TleDriverErrorToValveError(dr.error());
     } else {
-        return hf_valve_err_t::VALVE_ERR_DRIVER_NOT_AVAILABLE;
+        return Record(hf_valve_err_t::VALVE_ERR_DRIVER_NOT_AVAILABLE);
     }
 
     if (HfValveErrOk(result)) {
@@ -307,17 +314,17 @@ hf_valve_err_t ValveManager::EnableChannel(ValveChannel channel) noexcept {
             kValveChannelMap[static_cast<uint8_t>(channel)].name.data(),
             HfValveErrToString(result));
     }
-    return result;
+    return Record(result);
 }
 
 hf_valve_err_t ValveManager::DisableChannel(ValveChannel channel) noexcept {
     if (!initialized_.load(std::memory_order_acquire))
-        return hf_valve_err_t::VALVE_ERR_NOT_INITIALIZED;
+        return Record(hf_valve_err_t::VALVE_ERR_NOT_INITIALIZED);
 
     ValveDriverType type;
     uint8_t hw_ch;
     if (!ResolveChannel(channel, type, hw_ch))
-        return hf_valve_err_t::VALVE_ERR_INVALID_CHANNEL;
+        return Record(hf_valve_err_t::VALVE_ERR_INVALID_CHANNEL);
 
     MutexLockGuard lock(mutex_);
     hf_valve_err_t result;
@@ -329,7 +336,7 @@ hf_valve_err_t ValveManager::DisableChannel(ValveChannel channel) noexcept {
         result = dr.has_value() ? hf_valve_err_t::VALVE_SUCCESS
                                 : TleDriverErrorToValveError(dr.error());
     } else {
-        return hf_valve_err_t::VALVE_ERR_DRIVER_NOT_AVAILABLE;
+        return Record(hf_valve_err_t::VALVE_ERR_DRIVER_NOT_AVAILABLE);
     }
 
     if (HfValveErrOk(result)) {
@@ -341,12 +348,12 @@ hf_valve_err_t ValveManager::DisableChannel(ValveChannel channel) noexcept {
             kValveChannelMap[static_cast<uint8_t>(channel)].name.data(),
             HfValveErrToString(result));
     }
-    return result;
+    return Record(result);
 }
 
 hf_valve_err_t ValveManager::EnableChannelsMask(uint16_t mask) noexcept {
     if (!initialized_.load(std::memory_order_acquire))
-        return hf_valve_err_t::VALVE_ERR_NOT_INITIALIZED;
+        return Record(hf_valve_err_t::VALVE_ERR_NOT_INITIALIZED);
     MutexLockGuard lock(mutex_);
 
     hf_valve_err_t first_error = hf_valve_err_t::VALVE_SUCCESS;
@@ -386,14 +393,17 @@ hf_valve_err_t ValveManager::EnableChannelsMask(uint16_t mask) noexcept {
         }
     }
 
-    return first_error;
+    return Record(first_error);
 }
 
 hf_valve_err_t ValveManager::DisableAllChannels() noexcept {
     if (!initialized_.load(std::memory_order_acquire))
-        return hf_valve_err_t::VALVE_ERR_NOT_INITIALIZED;
+        return Record(hf_valve_err_t::VALVE_ERR_NOT_INITIALIZED);
     MutexLockGuard lock(mutex_);
+    return Record(DisableAllLocked());
+}
 
+hf_valve_err_t ValveManager::DisableAllLocked() noexcept {
     hf_valve_err_t first_error = hf_valve_err_t::VALVE_SUCCESS;
 
     if (max22200_valid_) {
@@ -411,7 +421,7 @@ hf_valve_err_t ValveManager::DisableAllChannels() noexcept {
     for (auto& state : channel_states_) {
         state.enabled = false;
     }
-    return first_error;
+    return Record(first_error);
 }
 
 bool ValveManager::IsChannelEnabled(ValveChannel channel) const noexcept {
@@ -428,14 +438,14 @@ hf_valve_err_t ValveManager::ConfigureSolenoidCdr(ValveChannel channel,
                                         uint16_t hit_ma, uint16_t hold_ma,
                                         float hit_time_ms) noexcept {
     if (!initialized_.load(std::memory_order_acquire))
-        return hf_valve_err_t::VALVE_ERR_NOT_INITIALIZED;
+        return Record(hf_valve_err_t::VALVE_ERR_NOT_INITIALIZED);
     if (!max22200_valid_)
-        return hf_valve_err_t::VALVE_ERR_DRIVER_NOT_AVAILABLE;
+        return Record(hf_valve_err_t::VALVE_ERR_DRIVER_NOT_AVAILABLE);
 
     ValveDriverType type;
     uint8_t hw_ch;
     if (!ResolveChannel(channel, type, hw_ch) || type != ValveDriverType::MAX22200)
-        return hf_valve_err_t::VALVE_ERR_CHANNEL_TYPE_MISMATCH;
+        return Record(hf_valve_err_t::VALVE_ERR_CHANNEL_TYPE_MISMATCH);
 
     MutexLockGuard lock(mutex_);
     auto result = MaxDriverStatusToValveError(
@@ -443,21 +453,21 @@ hf_valve_err_t ValveManager::ConfigureSolenoidCdr(ValveChannel channel,
     if (HfValveErrOk(result)) {
         channel_states_[static_cast<uint8_t>(channel)].configured = true;
     }
-    return result;
+    return Record(result);
 }
 
 hf_valve_err_t ValveManager::ConfigureSolenoidVdr(ValveChannel channel,
                                         float hit_duty_pct, float hold_duty_pct,
                                         float hit_time_ms) noexcept {
     if (!initialized_.load(std::memory_order_acquire))
-        return hf_valve_err_t::VALVE_ERR_NOT_INITIALIZED;
+        return Record(hf_valve_err_t::VALVE_ERR_NOT_INITIALIZED);
     if (!max22200_valid_)
-        return hf_valve_err_t::VALVE_ERR_DRIVER_NOT_AVAILABLE;
+        return Record(hf_valve_err_t::VALVE_ERR_DRIVER_NOT_AVAILABLE);
 
     ValveDriverType type;
     uint8_t hw_ch;
     if (!ResolveChannel(channel, type, hw_ch) || type != ValveDriverType::MAX22200)
-        return hf_valve_err_t::VALVE_ERR_CHANNEL_TYPE_MISMATCH;
+        return Record(hf_valve_err_t::VALVE_ERR_CHANNEL_TYPE_MISMATCH);
 
     MutexLockGuard lock(mutex_);
     auto result = MaxDriverStatusToValveError(
@@ -466,7 +476,7 @@ hf_valve_err_t ValveManager::ConfigureSolenoidVdr(ValveChannel channel,
         channel_states_[static_cast<uint8_t>(channel)].configured = true;
         channel_states_[static_cast<uint8_t>(channel)].duty_percent = hold_duty_pct;
     }
-    return result;
+    return Record(result);
 }
 
 //==============================================================================
@@ -475,14 +485,14 @@ hf_valve_err_t ValveManager::ConfigureSolenoidVdr(ValveChannel channel,
 
 hf_valve_err_t ValveManager::SetProportionalCurrent(ValveChannel channel, uint16_t current_ma) noexcept {
     if (!initialized_.load(std::memory_order_acquire))
-        return hf_valve_err_t::VALVE_ERR_NOT_INITIALIZED;
+        return Record(hf_valve_err_t::VALVE_ERR_NOT_INITIALIZED);
     if (!tle92466_valid_)
-        return hf_valve_err_t::VALVE_ERR_DRIVER_NOT_AVAILABLE;
+        return Record(hf_valve_err_t::VALVE_ERR_DRIVER_NOT_AVAILABLE);
 
     ValveDriverType type;
     uint8_t hw_ch;
     if (!ResolveChannel(channel, type, hw_ch) || type != ValveDriverType::TLE92466)
-        return hf_valve_err_t::VALVE_ERR_CHANNEL_TYPE_MISMATCH;
+        return Record(hf_valve_err_t::VALVE_ERR_CHANNEL_TYPE_MISMATCH);
 
     MutexLockGuard lock(mutex_);
     auto dr = tle92466_->SetChannelCurrent(hw_ch, current_ma);
@@ -491,25 +501,25 @@ hf_valve_err_t ValveManager::SetProportionalCurrent(ValveChannel channel, uint16
         channel_states_[static_cast<uint8_t>(channel)].configured = true;
         return hf_valve_err_t::VALVE_SUCCESS;
     }
-    return TleDriverErrorToValveError(dr.error());
+    return Record(TleDriverErrorToValveError(dr.error()));
 }
 
 hf_valve_err_t ValveManager::ConfigureProportionalPwm(ValveChannel channel,
                                             float frequency_hz) noexcept {
     if (!initialized_.load(std::memory_order_acquire))
-        return hf_valve_err_t::VALVE_ERR_NOT_INITIALIZED;
+        return Record(hf_valve_err_t::VALVE_ERR_NOT_INITIALIZED);
     if (!tle92466_valid_)
-        return hf_valve_err_t::VALVE_ERR_DRIVER_NOT_AVAILABLE;
+        return Record(hf_valve_err_t::VALVE_ERR_DRIVER_NOT_AVAILABLE);
 
     ValveDriverType type;
     uint8_t hw_ch;
     if (!ResolveChannel(channel, type, hw_ch) || type != ValveDriverType::TLE92466)
-        return hf_valve_err_t::VALVE_ERR_CHANNEL_TYPE_MISMATCH;
+        return Record(hf_valve_err_t::VALVE_ERR_CHANNEL_TYPE_MISMATCH);
 
     if (frequency_hz <= 0.0f) {
         Logger::GetInstance().Error(TAG, "PWM frequency must be > 0 (got %.1f Hz)",
                                    static_cast<double>(frequency_hz));
-        return hf_valve_err_t::VALVE_ERR_INVALID_PARAMETER;
+        return Record(hf_valve_err_t::VALVE_ERR_INVALID_PARAMETER);
     }
 
     // Convert frequency (Hz) → period (µs) and let the driver handle
@@ -517,7 +527,7 @@ hf_valve_err_t ValveManager::ConfigureProportionalPwm(ValveChannel channel,
     const float period_us = 1'000'000.0f / frequency_hz;
 
     auto* driver = tle92466_->GetDriver();
-    if (!driver) return hf_valve_err_t::VALVE_ERR_DRIVER_NOT_AVAILABLE;
+    if (!driver) return Record(hf_valve_err_t::VALVE_ERR_DRIVER_NOT_AVAILABLE);
 
     MutexLockGuard lock(mutex_);
     auto result = driver->ConfigurePwmPeriod(
@@ -531,33 +541,33 @@ hf_valve_err_t ValveManager::ConfigureProportionalPwm(ValveChannel channel,
         "ConfigurePwmPeriod failed for channel %u (freq=%.1f Hz, period=%.1f µs)",
         hw_ch, static_cast<double>(frequency_hz), static_cast<double>(period_us));
     channel_states_[static_cast<uint8_t>(channel)].error_count++;
-    return TleDriverErrorToValveError(result.error());
+    return Record(TleDriverErrorToValveError(result.error()));
 }
 
 hf_valve_err_t ValveManager::ConfigureProportionalDither(ValveChannel channel,
                                                float amplitude_ma,
                                                float frequency_hz) noexcept {
     if (!initialized_.load(std::memory_order_acquire))
-        return hf_valve_err_t::VALVE_ERR_NOT_INITIALIZED;
+        return Record(hf_valve_err_t::VALVE_ERR_NOT_INITIALIZED);
     if (!tle92466_valid_)
-        return hf_valve_err_t::VALVE_ERR_DRIVER_NOT_AVAILABLE;
+        return Record(hf_valve_err_t::VALVE_ERR_DRIVER_NOT_AVAILABLE);
 
     ValveDriverType type;
     uint8_t hw_ch;
     if (!ResolveChannel(channel, type, hw_ch) || type != ValveDriverType::TLE92466)
-        return hf_valve_err_t::VALVE_ERR_CHANNEL_TYPE_MISMATCH;
+        return Record(hf_valve_err_t::VALVE_ERR_CHANNEL_TYPE_MISMATCH);
 
     if (amplitude_ma < 0.0f || frequency_hz <= 0.0f) {
         Logger::GetInstance().Error(TAG, "Invalid dither params: amplitude=%.1f mA, freq=%.1f Hz",
                                    static_cast<double>(amplitude_ma),
                                    static_cast<double>(frequency_hz));
-        return hf_valve_err_t::VALVE_ERR_INVALID_PARAMETER;
+        return Record(hf_valve_err_t::VALVE_ERR_INVALID_PARAMETER);
     }
 
     // Use the driver's high-level ConfigureDither which handles the
     // step_size / num_steps / flat_steps computation internally.
     auto* driver = tle92466_->GetDriver();
-    if (!driver) return hf_valve_err_t::VALVE_ERR_DRIVER_NOT_AVAILABLE;
+    if (!driver) return Record(hf_valve_err_t::VALVE_ERR_DRIVER_NOT_AVAILABLE);
 
     MutexLockGuard lock(mutex_);
     auto result = driver->ConfigureDither(
@@ -571,7 +581,7 @@ hf_valve_err_t ValveManager::ConfigureProportionalDither(ValveChannel channel,
 
     Logger::GetInstance().Error(TAG, "ConfigureDither failed for channel %u", hw_ch);
     channel_states_[static_cast<uint8_t>(channel)].error_count++;
-    return TleDriverErrorToValveError(result.error());
+    return Record(TleDriverErrorToValveError(result.error()));
 }
 
 //==============================================================================
@@ -584,7 +594,7 @@ bool ValveManager::HasFault() noexcept {
 
 hf_valve_err_t ValveManager::ClearAllFaults() noexcept {
     if (!initialized_.load(std::memory_order_acquire))
-        return hf_valve_err_t::VALVE_ERR_NOT_INITIALIZED;
+        return Record(hf_valve_err_t::VALVE_ERR_NOT_INITIALIZED);
     MutexLockGuard lock(mutex_);
 
     hf_valve_err_t first_error = hf_valve_err_t::VALVE_SUCCESS;
@@ -600,7 +610,7 @@ hf_valve_err_t ValveManager::ClearAllFaults() noexcept {
             if (HfValveErrOk(first_error)) first_error = err;
         }
     }
-    return first_error;
+    return Record(first_error);
 }
 
 bool ValveManager::HasSolenoidFault() noexcept {
@@ -615,13 +625,13 @@ bool ValveManager::HasProportionalFault() noexcept {
 
 hf_valve_err_t ValveManager::GetSolenoidFaults(max22200::FaultStatus& faults) noexcept {
     if (!max22200_valid_)
-        return hf_valve_err_t::VALVE_ERR_DRIVER_NOT_AVAILABLE;
-    return MaxDriverStatusToValveError(max22200_->ReadFaultRegister(faults));
+        return Record(hf_valve_err_t::VALVE_ERR_DRIVER_NOT_AVAILABLE);
+    return Record(MaxDriverStatusToValveError(max22200_->ReadFaultRegister(faults)));
 }
 
 hf_valve_err_t ValveManager::GetProportionalFaults(tle92466ed::FaultReport& report) noexcept {
     if (!tle92466_valid_)
-        return hf_valve_err_t::VALVE_ERR_DRIVER_NOT_AVAILABLE;
+        return Record(hf_valve_err_t::VALVE_ERR_DRIVER_NOT_AVAILABLE);
     auto dr = tle92466_->GetFaultReport(report);
     return dr.has_value() ? hf_valve_err_t::VALVE_SUCCESS
                           : TleDriverErrorToValveError(dr.error());
@@ -656,11 +666,11 @@ ValveChannel ValveManager::FindChannel(std::string_view name) const noexcept {
 //==============================================================================
 
 Max22200Handler* ValveManager::GetMax22200Handler() noexcept {
-    return max22200_valid_ ? max22200_.get() : nullptr;
+    return max22200_valid_ ? &*max22200_ : nullptr;
 }
 
 Tle92466edHandler* ValveManager::GetTle92466Handler() noexcept {
-    return tle92466_valid_ ? tle92466_.get() : nullptr;
+    return tle92466_valid_ ? &*tle92466_ : nullptr;
 }
 
 //==============================================================================
@@ -683,7 +693,9 @@ hf_valve_err_t ValveManager::GetSystemDiagnostics(ValveSystemDiagnostics& diag) 
         diag.total_errors      += state.error_count;
     }
 
-    diag.system_healthy = (max22200_valid_ || tle92466_valid_) && (diag.total_errors == 0);
+    // Fail-closed: healthy only when the manager is up (both banks) and nothing has failed.
+    diag.system_healthy = initialized_.load(std::memory_order_acquire) && max22200_valid_ && tle92466_valid_ &&
+                          (diag.total_errors == 0);
     return hf_valve_err_t::VALVE_SUCCESS;
 }
 
@@ -718,8 +730,9 @@ void ValveManager::DumpStatistics() const noexcept {
         }
     }
 
-    if (max22200_valid_) max22200_->DumpDiagnostics();
-    if (tle92466_valid_) tle92466_->DumpDiagnostics();
+    // The handlers' dump calls read registers and are not const; the dump does not change state.
+    if (max22200_valid_) const_cast<Max22200Handler&>(*max22200_).DumpDiagnostics();
+    if (tle92466_valid_) const_cast<Tle92466edHandler&>(*tle92466_).DumpDiagnostics();
 
     log.Info(TAG, "=== End Flux Valve Manager Statistics ===");
 }
@@ -730,26 +743,31 @@ void ValveManager::DumpStatistics() const noexcept {
 
 bool ValveManager::Deinitialize() noexcept {
     MutexLockGuard lock(mutex_);
-    if (!initialized_.load(std::memory_order_acquire)) return true;
 
-    Logger::GetInstance().Info(TAG, "Deinitializing Flux Valve manager");
+    if (initialized_.load(std::memory_order_acquire) || max22200_valid_ || tle92466_valid_) {
+        Logger::GetInstance().Info(TAG, "Deinitializing Flux Valve manager");
+        // Outputs off before the handlers go away.
+        const hf_valve_err_t off = DisableAllLocked();
+        if (!HfValveErrOk(off)) {
+            Logger::GetInstance().Warn(TAG, "DisableAll during deinit failed: %s", HfValveErrToString(off));
+        }
+    }
 
     // Reset channel states
     for (auto& state : channel_states_) {
-        state.enabled = false;
-        state.configured = false;
-        state.activation_count = 0;
-        state.error_count = 0;
+        state = ValveChannelState{};
     }
 
-    // Release MAX22200 handler
-    max22200_.reset();
-    max22200_valid_ = false;
-
-    // Release TLE92466ED handler
-    tle92466_.reset();
-    tle92466_valid_ = false;
+    ReleaseDriversLocked();
 
     initialized_.store(false, std::memory_order_release);
+    manager_error_.store(ManagerError::NotInitialized, std::memory_order_release);
     return true;
+}
+
+void ValveManager::ReleaseDriversLocked() noexcept {
+    max22200_valid_ = false;
+    max22200_.reset();
+    tle92466_valid_ = false;
+    tle92466_.reset();
 }

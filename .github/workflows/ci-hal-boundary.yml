@@ -1,6 +1,7 @@
 ---
-# HAL boundary: ESP-IDF, FreeRTOS and Esp* code only under lib/managers/bsp_bind/<family>/ (ADR 0004), and the
-# MCU-free part of the HAL (facade, managers, board binding) builds on a host against bsp_bind/host.
+# HAL boundary: ESP-IDF, FreeRTOS and Esp* code only under lib/managers/bsp_bind/<family>/ (ADR 0004); no heap or
+# heap-backed type in the HAL library (ADR 0005); and the MCU-free part of the HAL (facade, managers, board
+# binding) builds on a host against bsp_bind/host.
 name: "\U0001F9F1 HAL Boundary CI"
 
 on:
@@ -19,7 +20,7 @@ concurrency:
 
 jobs:
   boundary-lint:
-    name: Boundary lint
+    name: Boundary and allocation lints
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
@@ -33,6 +34,9 @@ jobs:
           else
             bash tools/lint/lint_hal_boundary.sh
           fi
+
+      - name: lint_hal_alloc.sh
+        run: bash tools/lint/lint_hal_alloc.sh
 
   host-build:
     name: Host build (${{ matrix.compiler }})

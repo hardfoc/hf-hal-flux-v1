@@ -40,6 +40,9 @@ bool GpioManager::EnsureInitialized() noexcept {
         return true;
     }
     bool ok = Initialize();
+    if (ok) {
+        manager_error_.store(flux::hal::ManagerError::None, std::memory_order_release);
+    }
     initialized_.store(ok, std::memory_order_release);
     return ok;
 }
@@ -50,8 +53,10 @@ bool GpioManager::Initialize() noexcept {
     Logger::GetInstance().Info(TAG, "  %-28s %-7s %-7s", "Name", "Pin", "Result");
     Logger::GetInstance().Info(TAG, "  %-28s %-7s %-7s", "----", "---", "------");
 
+    // A previous failed attempt may have left pins registered; start from nothing.
+    ReleaseLocked();
     init_time_ms_ = os_get_elapsed_time_msec();
-    registered_count_ = 0;
+    size_t expected = 0;
 
     // Iterate through all pins defined in the pin config
     for (size_t i = 0; i < HF_GPIO_MAPPING_SIZE; ++i) {
@@ -68,6 +73,7 @@ bool GpioManager::Initialize() noexcept {
             continue;
         }
 
+        ++expected;
         auto& entry = entries_[i];
         entry.functional_pin = static_cast<HfFunctionalGpioPin>(i);
 
@@ -112,7 +118,14 @@ bool GpioManager::Initialize() noexcept {
 
     logger_decor::Rule(TAG);
     Logger::GetInstance().Info(TAG, "GPIO manager initialized: %zu pins registered", registered_count_);
-    return registered_count_ > 0;
+    // Fail closed: every GPIO-category pin in the pin map must be up.
+    if (registered_count_ != expected || expected == 0) {
+        manager_error_.store(flux::hal::ManagerError::BindFailed, std::memory_order_release);
+        Logger::GetInstance().Error(TAG, "GPIO manager NOT initialised (fail-closed): %zu of %zu pins registered",
+                                    registered_count_, expected);
+        return false;
+    }
+    return true;
 }
 
 //==============================================================================
@@ -275,12 +288,22 @@ void GpioManager::DumpStatistics() const noexcept {
 
 bool GpioManager::Deinitialize() noexcept {
     MutexLockGuard lock(mutex_);
-    if (!initialized_.load(std::memory_order_acquire)) return true;
+    if (initialized_.load(std::memory_order_acquire)) {
+        Logger::GetInstance().Info(TAG, "Deinitializing Flux GPIO manager");
+    }
+    ReleaseLocked();
+    total_ops_ = 0;
+    successful_ops_ = 0;
+    failed_ops_ = 0;
+    last_error_ = hf_gpio_err_t::GPIO_SUCCESS;
 
-    Logger::GetInstance().Info(TAG, "Deinitializing Flux GPIO manager");
+    initialized_.store(false, std::memory_order_release);
+    manager_error_.store(flux::hal::ManagerError::NotInitialized, std::memory_order_release);
+    return true;
+}
 
-    // Clear all entries
-    for (size_t i = 0; i < HF_GPIO_MAPPING_SIZE; ++i) {
+void GpioManager::ReleaseLocked() noexcept {
+    for (size_t i = 0; i < HF_GPIO_MAPPING_SIZE && i < kMaxEntries; ++i) {
         flux::bsp::DestroyGpio(i);
         entries_[i].driver = nullptr;
         entries_[i].registered = false;
@@ -288,13 +311,6 @@ bool GpioManager::Deinitialize() noexcept {
         entries_[i].error_count = 0;
     }
     registered_count_ = 0;
-    total_ops_ = 0;
-    successful_ops_ = 0;
-    failed_ops_ = 0;
-    last_error_ = hf_gpio_err_t::GPIO_SUCCESS;
-
-    initialized_.store(false, std::memory_order_release);
-    return true;
 }
 
 //==============================================================================

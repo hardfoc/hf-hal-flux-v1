@@ -93,6 +93,12 @@ bool CommChannelsManager::EnsureInitialized() noexcept {
         return true;
     }
     bool ok = Initialize();
+    if (ok) {
+        manager_error_.store(flux::hal::ManagerError::None, std::memory_order_release);
+    } else {
+        manager_error_.store(flux::hal::ManagerError::BindFailed, std::memory_order_release);
+        UpdateLastError(CommError::INITIALIZATION_FAILED);
+    }
     initialized_.store(ok, std::memory_order_release);
     return ok;
 }
@@ -100,6 +106,9 @@ bool CommChannelsManager::EnsureInitialized() noexcept {
 bool CommChannelsManager::Initialize() noexcept {
     Logger::GetInstance().Info(TAG, "Initializing Flux V1 communication channels");
     using flux::board::SpiBus;
+
+    // A previous failed attempt may have left buses up; start from nothing.
+    ReleaseLocked();
 
     //==========================================================================
     // VALVE SPI BUS — shared by MAX22200 and TLE92466ED (pin map SPI2_*)
@@ -130,6 +139,7 @@ bool CommChannelsManager::Initialize() noexcept {
         spi_devices_[static_cast<uint8_t>(SpiDeviceId::ADS7952_ADC_0)] =
             AddSpiDevice(SpiBus::Pressure, HfFunctionalGpioPin::SPI3_CS_ADS7952_0, flux::board::kAds7952SpiHz,
                          flux::board::kAds7952SpiMode, "ADS7952");
+        spi3_bus_valid_ = spi_devices_[static_cast<uint8_t>(SpiDeviceId::ADS7952_ADC_0)] != nullptr;
     } else {
         Logger::GetInstance().Warn(TAG, "Pressure SPI bus initialization failed — ADS7952 unavailable");
     }
@@ -160,14 +170,28 @@ bool CommChannelsManager::Initialize() noexcept {
                               spi_bus_valid_ ? "OK" : "FAIL",
                               can_bus_valid_ ? "OK" : "FAIL");
 
-    // If SPI failed (hard requirement), clean up any non-critical resources
-    if (!spi_bus_valid_) {
-        flux::bsp::DestroyCan();
-        can_bus_ = nullptr;
-        can_bus_valid_ = false;
+    // Fail closed on the required set: the valve bus with both valve chip selects.
+    const bool valve_devices_ok =
+        spi_devices_[static_cast<uint8_t>(SpiDeviceId::MAX22200_SOLENOID_DRIVER)] != nullptr &&
+        spi_devices_[static_cast<uint8_t>(SpiDeviceId::TLE92466_LOWSIDE_DRIVER)] != nullptr;
+    if (!spi_bus_valid_ || !valve_devices_ok) {
+        Logger::GetInstance().Error(TAG, "Comms NOT initialised (fail-closed): valve SPI bus=%s, valve devices=%s",
+                                    spi_bus_valid_ ? "OK" : "FAIL", valve_devices_ok ? "OK" : "FAIL");
+        ReleaseLocked();
+        return false;
     }
+    return true;
+}
 
-    return spi_bus_valid_; // SPI is the only hard requirement
+void CommChannelsManager::ReleaseLocked() noexcept {
+    flux::bsp::DestroySpiBus(static_cast<size_t>(flux::board::SpiBus::Valve));
+    flux::bsp::DestroySpiBus(static_cast<size_t>(flux::board::SpiBus::Pressure));
+    spi_devices_.fill(nullptr);
+    spi_bus_valid_ = false;
+    spi3_bus_valid_ = false;
+    flux::bsp::DestroyCan();
+    can_bus_ = nullptr;
+    can_bus_valid_ = false;
 }
 
 //==============================================================================
@@ -347,18 +371,11 @@ bool CommChannelsManager::Deinitialize() noexcept {
 
     Logger::GetInstance().Info(TAG, "Deinitializing Flux CommChannels manager");
 
-    // Release both SPI buses and their devices
-    flux::bsp::DestroySpiBus(static_cast<size_t>(flux::board::SpiBus::Valve));
-    flux::bsp::DestroySpiBus(static_cast<size_t>(flux::board::SpiBus::Pressure));
-    spi_devices_.fill(nullptr);
-    spi_bus_valid_ = false;
-    spi3_bus_valid_ = false;
-
-    // Release CAN bus
-    flux::bsp::DestroyCan();
-    can_bus_ = nullptr;
-    can_bus_valid_ = false;
+    // Release both SPI buses, their devices and the CAN controller. UART ports stay:
+    // they are acquired by the application, which owns their lifetime.
+    ReleaseLocked();
 
     initialized_.store(false, std::memory_order_release);
+    manager_error_.store(flux::hal::ManagerError::NotInitialized, std::memory_order_release);
     return true;
 }
