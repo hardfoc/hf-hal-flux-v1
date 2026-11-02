@@ -28,7 +28,6 @@ cd examples/esp32
 | `valve_manager_example` | [`main/ValveManagerExample.cpp`](../main/ValveManagerExample.cpp) | example | no | Valve manager demo |
 | `ads7952_example` | [`main/Ads7952Example.cpp`](../main/Ads7952Example.cpp) | example | no | ADS7952 demo |
 | `alicat_basis2_example` | [`main/AlicatBasis2Example.cpp`](../main/AlicatBasis2Example.cpp) | example | no | Alicat Basis 2 demo |
-| `manifold_valves_pressure_control` | [`main/manifold_valves_pressure_control/manifold_valves_pressure_control.cpp`](../main/manifold_valves_pressure_control/manifold_valves_pressure_control.cpp) (+ linked `.cpp` in `app_config.yml`) | example | no | Multi-file app; see [`main/manifold_valves_pressure_control/README.md`](../main/manifold_valves_pressure_control/README.md) |
 
 ## Tie-back
 

@@ -15,6 +15,11 @@ that can be built and flashed independently using the `build_app.sh` script.
 | `flux_api_test` | `flux_api_test.cpp` | Full Flux API initialization and diagnostics |
 | `flux_nvs_example` | `flux_nvs_example.cpp` | **NVS / `NvsManager`** — `flux` / `flux_cal` / `flux_cfg`, boot counter, blob, string |
 
+The examples cover HAL bring-up only: one manager or chip at a time, no product
+logic. The manifold valve and pressure application (named valves, valve self-test,
+pressure-sensor threads) is part of the product firmware,
+[`hardfoc-flux-v1`](https://github.com/hardfoc/hardfoc-flux-v1), not of the HAL.
+
 ## Quick Start
 
 ```bash

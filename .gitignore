@@ -139,9 +139,5 @@ Thumbs.db
 # Changelogs (maintained locally, not tracked)
 CHANGELOG.md
 
-# Local bench tests (machine-specific, not for GitHub)
-examples/manifold_valves_pressure_control.cpp
-examples/esp32/main/manifold_valves_pressure_control/manifold_valves_pressure_control.cpp
-
 # Documentation site (mkdocs build)
 site/

@@ -17,13 +17,20 @@ cd examples/esp32
     `flux_api_test` initialises everything and checks each manager, so it is the quickest way to see whether a board
     is healthy. Then pick the documentation example for the manager you care about.
 
+!!! note "Where the manifold application lives"
+    The examples bring up the HAL: one manager or chip at a time, no product logic. The valve, pressure-sensor and
+    self-test application that used to sit in `examples/esp32/main/manifold_valves_pressure_control/` was an older
+    copy of the product middleware and has been removed. The maintained version is in the product firmware,
+    [`hardfoc-flux-v1`](https://github.com/hardfoc/hardfoc-flux-v1) (`main/middleware/utils/valves/` and
+    `main/middleware/utils/hardware/`).
+
 ## Catalogue
 
 <!-- generated: examples-catalogue -->
 From [`examples/esp32/app_config.yml`](../../examples/esp32/app_config.yml)
 and each source file's `@brief`; do not edit.
 
-15 apps, 5 built by CI on every pull request. Target `esp32s3`, ESP-IDF release/v5.5.
+14 apps, 5 built by CI on every pull request. Target `esp32s3`, ESP-IDF release/v5.5.
 
 ### Start here
 
@@ -53,12 +60,6 @@ and each source file's `@brief`; do not edit.
 | `valve_manager_example` | Documentation example: Unified valve control on Flux V1. | - | [`ValveManagerExample.cpp`](../../examples/esp32/main/ValveManagerExample.cpp) |
 | `ads7952_example` | Documentation example: ADS7952 12-channel ADC on Flux V1. | - | [`Ads7952Example.cpp`](../../examples/esp32/main/Ads7952Example.cpp) |
 | `alicat_basis2_example` | Comprehensive Flux V1 example exercising the Alicat BASIS-2 driver and `AlicatBasis2Handler` over an ESP32-S3 UART configured for RS-485 half-duplex. | - | [`AlicatBasis2Example.cpp`](../../examples/esp32/main/AlicatBasis2Example.cpp) |
-
-### Bench applications
-
-| App (`APP_TYPE`) | What it does | CI | Source |
-| --- | --- | :---: | --- |
-| `manifold_valves_pressure_control` | Manifold test bench: pressure sensor calibration and high-rate monitoring. | - | [`manifold_valves_pressure_control.cpp`](../../examples/esp32/main/manifold_valves_pressure_control/manifold_valves_pressure_control.cpp) |
 <!-- /generated -->
 
 ## Adding an app

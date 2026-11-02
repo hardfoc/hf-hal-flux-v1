@@ -16,6 +16,8 @@ exclude = [
   # hf-development-handbook is a private repository: it is not checked out in
   # CI (update = none in .gitmodules) and returns 404 to anonymous requests.
   '^https://github\.com/hardfoc/hf-development-handbook.*',
+  # The product firmware (hardfoc-flux-v1) is a private repository: 404 to anonymous requests.
+  '^https://github\.com/hardfoc/hardfoc-flux-v1.*',
   '/docs/hf-development-handbook/',
   # lib/core (hf-core) is a submodule. The reusable link check can only check
   # out submodules recursively, and recursion fails at the pinned hf-core

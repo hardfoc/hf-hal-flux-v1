@@ -64,15 +64,6 @@ apps:
     source_file: "AlicatBasis2Example.cpp"
     category: "example"
     ci_enabled: false
-  manifold_valves_pressure_control:
-    source_files:
-      - "manifold_valves_pressure_control/manifold_valves_pressure_control.cpp"
-      - "manifold_valves_pressure_control/PressureSensor.cpp"
-      - "manifold_valves_pressure_control/PressureSensorThread.cpp"
-    include_dirs:
-      - "manifold_valves_pressure_control"
-    category: "example"
-    ci_enabled: false
 
 build_config:
   build_types:
