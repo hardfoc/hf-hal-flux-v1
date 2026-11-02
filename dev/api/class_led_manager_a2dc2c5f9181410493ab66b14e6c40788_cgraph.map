@@ -1,0 +1,37 @@
+<map id="LedManager::Shutdown" name="LedManager::Shutdown">
+<area shape="rect" id="Node000001" title="Turn off the LED and release driver resources." alt="" coords="5,219,180,244"/>
+<area shape="rect" id="Node000002" href="$_led_manager_8h.html#afea8c79ff81c3999d2327928dc5e4fbb" title="Convert a LedError to a human&#45;readable C&#45;string." alt="" coords="245,144,373,169"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="125,216,227,178,249,171,251,176,229,183,127,221"/>
+<area shape="rect" id="Node000003" href="$namespaceflux_1_1bsp.html#a4da7416ca257af24bb65762ba685c2b8" title="Stop the strip and release its peripheral." alt="" coords="228,193,391,219"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="180,218,214,214,215,220,181,224"/>
+<area shape="rect" id="Node000004" href="$class_led_manager.html#a121a6a5f0c2da5ebc117f9f7d054a12c" title="Stop the current animation and turn the LED off." alt="" coords="445,329,651,355"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="126,242,229,277,344,304,452,324,451,330,343,309,227,282,125,247"/>
+<area shape="rect" id="Node000008" href="$class_led_manager.html#a70ae6019c2839bdc8c371a440e10908d" title="Turn the LED off (set colour to black)." alt="" coords="231,243,387,268"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="181,238,218,243,218,248,180,244"/>
+<area shape="rect" id="Node000005" href="$namespace_led_colors.html#ac73d9c4d71b45c9f83cf04a51e6dbb3c" title="Off / black." alt="" coords="719,204,858,229"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="628,327,656,314,671,302,680,289,689,274,704,259,743,233,746,238,707,263,693,277,685,291,675,305,659,319,631,332"/>
+<area shape="rect" id="Node000006" href="$namespaceflux_1_1bsp.html#a6b08718df1ad5fee11813553a43116eb" title="Stage a 0xRRGGBB colour for LED index (sent on LedStripShow)." alt="" coords="949,153,1140,179"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="608,327,657,314,765,279,871,238,1002,182,1004,187,873,243,767,284,658,319,610,332"/>
+<area shape="rect" id="Node000007" href="$namespaceflux_1_1bsp.html#a82cb93630ae5f29d095a51ded4237fe2" title="Send the staged colours." alt="" coords="958,329,1131,355"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="652,339,944,339,944,345,652,345"/>
+<area shape="poly" id="edge18_Node000008_Node000004" title=" " alt="" coords="335,266,382,290,440,314,470,323,468,328,438,319,380,295,332,271"/>
+<area shape="poly" id="edge8_Node000008_Node000005" title=" " alt="" coords="349,240,438,215,508,208,579,205,705,208,705,213,579,211,509,213,439,221,351,245"/>
+<area shape="poly" id="edge16_Node000008_Node000006" title=" " alt="" coords="358,240,389,228,412,209,422,201,438,193,502,174,568,160,636,151,703,146,829,144,936,151,935,156,829,150,703,151,636,156,569,165,503,179,440,198,425,205,416,214,392,232,360,245"/>
+<area shape="poly" id="edge17_Node000008_Node000007" title=" " alt="" coords="322,267,368,318,402,345,440,365,513,386,590,398,668,401,744,398,816,390,882,379,987,356,989,361,883,385,817,396,744,403,668,406,589,403,512,391,438,370,399,349,365,322,318,270"/>
+<area shape="rect" id="Node000009" href="$class_led_manager.html#afa325e20cb2d4356fb870fdd86d4c729" title="Initialise the WS2812 LED strip (idempotent)." alt="" coords="439,79,657,104"/>
+<area shape="poly" id="edge9_Node000008_Node000009" title=" " alt="" coords="369,240,389,228,400,215,407,203,412,176,418,149,425,135,437,121,459,107,462,112,440,125,429,138,423,150,417,177,412,204,404,218,392,232,372,245"/>
+<area shape="rect" id="Node000014" href="$class_led_manager.html#a6305fee5cff625bb3332808eb7e63207" title=" " alt="" coords="441,231,655,256"/>
+<area shape="poly" id="edge19_Node000008_Node000014" title=" " alt="" coords="388,249,427,247,427,252,388,254"/>
+<area shape="rect" id="Node000015" href="$class_led_manager.html#aee4b32be72e10edb7a7d69d49f8967b4" title=" " alt="" coords="439,280,657,305"/>
+<area shape="poly" id="edge20_Node000008_Node000015" title=" " alt="" coords="388,265,454,275,453,281,388,270"/>
+<area shape="rect" id="Node000010" href="$class_led_manager.html#aeb27eef4ebf25b19bd864c9822a6c892" title=" " alt="" coords="705,79,872,104"/>
+<area shape="poly" id="edge10_Node000009_Node000010" title=" " alt="" coords="658,89,692,89,692,94,658,94"/>
+<area shape="poly" id="edge14_Node000010_Node000006" title=" " alt="" coords="824,102,921,138,959,148,958,153,919,143,822,107"/>
+<area shape="poly" id="edge15_Node000010_Node000007" title=" " alt="" coords="805,102,1022,317,1018,321,801,106"/>
+<area shape="rect" id="Node000011" href="$class_led_manager.html#ae828db17e36fef3b0d93e565daa15bfd" title=" " alt="" coords="941,5,1148,31"/>
+<area shape="poly" id="edge11_Node000010_Node000011" title=" " alt="" coords="819,76,919,39,953,31,954,36,921,45,820,81"/>
+<area shape="rect" id="Node000012" href="$class_led_manager.html#aec49368647c9b09857ea1b775d655e5e" title=" " alt="" coords="920,55,1169,80"/>
+<area shape="poly" id="edge12_Node000010_Node000012" title=" " alt="" coords="872,81,906,78,906,83,873,86"/>
+<area shape="rect" id="Node000013" href="$namespaceflux_1_1bsp.html#a0de4fe9b88c2256e42ce338e2a44b741" title="Create and start the strip." alt="" coords="957,104,1132,129"/>
+<area shape="poly" id="edge13_Node000010_Node000013" title=" " alt="" coords="873,97,944,104,943,109,872,102"/>
+</map>

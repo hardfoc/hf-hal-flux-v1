@@ -1,0 +1,5 @@
+<map id="flux::bsp::anonymous_namespace{FluxPlatformBindHost.cpp}::SpiDeviceSlot" name="flux::bsp::anonymous_namespace{FluxPlatformBindHost.cpp}::SpiDeviceSlot">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,93,231,148"/>
+<area shape="rect" id="Node000002" href="$structflux_1_1bsp_1_1_spi_device_spec.html" title="One chip select on an SPI bus." alt="" coords="27,5,209,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="121,45,121,93,115,93,115,45"/>
+</map>

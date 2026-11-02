@@ -1,0 +1,11 @@
+<map id="Flux::InitializeComms" name="Flux::InitializeComms">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,169,56"/>
+<area shape="rect" id="Node000002" href="$class_comm_channels_manager.html#af67cc44d654cf6c433e4d7ef4d3927d8" title="Initialise all communication buses if not already initialised." alt="" coords="217,23,400,63"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="169,41,204,41,204,46,169,46"/>
+<area shape="rect" id="Node000003" href="$class_comm_channels_manager.html#a868bd4abe1ce3b5497983c2d8ec70914" title=" " alt="" coords="448,23,631,63"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="400,41,434,41,434,46,400,46"/>
+<area shape="rect" id="Node000004" href="$namespaceflux_1_1bsp.html#a84c467cf6b9bd7fb8a9f7441ad5537ec" title="Create the CAN controller (configured, not started). nullptr on failure." alt="" coords="683,5,836,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="631,30,669,26,669,31,631,35"/>
+<area shape="rect" id="Node000005" href="$namespaceflux_1_1bsp.html#a5d5827fa54cd130b7e8ba5c419a0fa95" title="Destroy the CAN controller." alt="" coords="679,55,840,80"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="631,51,665,54,665,60,631,56"/>
+</map>

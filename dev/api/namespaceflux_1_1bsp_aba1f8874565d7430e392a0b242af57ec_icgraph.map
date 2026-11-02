@@ -1,0 +1,19 @@
+<map id="flux::bsp::DestroyDieTemperature" name="flux::bsp::DestroyDieTemperature">
+<area shape="rect" id="Node000001" title="Destroy the die&#45;temperature sensor." alt="" coords="1367,45,1607,70"/>
+<area shape="rect" id="Node000002" href="$class_temperature_manager.html#ab0fb6f812a61aada976012374be62e6e" title="Release all temperature sensor resources and reset to uninitialized state." alt="" coords="1151,5,1312,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1371,46,1312,38,1312,33,1372,40"/>
+<area shape="rect" id="Node000004" href="$class_temperature_manager.html#a61d59b98806b5283ee9bae390add2ba5" title=" " alt="" coords="1144,69,1319,109"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="1372,74,1319,81,1319,76,1371,69"/>
+<area shape="rect" id="Node000003" href="$class_flux.html#a381c21e10f3556ecc16df4b4f2ead006" title="Shut down all subsystems in reverse initialisation order." alt="" coords="954,13,1077,38"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="1137,28,1077,28,1077,23,1137,23"/>
+<area shape="rect" id="Node000005" href="$class_temperature_manager.html#affefc5063769540fccf0f63b255281a9" title=" " alt="" coords="935,69,1096,109"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="1130,92,1096,92,1096,87,1130,87"/>
+<area shape="rect" id="Node000006" href="$class_temperature_manager.html#abacecf9ec508cefbff22be8aec0a85cb" title="Initialise the temperature subsystem if not already initialised." alt="" coords="725,69,887,109"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="920,92,887,92,887,87,920,87"/>
+<area shape="rect" id="Node000007" href="$class_flux.html#a4157554ef34d3f8b49d07f9f535e28d8" title=" " alt="" coords="481,77,677,102"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="712,92,678,92,678,87,712,87"/>
+<area shape="rect" id="Node000008" href="$class_flux.html#a0d67fb153ddebb59c51eb20ad311cb32" title=" " alt="" coords="220,77,433,102"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="467,92,434,92,434,87,467,87"/>
+<area shape="rect" id="Node000009" href="$class_flux.html#a6c011c136a43dd2d9859dcf7d56571e8" title="Ensure all Flux subsystems are properly initialized." alt="" coords="5,77,172,102"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="206,92,172,92,172,87,206,87"/>
+</map>

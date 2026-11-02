@@ -1,0 +1,9 @@
+<map id="GpioManager::EnsureInitialized" name="GpioManager::EnsureInitialized">
+<area shape="rect" id="Node000001" title="Register all GPIO pins and initialise drivers (idempotent)." alt="" coords="5,31,231,56"/>
+<area shape="rect" id="Node000002" href="$class_gpio_manager.html#a71081920f92fb76254ccd258ec539c9e" title=" " alt="" coords="279,31,452,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="231,41,265,41,265,46,231,46"/>
+<area shape="rect" id="Node000003" href="$namespaceflux_1_1bsp.html#a26c01dd86384f55f056c457237ea38dc" title="Create the GPIO object for slot. No hardware access until the object is initialised." alt="" coords="504,5,663,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="452,31,490,26,491,31,453,36"/>
+<area shape="rect" id="Node000004" href="$namespaceflux_1_1bsp.html#afac5377c3dce5148341624e6573fa36b" title="Destroy the GPIO object in slot (releases the pin)." alt="" coords="500,55,667,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="453,50,486,54,486,59,452,56"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="ValveManager::HasFault" name="ValveManager::HasFault">
+<area shape="rect" id="Node000001" title="Check if any driver reports a fault." alt="" coords="5,45,184,70"/>
+<area shape="rect" id="Node000002" href="$class_valve_manager.html#a1c11f0622cde34ca096fe560e70a4669" title="Check for TLE92466ED&#45;specific faults." alt="" coords="232,5,459,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="184,43,218,39,219,44,184,49"/>
+<area shape="rect" id="Node000003" href="$class_valve_manager.html#ae723854565fb172e4cc7f95136693218" title="Check for MAX22200&#45;specific faults." alt="" coords="243,69,447,109"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="184,66,230,72,229,77,184,71"/>
+</map>

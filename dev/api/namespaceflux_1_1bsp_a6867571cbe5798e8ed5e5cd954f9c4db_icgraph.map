@@ -1,0 +1,7 @@
+<map id="flux::bsp::DestroySpiBus" name="flux::bsp::DestroySpiBus">
+<area shape="rect" id="Node000001" title="Destroy SPI bus bus and every device on it." alt="" coords="407,13,587,38"/>
+<area shape="rect" id="Node000002" href="$class_comm_channels_manager.html#a8f73e8183217a6d09ec4e581f8010ed9" title="Release all bus resources and reset to uninitialized state." alt="" coords="176,5,359,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="393,28,359,28,359,23,393,23"/>
+<area shape="rect" id="Node000003" href="$class_flux.html#a381c21e10f3556ecc16df4b4f2ead006" title="Shut down all subsystems in reverse initialisation order." alt="" coords="5,13,128,38"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="162,28,128,28,128,23,162,23"/>
+</map>

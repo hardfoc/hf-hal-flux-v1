@@ -1,0 +1,15 @@
+<map id="LedManager::IndicateCalibration" name="LedManager::IndicateCalibration">
+<area shape="rect" id="Node000001" title="Show the calibration indicator (cyan breathe)." alt="" coords="5,104,239,129"/>
+<area shape="rect" id="Node000002" href="$class_led_manager.html#a6e36bf7b11956c56582ce34da47d08ba" title="Start a named animation with an optional base colour." alt="" coords="287,104,495,129"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="239,114,273,114,273,119,239,119"/>
+<area shape="rect" id="Node000003" href="$namespace_led_colors.html#ae2a97d61b4ffac876640780401177e7f" title="Pure blue." alt="" coords="552,5,680,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="414,101,472,72,542,40,559,33,561,38,544,44,474,76,417,106"/>
+<area shape="rect" id="Node000004" href="$namespace_led_colors.html#a10b798abecc127d3529e0fa597426e6a" title="Pure green." alt="" coords="547,55,685,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="449,101,543,80,545,86,450,107"/>
+<area shape="rect" id="Node000005" href="$namespace_led_colors.html#a967d5a1dfb0d78523c126b564050f55c" title="Purple." alt="" coords="544,104,688,129"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="495,114,530,114,530,119,495,119"/>
+<area shape="rect" id="Node000006" href="$namespace_led_colors.html#af4d56375fdebf6240c7690d7f8e8f1fe" title="Pure red." alt="" coords="555,153,677,179"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="450,127,545,148,543,153,449,132"/>
+<area shape="rect" id="Node000007" href="$namespace_led_colors.html#a884ae4aac5589990c381e97c734283d8" title="Yellow." alt="" coords="543,203,689,228"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="417,127,544,188,564,195,562,200,542,192,415,132"/>
+</map>

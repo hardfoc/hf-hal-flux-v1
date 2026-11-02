@@ -1,0 +1,15 @@
+<map id="LedManager.h" name="LedManager.h">
+<area shape="rect" id="Node000001" title="LED management for the HardFOC Flux V1 platform (single WS2812)." alt="" coords="496,5,609,31"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,79,185,148"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="496,29,364,48,199,81,198,76,363,43,495,24"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="209,101,392,126"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="523,33,346,98,344,93,521,28"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="417,101,521,126"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="544,32,490,92,486,89,540,29"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="545,79,729,148"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="565,29,599,67,595,70,561,32"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="753,101,819,126"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="605,28,671,48,742,76,763,90,761,94,739,81,670,53,604,33"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="843,101,910,126"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="610,22,716,39,775,55,832,76,855,90,852,94,830,81,774,60,715,44,609,27"/>
+</map>

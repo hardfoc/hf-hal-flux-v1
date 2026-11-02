@@ -1,0 +1,7 @@
+<map id="LedManager::SetBrightnessRaw" name="LedManager::SetBrightnessRaw">
+<area shape="rect" id="Node000001" title="Set brightness as a raw 0–255 value." alt="" coords="5,31,233,56"/>
+<area shape="rect" id="Node000002" href="$namespaceflux_1_1bsp.html#ad5c17e9c89366643fb0d597789513829" title="Global brightness 0..255 applied to the next LedStripShow." alt="" coords="281,5,509,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="233,30,267,27,268,32,234,36"/>
+<area shape="rect" id="Node000003" href="$namespaceflux_1_1bsp.html#a82cb93630ae5f29d095a51ded4237fe2" title="Send the staged colours." alt="" coords="309,55,482,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="234,51,295,56,295,61,233,56"/>
+</map>

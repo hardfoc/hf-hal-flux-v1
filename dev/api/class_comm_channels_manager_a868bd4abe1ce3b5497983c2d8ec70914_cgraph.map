@@ -1,0 +1,7 @@
+<map id="CommChannelsManager::Initialize" name="CommChannelsManager::Initialize">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,23,188,63"/>
+<area shape="rect" id="Node000002" href="$namespaceflux_1_1bsp.html#a84c467cf6b9bd7fb8a9f7441ad5537ec" title="Create the CAN controller (configured, not started). nullptr on failure." alt="" coords="240,5,393,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="188,30,226,26,227,31,189,35"/>
+<area shape="rect" id="Node000003" href="$namespaceflux_1_1bsp.html#a5d5827fa54cd130b7e8ba5c419a0fa95" title="Destroy the CAN controller." alt="" coords="236,55,397,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="189,51,222,54,222,60,188,56"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="GpioManager::Deinitialize" name="GpioManager::Deinitialize">
+<area shape="rect" id="Node000001" title="Reset GPIO manager to uninitialized state." alt="" coords="5,5,196,31"/>
+<area shape="rect" id="Node000002" href="$namespaceflux_1_1bsp.html#afac5377c3dce5148341624e6573fa36b" title="Destroy the GPIO object in slot (releases the pin)." alt="" coords="244,5,411,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="196,15,230,15,230,21,196,21"/>
+</map>

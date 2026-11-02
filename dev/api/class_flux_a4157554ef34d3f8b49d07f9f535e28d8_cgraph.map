@@ -1,0 +1,20 @@
+<map id="Flux::InitializeTemperature" name="Flux::InitializeTemperature">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,93,201,119"/>
+<area shape="rect" id="Node000002" href="$class_temperature_manager.html#abacecf9ec508cefbff22be8aec0a85cb" title="Initialise the temperature subsystem if not already initialised." alt="" coords="249,86,411,126"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="202,103,236,103,236,109,202,109"/>
+<area shape="rect" id="Node000003" href="$class_temperature_manager.html#affefc5063769540fccf0f63b255281a9" title=" " alt="" coords="459,86,620,126"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="411,103,445,103,445,109,411,109"/>
+<area shape="rect" id="Node000004" href="$class_temperature_manager.html#a61d59b98806b5283ee9bae390add2ba5" title=" " alt="" coords="689,22,863,62"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="613,83,688,63,689,68,615,88"/>
+<area shape="rect" id="Node000007" href="$class_temperature_manager.html#aef9e7888e394cba4b66931419e1790ab" title=" " alt="" coords="668,86,884,126"/>
+<area shape="poly" id="edge6_Node000003_Node000007" title=" " alt="" coords="621,103,654,103,654,109,621,109"/>
+<area shape="rect" id="Node000009" href="$class_temperature_manager.html#a48a4292dbf5a5f12e5a2d7a2b5546621" title=" " alt="" coords="687,150,865,190"/>
+<area shape="poly" id="edge8_Node000003_Node000009" title=" " alt="" coords="615,124,689,144,688,149,613,129"/>
+<area shape="rect" id="Node000005" href="$namespaceflux_1_1bsp.html#ac8a1e8afebae0edb027c2240888857cf" title="Create the MCU die&#45;temperature sensor (not initialised). nullptr if the family has none." alt="" coords="936,5,1168,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="863,32,922,27,922,32,864,37"/>
+<area shape="rect" id="Node000006" href="$namespaceflux_1_1bsp.html#aba1f8874565d7430e392a0b242af57ec" title="Destroy the die&#45;temperature sensor." alt="" coords="932,55,1172,80"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="864,47,919,52,918,58,863,53"/>
+<area shape="rect" id="Node000008" href="$class_adc_manager.html#ae3d2137cd97edce8f97092d5b4a6d1d1" title="Return the singleton AdcManager instance." alt="" coords="957,119,1147,144"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="884,113,944,119,944,124,884,119"/>
+<area shape="poly" id="edge9_Node000009_Node000008" title=" " alt="" coords="865,155,947,143,948,149,866,160"/>
+</map>

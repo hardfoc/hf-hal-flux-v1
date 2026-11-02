@@ -1,0 +1,13 @@
+<map id="LedManager::Initialize" name="LedManager::Initialize">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,104,172,129"/>
+<area shape="rect" id="Node000002" href="$class_led_manager.html#ae828db17e36fef3b0d93e565daa15bfd" title=" " alt="" coords="241,5,448,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="107,101,156,70,219,40,244,32,246,37,221,44,158,75,109,106"/>
+<area shape="rect" id="Node000003" href="$class_led_manager.html#aec49368647c9b09857ea1b775d655e5e" title=" " alt="" coords="220,55,469,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="155,101,219,89,264,80,265,85,221,94,156,107"/>
+<area shape="rect" id="Node000004" href="$namespaceflux_1_1bsp.html#a0de4fe9b88c2256e42ce338e2a44b741" title="Create and start the strip." alt="" coords="257,104,432,129"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="172,114,243,114,243,119,172,119"/>
+<area shape="rect" id="Node000005" href="$namespaceflux_1_1bsp.html#a6b08718df1ad5fee11813553a43116eb" title="Stage a 0xRRGGBB colour for LED index (sent on LedStripShow)." alt="" coords="249,153,440,179"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="156,127,265,148,264,153,155,132"/>
+<area shape="rect" id="Node000006" href="$namespaceflux_1_1bsp.html#a82cb93630ae5f29d095a51ded4237fe2" title="Send the staged colours." alt="" coords="258,203,431,228"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="110,127,159,158,221,188,250,197,249,202,219,192,156,162,107,132"/>
+</map>

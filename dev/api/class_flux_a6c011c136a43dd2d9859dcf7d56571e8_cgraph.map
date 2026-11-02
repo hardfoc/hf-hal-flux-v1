@@ -1,0 +1,107 @@
+<map id="Flux::EnsureInitialized" name="Flux::EnsureInitialized">
+<area shape="rect" id="Node000001" title="Ensure all Flux subsystems are properly initialized." alt="" coords="5,259,172,284"/>
+<area shape="rect" id="Node000002" href="$class_flux.html#a4c1e7219caebec1dc2b954bd9512b48e" title="Time in ms that the initialisation sequence took to complete." alt="" coords="499,208,713,233"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="146,256,220,243,357,230,485,222,485,227,357,235,220,249,147,261"/>
+<area shape="rect" id="Node000003" href="$class_flux.html#a0d67fb153ddebb59c51eb20ad311cb32" title=" " alt="" coords="229,455,442,480"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="108,282,309,444,305,448,104,286"/>
+<area shape="rect" id="Node000048" href="$class_flux.html#ab5255b2ed02ad854934e25e08df1f22d" title=" " alt="" coords="220,259,451,284"/>
+<area shape="poly" id="edge54_Node000001_Node000048" title=" " alt="" coords="172,269,206,269,206,274,172,274"/>
+<area shape="rect" id="Node000004" href="$class_flux.html#a4bbee39ff1da8e9359edb151e4ee3cda" title="Access the singleton instance (Meyers singleton, thread&#45;safe)." alt="" coords="538,504,674,529"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="406,477,525,499,524,504,405,483"/>
+<area shape="rect" id="Node000005" href="$class_flux.html#a99371decae4e60cd6db9c40ec38c76d5" title=" " alt="" coords="537,592,675,617"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="363,478,569,583,566,588,360,482"/>
+<area shape="rect" id="Node000011" href="$class_flux.html#a8c5bdfa024bae49273274f13bcb30491" title=" " alt="" coords="524,785,688,811"/>
+<area shape="poly" id="edge11_Node000003_Node000011" title=" " alt="" coords="344,479,363,527,396,595,442,671,470,707,500,740,528,761,558,777,556,782,525,766,497,744,466,711,438,674,392,598,358,529,339,481"/>
+<area shape="rect" id="Node000016" href="$class_flux.html#aa60e3a7ffd95134b8dc4b3748a288c44" title=" " alt="" coords="534,307,678,332"/>
+<area shape="poly" id="edge16_Node000003_Node000016" title=" " alt="" coords="347,453,408,398,451,367,498,341,520,332,522,337,500,346,454,372,412,403,351,457"/>
+<area shape="rect" id="Node000021" href="$class_flux.html#a52462f0d3eb1a4c1380f270362698209" title=" " alt="" coords="534,356,678,381"/>
+<area shape="poly" id="edge21_Node000003_Node000021" title=" " alt="" coords="359,452,421,422,498,390,525,382,526,387,500,395,423,426,361,457"/>
+<area shape="rect" id="Node000029" href="$class_flux.html#a9ab68866d28fde13b245c118048f52b7" title=" " alt="" coords="537,405,675,431"/>
+<area shape="poly" id="edge29_Node000003_Node000029" title=" " alt="" coords="405,452,522,430,523,436,406,457"/>
+<area shape="rect" id="Node000032" href="$class_flux.html#a4157554ef34d3f8b49d07f9f535e28d8" title=" " alt="" coords="508,455,704,480"/>
+<area shape="poly" id="edge32_Node000003_Node000032" title=" " alt="" coords="442,465,494,465,494,470,442,470"/>
+<area shape="rect" id="Node000041" href="$class_flux.html#af36707264a8180cfeb4f7a31247ad66b" title=" " alt="" coords="527,704,685,729"/>
+<area shape="poly" id="edge42_Node000003_Node000041" title=" " alt="" coords="350,478,413,544,500,628,579,693,575,697,497,632,409,547,347,482"/>
+<area shape="rect" id="Node000006" href="$class_adc_manager.html#a93d9add5dfe70a4605297be247318c71" title="Initialise the ADC subsystem if not already initialised." alt="" coords="767,603,986,628"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="676,605,754,608,753,613,676,610"/>
+<area shape="rect" id="Node000007" href="$class_adc_manager.html#a3561cebd5b27e351c066236543a0bc59" title=" " alt="" coords="1052,603,1219,628"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="986,622,1038,621,1038,627,986,627"/>
+<area shape="poly" id="edge8_Node000007_Node000006" title=" " alt="" coords="1052,610,1000,609,1000,604,1052,604"/>
+<area shape="rect" id="Node000008" href="$namespaceflux_1_1bsp.html#a11292ce06a39e8ddd8dba609b1005662" title="Create and initialise the MCU ADC unit with the given channels enabled." alt="" coords="1302,608,1505,633"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="1219,614,1288,616,1288,621,1219,620"/>
+<area shape="rect" id="Node000009" href="$class_comm_channels_manager.html#ad1249df1c4ece9e2468d4b4536d237ae" title="Return the singleton CommChannelsManager instance." alt="" coords="1605,731,1787,771"/>
+<area shape="poly" id="edge9_Node000007_Node000009" title=" " alt="" coords="1189,625,1600,725,1599,731,1188,631"/>
+<area shape="rect" id="Node000010" href="$namespaceflux_1_1bsp.html#a4fb331ad765d4f63a94c7d132c0257c8" title="Number of channels per unit of the MCU ADC (0 when the family has none)." alt="" coords="1297,543,1509,583"/>
+<area shape="poly" id="edge10_Node000007_Node000010" title=" " alt="" coords="1201,600,1286,583,1287,589,1202,605"/>
+<area shape="rect" id="Node000012" href="$class_comm_channels_manager.html#af67cc44d654cf6c433e4d7ef4d3927d8" title="Initialise all communication buses if not already initialised." alt="" coords="785,874,968,914"/>
+<area shape="poly" id="edge12_Node000011_Node000012" title=" " alt="" coords="644,808,807,867,805,872,642,813"/>
+<area shape="rect" id="Node000013" href="$class_comm_channels_manager.html#a868bd4abe1ce3b5497983c2d8ec70914" title=" " alt="" coords="1044,931,1227,971"/>
+<area shape="poly" id="edge13_Node000012_Node000013" title=" " alt="" coords="968,911,1032,926,1031,931,967,917"/>
+<area shape="rect" id="Node000014" href="$namespaceflux_1_1bsp.html#a84c467cf6b9bd7fb8a9f7441ad5537ec" title="Create the CAN controller (configured, not started). nullptr on failure." alt="" coords="1327,939,1480,964"/>
+<area shape="poly" id="edge14_Node000013_Node000014" title=" " alt="" coords="1227,949,1313,949,1313,954,1227,954"/>
+<area shape="rect" id="Node000015" href="$namespaceflux_1_1bsp.html#a5d5827fa54cd130b7e8ba5c419a0fa95" title="Destroy the CAN controller." alt="" coords="1323,988,1484,1013"/>
+<area shape="poly" id="edge15_Node000013_Node000015" title=" " alt="" coords="1227,965,1321,983,1320,988,1226,971"/>
+<area shape="rect" id="Node000017" href="$class_gpio_manager.html#a88a01fcf59a2db604d59b5cca4503112" title="Register all GPIO pins and initialise drivers (idempotent)." alt="" coords="764,129,989,155"/>
+<area shape="poly" id="edge17_Node000016_Node000017" title=" " alt="" coords="677,305,712,292,756,263,796,228,855,164,859,167,800,232,759,267,715,296,679,310"/>
+<area shape="rect" id="Node000018" href="$class_gpio_manager.html#a71081920f92fb76254ccd258ec539c9e" title=" " alt="" coords="1049,55,1222,80"/>
+<area shape="poly" id="edge18_Node000017_Node000018" title=" " alt="" coords="921,127,1077,81,1078,86,923,132"/>
+<area shape="rect" id="Node000019" href="$namespaceflux_1_1bsp.html#a26c01dd86384f55f056c457237ea38dc" title="Create the GPIO object for slot. No hardware access until the object is initialised." alt="" coords="1324,55,1483,80"/>
+<area shape="poly" id="edge19_Node000018_Node000019" title=" " alt="" coords="1222,65,1311,65,1311,70,1222,70"/>
+<area shape="rect" id="Node000020" href="$namespaceflux_1_1bsp.html#afac5377c3dce5148341624e6573fa36b" title="Destroy the GPIO object in slot (releases the pin)." alt="" coords="1320,5,1487,31"/>
+<area shape="poly" id="edge20_Node000018_Node000020" title=" " alt="" coords="1205,52,1320,31,1321,36,1205,57"/>
+<area shape="rect" id="Node000022" href="$class_led_manager.html#afa325e20cb2d4356fb870fdd86d4c729" title="Initialise the WS2812 LED strip (idempotent)." alt="" coords="767,284,986,309"/>
+<area shape="poly" id="edge22_Node000021_Node000022" title=" " alt="" coords="662,353,713,341,820,311,821,316,714,346,663,359"/>
+<area shape="rect" id="Node000023" href="$class_led_manager.html#aeb27eef4ebf25b19bd864c9822a6c892" title=" " alt="" coords="1052,228,1219,253"/>
+<area shape="poly" id="edge23_Node000022_Node000023" title=" " alt="" coords="936,281,1062,254,1063,259,937,287"/>
+<area shape="rect" id="Node000024" href="$class_led_manager.html#ae828db17e36fef3b0d93e565daa15bfd" title=" " alt="" coords="1300,104,1507,129"/>
+<area shape="poly" id="edge24_Node000023_Node000024" title=" " alt="" coords="1149,226,1202,182,1239,158,1278,138,1299,131,1300,136,1280,143,1241,163,1206,187,1152,230"/>
+<area shape="rect" id="Node000025" href="$class_led_manager.html#aec49368647c9b09857ea1b775d655e5e" title=" " alt="" coords="1279,153,1528,179"/>
+<area shape="poly" id="edge25_Node000023_Node000025" title=" " alt="" coords="1168,225,1278,187,1313,179,1315,184,1279,193,1169,230"/>
+<area shape="rect" id="Node000026" href="$namespaceflux_1_1bsp.html#a0de4fe9b88c2256e42ce338e2a44b741" title="Create and start the strip." alt="" coords="1316,203,1491,228"/>
+<area shape="poly" id="edge26_Node000023_Node000026" title=" " alt="" coords="1219,230,1302,222,1303,228,1219,235"/>
+<area shape="rect" id="Node000027" href="$namespaceflux_1_1bsp.html#a6b08718df1ad5fee11813553a43116eb" title="Stage a 0xRRGGBB colour for LED index (sent on LedStripShow)." alt="" coords="1308,252,1499,277"/>
+<area shape="poly" id="edge27_Node000023_Node000027" title=" " alt="" coords="1219,245,1295,252,1294,258,1219,251"/>
+<area shape="rect" id="Node000028" href="$namespaceflux_1_1bsp.html#a82cb93630ae5f29d095a51ded4237fe2" title="Send the staged colours." alt="" coords="1317,301,1490,327"/>
+<area shape="poly" id="edge28_Node000023_Node000028" title=" " alt="" coords="1172,251,1279,286,1320,296,1318,301,1278,291,1170,256"/>
+<area shape="rect" id="Node000030" href="$class_nvs_manager.html#a96ef9087cc96c674f3eafb99b11ee883" title="Initialize NVS flash (once) and open all Flux namespaces." alt="" coords="767,397,987,423"/>
+<area shape="poly" id="edge30_Node000029_Node000030" title=" " alt="" coords="676,413,753,411,753,416,676,419"/>
+<area shape="rect" id="Node000031" href="$class_nvs_manager.html#a4faeb9380248f065480cbd92a65b4163" title=" " alt="" coords="1040,397,1231,423"/>
+<area shape="poly" id="edge31_Node000030_Node000031" title=" " alt="" coords="987,407,1026,407,1026,413,987,413"/>
+<area shape="rect" id="Node000033" href="$class_temperature_manager.html#abacecf9ec508cefbff22be8aec0a85cb" title="Initialise the temperature subsystem if not already initialised." alt="" coords="796,447,957,487"/>
+<area shape="poly" id="edge33_Node000032_Node000033" title=" " alt="" coords="704,465,782,465,782,470,704,470"/>
+<area shape="rect" id="Node000034" href="$class_temperature_manager.html#affefc5063769540fccf0f63b255281a9" title=" " alt="" coords="1055,447,1216,487"/>
+<area shape="poly" id="edge34_Node000033_Node000034" title=" " alt="" coords="958,465,1041,465,1041,470,958,470"/>
+<area shape="rect" id="Node000035" href="$class_temperature_manager.html#a61d59b98806b5283ee9bae390add2ba5" title=" " alt="" coords="1316,479,1491,519"/>
+<area shape="poly" id="edge35_Node000034_Node000035" title=" " alt="" coords="1217,474,1303,485,1302,490,1216,480"/>
+<area shape="rect" id="Node000038" href="$class_temperature_manager.html#aef9e7888e394cba4b66931419e1790ab" title=" " alt="" coords="1295,415,1511,455"/>
+<area shape="poly" id="edge38_Node000034_Node000038" title=" " alt="" coords="1216,455,1281,447,1282,453,1217,460"/>
+<area shape="rect" id="Node000040" href="$class_temperature_manager.html#a48a4292dbf5a5f12e5a2d7a2b5546621" title=" " alt="" coords="1314,351,1493,391"/>
+<area shape="poly" id="edge40_Node000034_Node000040" title=" " alt="" coords="1202,445,1229,433,1253,417,1277,401,1300,392,1302,397,1280,406,1256,421,1232,438,1204,450"/>
+<area shape="rect" id="Node000036" href="$namespaceflux_1_1bsp.html#ac8a1e8afebae0edb027c2240888857cf" title="Create the MCU die&#45;temperature sensor (not initialised). nullptr if the family has none." alt="" coords="1580,480,1812,505"/>
+<area shape="poly" id="edge36_Node000035_Node000036" title=" " alt="" coords="1491,495,1566,493,1566,498,1491,500"/>
+<area shape="rect" id="Node000037" href="$namespaceflux_1_1bsp.html#aba1f8874565d7430e392a0b242af57ec" title="Destroy the die&#45;temperature sensor." alt="" coords="1576,529,1816,555"/>
+<area shape="poly" id="edge37_Node000035_Node000037" title=" " alt="" coords="1491,509,1595,525,1595,530,1491,515"/>
+<area shape="rect" id="Node000039" href="$class_adc_manager.html#ae3d2137cd97edce8f97092d5b4a6d1d1" title="Return the singleton AdcManager instance." alt="" coords="1601,391,1791,416"/>
+<area shape="poly" id="edge39_Node000038_Node000039" title=" " alt="" coords="1511,421,1587,412,1588,418,1512,426"/>
+<area shape="poly" id="edge41_Node000040_Node000039" title=" " alt="" coords="1493,378,1588,389,1587,394,1493,384"/>
+<area shape="rect" id="Node000042" href="$class_valve_manager.html#a7a708a5ebc126913968db54b7629aff9" title="Ensure the valve manager system is initialized." alt="" coords="761,767,992,792"/>
+<area shape="poly" id="edge43_Node000041_Node000042" title=" " alt="" coords="662,727,808,761,807,766,661,732"/>
+<area shape="rect" id="Node000043" href="$_valve_manager_8h.html#ae6cff86821790a19053b6f8423493fe7" title="Check if a valve error code indicates success." alt="" coords="1081,816,1190,841"/>
+<area shape="poly" id="edge44_Node000042_Node000043" title=" " alt="" coords="944,789,1067,813,1066,818,943,795"/>
+<area shape="rect" id="Node000044" href="$class_valve_manager.html#a8351cec1ba13df5f82b88c59b5ed5fd1" title=" " alt="" coords="1046,767,1225,792"/>
+<area shape="poly" id="edge45_Node000042_Node000044" title=" " alt="" coords="992,777,1032,777,1032,782,992,782"/>
+<area shape="poly" id="edge46_Node000044_Node000009" title=" " alt="" coords="1181,764,1228,753,1278,745,1360,738,1443,737,1591,741,1590,746,1443,742,1360,744,1279,750,1229,758,1182,769"/>
+<area shape="rect" id="Node000045" href="$class_gpio_manager.html#af18a40c292b97c42dace2eb42c511053" title="Access the singleton instance (Meyers singleton, thread&#45;safe)." alt="" coords="1599,831,1793,856"/>
+<area shape="poly" id="edge47_Node000044_Node000045" title=" " alt="" coords="1208,790,1232,803,1249,821,1256,841,1264,858,1280,873,1327,892,1378,902,1429,904,1481,901,1576,882,1651,858,1652,864,1578,887,1482,906,1429,910,1377,907,1326,897,1277,878,1259,861,1251,843,1244,824,1229,807,1205,794"/>
+<area shape="rect" id="Node000046" href="$class_valve_manager.html#a65a366456425166815040d2415d534d9" title=" " alt="" coords="1314,759,1493,799"/>
+<area shape="poly" id="edge48_Node000044_Node000046" title=" " alt="" coords="1225,777,1300,777,1300,782,1225,782"/>
+<area shape="rect" id="Node000047" href="$class_valve_manager.html#a3f22e9630f0367e73f28487aa375f664" title=" " alt="" coords="1314,823,1493,863"/>
+<area shape="poly" id="edge51_Node000044_Node000047" title=" " alt="" coords="1190,790,1306,818,1305,823,1189,795"/>
+<area shape="poly" id="edge49_Node000046_Node000009" title=" " alt="" coords="1493,768,1591,759,1591,764,1493,773"/>
+<area shape="poly" id="edge50_Node000046_Node000045" title=" " alt="" coords="1493,796,1624,825,1623,830,1492,801"/>
+<area shape="poly" id="edge52_Node000047_Node000009" title=" " alt="" coords="1486,821,1527,809,1629,774,1631,779,1529,814,1487,826"/>
+<area shape="poly" id="edge53_Node000047_Node000045" title=" " alt="" coords="1493,841,1585,841,1585,846,1493,846"/>
+<area shape="poly" id="edge55_Node000048_Node000002" title=" " alt="" coords="403,256,524,233,525,239,404,261"/>
+<area shape="rect" id="Node000049" href="$class_flux.html#a87a293c76de1c9c16232878b7fc0515d" title="Milliseconds elapsed since EnsureInitialized() completed." alt="" coords="507,257,705,283"/>
+<area shape="poly" id="edge56_Node000048_Node000049" title=" " alt="" coords="451,268,494,268,494,273,451,273"/>
+</map>
