@@ -1,0 +1,19 @@
+<map id="AdcManager" name="AdcManager">
+<area shape="rect" id="Node000001" title="Singleton manager for all analogue&#45;to&#45;digital channels on Flux V1." alt="" coords="985,134,1088,159"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="647,5,808,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="822,39,892,58,963,86,997,108,1024,132,1021,136,994,112,960,90,891,63,821,44"/>
+<area shape="rect" id="Node000003" href="$struct_adc_entry.html" title="A single ADC channel entry in the fixed&#45;size registry." alt="" coords="436,13,516,38"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="530,23,646,23,646,28,530,28"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="221,13,347,38"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="360,23,436,23,436,28,360,28"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="5,5,172,45"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="186,23,221,23,221,28,186,28"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="657,69,798,109"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="812,98,962,124,992,131,991,137,961,129,811,103"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="629,134,825,159"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="840,144,985,144,985,149,840,149"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="651,183,804,209"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="817,185,961,164,992,157,993,162,962,169,818,190"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="651,233,804,273"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="817,241,889,227,960,202,994,181,1021,158,1024,162,997,185,962,206,890,232,818,247"/>
+</map>

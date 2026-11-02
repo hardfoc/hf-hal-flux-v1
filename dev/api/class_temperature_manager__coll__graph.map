@@ -1,0 +1,21 @@
+<map id="TemperatureManager" name="TemperatureManager">
+<area shape="rect" id="Node000001" title="Singleton manager for all temperature sensors on Flux V1." alt="" coords="1071,159,1232,185"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="681,5,853,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="867,33,957,51,1003,66,1048,84,1076,101,1101,120,1140,157,1136,161,1098,124,1073,105,1045,89,1002,71,956,57,866,38"/>
+<area shape="rect" id="Node000003" href="$struct_temp_entry.html" title="A single temperature sensor entry in the fixed&#45;size registry." alt="" coords="436,13,527,38"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="541,23,681,23,681,28,541,28"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="221,13,347,38"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="360,23,435,23,435,28,360,28"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="5,5,172,45"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="186,23,221,23,221,28,186,28"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="640,70,895,95"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="876,95,960,110,1047,131,1121,157,1119,162,1046,136,959,115,875,100"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="648,120,887,160"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="900,148,1071,163,1070,168,900,154"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="671,184,864,224"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="878,194,1046,180,1070,178,1071,183,1047,185,878,199"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="691,249,844,274"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="857,248,949,233,1046,211,1122,182,1123,187,1047,216,950,238,858,253"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="671,299,863,339"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="877,307,962,290,1005,276,1045,259,1073,242,1099,222,1137,183,1141,187,1102,226,1076,246,1048,264,1006,281,963,295,878,312"/>
+</map>

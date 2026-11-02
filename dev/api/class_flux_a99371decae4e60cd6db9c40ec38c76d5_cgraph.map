@@ -1,0 +1,10 @@
+<map id="Flux::InitializeAdc" name="Flux::InitializeAdc">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,13,144,38"/>
+<area shape="rect" id="Node000002" href="$class_adc_manager.html#a93d9add5dfe70a4605297be247318c71" title="Initialise the ADC subsystem if not already initialised." alt="" coords="192,13,411,38"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="144,23,178,23,178,28,144,28"/>
+<area shape="rect" id="Node000003" href="$class_adc_manager.html#a3561cebd5b27e351c066236543a0bc59" title=" " alt="" coords="459,13,625,38"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="411,32,445,32,445,37,411,37"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="458,19,424,19,424,14,458,14"/>
+<area shape="rect" id="Node000004" href="$class_comm_channels_manager.html#ad1249df1c4ece9e2468d4b4536d237ae" title="Return the singleton CommChannelsManager instance." alt="" coords="673,5,856,45"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="626,23,660,23,660,28,626,28"/>
+</map>

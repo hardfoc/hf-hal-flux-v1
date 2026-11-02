@@ -1,0 +1,5 @@
+<map id="Flux.h" name="Flux.h">
+<area shape="rect" id="Node000001" title="Unified API singleton for the HardFOC Flux V1 platform." alt="" coords="13,5,75,31"/>
+<area shape="rect" id="Node000002" href="$_flux_8cpp.html" title="Implementation of the unified Flux API singleton." alt="" coords="5,79,83,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="47,44,47,79,41,79,41,44"/>
+</map>

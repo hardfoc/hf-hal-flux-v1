@@ -1,0 +1,11 @@
+<map id="CommChannelsManager::Initialize" name="CommChannelsManager::Initialize">
+<area shape="rect" id="Node000001" title=" " alt="" coords="924,5,1107,45"/>
+<area shape="rect" id="Node000002" href="$class_comm_channels_manager.html#af67cc44d654cf6c433e4d7ef4d3927d8" title="Initialise all communication buses if not already initialised." alt="" coords="693,5,876,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="911,28,876,28,876,23,911,23"/>
+<area shape="rect" id="Node000003" href="$class_flux.html#a8c5bdfa024bae49273274f13bcb30491" title=" " alt="" coords="481,13,645,38"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="680,28,646,28,646,23,680,23"/>
+<area shape="rect" id="Node000004" href="$class_flux.html#a0d67fb153ddebb59c51eb20ad311cb32" title=" " alt="" coords="220,13,433,38"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="467,28,433,28,433,23,467,23"/>
+<area shape="rect" id="Node000005" href="$class_flux.html#a6c011c136a43dd2d9859dcf7d56571e8" title="Ensure all Flux subsystems are properly initialized." alt="" coords="5,13,172,38"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="206,28,172,28,172,23,206,23"/>
+</map>

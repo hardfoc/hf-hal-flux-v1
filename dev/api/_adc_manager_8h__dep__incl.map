@@ -1,0 +1,9 @@
+<map id="AdcManager.h" name="AdcManager.h">
+<area shape="rect" id="Node000001" title="ADC management for the HardFOC Flux V1 platform." alt="" coords="141,5,255,31"/>
+<area shape="rect" id="Node000002" href="$_adc_manager_8cpp.html" title="Implementation of the Flux V1 ADC manager." alt="" coords="5,79,135,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="167,40,92,81,90,76,164,35"/>
+<area shape="rect" id="Node000003" href="$_flux_8cpp.html" title="Implementation of the unified Flux API singleton." alt="" coords="159,79,237,104"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="201,44,201,79,195,79,195,44"/>
+<area shape="rect" id="Node000004" href="$_temperature_manager_8cpp.html" title="Implementation of the Flux V1 temperature manager." alt="" coords="261,79,447,104"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="237,34,330,76,327,81,234,39"/>
+</map>

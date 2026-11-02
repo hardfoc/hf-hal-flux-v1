@@ -1,0 +1,15 @@
+<map id="NvsManager.cpp" name="NvsManager.cpp">
+<area shape="rect" id="Node000001" title="Flux NVS manager — three EspNvs namespaces on ESP32." alt="" coords="224,5,355,31"/>
+<area shape="rect" id="Node000002" href="$_nvs_manager_8h.html" title="Non&#45;volatile storage for Flux V1 — ESP&#45;IDF NVS behind BaseNvs." alt="" coords="145,79,260,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="277,33,229,72,226,68,274,29"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="285,79,467,104"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="305,29,353,68,350,72,302,33"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,174,72,199"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="178,107,85,154,65,168,62,164,83,150,175,102"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="96,174,163,199"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="196,106,149,165,145,162,192,102"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="187,152,367,221"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="214,102,244,140,240,143,210,106"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="391,152,569,221"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="238,102,379,149,377,154,236,107"/>
+</map>
