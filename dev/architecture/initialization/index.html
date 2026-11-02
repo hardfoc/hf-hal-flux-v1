@@ -1825,11 +1825,11 @@
 <details class="hf-figure-desc">
 <summary>Figure description and sources</summary>
 <p>Left to right, then the second row. The facade initialises the managers one at a time, in the order of the calls in its init function. The first group is required: if any of them fails, EnsureInitialized() returns false and the application should not continue. The second group is best effort: a failure there is logged as a warning, the manager stays unavailable and the system reports itself as degraded, so a bench with only some chips fitted still comes up. The order and the required / best-effort split are read from the init function, which returns false only in the required branches.</p>
-<p>Drawn from: <a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/49b4b5a552eee63150a6a893664d3b48be501695/lib/api/Flux.cpp"><code>lib/api/Flux.cpp</code></a> <code>Flux::InitializeAllComponents</code>; figure module <a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/49b4b5a552eee63150a6a893664d3b48be501695/docs/diagrams/figures/init-order.py"><code>docs/diagrams/figures/init-order.py</code></a>.</p>
+<p>Drawn from: <a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/edeb433b9563ef2ad65e288da4f77f4d38c96695/lib/api/Flux.cpp"><code>lib/api/Flux.cpp</code></a> <code>Flux::InitializeAllComponents</code>; figure module <a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/edeb433b9563ef2ad65e288da4f77f4d38c96695/docs/diagrams/figures/init-order.py"><code>docs/diagrams/figures/init-order.py</code></a>.</p>
 </details>
 <h2 id="the-order">The order<a class="headerlink" href="#the-order" title="Permanent link">&para;</a></h2>
 <!-- generated: init-order -->
-<p>From <a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/49b4b5a552eee63150a6a893664d3b48be501695/lib/api/Flux.cpp"><code>Flux.cpp</code></a>
+<p>From <a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/edeb433b9563ef2ad65e288da4f77f4d38c96695/lib/api/Flux.cpp"><code>Flux.cpp</code></a>
 (<code>Flux::InitializeAllComponents</code>); do not edit.</p>
 <table>
 <thead>
@@ -1922,7 +1922,7 @@ works, but going through <code>Flux::EnsureInitialized()</code> gives you the lo
 <p><code>Flux::Shutdown()</code> de-initialises the managers in reverse order (temperature, LEDs, ADC, GPIO, comms, NVS).</p>
 <div class="admonition warning">
 <p class="admonition-title">Valves are not de-initialised by <code>Shutdown()</code></p>
-<p><code>Flux::Shutdown()</code> skips <code>ValveManager</code> (see the comment in <a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/49b4b5a552eee63150a6a893664d3b48be501695/lib/api/Flux.cpp"><code>Flux.cpp</code></a>). Disable the
+<p><code>Flux::Shutdown()</code> skips <code>ValveManager</code> (see the comment in <a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/edeb433b9563ef2ad65e288da4f77f4d38c96695/lib/api/Flux.cpp"><code>Flux.cpp</code></a>). Disable the
 valve channels yourself (<code>flux.valves.DisableAllChannels()</code>) before shutting down.</p>
 </div>
 

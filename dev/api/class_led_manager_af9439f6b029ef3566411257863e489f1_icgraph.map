@@ -1,5 +1,0 @@
-<map id="LedManager::GetInstance" name="LedManager::GetInstance">
-<area shape="rect" id="Node000001" title="Access the singleton instance (Meyers singleton, thread&#45;safe)." alt="" coords="179,5,367,31"/>
-<area shape="rect" id="Node000002" href="$_led_manager_8h.html#a8aa29fd970acb470dc3b9bb5eceb3742" title="Convenience accessor — equivalent to LedManager::GetInstance()." alt="" coords="5,5,131,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="165,21,131,21,131,15,165,15"/>
-</map>
