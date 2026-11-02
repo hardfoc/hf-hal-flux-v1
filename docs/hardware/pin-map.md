@@ -2,16 +2,15 @@
 
 Every pin and ADC channel the HAL knows about. The single source is the X-macro table in
 [`hf_functional_pin_config_flux_v1.hpp`](../../lib/core/hf-core-drivers/internal/hf-pincfg/src/hf_functional_pin_config_flux_v1.hpp)
-(in the `hf-pincfg` submodule); the managers register their pins from it at start-up and these tables are generated
-from it by `hardfoc-docs gen`, so the docs cannot drift from the firmware.
+(in the `hf-pincfg` submodule); the managers register their pins from it at start-up and the tables below are
+filled from it, so they cannot drift from the firmware.
 
-How to read the tables:
-
-- **Function** is the `HfFunctionalGpioPin` / `HfFunctionalAdcChannel` enum value. Code that needs a pin uses it.
-- **Name** is the string you pass to `GpioManager::Get("...")` or `AdcManager::ReadVoltage("...")`.
-- **Category**: *core* pins are reserved by the system, *comm* pins belong to a bus and are configured by
-  `CommChannelsManager`, *GPIO* pins are registered by `GpioManager` and can be driven by name.
-- **Active low** pins (`_N` suffix, chip selects, reset) are inverted for you: `SetActive()` drives them low.
+??? note "How to read the tables"
+    - **Function** is the `HfFunctionalGpioPin` / `HfFunctionalAdcChannel` enum value. Code that needs a pin uses it.
+    - **Name** is the string you pass to `GpioManager::Get("...")` or `AdcManager::ReadVoltage("...")`.
+    - **Category**: *core* pins are reserved by the system, *comm* pins belong to a bus and are configured by
+      `CommChannelsManager`, *GPIO* pins are registered by `GpioManager` and can be driven by name.
+    - **Active low** pins (`_N` suffix, chip selects, reset) are inverted for you: `SetActive()` drives them low.
 
 ## Summary
 
