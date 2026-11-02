@@ -142,3 +142,7 @@ CHANGELOG.md
 # Local bench tests (machine-specific, not for GitHub)
 examples/manifold_valves_pressure_control.cpp
 examples/esp32/main/manifold_valves_pressure_control/manifold_valves_pressure_control.cpp
+
+# Documentation site (mkdocs build) and the Doxygen output
+site/
+docs/_doxygen/

@@ -23,7 +23,7 @@ INPUT                  = lib/api \
                          examples \
                          README.md
 
-FILE_PATTERNS          = *.c *.cpp *.h *.hpp *.md
+FILE_PATTERNS          = *.c *.cpp *.h *.hpp
 RECURSIVE              = YES
 USE_MDFILE_AS_MAINPAGE = README.md
 FILTER_PATTERNS        = *.md="sed -e '/^---$/,/^---$/d'"

@@ -1,0 +1,224 @@
+/* HardFOC look for Material for MkDocs: palette tokens, typography, landing hero, cards and figures.
+ *
+ * Colours are tokens (custom properties). Every text colour below reaches at least 4.5:1 on the background it is
+ * used on, in both schemes (checked with the WCAG 2.x formula when the palette was chosen). Change a token, not a
+ * rule, and re-check the pairs listed next to it.
+ */
+
+/* ---------------------------------------------------------------- palette: light */
+:root,
+[data-md-color-scheme="default"] {
+  --hf-indigo-600: #3b38c4;   /* header, buttons: white text 8.2:1 */
+  --hf-indigo-700: #2d2a9e;   /* links on white 10.8:1 */
+  --hf-indigo-50: #eef0ff;
+  --hf-teal-700: #0b7a72;     /* accent / hover on white 5.2:1 */
+  --hf-teal-300: #5eead4;
+  --hf-ink: #17202c;          /* body text on white 16.4:1 */
+  --hf-muted: #566070;        /* secondary text on white 6.4:1, on #f5f7fa 5.9:1 */
+  --hf-surface: #f5f7fa;
+  --hf-line: #e2e7ee;
+}
+
+[data-md-color-primary="custom"] {
+  --md-primary-fg-color: var(--hf-indigo-600);
+  --md-primary-fg-color--light: #5552dc;
+  --md-primary-fg-color--dark: var(--hf-indigo-700);
+  --md-primary-bg-color: #ffffff;
+  --md-primary-bg-color--light: #ffffffb3;
+}
+
+[data-md-color-accent="custom"] {
+  --md-accent-fg-color: var(--hf-teal-700);
+  --md-accent-fg-color--transparent: #0b7a721a;
+  --md-accent-bg-color: #ffffff;
+}
+
+[data-md-color-scheme="default"] {
+  --md-default-fg-color: var(--hf-ink);
+  --md-typeset-color: var(--hf-ink);
+  --md-default-fg-color--light: var(--hf-muted);
+  --md-typeset-a-color: var(--hf-indigo-700);
+  --md-code-bg-color: var(--hf-surface);
+}
+
+/* ---------------------------------------------------------------- palette: dark */
+[data-md-color-scheme="slate"] {
+  --md-hue: 222;
+  --hf-ink: #e6ebf2;          /* body text on #0e131a 15.6:1 */
+  --hf-muted: #a2adbb;        /* secondary text on #0e131a 8.2:1 */
+  --hf-surface: #151c26;
+  --hf-line: #283241;
+  --md-default-bg-color: #0e131a;
+  --md-default-fg-color: var(--hf-ink);
+  --md-typeset-color: var(--hf-ink);
+  --md-default-fg-color--light: var(--hf-muted);
+  --md-typeset-a-color: #a5a9ff;          /* links on #0e131a 8.6:1 */
+  --md-code-bg-color: var(--hf-surface);
+  --md-footer-bg-color: #0a0e14;
+  --md-footer-bg-color--dark: #07090d;
+}
+
+[data-md-color-scheme="slate"][data-md-color-primary="custom"] {
+  --md-primary-fg-color: #1b2140;         /* header: white text 15.7:1 */
+  --md-primary-fg-color--dark: #141936;
+  --md-primary-bg-color: #ffffff;
+}
+
+[data-md-color-scheme="slate"][data-md-color-accent="custom"] {
+  --md-accent-fg-color: #5eead4;          /* hover on #0e131a 12.6:1 */
+  --md-accent-fg-color--transparent: #5eead41a;
+}
+
+/* ---------------------------------------------------------------- typography */
+.md-typeset {
+  font-size: 0.8rem;
+  line-height: 1.7;
+  font-feature-settings: "cv11", "ss01";
+}
+
+.md-typeset h1 {
+  font-weight: 750;
+  letter-spacing: -0.02em;
+  color: var(--md-default-fg-color);
+}
+
+.md-typeset h2 {
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  border-top: 1px solid var(--hf-line);
+  padding-top: 1.2em;
+}
+
+.md-typeset h3 {
+  font-weight: 650;
+}
+
+.md-typeset code {
+  font-size: 0.86em;
+  border-radius: 0.3em;
+}
+
+.md-typeset table:not([class]) {
+  font-size: 0.74rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--hf-line);
+}
+
+.md-typeset table:not([class]) td code {
+  white-space: nowrap;      /* identifiers stay whole; the table scrolls instead */
+}
+
+.md-typeset table:not([class]) th {
+  background: var(--hf-surface);
+  font-weight: 650;
+}
+
+/* ---------------------------------------------------------------- landing hero */
+.md-typeset .hf-hero {
+  margin: 0 0 2rem;
+  padding: 2.4rem 2rem 2rem;
+  border-radius: 1.2rem;
+  color: #ffffff;
+  background:
+    radial-gradient(60rem 22rem at 110% -10%, #5eead433, transparent 60%),
+    linear-gradient(135deg, #2d2a9e 0%, #3b38c4 55%, #1f4fb8 100%);
+}
+
+[data-md-color-scheme="slate"] .md-typeset .hf-hero {
+  background:
+    radial-gradient(60rem 22rem at 110% -10%, #5eead422, transparent 60%),
+    linear-gradient(135deg, #141936 0%, #1f2463 60%, #16306e 100%);
+  border: 1px solid #283241;
+}
+
+.md-typeset .hf-hero h1 {
+  color: #ffffff;
+  margin: 0 0 0.4rem;
+  font-size: 2.1rem;
+}
+
+.md-typeset .hf-hero p {
+  color: #e6e9ff;              /* on #3b38c4 6.9:1, on #1f4fb8 6.1:1, on #1f2463 11.7:1 */
+  font-size: 0.95rem;
+  max-width: 44rem;
+}
+
+.md-typeset .hf-hero .md-button {
+  color: #ffffff;
+  border-color: #ffffffb3;
+  margin: 0.4rem 0.4rem 0 0;
+}
+
+.md-typeset .hf-hero .md-button--primary {
+  color: #1b1a6b;              /* on white 14.9:1 */
+  background: #ffffff;
+  border-color: #ffffff;
+}
+
+.md-typeset .hf-hero .md-button:hover,
+.md-typeset .hf-hero .md-button:focus {
+  color: #0e131a;
+  background: var(--hf-teal-300);
+  border-color: var(--hf-teal-300);
+}
+
+.md-typeset .hf-hero .hf-kicker {
+  display: inline-block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #ccfbf1;              /* on #3b38c4 7.3:1 */
+  margin-bottom: 0.6rem;
+}
+
+/* ---------------------------------------------------------------- cards */
+.md-typeset .grid.cards > ul > li,
+.md-typeset .grid > .card {
+  border-radius: 0.9rem;
+  border-color: var(--hf-line);
+  transition: border-color 120ms, box-shadow 120ms, transform 120ms;
+}
+
+.md-typeset .grid.cards > ul > li:hover,
+.md-typeset .grid.cards > ul > li:focus-within {
+  border-color: var(--md-accent-fg-color);
+  box-shadow: 0 0.4rem 1.2rem #0000001a;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .md-typeset .grid.cards > ul > li:hover {
+    transform: translateY(-1px);
+  }
+}
+
+/* ---------------------------------------------------------------- figures */
+.md-typeset figure.hf-figure {
+  margin: 1.6em 0 0.6em;
+  max-width: 100%;
+}
+
+.md-typeset figure.hf-figure img {
+  width: 100%;
+  height: auto;
+  border-radius: 0.8rem;
+}
+
+.md-typeset figure.hf-figure figcaption {
+  font-size: 0.72rem;
+  color: var(--md-default-fg-color--light);
+  max-width: 100%;
+}
+
+.md-typeset details.hf-figure-desc {
+  font-size: 0.72rem;
+  margin-top: 0;
+}
+
+/* Keyboard focus is always visible. */
+.md-typeset a:focus-visible,
+.md-typeset summary:focus-visible,
+.md-button:focus-visible {
+  outline: 2px solid var(--md-accent-fg-color);
+  outline-offset: 2px;
+}

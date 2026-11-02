@@ -1,0 +1,9 @@
+{#- HardFOC look for Material: the banner shown on an older version of a versioned (mike) site. -#}
+{% extends "base.html" %}
+
+{% block outdated %}
+  This page documents an older version.
+  <a href="{{ config.site_url or ('../' ~ base_url) }}">
+    <strong>Go to the latest version.</strong>
+  </a>
+{% endblock %}

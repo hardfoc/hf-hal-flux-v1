@@ -1,0 +1,44 @@
+{
+  "board": "Flux V1",
+  "mcu": "ESP32-S3",
+  "facade": "Flux",
+  "managers": [
+    "CommChannelsManager",
+    "NvsManager",
+    "GpioManager",
+    "ValveManager",
+    "AdcManager",
+    "LedManager",
+    "TemperatureManager"
+  ],
+  "handlers": [
+    "Ads7952Handler",
+    "Max22200Handler",
+    "Mcp9700TemperatureHandler",
+    "NtcTemperatureHandler",
+    "Tle92466edHandler"
+  ],
+  "drivers": [
+    "hf-ads7952",
+    "hf-max22200",
+    "hf-mcp9700",
+    "hf-ntc-thermistor",
+    "hf-tle92466ed",
+    "hf-ws2812-rmt"
+  ],
+  "interfaces": [
+    "BaseAdc",
+    "BaseCan",
+    "BaseGpio",
+    "BaseNvs",
+    "BaseSpi",
+    "BaseTemperature",
+    "BaseUart",
+    "BaseUsbSerialJtag"
+  ],
+  "sources": [
+    "lib/api/Flux.h:Flux (manager references)",
+    "lib/managers:#includes",
+    "lib/core/handlers:#includes"
+  ]
+}
