@@ -4,7 +4,9 @@
 #
 # Builds the HAL managers against the host family of the platform binding
 # (lib/managers/bsp_bind/host, over hf-core's hf_core_host_mocks) and runs the
-# manager tests. No ESP-IDF, no FreeRTOS. On-target builds do not use this file.
+# manager tests against register-level models of the MAX22200, TLE92466ED and
+# ADS7952 (FluxChipModels.h). No ESP-IDF, no FreeRTOS. On-target builds do not
+# use this file.
 #
 #   cmake -S tests/host -B build/host -G Ninja
 #   cmake --build build/host
@@ -24,10 +26,13 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 get_filename_component(HF_HAL_ROOT "${CMAKE_CURRENT_LIST_DIR}/../.." REALPATH)
 
-option(HF_HAL_SANITIZE "Build with AddressSanitizer and UndefinedBehaviorSanitizer" OFF)
-if(HF_HAL_SANITIZE)
-    add_compile_options(-fsanitize=address,undefined -fno-omit-frame-pointer -fno-sanitize-recover=undefined)
-    add_link_options(-fsanitize=address,undefined)
+# Sanitizers, e.g. -DHF_HAL_SANITIZERS=undefined. AddressSanitizer is not usable yet: hf-core's
+# MAX22200 SPI adapter copies buffers with aligned 32-bit accesses that touch bytes around them
+# (documented in hf-core docs/host-build.md).
+set(HF_HAL_SANITIZERS "" CACHE STRING "Comma-separated -fsanitize= list for the host build (empty = none)")
+if(HF_HAL_SANITIZERS)
+    add_compile_options(-fsanitize=${HF_HAL_SANITIZERS} -fno-omit-frame-pointer -fno-sanitize-recover=all)
+    add_link_options(-fsanitize=${HF_HAL_SANITIZERS})
 endif()
 
 # ── hf-core: only the handlers Flux V1 uses ──────────────────────────────
@@ -78,3 +83,22 @@ target_compile_definitions(hf_hal_flux_host PUBLIC
     HARDFOC_FLUX_API=1
 )
 target_compile_options(hf_hal_flux_host PRIVATE -Wall -Wextra -Werror -Wno-unused-parameter)
+
+# ── Manager tests ─────────────────────────────────────────────────────────
+enable_testing()
+
+function(hf_hal_host_test name)
+    add_executable(${name} ${ARGN})
+    target_link_libraries(${name} PRIVATE hf_hal_flux_host hf_core_host_test_main)
+    target_include_directories(${name} PRIVATE "${CMAKE_CURRENT_LIST_DIR}")
+    # Register masks promote to int; the harness compares them with unsigned literals.
+    target_compile_options(${name} PRIVATE -Wall -Wextra -Werror -Wno-unused-parameter -Wno-sign-compare)
+    add_test(NAME ${name} COMMAND ${name})
+    set_tests_properties(${name} PROPERTIES TIMEOUT 120)
+endfunction()
+
+hf_hal_host_test(test_valve_manager       test_valve_manager.cpp)
+hf_hal_host_test(test_adc_manager         test_adc_manager.cpp)
+hf_hal_host_test(test_temperature_manager test_temperature_manager.cpp)
+hf_hal_host_test(test_nvs_manager         test_nvs_manager.cpp)
+hf_hal_host_test(test_flux_hal            test_flux_hal.cpp)

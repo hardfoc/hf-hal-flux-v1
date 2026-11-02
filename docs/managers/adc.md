@@ -45,6 +45,8 @@ operation counters. Per-channel access and error counts are logged by `DumpStati
 
 ## Pitfalls
 
+- **The ADS7952 needs comms.** `EnsureInitialized()` brings `CommChannelsManager` up first (it owns the pressure
+  bus); if comms is down the manager reports `DependencyNotReady`.
 - **Fail-closed start-up.** If the ADS7952 or the MCU ADC does not come up, the manager stays uninitialised
   ([ADR 0005](../adr/0005-no-heap-fail-closed.md)): every read returns `ADC_ERR_NOT_INITIALIZED` and `Get()` returns
   `nullptr`. `GetManagerError()` says why, and `IsAds7952Ready(0)` / `IsInternalAdcReady()` say which part is

@@ -59,6 +59,8 @@ uint32_t InternalAdcChannelMask() noexcept;
 void FailInternalAdc(bool fail = true) noexcept;
 /** @brief The die-temperature fake, or nullptr. */
 hf::host::MockTemperature* DieTemperature() noexcept;
+/** @brief Make the next die-temperature fake fail its initialisation. */
+void FailDieTemperatureInit(bool fail = true) noexcept;
 /** @brief The NVS fake in region @p slot, or nullptr. */
 hf::host::MockNvs* Nvs(size_t slot) noexcept;
 /** @brief The CAN fake, or nullptr. */

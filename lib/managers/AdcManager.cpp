@@ -157,6 +157,8 @@ bool AdcManager::Initialize() noexcept {
     //==========================================================================
     // ADS7952 EXTERNAL ADC — one handler per device, constructed in place
     //==========================================================================
+    // The ADS7952s sit on the pressure SPI bus, which CommChannelsManager owns.
+    const bool comms_up = CommChannelsManager::GetInstance().EnsureInitialized();
     // Iterate pincfg ADC mapping for ADS7952_EXTERNAL channels
     // Group by chip_unit (device index) and create one handler per device
     for (size_t i = 0; i < HF_ADC_MAPPING_SIZE; ++i) {
@@ -182,7 +184,7 @@ bool AdcManager::Initialize() noexcept {
                 static_cast<uint8_t>(SpiDeviceId::ADS7952_ADC_0) + dev_idx);
 
             auto& comms = CommChannelsManager::GetInstance();
-            BaseSpi* spi = comms.GetSpiDevice(spi_dev_id);
+            BaseSpi* spi = comms_up ? comms.GetSpiDevice(spi_dev_id) : nullptr;
             if (spi) {
                 Ads7952HandlerConfig cfg = GetDefaultAds7952Config();
                 cfg.device_index = dev_idx;
@@ -196,6 +198,9 @@ bool AdcManager::Initialize() noexcept {
                     ads7952_handlers_[dev_idx].reset();
                     if (ads_error == ManagerError::None) ads_error = ManagerError::HardwareFault;
                 }
+            } else if (!comms_up) {
+                Logger::GetInstance().Error(TAG, "  [ADS7952] Dev%u: comms manager not initialised", dev_idx);
+                ads_error = ManagerError::DependencyNotReady;
             } else {
                 Logger::GetInstance().Error(TAG, "  [ADS7952] Dev%u: SPI device not available", dev_idx);
                 ads_error = ManagerError::BindFailed;

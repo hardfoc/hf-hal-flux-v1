@@ -44,6 +44,7 @@ struct HostState {
     bool adc_fail{false};
 
     std::optional<hf::host::MockTemperature> die_temp{};
+    bool die_temp_fail{false};
     std::array<std::optional<hf::host::MockNvs>, kMaxNvsRegions> nvs{};
 
     std::array<SpiBusSlot, kMaxSpiBuses> spi{};
@@ -133,6 +134,7 @@ void DestroyInternalAdc() noexcept {
 BaseTemperature* CreateDieTemperature() noexcept {
     if (!S().die_temp.has_value()) {
         S().die_temp.emplace();
+        S().die_temp->SetInitializeResult(!S().die_temp_fail);
     }
     return &*S().die_temp;
 }
@@ -308,17 +310,15 @@ void Reset() noexcept {
     s.adc_mask = 0;
     s.adc_fail = false;
     s.die_temp.reset();
+    s.die_temp_fail = false;
     // NVS regions are referenced by NvsManager for the life of the program: keep the
-    // objects, clear their contents by re-creating them in place.
+    // objects where they are and clear them by re-creating them in place. BaseNvs keeps
+    // the namespace pointer, which is the manager's string literal, so it stays valid.
     for (auto& n : s.nvs) {
         if (n.has_value()) {
             const char* ns = n->GetNamespace();
-            char name[16] = {};
-            for (size_t i = 0; ns != nullptr && ns[i] != '\0' && i + 1 < sizeof(name); ++i) {
-                name[i] = ns[i];
-            }
             n.reset();
-            n.emplace(name);
+            n.emplace(ns);
         }
     }
     for (auto& b : s.spi) {
@@ -417,6 +417,10 @@ void FailInternalAdc(bool fail) noexcept {
 
 hf::host::MockTemperature* DieTemperature() noexcept {
     return S().die_temp.has_value() ? &*S().die_temp : nullptr;
+}
+
+void FailDieTemperatureInit(bool fail) noexcept {
+    S().die_temp_fail = fail;
 }
 
 hf::host::MockNvs* Nvs(size_t slot) noexcept {

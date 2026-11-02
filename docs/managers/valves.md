@@ -73,7 +73,9 @@ chip:
 1. **TLE92466ED**: creates the handler, enters mission mode, drives its enable pin, clears the feedback freeze so
    the per-channel feedback registers update, and sets the supply under- / over-voltage trips to 19 V / 29 V for the
    24 V valve rail.
-2. **MAX22200**: creates the handler with a 15 kΩ reference resistor (full-scale current 1000 mA).
+2. **MAX22200**: creates the handler with a 15 kΩ reference resistor (full-scale current 1000 mA), then reads
+   STATUS back as a presence check: all ones, `ACTIVE=0` or a channel left on means nothing answered on the chip
+   select (the MISO line is pulled up, and the driver alone accepts all ones as a live part).
 
 It succeeds only if **both** chips work (fail-closed, [ADR 0005](../adr/0005-no-heap-fail-closed.md)). Otherwise
 `IsInitialized()` stays `false`, every channel call returns `VALVE_ERR_NOT_INITIALIZED`, and `GetManagerError()`

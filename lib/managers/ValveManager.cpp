@@ -154,6 +154,25 @@ ManagerError ValveManager::InitializeMax22200() noexcept {
         return ManagerError::HardwareFault;
     }
 
+    // Presence check. The driver accepts an all-ones STATUS as "ACTIVE with UVM set", so a
+    // missing chip on the pulled-up MISO line would otherwise pass bring-up. Right after
+    // Initialize() the part has every channel off and ACTIVE=1: all ones (or ACTIVE=0) is a
+    // floating bus, not a MAX22200.
+    {
+        uint32_t raw = 0;
+        auto* drv = max22200_->GetDriver();
+        const bool read_ok = drv != nullptr &&
+                             drv->ReadRegister32(max22200::RegBank::STATUS, raw) == max22200::DriverStatus::OK;
+        if (!read_ok || raw == 0xFFFFFFFFu || (raw & max22200::StatusReg::ACTIVE_BIT) == 0u ||
+            (raw & max22200::StatusReg::ONCH_MASK) != 0u) {
+            Logger::GetInstance().Error(TAG,
+                "MAX22200 presence check failed (STATUS=0x%08lX): no device on the valve bus chip select",
+                static_cast<unsigned long>(raw));
+            max22200_.reset();
+            return ManagerError::HardwareFault;
+        }
+    }
+
     max22200_valid_ = true;
     Logger::GetInstance().Info(TAG, "MAX22200 initialized successfully (8 solenoid channels)");
     return ManagerError::None;

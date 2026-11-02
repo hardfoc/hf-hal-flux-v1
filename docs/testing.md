@@ -16,11 +16,43 @@ What runs on a pull request, what each check means, and how to run it on your ma
 | Docs Link Check CI | `ci-docs-linkcheck.yml` | push, pull request | lychee over the Markdown files, config `_config/lychee.toml` |
 | Markdown Lint CI | `ci-markdown-lint.yml` | push, pull request | markdownlint, config `_config/.markdownlint.json` |
 | YAML Lint CI | `ci-yaml-lint.yml` | push, pull request | yamllint, config `_config/.yamllint` |
-| HAL Boundary CI | `ci-hal-boundary.yml` | push, pull request | `tools/lint/lint_hal_boundary.sh` (no ESP-IDF, FreeRTOS or `Esp*` code outside `lib/managers/bsp_bind/<family>/`; shrink-only allowlist checked against the PR base); `tools/lint/lint_hal_alloc.sh` (no heap or heap-backed type in the HAL library); host build of the managers against `bsp_bind/host` |
+| HAL Boundary CI | `ci-hal-boundary.yml` | push, pull request | `tools/lint/lint_hal_boundary.sh` (no ESP-IDF, FreeRTOS or `Esp*` code outside `lib/managers/bsp_bind/<family>/`; shrink-only allowlist checked against the PR base); `tools/lint/lint_hal_alloc.sh` (no heap or heap-backed type in the HAL library); host build of the managers against `bsp_bind/host` and the manager tests in `tests/host` (GCC, Clang, Clang with UBSan) |
 | Release | `release.yml` | `v*` tags | Builds the release artifacts |
 
 The examples are integration tests: they run on a board, not in CI. CI proves they compile; a person flashes them.
-There are no host unit tests in this repository yet.
+The manager logic is unit-tested on a host, below.
+
+## Host tests
+
+[`tests/host`](../tests/host) builds the facade and the managers against the host family of the platform binding
+([`bsp_bind/host`](../lib/managers/bsp_bind/host), over hf-core's `hf_core_host_mocks`) and runs one executable per
+manager. The chips are register-level SPI models in [`FluxChipModels.h`](../tests/host/FluxChipModels.h), so the real
+hf-core handlers and chip drivers run their unmodified bring-up and channel code:
+
+| Model | What it answers |
+| --- | --- |
+| `Max22200Model` | Two-phase protocol (command byte with CMD high, then 8- or 32-bit data), STATUS / CFG / FAULT registers, fault flags on SDO, an absent part (MISO high) |
+| `Tle92466Model` | 32-bit frames with the SAE J1850 CRC, the one-frame reply pipeline, 16- and 22-bit reply widths, write-1-to-clear diagnosis registers, ICVID, an absent part |
+| `Ads7952Model` | 16-bit frames, manual channel select, channel id in the reply, an absent part |
+
+| Test | Proves |
+| --- | --- |
+| `test_valve_manager` | `kValveChannelMap` is a bijection onto MAX22200 OUT0-7 and TLE92466ED OUT0-5; each channel switches only its own output on the wire; currents land on the mapped TLE channel; the bank mask splits; the board's SPI modes and clocks; fault pins are inputs; fail-closed bring-up with either chip absent or the bus down, retry; MAX22200 and TLE92466ED fault reporting; shutdown turns every channel off |
+| `test_adc_manager` | Every pin-map channel registers; each ADS7952 channel reads its own input; the VBUS divider; name and enum lookups agree; failed reads are recorded; fail-closed with the ADS7952 absent, the pressure bus down or the MCU ADC down |
+| `test_temperature_manager` | All three sensors; the NTC through its pin-map channel; the MCP9700 through the ADS7952; degraded mode without the ADC or the die sensor; failure with no sensor |
+| `test_nvs_manager` | The three namespaces and their binding slots; isolation; the 15-character key limit; fail-closed opening |
+| `test_flux_hal` | Init order and the required set; `CollectDiagnostics()` for a healthy board, a missing valve driver, a missing valve bus and a degraded temperature manager; system calls through the binding |
+
+```bash
+cmake -S tests/host -B build/host -G Ninja
+cmake --build build/host
+ctest --test-dir build/host --output-on-failure
+# with UndefinedBehaviorSanitizer:
+cmake -S tests/host -B build/host-ubsan -G Ninja -DHF_HAL_SANITIZERS=undefined
+```
+
+AddressSanitizer is not used yet: hf-core's MAX22200 SPI adapter copies buffers with aligned word accesses that touch
+the bytes around them (see hf-core's `docs/host-build.md`).
 
 ## Run the checks locally
 
