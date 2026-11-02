@@ -24,7 +24,7 @@ concurrency:
 jobs:
   docs:
     # Pinned to the branch that adds the workflow until it is merged; then switch to @main.
-    uses: hardfoc/hf-general-ci-tools/.github/workflows/ru-mkdocs-publish.yml@docs/mkdocs-platform
+    uses: hardfoc/hf-general-ci-tools/.github/workflows/ru-mkdocs-publish.yml@main
     permissions:
       contents: write  # the publish job pushes gh-pages; the build job only reads
     with:
