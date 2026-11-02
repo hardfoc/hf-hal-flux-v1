@@ -1,0 +1,15 @@
+<map id="ValveManager" name="ValveManager">
+<area shape="rect" id="Node000001" title="Unified singleton for controlling all valve channels on the Flux board." alt="" coords="636,155,751,181"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="270,5,473,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="477,47,545,69,613,100,652,127,681,153,678,157,648,131,611,105,543,74,475,52"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="266,69,477,109"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="469,110,613,145,642,153,641,158,611,151,468,115"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="264,133,479,203"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="493,165,636,165,636,171,493,171"/>
+<area shape="rect" id="Node000005" href="$struct_valve_channel_state.html" title="Per&#45;channel runtime state tracked by the manager." alt="" coords="5,155,151,181"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="164,165,264,165,264,171,164,171"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="295,227,448,253"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="447,222,611,185,642,178,643,183,613,191,448,227"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="288,277,455,317"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="467,278,539,259,611,230,649,205,678,179,681,183,652,209,613,234,541,264,469,283"/>
+</map>

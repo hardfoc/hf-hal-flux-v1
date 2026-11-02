@@ -1,0 +1,11 @@
+<map id="Flux::InitializeLeds" name="Flux::InitializeLeds">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,149,56"/>
+<area shape="rect" id="Node000002" href="$class_led_manager.html#afa325e20cb2d4356fb870fdd86d4c729" title="Initialise the WS2812 LED strip (idempotent)." alt="" coords="197,31,416,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="150,41,184,41,184,46,150,46"/>
+<area shape="rect" id="Node000003" href="$class_led_manager.html#aeb27eef4ebf25b19bd864c9822a6c892" title=" " alt="" coords="464,31,631,56"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="416,41,450,41,450,46,416,46"/>
+<area shape="rect" id="Node000004" href="$class_led_manager.html#ac6bff1fceb7eab43ee606dd3807d3d47" title=" " alt="" coords="700,5,907,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="631,32,686,27,687,32,631,38"/>
+<area shape="rect" id="Node000005" href="$class_led_manager.html#aec49368647c9b09857ea1b775d655e5e" title=" " alt="" coords="679,55,928,80"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="631,48,665,52,664,57,631,54"/>
+</map>

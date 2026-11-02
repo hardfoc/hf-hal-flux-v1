@@ -1,0 +1,9 @@
+<map id="ValveManager::ClearAllFaults" name="ValveManager::ClearAllFaults">
+<area shape="rect" id="Node000001" title="Clear faults on both drivers." alt="" coords="5,55,217,80"/>
+<area shape="rect" id="Node000002" href="$_valve_manager_8h.html#ae6cff86821790a19053b6f8423493fe7" title="Check if a valve error code indicates success." alt="" coords="317,5,426,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="178,52,303,28,304,33,179,57"/>
+<area shape="rect" id="Node000003" href="$_valve_manager_8h.html#a1029903401a6b8ed1b70aaff9b2c6acc" title="Map MAX22200 DriverStatus to the unified hf_valve_err_t domain." alt="" coords="265,55,477,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="217,65,252,65,252,70,217,70"/>
+<area shape="rect" id="Node000004" href="$_valve_manager_8h.html#a07104dd82857d7cb8af8bf459645484c" title="Map TLE92466ED DriverError to the unified hf_valve_err_t domain." alt="" coords="274,104,469,129"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="179,77,291,99,290,104,178,83"/>
+</map>

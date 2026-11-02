@@ -1,0 +1,5 @@
+<map id="LedManager::SetBrightness" name="LedManager::SetBrightness">
+<area shape="rect" id="Node000001" title="Alias for SetBrightnessRaw()." alt="" coords="5,5,205,31"/>
+<area shape="rect" id="Node000002" href="$class_led_manager.html#ab6454f358cc386fc8bf7566000cd0c0e" title="Set brightness as a raw 0–255 value." alt="" coords="253,5,481,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="205,15,240,15,240,21,205,21"/>
+</map>

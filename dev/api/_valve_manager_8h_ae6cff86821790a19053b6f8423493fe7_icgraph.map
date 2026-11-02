@@ -1,0 +1,25 @@
+<map id="HfValveErrOk" name="HfValveErrOk">
+<area shape="rect" id="Node000001" title="Check if a valve error code indicates success." alt="" coords="997,191,1107,216"/>
+<area shape="rect" id="Node000002" href="$class_valve_manager.html#aa45a05ea99d548ca5e6bc37199d76e02" title="Clear faults on both drivers." alt="" coords="712,5,924,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1040,179,1026,147,1007,110,981,74,948,44,923,32,926,27,951,40,985,70,1011,107,1031,144,1044,176"/>
+<area shape="rect" id="Node000003" href="$class_valve_manager.html#a7ccec1088213c4d670a7fcfeeeeca2c7" title="Configure a solenoid channel with CDR (current drive regulation)." alt="" coords="687,55,949,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="1034,181,998,135,975,112,948,94,922,83,924,78,951,89,978,108,1002,131,1038,177"/>
+<area shape="rect" id="Node000004" href="$class_valve_manager.html#af4516b2a983b758785a59321f42a20b0" title="Configure a solenoid channel with VDR (voltage drive regulation)." alt="" coords="687,104,949,129"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="1021,185,987,163,948,144,906,132,908,127,950,140,990,159,1024,180"/>
+<area shape="rect" id="Node000005" href="$class_valve_manager.html#adf0a124b524aeaff77fd8ae6104a12b0" title="Disable all channels on both drivers." alt="" coords="723,154,913,194"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="983,197,913,189,913,183,984,192"/>
+<area shape="rect" id="Node000006" href="$class_valve_manager.html#a40cab939ee2a6269d3f9b47339ab2c2b" title="Disable a valve channel output." alt="" coords="705,219,931,244"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="984,214,924,221,924,216,983,209"/>
+<area shape="rect" id="Node000007" href="$class_valve_manager.html#a915cd57bf1c1e510f11ac54b57ec2f02" title="Enable a valve channel output." alt="" coords="708,268,928,293"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="1020,225,987,243,950,258,904,271,902,265,948,253,984,238,1017,221"/>
+<area shape="rect" id="Node000008" href="$class_valve_manager.html#a18f9a4ed2c88fe65e16b264c873bc24e" title="Enable multiple channels by bitmask." alt="" coords="687,317,949,343"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="1035,229,1000,270,976,290,951,307,919,320,917,315,948,302,973,286,996,266,1031,226"/>
+<area shape="rect" id="Node000009" href="$class_valve_manager.html#a7a708a5ebc126913968db54b7629aff9" title="Ensure the valve manager system is initialized." alt="" coords="703,367,933,392"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="1043,230,1009,294,983,328,951,356,926,369,923,364,948,352,979,324,1005,291,1039,228"/>
+<area shape="rect" id="Node000010" href="$class_flux.html#af36707264a8180cfeb4f7a31247ad66b" title=" " alt="" coords="481,367,639,392"/>
+<area shape="poly" id="edge9_Node000009_Node000010" title=" " alt="" coords="689,382,639,382,639,377,689,377"/>
+<area shape="rect" id="Node000011" href="$class_flux.html#a0d67fb153ddebb59c51eb20ad311cb32" title=" " alt="" coords="220,367,433,392"/>
+<area shape="poly" id="edge10_Node000010_Node000011" title=" " alt="" coords="468,382,434,382,434,377,468,377"/>
+<area shape="rect" id="Node000012" href="$class_flux.html#a6c011c136a43dd2d9859dcf7d56571e8" title="Ensure all Flux subsystems are properly initialized." alt="" coords="5,367,172,392"/>
+<area shape="poly" id="edge11_Node000011_Node000012" title=" " alt="" coords="206,382,172,382,172,377,206,377"/>
+</map>

@@ -1,0 +1,29 @@
+<map id="CommChannelsManager::GetInstance" name="CommChannelsManager::GetInstance">
+<area shape="rect" id="Node000001" title="Return the singleton CommChannelsManager instance." alt="" coords="1485,98,1668,138"/>
+<area shape="rect" id="Node000002" href="$_comm_channels_manager_8h.html#a1a653b503be78ab8545545d7af912c01" title="Convenience accessor — equivalent to CommChannelsManager::GetInstance()." alt="" coords="1232,5,1437,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1532,93,1487,68,1436,44,1401,33,1402,28,1438,40,1489,63,1534,89"/>
+<area shape="rect" id="Node000003" href="$class_adc_manager.html#a3561cebd5b27e351c066236543a0bc59" title=" " alt="" coords="1251,55,1418,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="1472,99,1395,83,1397,77,1473,94"/>
+<area shape="rect" id="Node000008" href="$class_valve_manager.html#a8351cec1ba13df5f82b88c59b5ed5fd1" title=" " alt="" coords="985,148,1164,173"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="1472,127,1232,146,1164,153,1164,148,1232,141,1472,122"/>
+<area shape="rect" id="Node000011" href="$class_valve_manager.html#a65a366456425166815040d2415d534d9" title=" " alt="" coords="1245,155,1424,195"/>
+<area shape="poly" id="edge12_Node000001_Node000011" title=" " alt="" coords="1479,144,1420,158,1419,153,1478,139"/>
+<area shape="rect" id="Node000012" href="$class_valve_manager.html#a3f22e9630f0367e73f28487aa375f664" title=" " alt="" coords="1245,219,1424,259"/>
+<area shape="poly" id="edge14_Node000001_Node000012" title=" " alt="" coords="1540,148,1493,180,1438,210,1409,222,1407,217,1436,205,1490,175,1537,144"/>
+<area shape="rect" id="Node000004" href="$class_adc_manager.html#a93d9add5dfe70a4605297be247318c71" title="Initialise the ADC subsystem if not already initialised." alt="" coords="965,55,1184,80"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="1237,79,1184,79,1184,74,1237,73"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="1198,56,1251,56,1251,62,1198,61"/>
+<area shape="rect" id="Node000005" href="$class_flux.html#a99371decae4e60cd6db9c40ec38c76d5" title=" " alt="" coords="491,91,629,116"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="952,79,630,101,629,96,951,73"/>
+<area shape="rect" id="Node000006" href="$class_flux.html#a0d67fb153ddebb59c51eb20ad311cb32" title=" " alt="" coords="220,116,433,141"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="477,115,434,120,433,114,476,110"/>
+<area shape="rect" id="Node000007" href="$class_flux.html#a6c011c136a43dd2d9859dcf7d56571e8" title="Ensure all Flux subsystems are properly initialized." alt="" coords="5,116,172,141"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="206,131,172,131,172,126,206,126"/>
+<area shape="rect" id="Node000009" href="$class_valve_manager.html#a7a708a5ebc126913968db54b7629aff9" title="Ensure the valve manager system is initialized." alt="" coords="687,140,917,165"/>
+<area shape="poly" id="edge9_Node000008_Node000009" title=" " alt="" coords="972,160,918,159,918,153,972,155"/>
+<area shape="rect" id="Node000010" href="$class_flux.html#af36707264a8180cfeb4f7a31247ad66b" title=" " alt="" coords="481,140,639,165"/>
+<area shape="poly" id="edge10_Node000009_Node000010" title=" " alt="" coords="673,155,639,155,639,150,673,150"/>
+<area shape="poly" id="edge11_Node000010_Node000006" title=" " alt="" coords="467,146,433,142,434,137,468,141"/>
+<area shape="poly" id="edge13_Node000011_Node000008" title=" " alt="" coords="1231,172,1164,168,1164,163,1232,167"/>
+<area shape="poly" id="edge15_Node000012_Node000008" title=" " alt="" coords="1254,218,1117,176,1118,171,1255,213"/>
+</map>
