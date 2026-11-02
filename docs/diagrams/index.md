@@ -33,8 +33,9 @@ Drawn from:
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="hal-layers.dark.svg">
   <img src="hal-layers.svg"
-    alt="Layer stack of the Flux V1 HAL: application, the Flux facade, 7 managers, 5 hf-core handlers, 6 chip
-    drivers, and the interface wrap on ESP-IDF and the ESP32-S3.">
+    alt="Layer stack of the Flux V1 HAL: application, the Flux facade, 7 MCU-free managers, 5 hf-core
+    handlers, 6 chip drivers, the interface classes, and the platform binding that creates their ESP32
+    implementations on ESP-IDF and the ESP32-S3.">
 </picture>
 <!-- /figure -->
 
@@ -45,6 +46,7 @@ Drawn from:
 - `Flux (manager references)` in [`lib/api/Flux.h`](../../lib/api/Flux.h)
 - `#includes` in [`lib/managers`](../../lib/managers)
 - `#includes` in [`lib/core/handlers`](../../lib/core/handlers)
+- `#includes` in [`lib/managers/bsp_bind`](../../lib/managers/bsp_bind)
 
 ## Flux::EnsureInitialized()
 
@@ -71,7 +73,8 @@ Drawn from:
   <img src="manager-dependencies.svg"
     alt="Graph from each manager to the hf-core handlers it uses and from each handler to the chip driver it
     wraps: ValveManager to the MAX22200 and TLE92466ED handlers, AdcManager to the ADS7952 handler,
-    TemperatureManager to the NTC and MCP9700 handlers, and LedManager directly to the WS2812 driver.">
+    TemperatureManager to the NTC and MCP9700 handlers. CommChannelsManager, GpioManager, LedManager and
+    NvsManager use no handler.">
 </picture>
 <!-- /figure -->
 

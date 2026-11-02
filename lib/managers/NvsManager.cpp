@@ -1,9 +1,10 @@
 /**
  * @file NvsManager.cpp
- * @brief Flux NVS manager — three `EspNvs` namespaces on ESP32.
+ * @brief Flux NVS manager — three `BaseNvs` namespaces from the platform binding.
  */
 
 #include "NvsManager.h"
+#include "bsp_bind/FluxPlatformBind.h"
 
 #include "handlers/logger/Logger.h"
 
@@ -23,9 +24,9 @@ NvsManager& NvsManager::GetInstance() noexcept {
 //==============================================================================
 
 NvsManager::NvsManager() noexcept
-    : app_("flux"),
-      calibration_("flux_cal"),
-      config_("flux_cfg") {}
+    : app_(flux::bsp::NvsRegion(0, "flux")),
+      calibration_(flux::bsp::NvsRegion(1, "flux_cal")),
+      config_(flux::bsp::NvsRegion(2, "flux_cfg")) {}
 
 bool NvsManager::EnsureInitialized() noexcept {
     if (initialized_.load(std::memory_order_acquire)) {
@@ -34,7 +35,7 @@ bool NvsManager::EnsureInitialized() noexcept {
 
     Logger::GetInstance().Info(TAG, "Initializing Flux NVS (flux / flux_cal / flux_cfg)");
 
-    auto openRegion = [this](EspNvs& region, const char* label) -> bool {
+    auto openRegion = [this](BaseNvs& region, const char* label) -> bool {
         if (!region.EnsureInitialized()) {
             SetLastError(hf_nvs_err_t::NVS_ERR_FAILURE);
             Logger::GetInstance().Error(TAG, "NVS init failed for %s (namespace=%s)", label, region.GetNamespace());

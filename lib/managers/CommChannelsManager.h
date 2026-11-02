@@ -9,9 +9,10 @@
  *          CAN is used for external devices (e.g. compressor). There is no
  *          I²C bus on Flux V1 — `GetI2cBus()` always returns nullptr.
  *
- *          Stack-based where possible: fixed-size arrays for known compile-time
- *          device counts, no heap vectors for bus/device lists. Bus objects
- *          are individually heap-allocated via unique_ptr (singleton lifetime).
+ *          The bus objects are created by the platform binding
+ *          (`bsp_bind/FluxPlatformBind.h`) in its static storage; this manager
+ *          decides which buses and chip selects exist (pin map + board config)
+ *          and holds `Base*` pointers only, so this header is MCU-free.
  *
  * @author HardFOC Team
  * @date 2026
@@ -24,19 +25,9 @@
 #include <array>
 #include <atomic>
 #include <cstdint>
-#include <memory>
 
-// Forward declarations
-class EspSpiBus;
-class EspSpiDevice;
-class EspI2cBus;  // forward — only appears as return type of GetI2cBus()
-class EspCan;
-class EspUart;
-class EspUsbSerialJtag;
-class BaseSpi;
-class BaseCan;
-class BaseUart;
-class BaseUsbSerialJtag;
+// Forward declaration — only appears as the return type of GetI2cBus()
+class BaseI2c;
 
 #include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/base/BaseSpi.h"
 #include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/base/BaseCan.h"
@@ -211,7 +202,7 @@ public:
      * @brief Flux V1 does not bring up an I²C bus in `CommChannelsManager`.
      * @return Always nullptr (API retained for portable example code).
      */
-    EspI2cBus* GetI2cBus() noexcept { return nullptr; }
+    BaseI2c* GetI2cBus() noexcept { return nullptr; }
 
     //==========================================================================
     // CAN ACCESSOR
@@ -228,14 +219,14 @@ public:
     //==========================================================================
 
     /**
-     * @brief Lazy-acquire configuration for an ESP32 UART port.
+     * @brief Lazy-acquire configuration for a hardware UART port.
      *
      * Apps that own a serial sensor (BASIS-2, FDO2, …) supply this to
      * `AcquireUart()`. The HAL owns the port; the app owns the device
      * driver layered on top of the returned `BaseUart&`.
      */
     struct UartAcquireConfig {
-        uint8_t  port_number;       ///< ESP32 UART port (0/1/2)
+        uint8_t  port_number;       ///< Hardware UART port (0/1/2)
         int16_t  tx_pin;            ///< GPIO; -1 to skip pin assignment.
         int16_t  rx_pin;            ///< GPIO; -1 to skip pin assignment.
         int16_t  rts_pin;           ///< -1 = plain UART, else RS-485 DE/RE.
@@ -251,7 +242,7 @@ public:
     static constexpr uint8_t kMaxUartPorts = 3;
 
     /**
-     * @brief Acquire (lazy-create + cache) a UART on the given ESP32 port.
+     * @brief Acquire (lazy-create + cache) a UART on the given hardware port.
      *
      * First call wins the configuration; subsequent calls with the same
      * `port_number` return the cached `BaseUart&` and ignore further
@@ -264,7 +255,7 @@ public:
 
     /**
      * @brief Look up a previously-acquired UART by port number.
-     * @return Pointer to the cached BaseUart (=== EspUart), or nullptr
+     * @return Pointer to the cached BaseUart, or nullptr
      *         if no UART has been acquired on that port yet.
      */
     BaseUart* GetUart(uint8_t port_number) noexcept;
@@ -287,7 +278,7 @@ public:
      *
      * @param cfg Ring buffer / policy configuration (defaults are sane:
      *            256-byte TX, 256-byte RX). Honoured only on the first call.
-     * @return Pointer to the cached `BaseUsbSerialJtag` (=== `EspUsbSerialJtag`),
+     * @return Pointer to the cached `BaseUsbSerialJtag`,
      *         or nullptr if the host platform has no USB Serial/JTAG block
      *         or driver install failed.
      */
@@ -309,42 +300,33 @@ public:
     void DumpStatistics() const noexcept;
 
 private:
-    CommChannelsManager() noexcept;
-    ~CommChannelsManager();
+    CommChannelsManager() noexcept = default;
+    ~CommChannelsManager() = default;
 
     bool Initialize() noexcept;
 
     //==========================================================================
-    // HARDWARE RESOURCES — heap-allocated via unique_ptr (singleton lifetime)
+    // HARDWARE RESOURCES — objects live in the platform binding (bsp_bind);
+    //                      the manager holds Base* pointers only
     //==========================================================================
 
     static constexpr uint8_t kSpiDeviceCount = static_cast<uint8_t>(SpiDeviceId::DEVICE_COUNT);
 
-    // SPI2 bus (valve drivers: MAX22200 + TLE92466ED)
-    std::unique_ptr<EspSpiBus> spi_bus_;
-    bool spi_bus_valid_{false};
+    bool spi_bus_valid_{false};    ///< Valve bus (MAX22200 + TLE92466ED) up
+    bool spi3_bus_valid_{false};   ///< Pressure bus (ADS7952) up
 
-    // SPI3 bus (ADS7952 external ADC — dedicated bus)
-    std::unique_ptr<EspSpiBus> spi3_bus_;
-    bool spi3_bus_valid_{false};
+    /// One device per SpiDeviceId; nullptr when its bus or chip select failed.
+    std::array<BaseSpi*, kSpiDeviceCount> spi_devices_{};
 
-    // Device indices: tracks device across both buses
-    std::array<int, kSpiDeviceCount> spi_device_indices_{};
-    // Which bus owns each device (0=spi_bus_, 1=spi3_bus_)
-    std::array<uint8_t, kSpiDeviceCount> spi_device_bus_{};
-
-    // CAN bus
-    std::unique_ptr<EspCan> can_bus_;
+    BaseCan* can_bus_{nullptr};    ///< CAN controller (configured, not started)
     bool can_bus_valid_{false};
 
-    // Lazy UART pool — one slot per ESP32 hardware UART port. App-driven:
+    // Lazy UART pool — one slot per hardware UART port. App-driven:
     // sensors (BASIS-2, FDO2, etc.) call `AcquireUart(cfg)` at boot.
-    std::array<std::unique_ptr<EspUart>, kMaxUartPorts> uarts_{};
+    std::array<BaseUart*, kMaxUartPorts> uarts_{};
 
-    // Lazy USB Serial/JTAG wrapper. The underlying controller is a single
-    // silicon block, so only one `BaseUsbSerialJtag*` ever exists per chip.
-    // Ownership is held by `EspUsbSerialJtag::Default()` (process-wide
-    // magic-static); we only cache the resolved pointer here for fast lookup.
+    // Lazy USB Serial/JTAG. The controller is a single silicon block, owned by
+    // the platform binding; we only cache the resolved pointer here.
     BaseUsbSerialJtag* usb_serial_jtag_{nullptr};
 
     std::atomic<bool> initialized_{false};
@@ -354,9 +336,6 @@ private:
     void UpdateLastError(CommError error) noexcept {
         last_error_.store(error, std::memory_order_release);
     }
-
-    /** @brief Resolve the bus pointer for a device index. */
-    EspSpiBus* GetBusForDevice(uint8_t device_index) noexcept;
 };
 
 //==============================================================================

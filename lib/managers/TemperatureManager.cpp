@@ -8,6 +8,7 @@
  */
 
 #include "TemperatureManager.h"
+#include "bsp_bind/FluxPlatformBind.h"
 #include "AdcManager.h"
 #include "core/hf-core-drivers/internal/hf-pincfg/src/hf_functional_pin_config_flux_v1.hpp"
 #include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/utils/memory_utils.h"
@@ -76,15 +77,16 @@ bool TemperatureManager::Initialize() noexcept {
 }
 
 bool TemperatureManager::InitializeEsp32Internal() noexcept {
-    esp32_temp_ = hf::utils::make_unique_nothrow<EspTemperature>();
-    if (!esp32_temp_) {
-        Logger::GetInstance().Error(TAG, "Failed to allocate EspTemperature");
+    die_temp_ = flux::bsp::CreateDieTemperature();
+    if (die_temp_ == nullptr) {
+        Logger::GetInstance().Error(TAG, "MCU die-temperature sensor not available on this platform");
         return false;
     }
 
-    if (!esp32_temp_->EnsureInitialized()) {
-        Logger::GetInstance().Error(TAG, "EspTemperature initialization failed");
-        esp32_temp_.reset();
+    if (!die_temp_->EnsureInitialized()) {
+        Logger::GetInstance().Error(TAG, "MCU die-temperature sensor initialization failed");
+        flux::bsp::DestroyDieTemperature();
+        die_temp_ = nullptr;
         return false;
     }
 
@@ -240,7 +242,7 @@ TemperatureError TemperatureManager::ReadTemperatureCelsius(std::string_view nam
     BaseTemperature* sensor = nullptr;
 
     switch (entry.sensor_type) {
-        case FluxTempSensorType::ESP32_INTERNAL: sensor = esp32_temp_.get(); break;
+        case FluxTempSensorType::ESP32_INTERNAL: sensor = die_temp_; break;
         case FluxTempSensorType::NTC_THERMISTOR: sensor = ntc_handler_.get(); break;
         case FluxTempSensorType::MCP9700_THERMISTOR: sensor = mcp9700_handler_.get(); break;
         default: {
@@ -398,7 +400,8 @@ bool TemperatureManager::Deinitialize() noexcept {
 
     mcp9700_handler_.reset();
     ntc_handler_.reset();
-    esp32_temp_.reset();
+    flux::bsp::DestroyDieTemperature();
+    die_temp_ = nullptr;
 
     initialized_.store(false, std::memory_order_release);
     return true;

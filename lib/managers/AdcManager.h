@@ -24,7 +24,6 @@
 #include <string_view>
 
 #include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/base/BaseAdc.h"
-#include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/mcu/esp32/EspAdc.h"
 #include "RtosMutex.h"
 #include "core/hf-core-drivers/internal/hf-pincfg/src/hf_functional_pin_config_flux_v1.hpp"
 
@@ -34,8 +33,8 @@ class Ads7952Handler;
 #endif
 
 //==============================================================================
-// ADC ENTRY — struct is stack-allocated; EspAdc driver owned by singleton via
-//              unique_ptr (heap-allocated, one per unit)
+// ADC ENTRY — fixed-size registry; the MCU ADC object lives in the platform
+//              binding's static storage
 //==============================================================================
 
 /**
@@ -44,7 +43,7 @@ class Ads7952Handler;
 struct AdcEntry {
     HfFunctionalAdcChannel functional_channel{HfFunctionalAdcChannel::HF_FUNCTIONAL_ADC_COUNT}; ///< Functional enum for this channel
     std::string_view name;              ///< Human-readable name from pincfg
-    BaseAdc* driver{nullptr};           ///< Pointer to the ADC driver (owned by the EspAdc array)
+    BaseAdc* driver{nullptr};           ///< ADC driver (MCU ADC in the binding, or an ADS7952 handler)
     uint8_t adc_unit{0};                ///< ADC unit (0 = ADC1, 1 = ADC2)
     uint8_t hw_channel{0};              ///< Hardware channel within the unit
     float voltage_divider{1.0f};        ///< Divider ratio for scaled readings
@@ -238,8 +237,8 @@ private:
     [[nodiscard]] hf_adc_err_t ReadRawByIndex(size_t idx, uint32_t& raw_count, uint8_t samples, uint16_t timeBetweenSamples) noexcept;
 
     //==========================================================================
-    // STORAGE — entries are fixed-size in static storage; EspAdc is
-    //           heap-allocated via unique_ptr (singleton lifetime)
+    // STORAGE — entries are fixed-size in static storage; the MCU ADC is
+    //           owned by the platform binding
     //==========================================================================
 
     static constexpr size_t kMaxChannels =
@@ -251,9 +250,8 @@ private:
     size_t registered_count_{0};
     uint64_t init_time_ms_{0};  ///< Timestamp (ms) when Initialize() completed
 
-    // EspAdc instance — only ADC1 used on ESP32
-    // Heap-allocated once via unique_ptr; singleton lives forever.
-    std::unique_ptr<EspAdc> esp_adc_;
+    // MCU ADC unit (ADC1) — owned by the platform binding (bsp_bind), nullptr when down.
+    BaseAdc* internal_adc_{nullptr};
 
     // ADS7952 external ADC handler(s) — conditionally compiled
     // Supports array of devices on same SPI bus with different CS pins.

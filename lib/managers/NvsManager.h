@@ -1,11 +1,13 @@
 /**
  * @file NvsManager.h
- * @brief Non-volatile storage for Flux V1 — ESP-IDF NVS behind `BaseNvs`.
+ * @brief Non-volatile storage for Flux V1 — three namespaces behind `BaseNvs`.
  *
- * @details Exposes three fixed ESP32 `EspNvs` namespaces for application data,
- *          calibration blobs, and device configuration. Upper layers should use
- *          `BaseNvs&` from this manager (not IDF NVS directly) so a future
- *          EEPROM-backed `BaseNvs` can be swapped in without changing callers.
+ * @details Exposes three fixed namespaces for application data, calibration blobs
+ *          and device configuration. The `BaseNvs` objects are created by the platform
+ *          binding (`bsp_bind/FluxPlatformBind.h`; ESP-IDF NVS on the ESP32-S3), so this
+ *          header is MCU-free. Upper layers use `BaseNvs&` from this manager, never the
+ *          platform NVS API, so an EEPROM-backed `BaseNvs` can be swapped in without
+ *          changing callers.
  *
  * @author HardFOC Team
  * @date 2026
@@ -18,14 +20,13 @@
 #include <cstdint>
 
 #include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/base/BaseNvs.h"
-#include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/mcu/esp32/EspNvs.h"
 
 /**
  * @class NvsManager
- * @brief Singleton owning `EspNvs` instances for Flux board persistent storage.
+ * @brief Singleton owning the Flux board's persistent-storage namespaces.
  *
  * Initialization runs **before** communication managers so calibration or
- * board identity can be read early. Namespaces (≤15 chars per ESP-IDF):
+ * board identity can be read early. Namespaces (at most 15 characters):
  *   - `"flux"`      — general application key-value
  *   - `"flux_cal"` — calibration / factory tuning blobs
  *   - `"flux_cfg"` — structured device configuration
@@ -69,9 +70,9 @@ private:
 
     void SetLastError(hf_nvs_err_t e) noexcept { last_error_ = e; }
 
-    EspNvs app_;
-    EspNvs calibration_;
-    EspNvs config_;
+    BaseNvs& app_;          ///< `flux`     (binding slot 0)
+    BaseNvs& calibration_;  ///< `flux_cal` (binding slot 1)
+    BaseNvs& config_;       ///< `flux_cfg` (binding slot 2)
 
     std::atomic<bool> initialized_{false};
     hf_nvs_err_t last_error_{hf_nvs_err_t::NVS_SUCCESS};

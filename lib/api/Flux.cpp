@@ -20,8 +20,7 @@
 #include "core/hf-core-utils/hf-utils-rtos-wrap/include/OsUtility.h"
 #include "core/handlers/logger/LogDecorators.h"
 
-#include "esp_system.h"
-#include "esp_heap_caps.h"
+#include "managers/bsp_bind/FluxPlatformBind.h"
 
 static constexpr const char* TAG = "Flux";
 
@@ -262,21 +261,20 @@ uint64_t Flux::GetInitializationTimeMs() const noexcept {
 //==============================================================================
 
 uint32_t Flux::GetLastResetReason() const noexcept {
-    return static_cast<uint32_t>(esp_reset_reason());
+    return flux::bsp::LastResetReason();
 }
 
 void Flux::SystemRestart() const noexcept {
     Logger::GetInstance().Warn(TAG, "Flux::SystemRestart() — rebooting");
-    esp_restart();
-    while (true) { /* unreachable */ }
+    flux::bsp::SystemRestart();
 }
 
 uint32_t Flux::GetFreeHeapBytes() const noexcept {
-    return static_cast<uint32_t>(heap_caps_get_free_size(MALLOC_CAP_DEFAULT));
+    return flux::bsp::FreeHeapBytes();
 }
 
 uint32_t Flux::GetLargestFreeHeapBlock() const noexcept {
-    return static_cast<uint32_t>(heap_caps_get_largest_free_block(MALLOC_CAP_DEFAULT));
+    return flux::bsp::LargestFreeHeapBlock();
 }
 
 bool Flux::CollectManagerHealth(ManagerHealthSnapshot& snapshot) noexcept {

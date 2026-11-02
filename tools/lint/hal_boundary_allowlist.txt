@@ -1,0 +1,8 @@
+# Files that may still break the HAL boundary rule (tools/lint/lint_hal_boundary.sh).
+#
+# One repository-relative path per line. This list may only shrink: the lint fails
+# when a listed file no longer violates (delete its line) and, in CI, when a line
+# is added relative to the pull request's base branch. Moving family code behind
+# lib/managers/bsp_bind/FluxPlatformBind.h is the fix; adding a line here is not.
+#
+# Empty since the bsp_bind boundary landed: lib/api and lib/managers are MCU-free.

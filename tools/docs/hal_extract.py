@@ -22,6 +22,7 @@ BOARD = {
     "facade_class": "Flux",
     "init_function": "InitializeAllComponents",
     "managers_dir": "lib/managers",
+    "bindings_dir": "lib/managers/bsp_bind",
     "handlers_dir": "lib/core/handlers",
     "pin_header": "lib/core/hf-core-drivers/internal/hf-pincfg/src/hf_functional_pin_config_flux_v1.hpp",
     "comms_header": "lib/managers/CommChannelsManager.h",
@@ -225,7 +226,8 @@ def dependencies() -> dict:
             | {by_file[i] for i in inc if "/" not in i and i in by_file}
         )
         drivers = sorted({m.group(1) for i in inc if (m := re.search(r"external/(hf-[\w-]+?)(?:-driver)?/", i))})
-        iface = sorted({m.group(1) for i in inc if (m := re.search(r"(?:^|/)(?:base|mcu/\w+)/(\w+)\.h$", i))})
+        iface = sorted({m.group(1) for i in inc if (m := re.search(r"(?:^|/)(?:base|mcu/\w+)/(\w+)\.h$", i))}
+                       - {"HardwareTypes"})
         uses = sorted({i[:-2] for i in inc if i.endswith(".h") and i[:-2] in managers and i[:-2] != name})
         out[name] = {
             "handlers": handlers,
@@ -246,6 +248,25 @@ def dependencies() -> dict:
         "handler_drivers": handler_drivers,
         # "path:what" so the docs can link the path; the paths are folders.
         "sources": [f"{BOARD['managers_dir']}:#includes", f"{BOARD['handlers_dir']}:#includes"],
+    }
+
+
+def bindings() -> dict:
+    """The platform-binding families under ``bsp_bind/`` (one directory per MCU family; ``board`` is board data, not
+    a family) and, from each family's #includes, the hf-core interface implementations and chip drivers it creates."""
+    bdir = ROOT / BOARD["bindings_dir"]
+    families = {}
+    for d in sorted(p for p in bdir.iterdir() if p.is_dir() and p.name != "board"):
+        inc = _includes(sorted(d.glob("*.cpp")) + sorted(d.glob("*.h")))
+        families[d.name] = {
+            "classes": sorted({m.group(1) for i in inc if (m := re.search(r"mcu/\w+/(\w+)\.h$", i))}),
+            "drivers": sorted({m.group(1) for i in inc if (m := re.search(r"external/(hf-[\w-]+?)(?:-driver)?/", i))}),
+            "files": [str(f.relative_to(ROOT)) for f in sorted(d.glob("*.*"))],
+        }
+    return {
+        "interface": f"{BOARD['bindings_dir']}/FluxPlatformBind.h",
+        "families": families,
+        "sources": [f"{BOARD['bindings_dir']}:#includes"],
     }
 
 

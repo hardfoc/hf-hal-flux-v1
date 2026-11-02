@@ -9,7 +9,7 @@ configuration and ordinary application data never collide. Source: [`NvsManager.
 | `Calibration()` | `flux_cal` | Factory or bench calibration |
 | `Config()` | `flux_cfg` | User or deployment configuration |
 
-Each accessor returns a `BaseNvs&` (the interface class; the ESP32 implementation is `EspNvs`).
+Each accessor returns a `BaseNvs&` (the interface class; on the ESP32-S3 the platform binding backs it with `EspNvs`).
 
 ## API
 

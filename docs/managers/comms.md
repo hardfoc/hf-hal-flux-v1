@@ -24,7 +24,7 @@ GPIO numbers are on the [pin map](../hardware/pin-map.md). There is no I2C bus o
 | `AcquireUart(const UartAcquireConfig&)` | `BaseUart*` | First call for a port creates and caches it; later calls return the cached port and ignore the new config. `rts_pin >= 0` enables RS-485 half-duplex |
 | `GetUart(port)` | `BaseUart*` | The cached port, or `nullptr` |
 | `AcquireUsbSerialJtag(cfg)`, `GetUsbSerialJtag()` | `BaseUsbSerialJtag*` | The USB serial / JTAG peripheral; returns `nullptr` because `HF_CORE_ENABLE_USB_SERIAL_JTAG` is off in this HAL's `CMakeLists.txt` |
-| `GetI2cBus()` | `EspI2cBus*` | Always `nullptr` on Flux V1 |
+| `GetI2cBus()` | `BaseI2c*` | Always `nullptr` on Flux V1 |
 | `GetLastError()`, `GetSystemDiagnostics(CommSystemDiagnostics&)`, `DumpStatistics()` | | See below |
 
 ## Example: open a UART for a sensor

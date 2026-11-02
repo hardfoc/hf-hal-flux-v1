@@ -1,0 +1,65 @@
+---
+# HAL boundary: ESP-IDF, FreeRTOS and Esp* code only under lib/managers/bsp_bind/<family>/ (ADR 0004), and the
+# MCU-free part of the HAL (facade, managers, board binding) builds on a host against bsp_bind/host.
+name: "\U0001F9F1 HAL Boundary CI"
+
+on:
+  push:
+    branches: [main, "release/*"]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: hal-boundary-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  boundary-lint:
+    name: Boundary lint
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # the shrink-only allowlist check reads the base branch's list
+
+      - name: lint_hal_boundary.sh
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            bash tools/lint/lint_hal_boundary.sh --base "origin/${{ github.base_ref }}"
+          else
+            bash tools/lint/lint_hal_boundary.sh
+          fi
+
+  host-build:
+    name: Host build (${{ matrix.compiler }})
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler: [gcc, clang]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Toolchain
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ninja-build
+          if [ "${{ matrix.compiler }}" = "clang" ]; then
+            echo "CC=clang" >> "$GITHUB_ENV"
+            echo "CXX=clang++" >> "$GITHUB_ENV"
+          else
+            echo "CC=gcc" >> "$GITHUB_ENV"
+            echo "CXX=g++" >> "$GITHUB_ENV"
+          fi
+
+      - name: Configure
+        run: cmake -S tests/host -B build/host -G Ninja -DCMAKE_BUILD_TYPE=Debug
+
+      - name: Build
+        run: cmake --build build/host

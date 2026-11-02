@@ -8,6 +8,7 @@ nav:
       - Pin map: hardware/pin-map.md
   - Concepts:
       - Architecture: architecture/index.md
+      - Platform bindings: architecture/bindings.md
       - Initialisation: architecture/initialization.md
       - Ownership: architecture/ownership.md
       - Threading: architecture/threading.md

@@ -2,7 +2,7 @@
 
 | | |
 | --- | --- |
-| Status | Accepted (records the current design) |
+| Status | Accepted; where the `Esp*` objects are created is superseded by [ADR 0004](0004-platform-bindings.md) |
 | Date | 2026-11-01 |
 
 ## Context

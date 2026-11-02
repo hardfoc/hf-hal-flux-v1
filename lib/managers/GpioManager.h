@@ -2,13 +2,13 @@
  * @file GpioManager.h
  * @brief GPIO management for the HardFOC Flux V1 platform.
  *
- * @details The Flux board uses only ESP32 internal GPIOs (no GPIO expander).
- *          Control pins for MAX22200 and TLE92466ED are managed as standard GPIOs.
- *          This is simpler than the Vortex GpioManager which spans 3 chip types.
+ * @details The Flux board uses only MCU GPIOs (no GPIO expander). Control pins for the
+ *          MAX22200 and TLE92466ED are managed as standard GPIOs.
  *
- *          Design improvement over Vortex: uses a fixed-size array for GPIO
- *          storage (all pins known at compile time) instead of heap-allocated
- *          unordered_map. String lookups go through a constexpr mapping table.
+ *          The registry is a fixed-size array indexed by functional pin (all pins are known at
+ *          compile time). The GPIO objects themselves are created by the platform binding
+ *          (`bsp_bind/FluxPlatformBind.h`) in its static storage, so this header is MCU-free and
+ *          the manager holds only `BaseGpio*`.
  *
  * @author HardFOC Team
  * @date 2026
@@ -21,29 +21,25 @@
 #include <array>
 #include <atomic>
 #include <cstdint>
-#include <memory>
 #include <string_view>
 
 #include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/base/BaseGpio.h"
-#include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/mcu/esp32/EspGpio.h"
 #include "RtosMutex.h"
 #include "core/hf-core-drivers/internal/hf-pincfg/src/hf_functional_pin_config_flux_v1.hpp"
 
 //==============================================================================
-// GPIO ENTRY — owns an EspGpio instance via unique_ptr (heap-allocated)
+// GPIO ENTRY
 //==============================================================================
 
 /**
  * @brief A single GPIO entry in the fixed-size registry.
  *
- * Owns an EspGpio instance via unique_ptr (heap-allocated, unique ownership).
- * No shared_ptr. The GpioEntry structs themselves live in a fixed-size
- * std::array inside the singleton (static storage). EspGpio is polymorphic
- * and non-movable, so unique_ptr is needed for the driver instance.
- * The pin count is known at compile time.
+ * The entry points at a GPIO object held in the platform binding's static storage
+ * (slot = functional pin index). The entries live in a fixed-size std::array inside
+ * the manager; nothing is heap-allocated.
  */
 struct GpioEntry {
-    std::unique_ptr<EspGpio> driver; ///< ESP32 GPIO driver instance (heap-allocated)
+    BaseGpio* driver;                   ///< GPIO object owned by the platform binding
     HfFunctionalGpioPin functional_pin; ///< Functional pin enum value
     bool registered{false};             ///< Whether this entry has been registered
     uint32_t access_count{0};           ///< Number of times accessed
@@ -74,7 +70,7 @@ struct GpioSystemDiagnostics {
 
 /**
  * @class GpioManager
- * @brief Singleton that manages all ESP32 GPIO pins defined in the X-MACRO pin config.
+ * @brief Singleton that manages all MCU GPIO pins defined in the X-MACRO pin config.
  *
  * @details Registers GPIO and USER category pins, provides name-based and
  *          enum-based access to the underlying BaseGpio drivers, and offers

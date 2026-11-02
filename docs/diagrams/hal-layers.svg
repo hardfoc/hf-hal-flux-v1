@@ -1,8 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="858" viewBox="0 0 1200 858" role="img" aria-labelledby="hal-layers-title hal-layers-desc" font-family="Inter, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="976" viewBox="0 0 1200 976" role="img" aria-labelledby="hal-layers-title hal-layers-desc" font-family="Inter, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif">
 <title id="hal-layers-title">Flux V1 HAL, layer by layer</title>
-<desc id="hal-layers-desc">Layer stack of the Flux V1 HAL: application, the Flux facade, 7 managers, 5 hf-core handlers, 6 chip drivers, and the interface wrap on ESP-IDF and the ESP32-S3.</desc>
+<desc id="hal-layers-desc">Layer stack of the Flux V1 HAL: application, the Flux facade, 7 MCU-free managers, 5 hf-core handlers, 6 chip drivers, the interface classes, and the platform binding that creates their ESP32 implementations on ESP-IDF and the ESP32-S3.</desc>
 <defs><marker id="fk-arrow-rail" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#8893A2"/></marker></defs>
-<rect x="0.5" y="0.5" width="1199" height="857" rx="16" fill="#FFFFFF" stroke="#E2E7EE"/>
+<rect x="0.5" y="0.5" width="1199" height="975" rx="16" fill="#FFFFFF" stroke="#E2E7EE"/>
 <text x="32" y="46.8" font-size="16" font-weight="700" letter-spacing="1.2" fill="#3730A3">ARCHITECTURE</text>
 <text x="32" y="85.6" font-size="32" font-weight="700" fill="#17202C">Flux V1 HAL, layer by layer</text>
 <text x="32" y="115.4" font-size="18" fill="#566070">Each layer calls only the one below it. Every name is read from the code.</text>
@@ -13,17 +13,20 @@
 <rect x="32" y="495.4" width="1136" height="96" rx="16" fill="#E6F6F4" stroke="#A6DCD5" stroke-width="1.2"/>
 <rect x="32" y="613.4" width="1136" height="96" rx="16" fill="#F3EEFF" stroke="#D5C5FA" stroke-width="1.2"/>
 <rect x="32" y="731.4" width="1136" height="96" rx="16" fill="#FFF5E3" stroke="#F1CF93" stroke-width="1.2"/>
+<rect x="32" y="849.4" width="1136" height="96" rx="16" fill="#F1F4F8" stroke="#CBD5E1" stroke-width="1.2"/>
 <path d="M1108 243.4 L1108 261.4" fill="none" stroke="#8893A2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#fk-arrow-rail)"/>
 <path d="M1108 357.4 L1108 375.4" fill="none" stroke="#8893A2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#fk-arrow-rail)"/>
 <path d="M1108 475.4 L1108 493.4" fill="none" stroke="#8893A2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#fk-arrow-rail)"/>
 <path d="M1108 593.4 L1108 611.4" fill="none" stroke="#8893A2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#fk-arrow-rail)"/>
 <path d="M1108 711.4 L1108 729.4" fill="none" stroke="#8893A2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#fk-arrow-rail)"/>
+<path d="M1108 829.4 L1108 847.4" fill="none" stroke="#8893A2" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#fk-arrow-rail)"/>
 <rect x="32" y="159.4" width="6" height="72" rx="3" fill="#64748B"/>
 <rect x="32" y="273.4" width="6" height="72" rx="3" fill="#4F46E5"/>
 <rect x="32" y="387.4" width="6" height="76" rx="3" fill="#2563EB"/>
 <rect x="32" y="505.4" width="6" height="76" rx="3" fill="#0F8B80"/>
 <rect x="32" y="623.4" width="6" height="76" rx="3" fill="#7C3AED"/>
 <rect x="32" y="741.4" width="6" height="76" rx="3" fill="#C26A05"/>
+<rect x="32" y="859.4" width="6" height="76" rx="3" fill="#64748B"/>
 <text x="58" y="191.4" font-size="20" font-weight="700" fill="#334155">Your application</text>
 <text x="58" y="217.4" font-size="16" font-family="'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace" fill="#334155">app_main()</text>
 <rect x="332" y="182.4" width="103" height="26" rx="13" fill="#F1F4F8" stroke="#CBD5E1" stroke-width="1"/>
@@ -78,8 +81,8 @@
 <text x="340" y="683.5" font-size="16" font-weight="700" fill="#5B21B6">hf-tle92466ed-driver</text>
 <rect x="535.4" y="665.4" width="198.7" height="26" rx="13" fill="#F3EEFF" stroke="#D5C5FA" stroke-width="1"/>
 <text x="543.4" y="683.5" font-size="16" font-weight="700" fill="#5B21B6">hf-ws2812-rmt-driver</text>
-<text x="58" y="775.4" font-size="20" font-weight="700" fill="#8A3C0B">Interface wrap</text>
-<text x="58" y="801.4" font-size="16" font-family="'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace" fill="#8A3C0B">ESP-IDF on ESP32-S3</text>
+<text x="58" y="775.4" font-size="20" font-weight="700" fill="#8A3C0B">Interface classes</text>
+<text x="58" y="801.4" font-size="16" font-family="'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace" fill="#8A3C0B">hf-internal-interface-wrap</text>
 <rect x="332" y="749.4" width="90" height="26" rx="13" fill="#FFF5E3" stroke="#F1CF93" stroke-width="1"/>
 <text x="340" y="767.5" font-size="16" font-weight="700" fill="#8A3C0B">BaseAdc</text>
 <rect x="430" y="749.4" width="89.6" height="26" rx="13" fill="#FFF5E3" stroke="#F1CF93" stroke-width="1"/>
@@ -96,4 +99,22 @@
 <text x="999.9" y="767.5" font-size="16" font-weight="700" fill="#8A3C0B">BaseUart</text>
 <rect x="332" y="783.4" width="173.1" height="26" rx="13" fill="#FFF5E3" stroke="#F1CF93" stroke-width="1"/>
 <text x="340" y="801.5" font-size="16" font-weight="700" fill="#8A3C0B">BaseUsbSerialJtag</text>
+<text x="58" y="893.4" font-size="20" font-weight="700" fill="#334155">Platform binding</text>
+<text x="58" y="919.4" font-size="16" font-family="'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace" fill="#334155">bsp_bind/esp32s3 on ESP-IDF</text>
+<rect x="332" y="867.4" width="79.8" height="26" rx="13" fill="#F1F4F8" stroke="#CBD5E1" stroke-width="1"/>
+<text x="340" y="885.5" font-size="16" font-weight="700" fill="#334155">EspAdc</text>
+<rect x="419.8" y="867.4" width="79.4" height="26" rx="13" fill="#F1F4F8" stroke="#CBD5E1" stroke-width="1"/>
+<text x="427.8" y="885.5" font-size="16" font-weight="700" fill="#334155">EspCan</text>
+<rect x="507.3" y="867.4" width="84.9" height="26" rx="13" fill="#F1F4F8" stroke="#CBD5E1" stroke-width="1"/>
+<text x="515.3" y="885.5" font-size="16" font-weight="700" fill="#334155">EspGpio</text>
+<rect x="600.2" y="867.4" width="79.1" height="26" rx="13" fill="#F1F4F8" stroke="#CBD5E1" stroke-width="1"/>
+<text x="608.2" y="885.5" font-size="16" font-weight="700" fill="#334155">EspNvs</text>
+<rect x="687.3" y="867.4" width="72.9" height="26" rx="13" fill="#F1F4F8" stroke="#CBD5E1" stroke-width="1"/>
+<text x="695.3" y="885.5" font-size="16" font-weight="700" fill="#334155">EspSpi</text>
+<rect x="768.2" y="867.4" width="154.7" height="26" rx="13" fill="#F1F4F8" stroke="#CBD5E1" stroke-width="1"/>
+<text x="776.2" y="885.5" font-size="16" font-weight="700" fill="#334155">EspTemperature</text>
+<rect x="930.9" y="867.4" width="81.9" height="26" rx="13" fill="#F1F4F8" stroke="#CBD5E1" stroke-width="1"/>
+<text x="938.9" y="885.5" font-size="16" font-weight="700" fill="#334155">EspUart</text>
+<rect x="332" y="901.4" width="162.9" height="26" rx="13" fill="#F1F4F8" stroke="#CBD5E1" stroke-width="1"/>
+<text x="340" y="919.5" font-size="16" font-weight="700" fill="#334155">EspUsbSerialJtag</text>
 </svg>

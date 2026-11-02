@@ -14,15 +14,16 @@
   },
   "hal-layers": {
     "title": "Flux V1 HAL, layer by layer",
-    "alt": "Layer stack of the Flux V1 HAL: application, the Flux facade, 7 managers, 5 hf-core handlers, 6 chip drivers, and the interface wrap on ESP-IDF and the ESP32-S3.",
-    "description": "From top to bottom, each layer only calls the one under it. Your application asks the facade singleton for the managers. The managers (one per board function) own the hf-core handlers, which wrap one chip driver each; a manager may also use a driver directly. Drivers talk to hardware only through the interface classes of the internal interface wrap, whose ESP32 implementations sit on ESP-IDF. Every name in a band is read from the code: the managers from the facade's member references, the handlers, drivers and interface classes from the managers' and handlers' #include lines.",
+    "alt": "Layer stack of the Flux V1 HAL: application, the Flux facade, 7 MCU-free managers, 5 hf-core handlers, 6 chip drivers, the interface classes, and the platform binding that creates their ESP32 implementations on ESP-IDF and the ESP32-S3.",
+    "description": "From top to bottom, each layer only calls the one under it. Your application asks the facade singleton for the managers. The managers (one per board function) own the hf-core handlers, which wrap one chip driver each. The managers are MCU-free: the platform binding of the MCU family (bsp_bind/esp32s3 on this board) creates the objects behind the interface classes, the ESP32 implementations that sit on ESP-IDF, and is the only HAL code that includes ESP-IDF. Drivers talk to hardware only through the interface classes. Every name in a band is read from the code: the managers from the facade's member references, the handlers, drivers and interface classes from the managers', handlers' and binding's #include lines.",
     "profile": "overview",
     "width": 1200,
     "source": "docs/diagrams/figures/hal-layers.py",
     "sources": [
       "lib/api/Flux.h:Flux (manager references)",
       "lib/managers:#includes",
-      "lib/core/handlers:#includes"
+      "lib/core/handlers:#includes",
+      "lib/managers/bsp_bind:#includes"
     ]
   },
   "init-order": {
@@ -38,8 +39,8 @@
   },
   "manager-dependencies": {
     "title": "Managers, handlers and drivers",
-    "alt": "Graph from each manager to the hf-core handlers it uses and from each handler to the chip driver it wraps: ValveManager to the MAX22200 and TLE92466ED handlers, AdcManager to the ADS7952 handler, TemperatureManager to the NTC and MCP9700 handlers, and LedManager directly to the WS2812 driver.",
-    "description": "Managers on the left, hf-core handlers in the middle, chip drivers on the right. An arrow means \"includes and uses\": a manager owns the handler it points at, and each handler wraps exactly one driver. ValveManager owns both valve drivers (MAX22200 for the solenoid channels, TLE92466ED for the proportional channels), AdcManager owns the ADS7952 external ADC, and TemperatureManager owns the NTC and MCP9700 sensor handlers. LedManager uses its driver directly, without a handler. Managers with no arrow (communication buses, GPIO, NVS) talk to the interface wrap only.",
+    "alt": "Graph from each manager to the hf-core handlers it uses and from each handler to the chip driver it wraps: ValveManager to the MAX22200 and TLE92466ED handlers, AdcManager to the ADS7952 handler, TemperatureManager to the NTC and MCP9700 handlers. CommChannelsManager, GpioManager, LedManager and NvsManager use no handler.",
+    "description": "Managers on the left, hf-core handlers in the middle, chip drivers on the right. An arrow means \"includes and uses\": a manager owns the handler it points at, and each handler wraps exactly one driver. ValveManager owns both valve drivers (MAX22200 for the solenoid channels, TLE92466ED for the proportional channels), AdcManager owns the ADS7952 external ADC, and TemperatureManager owns the NTC and MCP9700 sensor handlers. Managers with no arrow (communication buses, GPIO, NVS, the status LED) get their objects from the platform binding and talk to them through the interface classes only.",
     "profile": "detail",
     "width": 1200,
     "source": "docs/diagrams/figures/manager-dependencies.py",

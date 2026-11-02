@@ -3,9 +3,9 @@
 Reads: Managers on the left, hf-core handlers in the middle, chip drivers on the right. An arrow means "includes and
 uses": a manager owns the handler it points at, and each handler wraps exactly one driver. ValveManager owns both
 valve drivers (MAX22200 for the solenoid channels, TLE92466ED for the proportional channels), AdcManager owns the
-ADS7952 external ADC, and TemperatureManager owns the NTC and MCP9700 sensor handlers. LedManager uses its driver
-directly, without a handler. Managers with no arrow (communication buses, GPIO, NVS) talk to the interface wrap
-only.
+ADS7952 external ADC, and TemperatureManager owns the NTC and MCP9700 sensor handlers. Managers with no arrow
+(communication buses, GPIO, NVS, the status LED) get their objects from the platform binding and talk to them
+through the interface classes only.
 """
 
 import hal_extract as hx
@@ -31,7 +31,7 @@ def build(data):
         "Managers, handlers and drivers",
         alt="Graph from each manager to the hf-core handlers it uses and from each handler to the chip driver it wraps: "
         "ValveManager to the MAX22200 and TLE92466ED handlers, AdcManager to the ADS7952 handler, TemperatureManager to "
-        "the NTC and MCP9700 handlers, and LedManager directly to the WS2812 driver.",
+        "the NTC and MCP9700 handlers. CommChannelsManager, GpioManager, LedManager and NvsManager use no handler.",
         width=1200,
         kicker="Architecture",
         subtitle="An arrow means the left side includes and uses the right side. Read from the #include lines of "
