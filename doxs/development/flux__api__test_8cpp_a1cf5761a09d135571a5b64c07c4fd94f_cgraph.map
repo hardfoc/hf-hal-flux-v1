@@ -1,5 +1,0 @@
-<map id="test_singleton_access" name="test_singleton_access">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,170,33"/>
-<area shape="rect" id="Node000002" href="$classFlux.html#a4bbee39ff1da8e9359edb151e4ee3cda" title="Access the singleton instance (Meyers singleton, thread&#45;safe)." alt="" coords="218,5,353,33"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="170,17,205,19,199,19,170,22"/>
-</map>

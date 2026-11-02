@@ -1,9 +1,0 @@
-<map id="NvsManager.h" name="NvsManager.h">
-<area shape="rect" id="Node000001" title="Non&#45;volatile storage for Flux V1 — ESP&#45;IDF NVS behind BaseNvs." alt="" coords="113,5,227,33"/>
-<area shape="rect" id="Node000002" href="$Flux_8cpp.html" title="Implementation of the unified Flux API singleton." alt="" coords="5,81,82,109"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="136,43,67,83,65,78,133,39"/>
-<area shape="rect" id="Node000003" href="$NvsManager_8cpp.html" title="Flux NVS manager — three EspNvs namespaces on ESP32." alt="" coords="106,81,235,109"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="172,47,172,82,168,79,168,51"/>
-<area shape="rect" id="Node000004" href="$flux__nvs__example_8cpp.html" title="Flux HAL — NVS (NvsManager / BaseNvs) smoke test on ESP32&#45;S3." alt="" coords="259,81,425,109"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="216,37,314,80,309,81,214,42"/>
-</map>

@@ -1,5 +1,0 @@
-<map id="manifold_valves::ProportionalValve::PositionToCurrentMa" name="manifold_valves::ProportionalValve::PositionToCurrentMa">
-<area shape="rect" id="Node000001" title="Convert a normalised position [0..1] into a current setpoint in milliamps using the configured full_f..." alt="" coords="270,5,486,50"/>
-<area shape="rect" id="Node000002" href="$classmanifold__valves_1_1ProportionalValve.html#a58f901541484fe897dcf0455325c53e2" title="Apply the current setpoint to the underlying driver IC." alt="" coords="5,5,222,50"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="252,28,222,30,222,25,257,28"/>
-</map>

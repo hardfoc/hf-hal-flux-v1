@@ -1,5 +1,0 @@
-<map id="manifold_valves::ProportionalValve::ApplyChannelFeatures" name="manifold_valves::ProportionalValve::ApplyChannelFeatures">
-<area shape="rect" id="Node000001" title="Push the model&#39;s per&#45;channel configuration features (open&#45;load detection, slew rate,..." alt="" coords="270,5,486,50"/>
-<area shape="rect" id="Node000002" href="$classmanifold__valves_1_1ProportionalValve.html#a58f901541484fe897dcf0455325c53e2" title="Apply the current setpoint to the underlying driver IC." alt="" coords="5,5,222,50"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="252,28,222,30,222,25,257,28"/>
-</map>

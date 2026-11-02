@@ -1,7 +1,0 @@
-<map id="manifold_valves::Valve::SetActualPosition" name="manifold_valves::Valve::SetActualPosition">
-<area shape="rect" id="Node000001" title=" " alt="" coords="270,40,443,85"/>
-<area shape="rect" id="Node000002" href="$classmanifold__valves_1_1ProportionalValve.html#a58f901541484fe897dcf0455325c53e2" title="Apply the current setpoint to the underlying driver IC." alt="" coords="5,5,222,50"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="252,48,222,46,222,41,257,47"/>
-<area shape="rect" id="Node000003" href="$classmanifold__valves_1_1SolenoidValve.html#ad7486ef4737a16cb1a91d3d7f34f18d3" title="Apply the current setpoint to the underlying driver IC." alt="" coords="17,75,210,119"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="252,77,211,86,210,81,257,76"/>
-</map>

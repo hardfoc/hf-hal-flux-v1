@@ -1,5 +1,0 @@
-<map id="ValveManager::SetProportionalCurrent" name="ValveManager::SetProportionalCurrent">
-<area shape="rect" id="Node000001" title="Set current setpoint for a proportional valve channel." alt="" coords="270,5,492,50"/>
-<area shape="rect" id="Node000002" href="$classmanifold__valves_1_1ProportionalValve.html#a58f901541484fe897dcf0455325c53e2" title="Apply the current setpoint to the underlying driver IC." alt="" coords="5,5,222,50"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="251,28,222,30,222,25,257,28"/>
-</map>

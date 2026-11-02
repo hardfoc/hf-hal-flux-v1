@@ -1,7 +1,0 @@
-<map id="ValveManager::ConfigureProportionalPwm" name="ValveManager::ConfigureProportionalPwm">
-<area shape="rect" id="Node000001" title="Configure PWM frequency for a proportional channel." alt="" coords="534,14,829,42"/>
-<area shape="rect" id="Node000002" href="$classmanifold__valves_1_1ProportionalValve.html#a3b0229a067cd171feb6dbd658721e068" title="Push the model&#39;s per&#45;channel configuration features (open&#45;load detection, slew rate,..." alt="" coords="270,5,486,50"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="516,28,486,30,486,25,521,28"/>
-<area shape="rect" id="Node000003" href="$classmanifold__valves_1_1ProportionalValve.html#a58f901541484fe897dcf0455325c53e2" title="Apply the current setpoint to the underlying driver IC." alt="" coords="5,5,222,50"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="252,28,222,30,222,25,257,28"/>
-</map>

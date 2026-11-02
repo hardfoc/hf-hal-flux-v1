@@ -1,7 +1,0 @@
-<map id="ValveManager::GetMax22200Handler" name="ValveManager::GetMax22200Handler">
-<area shape="rect" id="Node000001" title="Get the MAX22200 handler for advanced solenoid operations." alt="" coords="506,5,719,50"/>
-<area shape="rect" id="Node000002" href="$classmanifold__valves_1_1SolenoidValve.html#a68e0147a1737922cec49a184dc1e3f62" title="Push the model&#39;s per&#45;channel configuration features (open&#45;load detection, slew rate,..." alt="" coords="247,5,458,50"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="488,28,458,30,458,25,493,28"/>
-<area shape="rect" id="Node000003" href="$classmanifold__valves_1_1SolenoidValve.html#ad7486ef4737a16cb1a91d3d7f34f18d3" title="Apply the current setpoint to the underlying driver IC." alt="" coords="5,5,199,50"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="228,28,199,30,199,25,234,27"/>
-</map>

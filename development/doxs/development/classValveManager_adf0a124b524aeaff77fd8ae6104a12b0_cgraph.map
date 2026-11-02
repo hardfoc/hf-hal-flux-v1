@@ -1,9 +1,0 @@
-<map id="ValveManager::DisableAllChannels" name="ValveManager::DisableAllChannels">
-<area shape="rect" id="Node000001" title="Disable all channels on both drivers." alt="" coords="5,49,194,94"/>
-<area shape="rect" id="Node000002" href="$ValveManager_8h.html#ae6cff86821790a19053b6f8423493fe7" title="Check if a valve error code indicates success." alt="" coords="293,5,402,33"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="194,49,280,33,275,35,195,54"/>
-<area shape="rect" id="Node000003" href="$ValveManager_8h.html#a1029903401a6b8ed1b70aaff9b2c6acc" title="Map MAX22200 DriverStatus to the unified hf_valve_err_t domain." alt="" coords="242,57,453,85"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="194,69,229,71,224,72,195,74"/>
-<area shape="rect" id="Node000004" href="$ValveManager_8h.html#a07104dd82857d7cb8af8bf459645484c" title="Map TLE92466ED DriverError to the unified hf_valve_err_t domain." alt="" coords="251,109,444,137"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="194,88,265,105,260,106,194,94"/>
-</map>

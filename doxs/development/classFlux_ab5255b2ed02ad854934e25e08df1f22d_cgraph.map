@@ -1,7 +1,0 @@
-<map id="Flux::UpdateSystemDiagnostics" name="Flux::UpdateSystemDiagnostics">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,32,235,60"/>
-<area shape="rect" id="Node000002" href="$classFlux.html#a4c1e7219caebec1dc2b954bd9512b48e" title="Time in ms that the initialisation sequence took to complete." alt="" coords="283,5,496,33"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="235,32,270,31,265,32,236,37"/>
-<area shape="rect" id="Node000003" href="$classFlux.html#a87a293c76de1c9c16232878b7fc0515d" title="Milliseconds elapsed since EnsureInitialized() completed." alt="" coords="291,57,488,85"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="235,54,279,60,273,61,235,59"/>
-</map>

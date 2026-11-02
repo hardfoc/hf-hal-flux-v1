@@ -1,5 +1,0 @@
-<map id="CommChannelsManager::EnsureInitialized" name="CommChannelsManager::EnsureInitialized">
-<area shape="rect" id="Node000001" title="Initialise all communication buses if not already initialised." alt="" coords="5,5,187,50"/>
-<area shape="rect" id="Node000002" href="$classCommChannelsManager.html#a868bd4abe1ce3b5497983c2d8ec70914" title=" " alt="" coords="235,5,416,50"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="187,25,222,27,217,28,187,30"/>
-</map>

@@ -1,7 +1,0 @@
-<map id="manifold_valves::ManifoldValvesControlThread::Step" name="manifold_valves::ManifoldValvesControlThread::Step">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,40,200,85"/>
-<area shape="rect" id="Node000002" href="$classmanifold__valves_1_1Valve.html#a20aed25a458ecd4e5db9e4a019172549" title="Atomically test&#45;and&#45;clear the dirty bit." alt="" coords="258,5,432,50"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="200,46,245,42,240,43,201,51"/>
-<area shape="rect" id="Node000003" href="$classmanifold__valves_1_1ManifoldValves.html#a0f2d9f5ceb7f8424695f4ccbc51f32fd" title=" " alt="" coords="248,75,442,119"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="200,74,235,81,230,81,200,79"/>
-</map>

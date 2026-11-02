@@ -1,1 +1,0 @@
-Sitemap: https://hardfoc.github.io/hf-hal-flux-v1/development/sitemap.xml

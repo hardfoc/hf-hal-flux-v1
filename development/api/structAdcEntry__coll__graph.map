@@ -1,7 +1,0 @@
-<map id="AdcEntry" name="AdcEntry">
-<area shape="rect" id="Node000001" title="A single ADC channel entry in the fixed&#45;size registry." alt="" coords="48,192,128,220"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="26,99,150,127"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="90,141,91,192,85,191,86,144"/>
-<area shape="rect" id="Node000003" title=" " alt="" coords="5,5,171,50"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="89,63,91,99,85,98,87,68"/>
-</map>

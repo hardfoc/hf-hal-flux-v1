@@ -1,7 +1,0 @@
-<map id="manifold_valves::Valve::GetActualPosition" name="manifold_valves::Valve::GetActualPosition">
-<area shape="rect" id="Node000001" title="Snapshot of the actual position the control thread last managed to set." alt="" coords="227,28,400,72"/>
-<area shape="rect" id="Node000002" href="$manifold__valves__pressure__control_8cpp.html#a630544a7f0a2cc40d8a7fefab7e2fe70" title=" " alt="" coords="49,5,135,33"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="209,37,135,28,135,22,214,35"/>
-<area shape="rect" id="Node000003" href="$classmanifold__valves_1_1Valve.html#a774c7b965d469cdda712d1bfc09c8664" title=" " alt="" coords="5,57,179,102"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="209,64,180,70,179,65,214,63"/>
-</map>

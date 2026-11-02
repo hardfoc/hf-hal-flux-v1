@@ -1,5 +1,0 @@
-<map id="LedManager::RawToPercent" name="LedManager::RawToPercent">
-<area shape="rect" id="Node000001" title=" " alt="" coords="303,14,503,42"/>
-<area shape="rect" id="Node000002" href="$classLedManager.html#a4e18258d50d9f46776255c5d95bf36c1" title="Read current brightness as a percentage of max." alt="" coords="5,5,255,50"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="284,28,255,30,255,25,289,28"/>
-</map>

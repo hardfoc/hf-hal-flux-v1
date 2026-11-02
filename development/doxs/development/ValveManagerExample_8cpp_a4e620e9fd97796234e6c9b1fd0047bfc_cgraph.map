@@ -1,9 +1,0 @@
-<map id="example_bitmask_operations" name="example_bitmask_operations">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,32,220,60"/>
-<area shape="rect" id="Node000002" href="$ValveManagerExample_8cpp.html#a1adc375ca8066a47d1642ce384f5a5dd" title="Helper: log a valve error result." alt="" coords="268,32,396,60"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="220,43,255,46,249,46,220,48"/>
-<area shape="rect" id="Node000003" href="$ValveManager_8h.html#ae6cff86821790a19053b6f8423493fe7" title="Check if a valve error code indicates success." alt="" coords="461,5,569,33"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="396,34,443,30,448,29,397,39"/>
-<area shape="rect" id="Node000004" href="$ValveManager_8h.html#a255db5fbbcc6babf9a239474d3363b4c" title="Convert hf_valve_err_t to a human&#45;readable description string." alt="" coords="444,57,586,85"/>
-<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="396,52,431,59,426,59,396,57"/>
-</map>

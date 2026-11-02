@@ -1,9 +1,0 @@
-<map id="example_proportional_pwm_dither" name="example_proportional_pwm_dither">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,24,170,68"/>
-<area shape="rect" id="Node000002" href="$ValveManagerExample_8cpp.html#a1adc375ca8066a47d1642ce384f5a5dd" title="Helper: log a valve error result." alt="" coords="218,32,346,60"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="170,43,205,45,199,46,170,48"/>
-<area shape="rect" id="Node000003" href="$ValveManager_8h.html#ae6cff86821790a19053b6f8423493fe7" title="Check if a valve error code indicates success." alt="" coords="411,5,519,33"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="346,34,393,30,398,29,347,39"/>
-<area shape="rect" id="Node000004" href="$ValveManager_8h.html#a255db5fbbcc6babf9a239474d3363b4c" title="Convert hf_valve_err_t to a human&#45;readable description string." alt="" coords="394,57,536,85"/>
-<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="346,52,381,59,376,59,346,57"/>
-</map>

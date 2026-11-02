@@ -1,5 +1,0 @@
-<map id="manifold_valves::SolenoidValve::ApplyChannelFeatures" name="manifold_valves::SolenoidValve::ApplyChannelFeatures">
-<area shape="rect" id="Node000001" title="Push the model&#39;s per&#45;channel configuration features (open&#45;load detection, slew rate,..." alt="" coords="247,5,458,50"/>
-<area shape="rect" id="Node000002" href="$classmanifold__valves_1_1SolenoidValve.html#ad7486ef4737a16cb1a91d3d7f34f18d3" title="Apply the current setpoint to the underlying driver IC." alt="" coords="5,5,199,50"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="228,28,199,30,199,25,234,27"/>
-</map>

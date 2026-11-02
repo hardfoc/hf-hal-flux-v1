@@ -1,7 +1,0 @@
-<map id="manifold_valves::ManifoldValves::ForEachValve" name="manifold_valves::ManifoldValves::ForEachValve">
-<area shape="rect" id="Node000001" title=" " alt="" coords="276,40,470,85"/>
-<area shape="rect" id="Node000002" href="$classmanifold__valves_1_1ManifoldValvesControlThread.html#ac63fb7dfb51f814375e19418a091969c" title=" " alt="" coords="19,5,214,50"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="257,48,214,43,214,38,263,47"/>
-<area shape="rect" id="Node000003" href="$classmanifold__valves_1_1ManifoldValvesDiagnosticsThread.html#a54d9c54c6185d5ad06d6cd5a487b250b" title=" " alt="" coords="5,75,228,119"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="258,78,228,85,228,79,263,77"/>
-</map>

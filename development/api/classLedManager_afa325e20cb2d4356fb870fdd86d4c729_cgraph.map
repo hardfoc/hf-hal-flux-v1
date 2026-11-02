@@ -1,9 +1,0 @@
-<map id="LedManager::EnsureInitialized" name="LedManager::EnsureInitialized">
-<area shape="rect" id="Node000001" title="Initialise the WS2812 LED strip (idempotent)." alt="" coords="5,32,223,60"/>
-<area shape="rect" id="Node000002" href="$classLedManager.html#aeb27eef4ebf25b19bd864c9822a6c892" title=" " alt="" coords="271,32,436,60"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="223,43,258,46,252,46,223,48"/>
-<area shape="rect" id="Node000003" href="$classLedManager.html#ac6bff1fceb7eab43ee606dd3807d3d47" title=" " alt="" coords="506,5,711,33"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="436,35,493,31,487,32,437,40"/>
-<area shape="rect" id="Node000004" href="$classLedManager.html#aec49368647c9b09857ea1b775d655e5e" title=" " alt="" coords="484,57,732,85"/>
-<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="437,51,471,57,466,57,436,57"/>
-</map>

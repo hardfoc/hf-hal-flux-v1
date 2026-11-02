@@ -1,5 +1,0 @@
-<map id="manifold_valves::Valve::RequestState" name="manifold_valves::Valve::RequestState">
-<area shape="rect" id="Node000001" title="Convenience for binary solenoid use; equivalent to RequestPosition(on?1:0)." alt="" coords="5,5,179,50"/>
-<area shape="rect" id="Node000002" href="$classmanifold__valves_1_1Valve.html#a7fe05d7dd0fa6bd49f61e2baafe601ab" title="Request a normalised position 0..1. @Browser For binary solenoids this is interpreted as 0 → off,..." alt="" coords="227,5,400,50"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="179,25,214,27,208,28,179,30"/>
-</map>

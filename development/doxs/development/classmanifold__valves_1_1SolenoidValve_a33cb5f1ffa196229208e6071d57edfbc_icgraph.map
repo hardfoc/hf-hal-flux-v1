@@ -1,5 +1,0 @@
-<map id="manifold_valves::SolenoidValve::OnDiagnostics" name="manifold_valves::SolenoidValve::OnDiagnostics">
-<area shape="rect" id="Node000001" title="Refresh per&#45;valve diagnostics from the driver IC." alt="" coords="276,5,469,50"/>
-<area shape="rect" id="Node000002" href="$classmanifold__valves_1_1ManifoldValvesDiagnosticsThread.html#a54d9c54c6185d5ad06d6cd5a487b250b" title=" " alt="" coords="5,5,228,50"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="257,28,228,30,228,25,263,28"/>
-</map>

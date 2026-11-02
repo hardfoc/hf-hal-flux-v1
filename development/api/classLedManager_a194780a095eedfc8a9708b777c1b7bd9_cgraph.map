@@ -1,7 +1,0 @@
-<map id="LedManager::SetColor" name="LedManager::SetColor">
-<area shape="rect" id="Node000001" title="Set LED colour from a packed 0xRRGGBB integer." alt="" coords="5,5,170,33"/>
-<area shape="rect" id="Node000002" href="$structLedColor.html#a6e26ad9fc73de952329f98eb17349abd" title="Unpack from a 24&#45;bit 0xRRGGBB integer." alt="" coords="218,5,362,33"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="170,17,205,19,200,19,170,22"/>
-<area shape="rect" id="Node000003" href="$structLedColor.html#affb23f6393ce5f38d2c922522ff6c317" title="Default&#45;construct black (0, 0, 0)." alt="" coords="410,5,553,33"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="362,17,397,19,392,19,362,22"/>
-</map>

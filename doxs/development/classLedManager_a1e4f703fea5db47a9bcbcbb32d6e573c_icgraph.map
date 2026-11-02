@@ -1,5 +1,0 @@
-<map id="LedManager::UpdateAnimationStep" name="LedManager::UpdateAnimationStep">
-<area shape="rect" id="Node000001" title=" " alt="" coords="277,5,529,33"/>
-<area shape="rect" id="Node000002" href="$classLedManager.html#a0357a6834f7f65e77a37536f357932d5" title="Advance the animation by one tick. Call periodically (~50 ms)." alt="" coords="5,5,229,33"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="258,19,229,22,229,17,264,19"/>
-</map>

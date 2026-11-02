@@ -1,5 +1,0 @@
-<map id="NvsManager::EnsureInitialized" name="NvsManager::EnsureInitialized">
-<area shape="rect" id="Node000001" title="Initialize NVS flash (once) and open all Flux namespaces." alt="" coords="5,5,225,33"/>
-<area shape="rect" id="Node000002" href="$classNvsManager.html#a4faeb9380248f065480cbd92a65b4163" title=" " alt="" coords="273,5,463,33"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="225,17,260,19,254,19,225,22"/>
-</map>

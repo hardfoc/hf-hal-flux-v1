@@ -1,5 +1,0 @@
-<map id="CommChannelsManager::DumpStatistics" name="CommChannelsManager::DumpStatistics">
-<area shape="rect" id="Node000001" title="Log communication channel statistics and bus health to the console." alt="" coords="259,5,440,50"/>
-<area shape="rect" id="Node000002" href="$classFlux.html#ac85a6ad26883360e0c3ea2c702b6fc11" title="Log a comprehensive system summary to the console." alt="" coords="5,14,211,42"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="240,28,211,30,211,25,245,27"/>
-</map>

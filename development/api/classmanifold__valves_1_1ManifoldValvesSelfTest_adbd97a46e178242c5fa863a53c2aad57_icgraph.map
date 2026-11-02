@@ -1,9 +1,0 @@
-<map id="manifold_valves::ManifoldValvesSelfTest::PrintParallelStress" name="manifold_valves::ManifoldValvesSelfTest::PrintParallelStress">
-<area shape="rect" id="Node000001" title=" " alt="" coords="645,5,887,50"/>
-<area shape="rect" id="Node000002" href="$classmanifold__valves_1_1ManifoldValvesSelfTest.html#a1805079dde417ef7bf199d71da2f5a8f" title=" " alt="" coords="381,5,597,50"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="627,28,598,30,598,25,632,28"/>
-<area shape="rect" id="Node000003" href="$classmanifold__valves_1_1ManifoldValvesSelfTest.html#addef632a632864e37101d4bc54db12b2" title="Run the configured self&#45;test plan synchronously on the caller." alt="" coords="139,5,333,50"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="363,28,334,30,334,25,368,28"/>
-<area shape="rect" id="Node000004" href="$manifold__valves__pressure__control_8cpp.html#a630544a7f0a2cc40d8a7fefab7e2fe70" title=" " alt="" coords="5,14,91,42"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="121,28,91,30,91,25,126,27"/>
-</map>

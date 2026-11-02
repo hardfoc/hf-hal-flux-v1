@@ -1,7 +1,0 @@
-<map id="example_brightness" name="example_brightness">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,32,159,60"/>
-<area shape="rect" id="Node000002" href="$LedManager_8h.html#afea8c79ff81c3999d2327928dc5e4fbb" title="Convert a LedError to a human&#45;readable C&#45;string." alt="" coords="211,5,338,33"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="159,33,198,29,193,31,160,38"/>
-<area shape="rect" id="Node000003" href="$namespaceLedColors.html#a1ebd70671e92d91da0aa1f1a6add4af5" title="Full white." alt="" coords="207,57,343,85"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="159,53,194,60,189,60,159,59"/>
-</map>

@@ -1,5 +1,0 @@
-<map id="log_led_result" name="log_led_result">
-<area shape="rect" id="Node000001" title="Helper: log an LED error result." alt="" coords="5,5,118,33"/>
-<area shape="rect" id="Node000002" href="$LedManager_8h.html#afea8c79ff81c3999d2327928dc5e4fbb" title="Convert a LedError to a human&#45;readable C&#45;string." alt="" coords="166,5,293,33"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="118,17,153,19,148,19,118,22"/>
-</map>

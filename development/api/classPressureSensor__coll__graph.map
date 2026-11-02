@@ -1,9 +1,0 @@
-<map id="PressureSensor" name="PressureSensor">
-<area shape="rect" id="Node000001" title="Reads raw ADC voltage and converts to engineering pressure units." alt="" coords="198,132,319,160"/>
-<area shape="rect" id="Node000002" href="$structPressureSensorConfig.html" title="Pressure sensor transfer function configuration." alt="" coords="5,5,168,33"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="116,40,205,106,241,132,236,131,202,110,114,45"/>
-<area shape="rect" id="Node000003" href="$structCalibrationConfig.html" title="Calibration parameters for ratiometric sensors." alt="" coords="192,5,325,33"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="261,47,261,133,256,130,256,50"/>
-<area shape="rect" id="Node000004" title=" " alt="" coords="350,5,503,33"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="409,43,379,79,341,110,296,134,294,129,338,106,375,75,405,46"/>
-</map>

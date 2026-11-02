@@ -1,5 +1,0 @@
-<map id="PressureSensor::SetSwapped" name="PressureSensor::SetSwapped">
-<area shape="rect" id="Node000001" title="Manually set swap state." alt="" coords="260,5,469,33"/>
-<area shape="rect" id="Node000002" href="$classPressureSensor.html#ad2e87054372f9a7ff26800b034847914" title="Toggle swap state." alt="" coords="5,5,212,33"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="242,19,212,22,212,17,247,19"/>
-</map>

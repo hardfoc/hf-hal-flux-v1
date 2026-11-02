@@ -1,8 +1,0 @@
-<map id="AdcManager::Initialize" name="AdcManager::Initialize">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,172,33"/>
-<area shape="rect" id="Node000002" href="$classAdcManager.html#a93d9add5dfe70a4605297be247318c71" title="Initialise the ADC subsystem if not already initialised." alt="" coords="220,5,438,33"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="172,25,207,28,201,29,173,30"/>
-<area shape="rect" id="Node000003" href="$classCommChannelsManager.html#ad1249df1c4ece9e2468d4b4536d237ae" title="Return the singleton CommChannelsManager instance." alt="" coords="238,57,420,102"/>
-<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="147,31,225,52,220,54,147,36"/>
-<area shape="poly" id="edge2_Node000002_Node000001" title=" " alt="" coords="217,11,188,13,187,8,222,9"/>
-</map>

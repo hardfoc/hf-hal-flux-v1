@@ -1,5 +1,0 @@
-<map id="ValveManager::SetProportionalCurrent" name="ValveManager::SetProportionalCurrent">
-<area shape="rect" id="Node000001" title="Set current setpoint for a proportional valve channel." alt="" coords="5,5,228,50"/>
-<area shape="rect" id="Node000002" href="$ValveManager_8h.html#a07104dd82857d7cb8af8bf459645484c" title="Map TLE92466ED DriverError to the unified hf_valve_err_t domain." alt="" coords="276,14,469,42"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="228,25,263,28,257,28,228,30"/>
-</map>

@@ -1,9 +1,0 @@
-<map id="init_test_progress_indicator" name="init_test_progress_indicator">
-<area shape="rect" id="Node000001" title=" " alt="" coords="574,5,712,50"/>
-<area shape="rect" id="Node000002" href="$TestFramework_8h.html#a57a48f91a141d98e45f82937581e1a97" title=" " alt="" coords="339,14,526,42"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="556,28,527,30,527,25,561,28"/>
-<area shape="rect" id="Node000003" href="$TestFramework_8h.html#ab7e4c076755ecdf2ad6212cb8f6578ab" title=" " alt="" coords="139,14,291,42"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="321,28,291,30,291,25,326,28"/>
-<area shape="rect" id="Node000004" href="$flux__api__test_8cpp.html#a630544a7f0a2cc40d8a7fefab7e2fe70" title=" " alt="" coords="5,14,91,42"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="120,28,91,30,91,25,126,27"/>
-</map>

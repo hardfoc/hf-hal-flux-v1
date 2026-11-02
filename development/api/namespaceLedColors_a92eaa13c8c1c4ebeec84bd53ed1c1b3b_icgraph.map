@@ -1,7 +1,0 @@
-<map id="LedColors::MAGENTA" name="LedColors::MAGENTA">
-<area shape="rect" id="Node000001" title="Magenta." alt="" coords="357,5,515,33"/>
-<area shape="rect" id="Node000002" href="$LedManagerExample_8cpp.html#aaa1c9c9a8f0b1068b18036783acba5ac" title=" " alt="" coords="139,5,309,33"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="339,19,310,22,310,17,344,19"/>
-<area shape="rect" id="Node000003" href="$LedManagerExample_8cpp.html#a630544a7f0a2cc40d8a7fefab7e2fe70" title=" " alt="" coords="5,5,91,33"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="120,19,91,22,91,17,126,19"/>
-</map>
