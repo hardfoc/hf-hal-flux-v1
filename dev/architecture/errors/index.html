@@ -1348,7 +1348,7 @@ error types, where to read the last error, and the system-level diagnostics.</p>
    the manager is not initialised or the thing you asked for does not exist.</li>
 <li>Every manager has two error lanes, as in pw-hal (<a href="../../adr/0005-no-heap-fail-closed/">ADR 0005</a>):
    <code>GetManagerError()</code> says why bring-up failed, in the shared <code>flux::hal::ManagerError</code> catalog
-   (<a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/d8d5d8b4142b2f54038db02638977eb8bb3dd481/lib/api/flux_hal/flux_hal_types.hpp"><code>flux_hal_types.hpp</code></a>); <code>GetLastError()</code> holds the last failed
+   (<a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/dc6e25edc17feac2eb68bbf23acfc1fecbbc8774/lib/api/flux_hal/flux_hal_types.hpp"><code>flux_hal_types.hpp</code></a>); <code>GetLastError()</code> holds the last failed
    operation in the manager's own enum. Facades return <code>flux::hal::HalResult</code>.</li>
 </ol>
 <h2 id="bring-up-errors-shared-catalog">Bring-up errors (shared catalog)<a class="headerlink" href="#bring-up-errors-shared-catalog" title="Permanent link">&para;</a></h2>

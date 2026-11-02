@@ -1,7 +1,0 @@
-<map id="ValveManager::ConfigureSolenoidVdr" name="ValveManager::ConfigureSolenoidVdr">
-<area shape="rect" id="Node000001" title="Configure a solenoid channel with VDR (voltage drive regulation)." alt="" coords="5,31,268,56"/>
-<area shape="rect" id="Node000002" href="$_valve_manager_8h.html#ae6cff86821790a19053b6f8423493fe7" title="Check if a valve error code indicates success." alt="" coords="367,5,477,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="268,29,353,21,354,27,268,34"/>
-<area shape="rect" id="Node000003" href="$_valve_manager_8h.html#a1029903401a6b8ed1b70aaff9b2c6acc" title="Map MAX22200 DriverStatus to the unified hf_valve_err_t domain." alt="" coords="316,55,528,80"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="268,52,302,55,302,60,268,57"/>
-</map>

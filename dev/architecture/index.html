@@ -1238,7 +1238,7 @@ by a platform binding, one per MCU family, which is the only code that includes 
 <details class="hf-figure-desc">
 <summary>Figure description and sources</summary>
 <p>From top to bottom, each layer only calls the one under it. Your application asks the facade singleton for the managers. The managers (one per board function) own the hf-core handlers, which wrap one chip driver each. The managers are MCU-free: the platform binding of the MCU family (bsp_bind/esp32s3 on this board) creates the objects behind the interface classes, the ESP32 implementations that sit on ESP-IDF, and is the only HAL code that includes ESP-IDF. Drivers talk to hardware only through the interface classes. Every name in a band is read from the code: the managers from the facade's member references, the handlers, drivers and interface classes from the managers', handlers' and binding's #include lines.</p>
-<p>Drawn from: <a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/d8d5d8b4142b2f54038db02638977eb8bb3dd481/lib/api/Flux.h"><code>lib/api/Flux.h</code></a> <code>Flux (manager references)</code>; <a href="https://github.com/hardfoc/hf-hal-flux-v1/tree/d8d5d8b4142b2f54038db02638977eb8bb3dd481/lib/managers"><code>lib/managers</code></a> <code>#includes</code>; <a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/d8d5d8b4142b2f54038db02638977eb8bb3dd481/lib/core/handlers"><code>lib/core/handlers</code></a> <code>#includes</code>; <a href="https://github.com/hardfoc/hf-hal-flux-v1/tree/d8d5d8b4142b2f54038db02638977eb8bb3dd481/lib/managers/bsp_bind"><code>lib/managers/bsp_bind</code></a> <code>#includes</code>; figure module <a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/d8d5d8b4142b2f54038db02638977eb8bb3dd481/docs/diagrams/figures/hal-layers.py"><code>docs/diagrams/figures/hal-layers.py</code></a>.</p>
+<p>Drawn from: <a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/dc6e25edc17feac2eb68bbf23acfc1fecbbc8774/lib/api/Flux.h"><code>lib/api/Flux.h</code></a> <code>Flux (manager references)</code>; <a href="https://github.com/hardfoc/hf-hal-flux-v1/tree/dc6e25edc17feac2eb68bbf23acfc1fecbbc8774/lib/managers"><code>lib/managers</code></a> <code>#includes</code>; <a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/dc6e25edc17feac2eb68bbf23acfc1fecbbc8774/lib/core/handlers"><code>lib/core/handlers</code></a> <code>#includes</code>; <a href="https://github.com/hardfoc/hf-hal-flux-v1/tree/dc6e25edc17feac2eb68bbf23acfc1fecbbc8774/lib/managers/bsp_bind"><code>lib/managers/bsp_bind</code></a> <code>#includes</code>; figure module <a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/dc6e25edc17feac2eb68bbf23acfc1fecbbc8774/docs/diagrams/figures/hal-layers.py"><code>docs/diagrams/figures/hal-layers.py</code></a>.</p>
 </details>
 <h2 id="the-layers">The layers<a class="headerlink" href="#the-layers" title="Permanent link">&para;</a></h2>
 <table>
@@ -1253,25 +1253,25 @@ by a platform binding, one per MCU family, which is the only code that includes 
 <tbody>
 <tr>
 <td>Application</td>
-<td>your project, <a href="https://github.com/hardfoc/hf-hal-flux-v1/tree/d8d5d8b4142b2f54038db02638977eb8bb3dd481/examples/esp32"><code>examples/esp32</code></a></td>
+<td>your project, <a href="https://github.com/hardfoc/hf-hal-flux-v1/tree/dc6e25edc17feac2eb68bbf23acfc1fecbbc8774/examples/esp32"><code>examples/esp32</code></a></td>
 <td>Tasks, control loops, protocols</td>
 <td>Always</td>
 </tr>
 <tr>
 <td>Facade</td>
-<td><a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/d8d5d8b4142b2f54038db02638977eb8bb3dd481/lib/api/Flux.h"><code>lib/api/Flux.h</code></a></td>
+<td><a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/dc6e25edc17feac2eb68bbf23acfc1fecbbc8774/lib/api/Flux.h"><code>lib/api/Flux.h</code></a></td>
 <td>One singleton; brings the managers up in order; system diagnostics</td>
 <td>Always: <code>Flux::GetInstance()</code></td>
 </tr>
 <tr>
 <td>Managers</td>
-<td><a href="https://github.com/hardfoc/hf-hal-flux-v1/tree/d8d5d8b4142b2f54038db02638977eb8bb3dd481/lib/managers"><code>lib/managers</code></a></td>
+<td><a href="https://github.com/hardfoc/hf-hal-flux-v1/tree/dc6e25edc17feac2eb68bbf23acfc1fecbbc8774/lib/managers"><code>lib/managers</code></a></td>
 <td>One per board function (valves, ADC, temperature, ...); know the board's wiring from the pin map; MCU-free</td>
 <td>Almost always: <code>flux.valves</code>, <code>flux.adc</code>, ...</td>
 </tr>
 <tr>
 <td>Platform binding</td>
-<td><a href="https://github.com/hardfoc/hf-hal-flux-v1/tree/d8d5d8b4142b2f54038db02638977eb8bb3dd481/lib/managers/bsp_bind"><code>lib/managers/bsp_bind</code></a></td>
+<td><a href="https://github.com/hardfoc/hf-hal-flux-v1/tree/dc6e25edc17feac2eb68bbf23acfc1fecbbc8774/lib/managers/bsp_bind"><code>lib/managers/bsp_bind</code></a></td>
 <td>Turns the managers' plain-data specs into <code>Base*</code> objects; <code>esp32s3/</code> is the only ESP-IDF code in the HAL</td>
 <td>When porting to another MCU (<a href="bindings/">Platform bindings</a>)</td>
 </tr>

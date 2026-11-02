@@ -1,7 +1,0 @@
-<map id="anonymous_namespace{CommChannelsManager::cpp}::AddSpiDevice" name="anonymous_namespace{CommChannelsManager::cpp}::AddSpiDevice">
-<area shape="rect" id="Node000001" title="Add one chip select to an initialised bus and log it. nullptr if the CS pin is unmapped." alt="" coords="5,23,196,77"/>
-<area shape="rect" id="Node000002" href="$namespaceflux_1_1bsp.html#a4dc8e63e5cb895259c6bba41a0215fb7" title="Add a device to an initialised SPI bus." alt="" coords="244,5,437,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="196,35,232,30,232,35,196,40"/>
-<area shape="rect" id="Node000003" href="$namespaceanonymous__namespace_02_comm_channels_manager_8cpp_03.html#acb00590c54a3b3f5648d388265b98b56" title=" " alt="" coords="245,55,436,109"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="196,60,232,65,232,70,196,65"/>
-</map>

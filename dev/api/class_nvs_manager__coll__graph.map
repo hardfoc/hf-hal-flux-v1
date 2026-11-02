@@ -1,9 +1,0 @@
-<map id="NvsManager" name="NvsManager">
-<area shape="rect" id="Node000001" title="Singleton owning the Flux board&#39;s persistent&#45;storage namespaces." alt="" coords="101,196,205,221"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="5,101,159,126"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="97,136,120,170,142,194,138,198,116,174,93,139"/>
-<area shape="rect" id="Node000003" title=" " alt="" coords="183,93,336,133"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="229,145,196,174,168,198,164,194,192,170,226,141"/>
-<area shape="rect" id="Node000004" title=" " alt="" coords="204,5,315,31"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="262,44,262,93,257,93,257,44"/>
-</map>

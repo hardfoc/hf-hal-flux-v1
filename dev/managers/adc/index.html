@@ -1307,7 +1307,7 @@
 <h1 id="adcmanager">AdcManager<a class="headerlink" href="#adcmanager" title="Permanent link">&para;</a></h1>
 <p>Every analog input of the board behind one interface: the two ESP32-S3 ADC1 channels (NTC thermistor, supply
 voltage) and the twelve channels of the ADS7952 external ADC. Channels are registered from the pin map, so the names
-and the scaling come from there. Source: <a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/d8d5d8b4142b2f54038db02638977eb8bb3dd481/lib/managers/AdcManager.h"><code>AdcManager.h</code></a>.</p>
+and the scaling come from there. Source: <a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/dc6e25edc17feac2eb68bbf23acfc1fecbbc8774/lib/managers/AdcManager.h"><code>AdcManager.h</code></a>.</p>
 <h2 id="channels">Channels<a class="headerlink" href="#channels" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -1383,6 +1383,8 @@ and the scaling come from there. Source: <a href="https://github.com/hardfoc/hf-
 operation counters. Per-channel access and error counts are logged by <code>DumpStatistics()</code>.</p>
 <h2 id="pitfalls">Pitfalls<a class="headerlink" href="#pitfalls" title="Permanent link">&para;</a></h2>
 <ul>
+<li><strong>The ADS7952 needs comms.</strong> <code>EnsureInitialized()</code> brings <code>CommChannelsManager</code> up first (it owns the pressure
+  bus); if comms is down the manager reports <code>DependencyNotReady</code>.</li>
 <li><strong>Fail-closed start-up.</strong> If the ADS7952 or the MCU ADC does not come up, the manager stays uninitialised
   (<a href="../../adr/0005-no-heap-fail-closed/">ADR 0005</a>): every read returns <code>ADC_ERR_NOT_INITIALIZED</code> and <code>Get()</code> returns
   <code>nullptr</code>. <code>GetManagerError()</code> says why, and <code>IsAds7952Ready(0)</code> / <code>IsInternalAdcReady()</code> say which part is

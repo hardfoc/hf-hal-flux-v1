@@ -1307,7 +1307,7 @@
 <h1 id="gpiomanager">GpioManager<a class="headerlink" href="#gpiomanager" title="Permanent link">&para;</a></h1>
 <p>Creates one ESP32 GPIO object for every <em>GPIO</em>-category pin of the pin map and lets you drive or read it by name or
 by enum. On Flux V1 those are the control and fault lines of the two valve drivers. Source:
-<a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/d8d5d8b4142b2f54038db02638977eb8bb3dd481/lib/managers/GpioManager.h"><code>GpioManager.h</code></a>.</p>
+<a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/dc6e25edc17feac2eb68bbf23acfc1fecbbc8774/lib/managers/GpioManager.h"><code>GpioManager.h</code></a>.</p>
 <h2 id="which-pins-it-owns">Which pins it owns<a class="headerlink" href="#which-pins-it-owns" title="Permanent link">&para;</a></h2>
 <p>At start-up it walks the pin map and registers each pin whose category is GPIO (or user) and whose chip is the
 ESP32. Core pins (boot, USB) and comm pins (SPI, CAN, UART, LED data) are skipped; their owners configure them. The

@@ -1,5 +1,0 @@
-<map id="flux::bsp::LargestFreeHeapBlock" name="flux::bsp::LargestFreeHeapBlock">
-<area shape="rect" id="Node000001" title="Largest contiguous free block in the default heap (0 when unknown)." alt="" coords="244,5,439,45"/>
-<area shape="rect" id="Node000002" href="$class_flux.html#a25beb862410765c38e17b080a125d352" title="Largest contiguous free block in the default heap." alt="" coords="5,5,196,45"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="230,28,196,28,196,23,230,23"/>
-</map>

@@ -1,9 +1,0 @@
-<map id="Flux::GetSystemUptimeMs" name="Flux::GetSystemUptimeMs">
-<area shape="rect" id="Node000001" title="Milliseconds elapsed since EnsureInitialized() completed." alt="" coords="499,31,696,56"/>
-<area shape="rect" id="Node000002" href="$class_flux.html#ac85a6ad26883360e0c3ea2c702b6fc11" title="Log a comprehensive system summary to the console." alt="" coords="232,5,439,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="485,35,439,31,439,25,485,30"/>
-<area shape="rect" id="Node000003" href="$class_flux.html#ab5255b2ed02ad854934e25e08df1f22d" title=" " alt="" coords="220,55,451,80"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="485,56,451,59,451,54,484,51"/>
-<area shape="rect" id="Node000004" href="$class_flux.html#a6c011c136a43dd2d9859dcf7d56571e8" title="Ensure all Flux subsystems are properly initialized." alt="" coords="5,55,172,80"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="206,70,172,70,172,65,206,65"/>
-</map>
