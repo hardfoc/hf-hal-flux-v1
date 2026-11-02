@@ -1,0 +1,10 @@
+<map id="FluxHalDiagnostics" name="FluxHalDiagnostics">
+<area shape="rect" id="Node000001" title="Board&#45;level bring&#45;up snapshot: every manager&#39;s state and every fitted part&#39;s readiness." alt="" coords="5,284,153,309"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="24,5,135,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="82,45,82,284,77,284,77,45"/>
+<area shape="rect" id="Node000004" href="$struct_manager_diagnostic.html" title="One manager&#39;s lifecycle state in FluxHalDiagnostics." alt="" coords="116,93,264,119"/>
+<area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="107,37,177,91,173,95,104,41"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="95,181,325,221"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="174,232,97,286,94,282,171,227"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="198,131,209,181,203,182,193,132"/>
+</map>

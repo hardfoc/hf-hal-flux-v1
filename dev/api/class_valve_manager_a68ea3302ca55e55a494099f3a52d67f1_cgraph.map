@@ -1,0 +1,19 @@
+<map id="ValveManager::Deinitialize" name="ValveManager::Deinitialize">
+<area shape="rect" id="Node000001" title="Turn every channel off, release both driver handlers and reset to uninitialised." alt="" coords="5,212,203,237"/>
+<area shape="rect" id="Node000002" href="$class_valve_manager.html#abac1e37ff85e537db85b9212ae03cd18" title="Disable every channel on every bank that is up (mutex held by the caller)." alt="" coords="267,79,457,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="130,210,306,123,309,128,132,214"/>
+<area shape="rect" id="Node000003" href="$_valve_manager_8h.html#ae6cff86821790a19053b6f8423493fe7" title="Check if a valve error code indicates success." alt="" coords="781,87,891,112"/>
+<area shape="poly" id="edge7_Node000001_Node000003" title=" " alt="" coords="203,221,336,217,489,208,632,193,689,184,732,172,776,148,811,120,814,124,779,152,734,176,690,189,632,199,490,213,336,222,203,226"/>
+<area shape="rect" id="Node000007" href="$_valve_manager_8h.html#a255db5fbbcc6babf9a239474d3363b4c" title="Convert hf_valve_err_t to a human&#45;readable description string." alt="" coords="291,237,433,263"/>
+<area shape="poly" id="edge8_Node000001_Node000007" title=" " alt="" coords="203,232,277,239,277,244,203,237"/>
+<area shape="rect" id="Node000008" href="$class_valve_manager.html#a6d0713b0cfd798920031c4b817508aab" title="Destroy both handlers and clear the bank flags (mutex held by the caller)." alt="" coords="251,287,473,327"/>
+<area shape="poly" id="edge9_Node000001_Node000008" title=" " alt="" coords="141,235,251,273,277,281,276,286,250,278,140,240"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="394,77,451,47,485,32,521,22,580,9,628,3,676,7,734,22,779,45,814,74,811,78,776,50,732,27,675,12,628,9,581,14,522,27,487,37,453,51,396,81"/>
+<area shape="rect" id="Node000004" href="$_valve_manager_8h.html#a1029903401a6b8ed1b70aaff9b2c6acc" title="Map MAX22200 DriverStatus to the unified hf_valve_err_t domain." alt="" coords="521,37,733,63"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="456,79,545,63,546,68,457,84"/>
+<area shape="rect" id="Node000005" href="$class_valve_manager.html#adcb9667cc3d68ec7b3c97f307aeacef4" title="Remember a failed operation result for GetLastError(); pass the result through." alt="" coords="543,87,711,112"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="457,97,529,97,529,102,457,102"/>
+<area shape="rect" id="Node000006" href="$_valve_manager_8h.html#a07104dd82857d7cb8af8bf459645484c" title="Map TLE92466ED DriverError to the unified hf_valve_err_t domain." alt="" coords="530,136,725,161"/>
+<area shape="poly" id="edge6_Node000002_Node000006" title=" " alt="" coords="457,114,546,131,545,136,456,119"/>
+<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="712,97,767,97,767,102,712,102"/>
+</map>

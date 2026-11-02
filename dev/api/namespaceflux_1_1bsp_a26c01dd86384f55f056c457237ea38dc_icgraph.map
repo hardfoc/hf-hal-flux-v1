@@ -1,0 +1,13 @@
+<map id="flux::bsp::CreateGpio" name="flux::bsp::CreateGpio">
+<area shape="rect" id="Node000001" title="Create the GPIO object for slot. No hardware access until the object is initialised." alt="" coords="1168,5,1327,31"/>
+<area shape="rect" id="Node000002" href="$class_gpio_manager.html#a71081920f92fb76254ccd258ec539c9e" title=" " alt="" coords="947,5,1120,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1154,21,1120,21,1120,15,1154,15"/>
+<area shape="rect" id="Node000003" href="$class_gpio_manager.html#a88a01fcf59a2db604d59b5cca4503112" title="Register all GPIO pins and initialise drivers (idempotent)." alt="" coords="673,5,899,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="933,21,899,21,899,15,933,15"/>
+<area shape="rect" id="Node000004" href="$class_flux.html#aa60e3a7ffd95134b8dc4b3748a288c44" title=" " alt="" coords="481,5,625,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="660,21,626,21,626,15,660,15"/>
+<area shape="rect" id="Node000005" href="$class_flux.html#a0d67fb153ddebb59c51eb20ad311cb32" title=" " alt="" coords="220,5,433,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="468,21,434,21,434,15,468,15"/>
+<area shape="rect" id="Node000006" href="$class_flux.html#a6c011c136a43dd2d9859dcf7d56571e8" title="Ensure all Flux subsystems are properly initialized." alt="" coords="5,5,172,31"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="206,21,172,21,172,15,206,15"/>
+</map>

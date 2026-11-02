@@ -1,0 +1,5 @@
+<map id="ValveManager::GetSolenoidFaults" name="ValveManager::GetSolenoidFaults">
+<area shape="rect" id="Node000001" title="Retrieve the MAX22200 fault status." alt="" coords="5,5,208,45"/>
+<area shape="rect" id="Node000002" href="$_valve_manager_8h.html#a1029903401a6b8ed1b70aaff9b2c6acc" title="Map MAX22200 DriverStatus to the unified hf_valve_err_t domain." alt="" coords="256,13,468,38"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="208,23,242,23,242,28,208,28"/>
+</map>

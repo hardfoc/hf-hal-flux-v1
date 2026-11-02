@@ -1,0 +1,5 @@
+<map id="TemperatureManager::DumpStatistics" name="TemperatureManager::DumpStatistics">
+<area shape="rect" id="Node000001" title="Log temperature sensor statistics and health info to the console." alt="" coords="260,5,421,45"/>
+<area shape="rect" id="Node000002" href="$class_flux.html#ac85a6ad26883360e0c3ea2c702b6fc11" title="Log a comprehensive system summary to the console." alt="" coords="5,13,212,38"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="246,28,212,28,212,23,246,23"/>
+</map>

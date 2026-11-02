@@ -1,0 +1,22 @@
+<map id="CommChannelsManager.h" name="CommChannelsManager.h">
+<area shape="rect" id="Node000001" title="Communication channels manager for the HardFOC Flux V1 platform." alt="" coords="425,5,618,31"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,101,61,126"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="425,29,230,48,139,63,74,81,55,93,53,89,72,76,138,58,229,43,424,23"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="85,101,152,126"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="425,28,302,45,236,60,172,81,146,95,144,90,170,76,234,55,301,40,424,23"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="697,196,764,221"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="425,28,362,34,300,45,248,60,229,70,217,80,206,97,202,114,206,130,216,146,240,158,284,168,416,185,564,196,684,203,684,208,564,202,415,190,284,174,238,163,213,150,201,132,197,114,201,95,213,77,227,65,246,55,299,40,361,29,424,22"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="227,79,407,148"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="497,33,404,75,402,71,495,28"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="431,79,611,148"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="524,31,524,65,519,65,519,31"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="635,79,815,148"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="547,28,641,71,638,75,545,33"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="839,79,1019,148"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="594,28,700,47,826,76,825,81,699,53,593,33"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="1044,101,1148,126"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="618,18,707,22,812,32,924,49,1033,76,1067,91,1065,96,1031,81,923,55,811,37,707,27,618,23"/>
+<area shape="rect" id="Node000010" href="$flux__hal__types_8hpp.html" title="Shared HAL types for Flux V1: the manager error catalog and the facade result." alt="" coords="1173,101,1371,126"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="619,20,866,36,1013,53,1161,76,1227,94,1226,99,1159,81,1013,58,865,41,618,25"/>
+<area shape="poly" id="edge10_Node000010_Node000004" title=" " alt="" coords="1239,129,1161,151,1054,171,947,187,778,206,777,201,947,181,1053,165,1159,145,1238,124"/>
+</map>

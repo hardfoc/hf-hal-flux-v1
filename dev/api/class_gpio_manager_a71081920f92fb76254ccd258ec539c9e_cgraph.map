@@ -1,0 +1,10 @@
+<map id="GpioManager::Initialize" name="GpioManager::Initialize">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,56,179,81"/>
+<area shape="rect" id="Node000002" href="$namespaceflux_1_1bsp.html#a26c01dd86384f55f056c457237ea38dc" title="Create the GPIO object for slot. No hardware access until the object is initialised." alt="" coords="255,5,413,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="153,53,259,31,260,36,154,58"/>
+<area shape="rect" id="Node000003" href="$namespaceflux_1_1bsp.html#afac5377c3dce5148341624e6573fa36b" title="Destroy the GPIO object in slot (releases the pin)." alt="" coords="489,81,656,107"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="179,71,476,86,475,92,179,76"/>
+<area shape="rect" id="Node000004" href="$class_gpio_manager.html#ae88d40d145606f638c64bca174b06376" title=" " alt="" coords="227,107,441,132"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="154,79,260,101,259,106,153,84"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="441,105,475,102,476,107,442,111"/>
+</map>
