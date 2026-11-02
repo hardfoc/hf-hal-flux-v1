@@ -1842,7 +1842,7 @@ that holds the lock may call another method of the same manager.</p>
    animation step is 50 ms).</li>
 </ol>
 <h2 id="cpu-affinity">CPU affinity<a class="headerlink" href="#cpu-affinity" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/edeb433b9563ef2ad65e288da4f77f4d38c96695/lib/api/FluxCpuAffinity.h"><code>FluxCpuAffinity.h</code></a> names the logical cores your tasks should use on the
+<p><a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/8af3903fff194cf3d941605901566a7f8c5dafe3/lib/api/FluxCpuAffinity.h"><code>FluxCpuAffinity.h</code></a> names the logical cores your tasks should use on the
 dual-core ESP32-S3: <code>flux_hal::kFluxCpuHostIo</code> (0) for host, system and communication work and
 <code>flux_hal::kFluxCpuRealtime</code> (1) for high-rate loops such as pressure control. <code>kFluxCpuNoAffinity</code> (-1) lets the
 scheduler choose. Pass them to <code>BaseThread</code> or <code>os_thread_create_pinned</code>.</p>

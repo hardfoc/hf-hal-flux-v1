@@ -1,7 +1,0 @@
-<map id="HfValveErrToString" name="HfValveErrToString">
-<area shape="rect" id="Node000001" title="Convert hf_valve_err_t to a human&#45;readable description string." alt="" coords="279,31,421,56"/>
-<area shape="rect" id="Node000002" href="$class_valve_manager.html#a40cab939ee2a6269d3f9b47339ab2c2b" title="Disable a valve channel output." alt="" coords="5,5,231,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="265,37,231,33,231,28,265,31"/>
-<area shape="rect" id="Node000003" href="$class_valve_manager.html#a915cd57bf1c1e510f11ac54b57ec2f02" title="Enable a valve channel output." alt="" coords="8,55,228,80"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="266,55,229,59,228,53,265,49"/>
-</map>
