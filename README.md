@@ -5,11 +5,10 @@ valves (MAX22200), six proportional valves (TLE92466ED), twelve external analog 
 and a status LED, through one `Flux` object.
 
 [![ESP32 Examples Build CI](https://github.com/hardfoc/hf-hal-flux-v1/actions/workflows/esp32-examples-build-ci.yml/badge.svg?branch=main)](https://github.com/hardfoc/hf-hal-flux-v1/actions/workflows/esp32-examples-build-ci.yml)
-[![Docs Publish CI](https://github.com/hardfoc/hf-hal-flux-v1/actions/workflows/ci-docs-publish.yml/badge.svg?branch=main)](https://github.com/hardfoc/hf-hal-flux-v1/actions/workflows/ci-docs-publish.yml)
-[![Documentation](https://img.shields.io/badge/docs-hardfoc.github.io-3b38c4)](https://hardfoc.github.io/hf-hal-flux-v1/)
+[![Docs](https://github.com/hardfoc/hf-hal-flux-v1/actions/workflows/ci-docs-publish.yml/badge.svg?branch=main)](https://hardfoc.github.io/hf-hal-flux-v1/latest/)
 [![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](LICENSE)
 
-**Documentation: <https://hardfoc.github.io/hf-hal-flux-v1/>**
+**Documentation: <https://hardfoc.github.io/hf-hal-flux-v1/latest/>**
 
 ## Architecture
 
@@ -76,7 +75,7 @@ extern "C" void app_main() {
 | `lib/core` | hf-core submodule: handlers, chip drivers, interface wrap, the pin map (`hf-pincfg`) |
 | `examples/esp32` | Buildable example and test apps ([catalogue](https://hardfoc.github.io/hf-hal-flux-v1/latest/examples/)) |
 | `docs` | The documentation site (MkDocs); figures and tables are generated from the code |
-| `_config` | Doxygen, lint and link-check configuration |
+| `_config` | Lint and link-check configuration (`Doxyfile` is at the root) |
 
 ## Contributing
 
