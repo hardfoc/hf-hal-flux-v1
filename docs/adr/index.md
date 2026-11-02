@@ -11,5 +11,6 @@ same decisions apply to the Vortex V1 HAL, which is built the same way.
 | [0003](0003-pin-map-ownership.md) | The hf-pincfg X-macro table is the single source of pin truth | Accepted |
 | [0004](0004-platform-bindings.md) | Create MCU objects in a per-family platform binding; keep managers MCU-free | Accepted |
 | [0005](0005-no-heap-fail-closed.md) | No heap in the HAL; managers fail closed and report through one error catalog | Accepted |
+| [0006](0006-enable-pin-hard-stop.md) | A hardware enable path for both valve banks, with the hold policy left to the product | Accepted |
 
 Start a new record from the [template](template.md).

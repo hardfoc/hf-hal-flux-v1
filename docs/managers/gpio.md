@@ -50,10 +50,14 @@ counts. `DumpStatistics()` logs the same and the per-pin access and error counts
 
 ## Pitfalls
 
-- **Every pin starts as an output.** Registration configures all pins as outputs, including the `_FAULT_N` inputs.
-  `ValveManager` switches the two fault pins to inputs during its own start-up; if you use a pin as an input before
-  that, call `SetDirection(name, HF_GPIO_DIRECTION_INPUT)` first.
+- **Directions come from the board config, not the pin map.** The pin map has no direction field. The two
+  `_FAULT_N` lines are created as inputs (`kInputPins` in
+  [`FluxBoardConfig.h`](../../lib/managers/bsp_bind/board/flux_v1/FluxBoardConfig.h)) and never driven; every other
+  pin is an output. The two valve enables (`kValveEnablePins`) start driven low, so both banks are off until
+  `ValveManager` brings the drivers up. A new input pin needs a line in `kInputPins`.
 - **The valve drivers own their control pins.** Changing `GPIO_TLE92466_EN` or `GPIO_MAX22200_ENABLE` behind
-  `ValveManager`'s back disables outputs it thinks are on.
+  `ValveManager`'s back disables outputs it thinks are on. To de-energise the banks on purpose, use
+  `ValveManager::DropEnablePins()` ([ValveManager](valves.md#hardware-enable-path-safehold)), which latches and
+  refuses new enables until re-armed.
 - **No lock on pin operations.** See [Threading](../architecture/threading.md).
 - **A wrong name** returns `GPIO_ERR_PIN_NOT_FOUND`, not a crash. Copy names from the pin map.

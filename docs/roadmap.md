@@ -16,7 +16,6 @@ nothing here is a promise of a date.
 | Gap | Where | Why it matters |
 | --- | --- | --- |
 | `Flux::GetSystemWarnings()` is always empty | `Flux.h` | Nothing calls the internal `AddSystemWarning()` |
-| GPIO pins all start as outputs | `GpioManager.cpp` | Fault inputs are outputs until `ValveManager` reconfigures them |
 
 ## Later: new transports and MCUs
 

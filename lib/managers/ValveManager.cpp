@@ -10,6 +10,7 @@
 #include "ValveManager.h"
 #include "CommChannelsManager.h"
 #include "GpioManager.h"
+#include "bsp_bind/board/flux_v1/FluxBoardConfig.h"
 #include "handlers/logger/Logger.h"
 #include "core/hf-core-drivers/internal/hf-pincfg/src/hf_functional_pin_config_flux_v1.hpp"
 
@@ -45,11 +46,53 @@ bool ValveManager::EnsureInitialized() noexcept {
     auto result = Initialize();
     if (HfValveErrOk(result)) {
         manager_error_.store(ManagerError::None, std::memory_order_release);
+        // A completed bring-up raised both enable pins: any earlier drop is over.
+        outputs_inhibited_.store(false, std::memory_order_release);
         initialized_.store(true, std::memory_order_release);
     } else {
         (void)Record(result);
     }
     return HfValveErrOk(result);
+}
+
+//==============================================================================
+// HARDWARE ENABLE PATH (SafeHold)
+//==============================================================================
+
+bool ValveManager::DropEnablePins() noexcept {
+    // Latch first, so a concurrent EnableChannel that has not yet reached the bus is refused.
+    outputs_inhibited_.store(true, std::memory_order_release);
+
+    // Straight to the GPIOs: GpioManager::Get() is a lock-free table lookup and
+    // BaseGpio::SetInactive() a register write. No SPI, no mutex, no logging.
+    auto& gpio = GpioManager::GetInstance();
+    bool all_ok = true;
+    bool any = false;
+    for (const auto pin : flux::board::kValveEnablePins) {
+        BaseGpio* g = gpio.Get(pin);
+        if (g == nullptr) {
+            continue;
+        }
+        any = true;
+        if (g->SetInactive() != hf_gpio_err_t::GPIO_SUCCESS) {
+            all_ok = false;
+        }
+    }
+    return any && all_ok;
+}
+
+bool ValveManager::RearmEnablePins() noexcept {
+    (void)Deinitialize();  // channels off, pins low, handlers released
+    return EnsureInitialized();
+}
+
+void ValveManager::GetEnablePinStates(bool& max_enable, bool& tle_enable) const noexcept {
+    auto& gpio = GpioManager::GetInstance();
+    const auto high = [](BaseGpio* g) noexcept {
+        return g != nullptr && g->IsOutput() && g->GetCurrentState() == hf_gpio_state_t::HF_GPIO_STATE_ACTIVE;
+    };
+    max_enable = high(gpio.Get(HfFunctionalGpioPin::MAX22200_ENABLE));
+    tle_enable = high(gpio.Get(HfFunctionalGpioPin::TLE92466_EN));
 }
 
 bool ValveManager::IsBankReady(ValveDriverType bank) const noexcept {
@@ -303,6 +346,8 @@ bool ValveManager::ResolveChannel(ValveChannel channel,
 hf_valve_err_t ValveManager::EnableChannel(ValveChannel channel) noexcept {
     if (!initialized_.load(std::memory_order_acquire))
         return Record(hf_valve_err_t::VALVE_ERR_NOT_INITIALIZED);
+    if (outputs_inhibited_.load(std::memory_order_acquire))
+        return Record(hf_valve_err_t::VALVE_ERR_WRONG_MODE);  // enable pins dropped (SafeHold)
 
     ValveDriverType type;
     uint8_t hw_ch;
@@ -373,6 +418,8 @@ hf_valve_err_t ValveManager::DisableChannel(ValveChannel channel) noexcept {
 hf_valve_err_t ValveManager::EnableChannelsMask(uint16_t mask) noexcept {
     if (!initialized_.load(std::memory_order_acquire))
         return Record(hf_valve_err_t::VALVE_ERR_NOT_INITIALIZED);
+    if (outputs_inhibited_.load(std::memory_order_acquire))
+        return Record(hf_valve_err_t::VALVE_ERR_WRONG_MODE);  // enable pins dropped (SafeHold)
     MutexLockGuard lock(mutex_);
 
     hf_valve_err_t first_error = hf_valve_err_t::VALVE_SUCCESS;
@@ -765,11 +812,13 @@ bool ValveManager::Deinitialize() noexcept {
 
     if (initialized_.load(std::memory_order_acquire) || max22200_valid_ || tle92466_valid_) {
         Logger::GetInstance().Info(TAG, "Deinitializing Flux Valve manager");
-        // Outputs off before the handlers go away.
+        // SafeHold before the handlers go away: every channel off over SPI, then both enable
+        // pins low so the banks stay de-energised in hardware.
         const hf_valve_err_t off = DisableAllLocked();
         if (!HfValveErrOk(off)) {
             Logger::GetInstance().Warn(TAG, "DisableAll during deinit failed: %s", HfValveErrToString(off));
         }
+        (void)DropEnablePins();
     }
 
     // Reset channel states
