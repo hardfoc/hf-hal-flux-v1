@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Page not found - HardFOC</title>
+  <style>
+    body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #ffffff; color: #17202c;
+           font: 16px/1.6 Inter, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+    main { max-width: 32rem; padding: 2rem 1rem; }
+    h1 { font-size: 1.6rem; margin: 0 0 .5rem; }
+    a { color: #2d2a9e; }
+    @media (prefers-color-scheme: dark) { body { background: #0d1220; color: #e6ebf2; } a { color: #a5a9ff; } }
+  </style>
+  <script>
+    // Served by GitHub Pages for any missing path of the site. A path without a version segment
+    // (an old link such as /repo/quickstart/) moves to the same page in the latest version; a path that already
+    // names a version stays here, so a page missing from every version cannot loop.
+    (function () {
+      var parts = location.pathname.split("/").filter(Boolean);
+      var repo = location.hostname.endsWith(".github.io") ? (parts.shift() || "") : "";
+      var base = "/" + (repo ? repo + "/" : "");
+      document.addEventListener("DOMContentLoaded", function () { document.getElementById("latest").href = base; });
+      fetch(base + "versions.json").then(function (r) { return r.ok ? r.json() : []; }).then(function (versions) {
+        var names = {};
+        versions.forEach(function (v) { names[v.version] = 1; (v.aliases || []).forEach(function (a) { names[a] = 1; }); });
+        if (parts.length && names[parts[0]]) return;
+        // Addresses of the Jekyll sites these replaced: /development/ and /docs/ pages, Doxygen under /doxs/ or /html/.
+        if (parts.length && (parts[0] === "development" || parts[0] === "docs")) parts.shift();
+        if (parts.length && (parts[0] === "doxs" || parts[0] === "html")) parts[0] = "api";
+        location.replace(base + "latest/" + parts.join("/") + location.search + location.hash);
+      }).catch(function () {});
+    })();
+  </script>
+</head>
+<body>
+  <main>
+    <h1>Page not found</h1>
+    <p>This page is not in the documentation. Go to the <a id="latest" href="/">latest documentation</a> or the
+       <a href="https://hardfoc.github.io/">HardFOC documentation portal</a>.</p>
+  </main>
+</body>
+</html>
