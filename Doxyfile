@@ -9,24 +9,24 @@
 # Project metadata
 #---------------------------------------------------------------------------
 PROJECT_NAME           = "HardFOC Flux V1 HAL"
-PROJECT_BRIEF          = "Unified HAL API for the HardFOC Flux valve-control platform (ESP32-C6)"
+PROJECT_BRIEF          = "Unified HAL API for the HardFOC Flux valve-control platform (ESP32-S3)"
 PROJECT_NUMBER         =
 PROJECT_LOGO           =
-OUTPUT_DIRECTORY       = docs/_doxygen
+OUTPUT_DIRECTORY       = build/doxygen
+HTML_OUTPUT            = html
+CASE_SENSE_NAMES       = NO
+GENERATE_TAGFILE       =
 
 #---------------------------------------------------------------------------
 # Input paths
 #---------------------------------------------------------------------------
 INPUT                  = lib/api \
                          lib/managers \
-                         examples/esp32/main \
-                         examples \
-                         README.md
+                         docs/_doxygen/mainpage.md
 
 FILE_PATTERNS          = *.c *.cpp *.h *.hpp
 RECURSIVE              = YES
-USE_MDFILE_AS_MAINPAGE = README.md
-FILTER_PATTERNS        = *.md="sed -e '/^---$/,/^---$/d'"
+USE_MDFILE_AS_MAINPAGE = docs/_doxygen/mainpage.md
 
 EXCLUDE                = *build* *cmake-build-* *managed_components* *__pycache__* *.pyc
 EXCLUDE_PATTERNS       = */build/* */cmake-build-*/* */.git/* */managed_components/* */__pycache__/* \
@@ -59,11 +59,8 @@ WARN_AS_ERROR          = NO
 # HTML output
 #---------------------------------------------------------------------------
 GENERATE_HTML          = YES
-GENERATE_TREEVIEW      = YES
 PAGE_OUTLINE_PANEL     = NO
-HTML_COPY_CLIPBOARD    = NO
 SEARCHENGINE           = YES
-HTML_EXTRA_STYLESHEET  = _config/doxygen-extensions/doxygen-awesome-css/doxygen-awesome.css
 
 #---------------------------------------------------------------------------
 # Graphs (requires Graphviz / dot)

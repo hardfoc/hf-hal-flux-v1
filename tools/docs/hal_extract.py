@@ -2,7 +2,7 @@
 
 Every function returns plain data with the file (and symbol) it was read from, so a table or a figure built from it
 can say where each fact came from, and ``--check`` can tell when the code moved. Nothing here is written by hand:
-change the code, rebuild the docs (``tools/docs/gen.py``, ``tools/figkit/build.py``), commit both.
+change the code, rebuild the docs (``hardfoc-docs gen``, ``hardfoc-docs figures``), commit both.
 
 The board-specific paths are in ``BOARD`` below; everything else is shared with the other HardFOC HAL sites.
 """

@@ -9,7 +9,7 @@ false only in the required branches.
 """
 
 import hal_extract as hx
-from figkit import Fig
+from hardfoc_mkdocs_theme.figkit import Fig
 
 
 def data():

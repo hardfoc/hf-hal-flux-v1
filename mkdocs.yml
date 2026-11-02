@@ -1,148 +1,29 @@
----
-# Documentation site: MkDocs + Material over docs/, versioned with mike, with the Doxygen API reference merged under
-# api/ by hardfoc/hf-general-ci-tools ru-mkdocs-publish.yml. Started from templates/mkdocs-site in that repository.
+# Documentation site on the HardFOC MkDocs platform: theme, plugin and toolchain come from the hardfoc-mkdocs-theme
+# package in hardfoc/hf-general-ci-tools. Preview locally:
 #
-#   python3 -m pip install -r requirements-docs.txt
-#   mkdocs serve                      live preview at http://127.0.0.1:8000
-#   mkdocs build --strict             the build CI runs
-#   python3 tools/figkit/build.py     rebuild the figures after a code or figure change
-#   python3 tools/docs/gen.py         refill the generated tables
+#   pip install "git+https://github.com/hardfoc/hf-general-ci-tools@v1\
+#   #subdirectory=packages/hardfoc-mkdocs-theme"      (one line, without the backslash)
+#   git submodule update --init lib/core && git -C lib/core submodule update --init hf-core-drivers \
+#     && git -C lib/core/hf-core-drivers submodule update --init internal/hf-pincfg   (the pin map and figures)
+#   mkdocs serve                                     http://127.0.0.1:8000
+#   mkdocs build --strict                            what CI runs
+#   hardfoc-docs figures && hardfoc-docs gen         refresh figures and generated tables
 #
-#   python3 tools/docs/gen.py --check && python3 tools/figkit/build.py --check   what CI checks before the build
-#
-# The pin tables and figures read lib/core (git submodule update --init --recursive lib/core).
+# Pages: docs/, order: docs/.nav.yml, rules: docs/DOCS-STYLE-GUIDE.md in hf-general-ci-tools.
 site_name: Flux V1 HAL
 site_description: >-
   Hardware abstraction layer for the HardFOC Flux V1 valve control board (ESP32-S3, MAX22200, TLE92466ED): one Flux
   object, one manager per board function, every chip on the board.
-site_url: https://hardfoc.github.io/hf-hal-flux-v1/
 repo_url: https://github.com/hardfoc/hf-hal-flux-v1
-repo_name: hardfoc/hf-hal-flux-v1
-edit_uri: edit/main/docs/
-copyright: Copyright &copy; HardFOC contributors
 
-docs_dir: docs
-# Build inputs and the Doxygen output are not pages of the site.
+# The development handbook is a submodule under docs/; it is its own site, not part of this one.
 exclude_docs: |
-  /diagrams/figures/
-  /diagrams/data/
-  /_doxygen/
   /hf-development-handbook/
-  *.py
-  *.json
-
-hooks:
-  - tools/docs/mkdocs_hooks.py
 
 theme:
-  name: material
-  custom_dir: overrides
-  logo: assets/logo.svg
-  favicon: assets/logo.svg
-  language: en
-  font:
-    text: Inter
-    code: JetBrains Mono
-  palette:
-    - media: "(prefers-color-scheme)"
-      toggle:
-        icon: material/brightness-auto
-        name: Switch to light mode
-    - media: "(prefers-color-scheme: light)"
-      scheme: default
-      primary: custom
-      accent: custom
-      toggle:
-        icon: material/weather-night
-        name: Switch to dark mode
-    - media: "(prefers-color-scheme: dark)"
-      scheme: slate
-      primary: custom
-      accent: custom
-      toggle:
-        icon: material/brightness-auto
-        name: Follow the system theme
-  icon:
-    repo: fontawesome/brands/github
-  features:
-    - navigation.tabs
-    - navigation.sections
-    - navigation.indexes
-    - navigation.top
-    - navigation.footer
-    - navigation.tracking
-    - navigation.instant
-    - navigation.instant.progress
-    - search.suggest
-    - search.highlight
-    - content.code.copy
-    - content.code.annotate
-    - content.action.edit
-    - content.tabs.link
-    - toc.follow
+  name: hardfoc
 
 plugins:
+  - hardfoc
   - search
-  # Order comes from docs/.nav.yml; folders it does not list follow, by name.
   - awesome-nav
-  - minify:
-      minify_html: true
-
-markdown_extensions:
-  - abbr
-  - admonition
-  - attr_list
-  - def_list
-  - footnotes
-  - md_in_html
-  - tables
-  - toc:
-      permalink: true
-      # GitHub-style anchors, so #section links work on GitHub and on the site.
-      slugify: !!python/object/apply:pymdownx.slugs.slugify
-        kwds:
-          case: lower
-  - pymdownx.betterem
-  - pymdownx.details
-  - pymdownx.emoji:
-      emoji_index: !!python/name:material.extensions.emoji.twemoji
-      emoji_generator: !!python/name:material.extensions.emoji.to_svg
-  - pymdownx.highlight:
-      anchor_linenums: true
-      pygments_lang_class: true
-  - pymdownx.inlinehilite
-  - pymdownx.keys
-  - pymdownx.superfences:
-      custom_fences:
-        - name: mermaid
-          class: mermaid
-          format: !!python/name:pymdownx.superfences.fence_code_format
-  - pymdownx.tabbed:
-      alternate_style: true
-  - pymdownx.tasklist:
-      custom_checkbox: true
-
-extra_css:
-  - stylesheets/hardfoc.css
-
-# Links to files outside docs/ are rewritten by the hook, so a link MkDocs cannot resolve is a real broken link and
-# fails the strict build.
-validation:
-  omitted_files: warn
-  absolute_links: warn
-  unrecognized_links: warn
-  anchors: warn
-  not_found: warn
-
-extra:
-  generator: false
-  # Folder of the built site that holds the Doxygen HTML (merged after MkDocs runs).
-  api_dir: api
-  version:
-    provider: mike
-    default: latest
-    alias: true
-  social:
-    - icon: fontawesome/brands/github
-      link: https://github.com/hardfoc
-      name: HardFOC on GitHub
