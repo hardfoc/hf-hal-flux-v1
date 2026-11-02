@@ -51,6 +51,7 @@ add_subdirectory("${HF_HAL_ROOT}/lib/core" hf-core)
 # ── The HAL under test ────────────────────────────────────────────────────
 add_library(hf_hal_flux_host STATIC
     "${HF_HAL_ROOT}/lib/api/Flux.cpp"
+    "${HF_HAL_ROOT}/lib/api/flux_hal/flux_hal_valve.cpp"
     "${HF_HAL_ROOT}/lib/managers/NvsManager.cpp"
     "${HF_HAL_ROOT}/lib/managers/CommChannelsManager.cpp"
     "${HF_HAL_ROOT}/lib/managers/GpioManager.cpp"

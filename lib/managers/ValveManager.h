@@ -348,6 +348,55 @@ public:
     bool Deinitialize() noexcept;
 
     //==========================================================================
+    // HARDWARE ENABLE PATH (SafeHold) — no SPI, no mutex
+    //==========================================================================
+
+    /**
+     * @brief Drive MAX22200 ENABLE and TLE92466ED EN low: both banks de-energised in hardware.
+     * @details The hardware half of SafeHold (architecture-port design §3.4, §3.8). Writes the two
+     *          enable GPIOs directly: no SPI transfer, no mutex, no allocation, no logging, so it is
+     *          safe from the safety thread at any priority while another thread is mid-transfer on
+     *          the valve bus. It works whether or not the manager is initialised (the pins exist as
+     *          soon as GpioManager is up).
+     *
+     *          After a drop the manager refuses every channel-energising call
+     *          (`EnableChannel`, `EnableChannelsMask`) with `VALVE_ERR_WRONG_MODE`, so software never
+     *          believes a valve is on while its bank is gated off. De-energising calls still work.
+     *          The drop holds until @ref RearmEnablePins.
+     *
+     *          This does not decide *when* to drop the pins or whether to vent first: that is the
+     *          caller's policy (the product's safety arbiter; vent-then-hold is owner question Q2).
+     *
+     * @note Callable from task context of any priority. From an ISR only if the binding's GPIO write
+     *       is ISR-safe; on the ESP32-S3 prefer waking the safety thread (`gpio_set_level` is not in
+     *       IRAM).
+     * @return true when every enable pin that exists was driven low.
+     */
+    bool DropEnablePins() noexcept;
+
+    /**
+     * @brief Leave SafeHold: full re-bring-up of both banks, which raises the enable pins again.
+     * @details The MAX22200 is not guaranteed to keep its configuration across an ENABLE low
+     *          period, so re-arming is `Deinitialize()` followed by `EnsureInitialized()`: every
+     *          channel off, handlers rebuilt, chips re-initialised, pins raised by their drivers.
+     *          Takes the manager mutex and uses SPI; never call it from the safety path.
+     * @return true when the manager is initialised again with both pins high.
+     */
+    bool RearmEnablePins() noexcept;
+
+    /** @brief The enable pins were dropped and not re-armed since. */
+    [[nodiscard]] bool IsOutputInhibited() const noexcept {
+        return outputs_inhibited_.load(std::memory_order_acquire);
+    }
+
+    /**
+     * @brief Read back the two enable outputs.
+     * @param[out] max_enable MAX22200 ENABLE is driven high (false if the pin does not exist).
+     * @param[out] tle_enable TLE92466ED EN is driven high (false if the pin does not exist).
+     */
+    void GetEnablePinStates(bool& max_enable, bool& tle_enable) const noexcept;
+
+    //==========================================================================
     // CHANNEL ENABLE / DISABLE (unified for both drivers)
     //==========================================================================
 
@@ -608,6 +657,7 @@ private:
     std::array<ValveChannelState, static_cast<size_t>(ValveChannel::CHANNEL_COUNT)> channel_states_{};
 
     std::atomic<bool> initialized_{false};
+    std::atomic<bool> outputs_inhibited_{false};  ///< DropEnablePins() latched, until re-armed
     std::atomic<flux::hal::ManagerError> manager_error_{flux::hal::ManagerError::NotInitialized};
     mutable std::atomic<hf_valve_err_t> last_error_{hf_valve_err_t::VALVE_SUCCESS};
     mutable RtosMutex mutex_;

@@ -21,6 +21,8 @@
 
 #include <cstdint>
 
+#include "core/hf-core-drivers/internal/hf-pincfg/src/hf_functional_pin_config_flux_v1.hpp"
+
 namespace flux::board {
 
 //==============================================================================
@@ -64,6 +66,48 @@ inline constexpr uint32_t kCanBitrate          = 500'000;  ///< TWAI nominal bit
 
 inline constexpr uint8_t  kStatusLedChannel    = 0;        ///< RMT channel of the WS2812 data line
 inline constexpr uint16_t kStatusLedCount      = 1;        ///< LEDs on the strip
+
+//==============================================================================
+// GPIO roles the pin map does not carry (it has no direction field)
+//==============================================================================
+
+/**
+ * @brief Pins that are inputs on Flux V1: the open-drain fault outputs of the two valve drivers.
+ * @details GpioManager creates them as inputs from the first instruction, so the MCU never drives
+ *          a chip's FAULT_N line, not even for the moment between pin creation and the valve
+ *          manager's bring-up.
+ */
+inline constexpr HfFunctionalGpioPin kInputPins[] = {
+    HfFunctionalGpioPin::MAX22200_FAULT_N,
+    HfFunctionalGpioPin::TLE92466_FAULT_N,
+};
+
+/**
+ * @brief The valve-bank enable outputs (MAX22200 ENABLE, TLE92466ED EN), active high.
+ * @details Driving either low de-energises its whole bank in hardware, without SPI. GpioManager
+ *          creates them driven inactive (low), so both banks are off until the valve manager's
+ *          bring-up raises them; `ValveManager::DropEnablePins()` drives them low again.
+ */
+inline constexpr HfFunctionalGpioPin kValveEnablePins[] = {
+    HfFunctionalGpioPin::MAX22200_ENABLE,
+    HfFunctionalGpioPin::TLE92466_EN,
+};
+
+/** @brief True when @p pin is in @ref kInputPins. */
+constexpr bool IsInputPin(HfFunctionalGpioPin pin) noexcept {
+    for (const auto p : kInputPins) {
+        if (p == pin) return true;
+    }
+    return false;
+}
+
+/** @brief True when @p pin is in @ref kValveEnablePins. */
+constexpr bool IsValveEnablePin(HfFunctionalGpioPin pin) noexcept {
+    for (const auto p : kValveEnablePins) {
+        if (p == pin) return true;
+    }
+    return false;
+}
 
 }  // namespace flux::board
 

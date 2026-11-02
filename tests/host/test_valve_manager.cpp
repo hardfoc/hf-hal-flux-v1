@@ -13,6 +13,7 @@
 #include "HalTestFixture.h"
 #include "HostTest.h"
 #include "bsp_bind/board/flux_v1/FluxBoardConfig.h"
+#include "flux_hal/flux_hal_valve.hpp"
 
 using flux::hal::ManagerError;
 using flux::test::Board;
@@ -317,4 +318,143 @@ HF_TEST(Flux_ShutdownIncludesTheValves) {
     CHECK(flux.Shutdown());
     CHECK(!VM().IsInitialized());
     CHECK_EQ(b.max.ChannelsOn(), 0u);
+}
+
+//==============================================================================
+// Hardware enable path (SafeHold)
+//==============================================================================
+
+namespace {
+
+size_t SlotOf(HfFunctionalGpioPin p) { return static_cast<size_t>(p); }
+
+bool EnableHigh(HfFunctionalGpioPin p) {
+    auto* g = GpioOf(p);
+    return g != nullptr && g->DrivenLevel() == hf_gpio_level_t::HF_GPIO_LEVEL_HIGH;
+}
+
+}  // namespace
+
+HF_TEST(Gpio_FaultLinesAreInputsAndEnablesStartLowFromTheFirstInstruction) {
+    Board b;
+    REQUIRE(GpioManager::GetInstance().EnsureInitialized());  // GPIO only: no valve driver has run
+    for (const auto pin : {HfFunctionalGpioPin::MAX22200_FAULT_N, HfFunctionalGpioPin::TLE92466_FAULT_N}) {
+        const auto* spec = flux::bsp::host::GpioSpecOf(SlotOf(pin));
+        REQUIRE(spec != nullptr);
+        CHECK(spec->direction == hf_gpio_direction_t::HF_GPIO_DIRECTION_INPUT);  // created as an input
+        CHECK(GpioOf(pin)->LevelHistory().empty());                               // never driven
+    }
+    for (const auto pin : {HfFunctionalGpioPin::MAX22200_ENABLE, HfFunctionalGpioPin::TLE92466_EN}) {
+        auto* g = GpioOf(pin);
+        REQUIRE(g != nullptr);
+        REQUIRE(!g->LevelHistory().empty());
+        CHECK(g->LevelHistory().front() == hf_gpio_level_t::HF_GPIO_LEVEL_LOW);  // banks off first
+        CHECK(!EnableHigh(pin));
+    }
+
+    // The valve bring-up is what raises them, after the drivers are configured.
+    REQUIRE(VM().EnsureInitialized());
+    CHECK(EnableHigh(HfFunctionalGpioPin::MAX22200_ENABLE));
+    CHECK(EnableHigh(HfFunctionalGpioPin::TLE92466_EN));
+    CHECK(GpioOf(HfFunctionalGpioPin::MAX22200_FAULT_N)->LevelHistory().empty());
+}
+
+HF_TEST(ValveManager_DropEnablePinsGatesBothBanksWithoutSpi) {
+    Board b;
+    REQUIRE(VM().EnsureInitialized());
+    REQUIRE(VM().EnableChannel(ValveChannel::SOL_CH1) == hf_valve_err_t::VALVE_SUCCESS);
+    REQUIRE(VM().EnableChannel(ValveChannel::PROP_CH4) == hf_valve_err_t::VALVE_SUCCESS);
+
+    auto* max_spi = flux::bsp::host::SpiDeviceByCs(flux::test::Pin(HfFunctionalGpioPin::SPI2_CS_MAX22200));
+    auto* tle_spi = flux::bsp::host::SpiDeviceByCs(flux::test::Pin(HfFunctionalGpioPin::SPI2_CS_TLE92466));
+    REQUIRE(max_spi != nullptr);
+    REQUIRE(tle_spi != nullptr);
+    const size_t max_frames = max_spi->Transactions().size();
+    const size_t tle_frames = tle_spi->Transactions().size();
+
+    CHECK(VM().DropEnablePins());
+    CHECK(!EnableHigh(HfFunctionalGpioPin::MAX22200_ENABLE));
+    CHECK(!EnableHigh(HfFunctionalGpioPin::TLE92466_EN));
+    CHECK_EQ(max_spi->Transactions().size(), max_frames);  // no SPI on the hardware path
+    CHECK_EQ(tle_spi->Transactions().size(), tle_frames);
+    CHECK(VM().IsOutputInhibited());
+    bool max_en = true;
+    bool tle_en = true;
+    VM().GetEnablePinStates(max_en, tle_en);
+    CHECK(!max_en);
+    CHECK(!tle_en);
+}
+
+HF_TEST(ValveManager_DropHoldsUntilReArmedAndRefusesEnergising) {
+    Board b;
+    REQUIRE(VM().EnsureInitialized());
+    REQUIRE(VM().DropEnablePins());
+
+    CHECK(VM().EnableChannel(ValveChannel::SOL_CH0) == hf_valve_err_t::VALVE_ERR_WRONG_MODE);
+    CHECK(VM().EnableChannelsMask(0x0101) == hf_valve_err_t::VALVE_ERR_WRONG_MODE);
+    CHECK(VM().GetLastError() == hf_valve_err_t::VALVE_ERR_WRONG_MODE);
+    CHECK_EQ(b.max.ChannelsOn(), 0u);
+    CHECK(VM().DisableAllChannels() == hf_valve_err_t::VALVE_SUCCESS);  // de-energising still works
+    CHECK(VM().EnsureInitialized());   // an idempotent EnsureInitialized does not re-arm
+    CHECK(VM().IsOutputInhibited());
+    CHECK(!EnableHigh(HfFunctionalGpioPin::MAX22200_ENABLE));
+
+    REQUIRE(VM().RearmEnablePins());
+    CHECK(!VM().IsOutputInhibited());
+    CHECK(EnableHigh(HfFunctionalGpioPin::MAX22200_ENABLE));
+    CHECK(EnableHigh(HfFunctionalGpioPin::TLE92466_EN));
+    CHECK(VM().EnableChannel(ValveChannel::SOL_CH0) == hf_valve_err_t::VALVE_SUCCESS);
+    CHECK_EQ(b.max.ChannelsOn(), 1u);
+}
+
+HF_TEST(ValveManager_DropWorksEvenWhenBringUpFailed) {
+    Board b;
+    b.tle.absent = true;
+    CHECK(!VM().EnsureInitialized());          // fail-closed, but the MAX22200 raised its ENABLE
+    CHECK(EnableHigh(HfFunctionalGpioPin::MAX22200_ENABLE));
+    CHECK(VM().DropEnablePins());              // the hardware path does not need the manager up
+    CHECK(!EnableHigh(HfFunctionalGpioPin::MAX22200_ENABLE));
+    CHECK(!EnableHigh(HfFunctionalGpioPin::TLE92466_EN));
+}
+
+HF_TEST(ValveManager_DropWithoutGpioReportsFailure) {
+    flux::test::ResetHal();  // nothing initialised: no enable pin exists
+    CHECK(!VM().DropEnablePins());
+    const auto r = flux::hal::ValveBank::EnablePins(false);
+    CHECK(!r.ok);
+    CHECK_EQ(r.code, ManagerError::NotInitialized);
+    flux::test::ResetHal();
+}
+
+HF_TEST(ValveManager_DeinitializeEndsInSafeHold) {
+    Board b;
+    REQUIRE(VM().EnsureInitialized());
+    REQUIRE(VM().EnableChannel(ValveChannel::SOL_CH4) == hf_valve_err_t::VALVE_SUCCESS);
+    CHECK(VM().Deinitialize());
+    CHECK_EQ(b.max.ChannelsOn(), 0u);                       // every channel off over SPI ...
+    CHECK(!EnableHigh(HfFunctionalGpioPin::MAX22200_ENABLE));  // ... then both pins low
+    CHECK(!EnableHigh(HfFunctionalGpioPin::TLE92466_EN));
+}
+
+HF_TEST(ValveBank_FacadeDropsAndReArms) {
+    Board b;
+    REQUIRE(VM().EnsureInitialized());
+    CHECK(flux::hal::ValveBank::EnablePinsHigh());
+    CHECK(!flux::hal::ValveBank::IsHeldOff());
+
+    const auto drop = flux::hal::ValveBank::EnablePins(false);
+    CHECK(drop.ok);
+    CHECK(!flux::hal::ValveBank::EnablePinsHigh());
+    CHECK(flux::hal::ValveBank::IsHeldOff());
+
+    const auto arm = flux::hal::ValveBank::EnablePins(true);
+    CHECK(arm.ok);
+    CHECK(flux::hal::ValveBank::EnablePinsHigh());
+    CHECK(!flux::hal::ValveBank::IsHeldOff());
+
+    b.tle.absent = true;  // a re-arm that cannot bring the banks back fails, with the reason
+    (void)flux::hal::ValveBank::EnablePins(false);
+    const auto bad = flux::hal::ValveBank::EnablePins(true);
+    CHECK(!bad.ok);
+    CHECK_EQ(bad.code, ManagerError::HardwareFault);
 }

@@ -37,7 +37,7 @@ hf-core handlers and chip drivers run their unmodified bring-up and channel code
 
 | Test | Proves |
 | --- | --- |
-| `test_valve_manager` | `kValveChannelMap` is a bijection onto MAX22200 OUT0-7 and TLE92466ED OUT0-5; each channel switches only its own output on the wire; currents land on the mapped TLE channel; the bank mask splits; the board's SPI modes and clocks; fault pins are inputs; fail-closed bring-up with either chip absent or the bus down, retry; MAX22200 and TLE92466ED fault reporting; shutdown turns every channel off |
+| `test_valve_manager` | `kValveChannelMap` is a bijection onto MAX22200 OUT0-7 and TLE92466ED OUT0-5; each channel switches only its own output on the wire; currents land on the mapped TLE channel; the bank mask splits; the board's SPI modes and clocks; fault pins are inputs and enables start low before any valve code runs; the enable path drops both banks without SPI, latches, refuses energising and re-arms; shutdown ends in SafeHold; fail-closed bring-up with either chip absent or the bus down, retry; MAX22200 and TLE92466ED fault reporting; shutdown turns every channel off |
 | `test_adc_manager` | Every pin-map channel registers; each ADS7952 channel reads its own input; the VBUS divider; name and enum lookups agree; failed reads are recorded; fail-closed with the ADS7952 absent, the pressure bus down or the MCU ADC down |
 | `test_temperature_manager` | All three sensors; the NTC through its pin-map channel; the MCP9700 through the ADS7952; degraded mode without the ADC or the die sensor; failure with no sensor |
 | `test_nvs_manager` | The three namespaces and their binding slots; isolation; the 15-character key limit; fail-closed opening |

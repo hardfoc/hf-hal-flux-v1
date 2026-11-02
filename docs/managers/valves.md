@@ -83,6 +83,29 @@ says `HardwareFault` (a chip did not answer) or `BindFailed` (its SPI device or 
 `IsBankReady(ValveDriverType::MAX22200 / TLE92466)` says which chip came up; that chip's handler accessor stays
 non-null for diagnosis. Both handlers are members of the manager, constructed in place: no heap.
 
+## Hardware enable path (SafeHold)
+
+Both banks have an enable input that gates every output of the chip in hardware: MAX22200 `ENABLE` and TLE92466ED
+`EN`. [ADR 0006](../adr/0006-enable-pin-hard-stop.md) records the decision.
+
+| Call | What it does |
+| --- | --- |
+| `DropEnablePins()` | Drives both enables low through their GPIOs: no SPI, no mutex, no logging, works even if the manager failed to start. Latches until re-armed: `EnableChannel()` and `EnableChannelsMask()` then return `VALVE_ERR_WRONG_MODE`; disabling still works |
+| `RearmEnablePins()` | Re-runs the valve bring-up (`Deinitialize()` then `EnsureInitialized()`), which raises both enables again. Uses SPI and the mutex |
+| `IsOutputInhibited()`, `GetEnablePinStates(max, tle)` | Whether a drop is in force; whether each enable is driven high |
+| `flux::hal::ValveBank::EnablePins(bool)` | The facade the product's safety thread calls ([`flux_hal_valve.hpp`](../../lib/api/flux_hal/flux_hal_valve.hpp)); returns `HalResult` |
+
+The pins start low: `GpioManager` creates both enables driven low, and the `FAULT_N` lines of both chips as inputs,
+before any valve code runs. The drivers' bring-up raises the enables. `Deinitialize()` (and `Flux::Shutdown()`) ends
+with every channel off and both enables low. Nothing else in the HAL drops them: when to hold, and whether to vent a
+side first, is the product's decision.
+
+```cpp
+// Safety thread, on a Stop-class latch: hardware first, then the SPI-level stop as today.
+(void)flux::hal::ValveBank::EnablePins(false);
+(void)Flux::GetInstance().valves.DisableAllChannels();
+```
+
 ## Diagnostics
 
 `GetSystemDiagnostics(ValveSystemDiagnostics&)`: which chips are up, configured and active channels, total
@@ -94,6 +117,8 @@ activations and errors. `GetChannelState(ch)` gives per-channel counters. `DumpS
   channel registers hold.
 - **Currents are limited by the chip setup.** The MAX22200 full scale is 1000 mA with this board's reference
   resistor; a set-point above it cannot be reached.
+- **A dropped enable pin stays dropped.** Re-arm with `RearmEnablePins()` (or `ValveBank::EnablePins(true)`); an
+  `EnsureInitialized()` on a running manager does not re-arm.
 - **One chip missing means no valve manager.** A bench with only one driver fitted gets the other bank only through
   its handler, for diagnosis.
 - **`GetLastError()`** holds the last failed call; it is not cleared by a later success.

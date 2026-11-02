@@ -9,6 +9,7 @@
 
 #include "GpioManager.h"
 #include "bsp_bind/FluxPlatformBind.h"
+#include "bsp_bind/board/flux_v1/FluxBoardConfig.h"
 #include "handlers/logger/Logger.h"
 #include "handlers/logger/LogDecorators.h"
 #include "core/hf-core-utils/hf-utils-rtos-wrap/include/OsUtility.h"
@@ -77,8 +78,13 @@ bool GpioManager::Initialize() noexcept {
         auto& entry = entries_[i];
         entry.functional_pin = static_cast<HfFunctionalGpioPin>(i);
 
-        // Configure the GPIO from the mapping data
-        hf_gpio_direction_t direction = hf_gpio_direction_t::HF_GPIO_DIRECTION_OUTPUT;
+        // Configure the GPIO from the mapping data. The pin map has no direction field: the
+        // board config names the inputs (the valve drivers' FAULT_N lines), which are created
+        // as inputs so the MCU never drives them, not even before the valve manager runs.
+        const auto fpin = static_cast<HfFunctionalGpioPin>(i);
+        hf_gpio_direction_t direction = flux::board::IsInputPin(fpin)
+                                            ? hf_gpio_direction_t::HF_GPIO_DIRECTION_INPUT
+                                            : hf_gpio_direction_t::HF_GPIO_DIRECTION_OUTPUT;
 
         hf_gpio_pull_mode_t pull_mode;
         if (mapping.has_pull) {
@@ -101,7 +107,13 @@ bool GpioManager::Initialize() noexcept {
                                        direction, active_state, output_mode, pull_mode};
         entry.driver = flux::bsp::CreateGpio(i, spec);
 
-        if (entry.driver != nullptr && entry.driver->EnsureInitialized()) {
+        // Valve-bank enables start driven low (both banks de-energised) until the valve
+        // manager's bring-up raises them.
+        const bool safe_ok = !flux::board::IsValveEnablePin(fpin) ||
+                             (entry.driver != nullptr && entry.driver->EnsureInitialized() &&
+                              entry.driver->SetInactive() == hf_gpio_err_t::GPIO_SUCCESS);
+
+        if (entry.driver != nullptr && entry.driver->EnsureInitialized() && safe_ok) {
             entry.registered = true;
             ++registered_count_;
             Logger::GetInstance().Info(TAG, "  %-28.*s GPIO%-3d %-7s",

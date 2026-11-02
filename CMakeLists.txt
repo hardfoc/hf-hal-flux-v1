@@ -59,6 +59,7 @@ include("${HF_HAL_ROOT}/lib/core/cmake/hf_core_build_settings.cmake")
 set(API_SOURCES
     "${HF_HAL_ROOT}/lib/api/Flux.cpp"
     "${HF_HAL_ROOT}/lib/api/FluxVersionManifest.cpp"
+    "${HF_HAL_ROOT}/lib/api/flux_hal/flux_hal_valve.cpp"
 )
 
 # Manager Sources (7 managers)
