@@ -104,6 +104,10 @@
   border: 1px solid var(--hf-line);
 }
 
+.md-typeset table:not([class]) td code {
+  white-space: nowrap;      /* identifiers stay whole; the table scrolls instead */
+}
+
 .md-typeset table:not([class]) th {
   background: var(--hf-surface);
   font-weight: 650;

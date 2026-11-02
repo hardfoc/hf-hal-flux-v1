@@ -168,7 +168,6 @@ def _figure(m: re.Match, page_dir: str, page: str) -> str:
         '<figure class="hf-figure">',
         f'<img src="{rel}.svg#only-light" alt="{alt}" width="{e["width"]}" loading="lazy">'
         f'<img src="{rel}.dark.svg#only-dark" alt="{alt}" width="{e["width"]}" loading="lazy">',
-        f"<figcaption>{html.escape(e['title'])}</figcaption>",
         "</figure>",
         "",
     ]

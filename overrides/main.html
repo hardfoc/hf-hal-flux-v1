@@ -3,7 +3,7 @@
 
 {% block outdated %}
   This page documents an older version.
-  <a href="{{ '../' ~ base_url }}">
+  <a href="{{ config.site_url or ('../' ~ base_url) }}">
     <strong>Go to the latest version.</strong>
   </a>
 {% endblock %}
