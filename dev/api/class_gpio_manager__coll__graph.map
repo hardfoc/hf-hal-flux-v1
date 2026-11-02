@@ -1,9 +1,0 @@
-<map id="GpioManager" name="GpioManager">
-<area shape="rect" id="Node000001" title="Singleton that manages all MCU GPIO pins defined in the X&#45;MACRO pin config." alt="" coords="171,196,281,221"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="5,93,172,133"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="129,139,211,194,208,198,126,143"/>
-<area shape="rect" id="Node000003" href="$struct_gpio_entry.html" title="A single GPIO entry in the fixed&#45;size registry." alt="" coords="45,5,132,31"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="91,44,91,93,86,93,86,44"/>
-<area shape="rect" id="Node000004" title=" " alt="" coords="196,101,349,126"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="263,139,234,197,229,195,258,137"/>
-</map>

@@ -1,5 +1,0 @@
-<map id="FluxHostBind.h" name="FluxHostBind.h">
-<area shape="rect" id="Node000001" title="Host (unit&#45;test) family of the Flux platform binding: scripting and inspection hooks." alt="" coords="41,5,162,31"/>
-<area shape="rect" id="Node000002" href="$_flux_platform_bind_host_8cpp.html" title="Host implementation of the Flux platform binding over the hf&#45;core host fakes." alt="" coords="5,79,197,104"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="104,44,104,79,99,79,99,44"/>
-</map>

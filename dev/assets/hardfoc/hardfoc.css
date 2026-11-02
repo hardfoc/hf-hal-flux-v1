@@ -448,6 +448,16 @@
   white-space: nowrap;   /* identifiers stay whole; the table scrolls on a phone instead */
 }
 
+/* From a tablet up, a table fills the column, so its text cells wrap and the last column (often the most useful
+   one, "Fix", "Description") stays in view. Identifiers in code stay whole; a table whose code alone is wider than
+   the column scrolls sideways, as on a phone. */
+@media screen and (min-width: 45em) {
+  .md-typeset table:not([class]) {
+    display: table;
+    width: 100%;
+  }
+}
+
 .md-typeset__scrollwrap {
   margin: 1em -0.8rem;
 }
@@ -867,10 +877,91 @@
   }
 }
 
+/* Filterable catalogue (the portal's repository list): a search field, topic chips that are buttons, and cards
+   (Material's .grid > .card) that a script hides when they do not match.
+     <input class="hf-filter" type="search" aria-label="Filter">
+     <div class="grid"><div class="card hf-repo">...<button class="hf-chipbtn">spi</button>...</div></div> */
+.md-typeset .hf-filter {
+  width: 100%;
+  font: inherit;
+  font-size: 0.8rem;
+  padding: 0.6em 0.9em;
+  border-radius: var(--hf-radius);
+  border: 1px solid var(--hf-line-strong);
+  background: var(--md-default-bg-color);
+  color: var(--md-default-fg-color);
+}
+
+.md-typeset .hf-filter:focus-visible {
+  outline: 2px solid var(--md-accent-fg-color);
+  outline-offset: 1px;
+}
+
+.md-typeset .hf-chipbtn {
+  font: inherit;
+  font-size: 0.62rem;
+  font-weight: 600;
+  line-height: 1.5;
+  padding: 0.1em 0.6em;
+  margin: 0 0.3em 0.3em 0;
+  border-radius: 1em;
+  cursor: pointer;
+  color: var(--hf-brand-strong);
+  background: var(--hf-brand-soft);
+  border: 1px solid color-mix(in srgb, var(--hf-brand-strong) 25%, transparent);
+}
+
+.md-typeset .hf-chipbtn:hover,
+.md-typeset .hf-chipbtn[aria-pressed="true"] {
+  color: var(--md-primary-bg-color);
+  background: var(--hf-brand);
+  border-color: var(--hf-brand);
+}
+
+.md-typeset .hf-chipbtn:focus-visible {
+  outline: 2px solid var(--md-accent-fg-color);
+  outline-offset: 1px;
+}
+
+.md-typeset .hf-repo h3 {
+  margin: 0 0 0.4em;
+  font-size: 0.85rem;
+  overflow-wrap: anywhere;
+}
+
+.md-typeset .hf-repo p {
+  margin: 0 0 0.6em;
+  font-size: 0.72rem;
+}
+
+.md-typeset .hf-repo .hf-repo__links {
+  margin: 0;
+  font-size: 0.7rem;
+}
+
+.md-typeset .hf-repo[hidden],
+.md-typeset .hf-catalogue__group[hidden] {
+  display: none;
+}
+
 /* ============================================================== 10 figures, Mermaid */
 .md-typeset figure.hf-figure {
   margin: 1.6em 0 0.4em;
   max-width: 100%;
+}
+
+/* On a phone a wide figure keeps a readable size and scrolls sideways instead of shrinking below its text size. */
+@media screen and (max-width: 44.9375em) {
+  .md-typeset figure.hf-figure {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .md-typeset figure.hf-figure img {
+    width: max(100%, 30rem);  /* about 600 px: figkit text stays at or above 11 px */
+    max-width: none;
+    height: auto;
+  }
 }
 
 .md-typeset figure.hf-figure img {

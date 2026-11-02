@@ -1,9 +1,0 @@
-<map id="NvsManager.h" name="NvsManager.h">
-<area shape="rect" id="Node000001" title="Non&#45;volatile storage for Flux V1 — three namespaces behind BaseNvs." alt="" coords="72,5,187,31"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="5,101,72,126"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="120,33,62,92,58,89,116,29"/>
-<area shape="rect" id="Node000003" title=" " alt="" coords="96,101,163,126"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="132,31,132,87,127,87,127,31"/>
-<area shape="rect" id="Node000004" title=" " alt="" coords="187,79,367,148"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="149,28,214,69,211,74,146,33"/>
-</map>
