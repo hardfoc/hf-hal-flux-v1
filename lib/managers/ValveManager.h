@@ -18,11 +18,15 @@
  * all 14 valve channels through a single interface. Each channel is identified
  * by a compile-time enum and its driver type is resolved at registration.
  *
- * Design principles (lessons from Vortex):
- *  - All channel descriptors are stack-allocated in fixed-size arrays.
- *  - Handler instances are heap-allocated (raw new, singleton lifetime).
- *  - No heap allocation for channel lookup — O(1) index-based access.
- *  - String lookups use linear scan over a small constexpr table.
+ * Design principles:
+ *  - All channel descriptors live in fixed-size arrays.
+ *  - Both handlers are members (`std::optional`, constructed in place during
+ *    `EnsureInitialized()`): no heap allocation, before or after init.
+ *  - Fail-closed bring-up: `EnsureInitialized()` succeeds only when every fitted
+ *    driver IC came up. Otherwise the manager stays uninitialised, every channel
+ *    operation is refused, and `GetManagerError()` says why. A bank that did come
+ *    up stays reachable through its handler accessor, for diagnosis only.
+ *  - O(1) index-based channel lookup; string lookups scan a small constexpr table.
  *  - Thread-safe via RtosMutex on state-changing operations.
  *
  * @author HardFOC Team
@@ -36,10 +40,11 @@
 #include <array>
 #include <atomic>
 #include <cstdint>
-#include <memory>
+#include <optional>
 #include <string_view>
 
 #include "RtosMutex.h"
+#include "flux_hal/flux_hal_types.hpp"
 #include "handlers/max22200/Max22200Handler.h"
 #include "handlers/tle92466ed/Tle92466edHandler.h"
 
@@ -319,7 +324,25 @@ public:
     [[nodiscard]] bool IsInitialized() const noexcept { return initialized_.load(std::memory_order_acquire); }
 
     /**
-     * @brief Release all valve driver resources and reset to uninitialized state.
+     * @brief Whether one driver IC came up during the last bring-up attempt.
+     * @details True for a bank even when the manager as a whole failed (fail-closed) because the
+     *          other bank did not come up; used for diagnosis (which part is missing).
+     * @param bank `ValveDriverType::MAX22200` or `ValveDriverType::TLE92466`.
+     */
+    [[nodiscard]] bool IsBankReady(ValveDriverType bank) const noexcept;
+
+    /**
+     * @brief Lifecycle / bind error of the last `EnsureInitialized()` (shared catalog).
+     * @return `ManagerError::None` when initialised; otherwise why bring-up failed.
+     */
+    [[nodiscard]] flux::hal::ManagerError GetManagerError() const noexcept {
+        return manager_error_.load(std::memory_order_acquire);
+    }
+
+    /**
+     * @brief Turn every channel off, release both driver handlers and reset to uninitialised.
+     * @details Safe to call when not initialised. Channels are disabled before the handlers are
+     *          destroyed, so a shutdown never leaves an output energised by a stale command.
      * @return true on success
      */
     bool Deinitialize() noexcept;
@@ -522,8 +545,11 @@ public:
     //==========================================================================
 
     /**
-     * @brief Get the most recent error code from any valve operation.
-     * @return Last hf_valve_err_t set by any API call
+     * @brief Get the most recent failed valve operation's error code.
+     * @details Operation lane (per call). Set by every channel, configuration and fault call that
+     *          fails, and by a failed bring-up; never cleared by a later success. The lifecycle
+     *          lane is `GetManagerError()`.
+     * @return Last hf_valve_err_t recorded, or VALVE_SUCCESS if nothing has failed.
      */
     [[nodiscard]] hf_valve_err_t GetLastError() const noexcept { return last_error_.load(std::memory_order_acquire); }
 
@@ -542,8 +568,22 @@ private:
     ~ValveManager() = default;
 
     hf_valve_err_t Initialize() noexcept;
-    bool InitializeMax22200() noexcept;
-    bool InitializeTle92466() noexcept;
+    flux::hal::ManagerError InitializeMax22200() noexcept;
+    flux::hal::ManagerError InitializeTle92466() noexcept;
+
+    /** @brief Disable every channel on every bank that is up (mutex held by the caller). */
+    hf_valve_err_t DisableAllLocked() noexcept;
+
+    /** @brief Destroy both handlers and clear the bank flags (mutex held by the caller). */
+    void ReleaseDriversLocked() noexcept;
+
+    /** @brief Remember a failed operation result for GetLastError(); pass the result through. */
+    hf_valve_err_t Record(hf_valve_err_t result) const noexcept {
+        if (!HfValveErrOk(result)) {
+            last_error_.store(result, std::memory_order_release);
+        }
+        return result;
+    }
 
     /** @brief Resolve channel enum to hw channel index and driver type. */
     [[nodiscard]] static bool ResolveChannel(ValveChannel channel,
@@ -552,13 +592,13 @@ private:
 
 
     //==========================================================================
-    // HANDLER INSTANCES — owned via unique_ptr (heap-allocated, singleton lifetime)
+    // HANDLER INSTANCES — members, constructed in place at bring-up (no heap)
     //==========================================================================
 
-    std::unique_ptr<Max22200Handler> max22200_;
+    std::optional<Max22200Handler> max22200_;
     bool max22200_valid_{false};
 
-    std::unique_ptr<Tle92466edHandler> tle92466_;
+    std::optional<Tle92466edHandler> tle92466_;
     bool tle92466_valid_{false};
 
     //==========================================================================
@@ -568,6 +608,7 @@ private:
     std::array<ValveChannelState, static_cast<size_t>(ValveChannel::CHANNEL_COUNT)> channel_states_{};
 
     std::atomic<bool> initialized_{false};
+    std::atomic<flux::hal::ManagerError> manager_error_{flux::hal::ManagerError::NotInitialized};
     mutable std::atomic<hf_valve_err_t> last_error_{hf_valve_err_t::VALVE_SUCCESS};
     mutable RtosMutex mutex_;
 };

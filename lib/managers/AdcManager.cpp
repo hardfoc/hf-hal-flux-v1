@@ -11,15 +11,13 @@
 #include "bsp_bind/FluxPlatformBind.h"
 #include "handlers/logger/Logger.h"
 #include "handlers/logger/LogDecorators.h"
-#include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/utils/memory_utils.h"
 #include "core/hf-core-utils/hf-utils-rtos-wrap/include/OsUtility.h"
 
-#ifdef HARDFOC_ADS7952_SUPPORT
-#include "Ads7952Handler.h"
 #include "CommChannelsManager.h"
-#endif
 
 static constexpr const char* TAG = "FluxAdc";
+
+using flux::hal::ManagerError;
 
 //==============================================================================
 // SINGLETON
@@ -39,12 +37,51 @@ bool AdcManager::EnsureInitialized() noexcept {
     MutexLockGuard lock(mutex_);
     if (initialized_.load(std::memory_order_acquire)) return true;
     bool ok = Initialize();
+    if (ok) {
+        manager_error_.store(ManagerError::None, std::memory_order_release);
+    } else {
+        last_error_.store(hf_adc_err_t::ADC_ERR_NOT_INITIALIZED, std::memory_order_release);
+    }
     initialized_.store(ok, std::memory_order_release);
     return ok;
 }
 
+bool AdcManager::IsAds7952Ready(uint8_t device_index) const noexcept {
+    return device_index < kMaxAds7952Devices && ads7952_handlers_[device_index].has_value();
+}
+
+void AdcManager::ReleaseLocked() noexcept {
+    for (size_t i = 0; i < registered_count_; ++i) {
+        entries_[i] = AdcEntry{};
+    }
+    registered_count_ = 0;
+    enum_to_index_.fill(kInvalidIndex);
+    if (internal_adc_ != nullptr) {
+        flux::bsp::DestroyInternalAdc();
+        internal_adc_ = nullptr;
+    }
+    for (auto& handler : ads7952_handlers_) {
+        if (handler.has_value()) {
+            (void)handler->Deinitialize();
+            handler.reset();
+        }
+    }
+    ads7952_device_count_ = 0;
+}
+
 bool AdcManager::Initialize() noexcept {
     Logger::GetInstance().Info(TAG, "Initializing Flux ADC manager");
+
+    // A previous failed attempt may have left part of the ADC up; start from nothing.
+    ReleaseLocked();
+
+    // Fail-closed bookkeeping: every source the pin map uses must come up.
+    bool internal_needed = false;
+    bool internal_failed = false;
+    std::array<bool, kMaxAds7952Devices> ads_needed{};
+    std::array<bool, kMaxAds7952Devices> ads_attempted{};
+    ManagerError ads_error = ManagerError::None;
+
     logger_decor::Section(TAG, "ADC registration table");
     Logger::GetInstance().Info(TAG, "  %-27s %-15s %-8s %-5s %-6s", "Channel", "Source", "Unit", "Ch", "Div");
     Logger::GetInstance().Info(TAG, "  %-27s %-15s %-8s %-5s %-6s", "-------", "------", "----", "--", "---");
@@ -81,7 +118,9 @@ bool AdcManager::Initialize() noexcept {
         channel_mask |= (1UL << hw_channel);
     }
 
-    internal_adc_ = (channel_mask != 0U) ? flux::bsp::CreateInternalAdc(kInternalAdcUnit, channel_mask) : nullptr;
+    internal_needed = (channel_mask != 0U);
+    internal_adc_ = internal_needed ? flux::bsp::CreateInternalAdc(kInternalAdcUnit, channel_mask) : nullptr;
+    internal_failed = internal_needed && (internal_adc_ == nullptr);
 
     if (internal_adc_ != nullptr) {
         // Iterate the pincfg ADC mapping and register each channel
@@ -116,9 +155,8 @@ bool AdcManager::Initialize() noexcept {
     }
 
     //==========================================================================
-    // ADS7952 EXTERNAL ADC — conditionally compiled
+    // ADS7952 EXTERNAL ADC — one handler per device, constructed in place
     //==========================================================================
-#ifdef HARDFOC_ADS7952_SUPPORT
     // Iterate pincfg ADC mapping for ADS7952_EXTERNAL channels
     // Group by chip_unit (device index) and create one handler per device
     for (size_t i = 0; i < HF_ADC_MAPPING_SIZE; ++i) {
@@ -128,9 +166,17 @@ bool AdcManager::Initialize() noexcept {
         }
 
         const uint8_t dev_idx = mapping.chip_unit;
+        if (dev_idx >= kMaxAds7952Devices) {
+            Logger::GetInstance().Error(TAG, "  [ADS7952] Dev%u out of range (max %u)", dev_idx,
+                                        static_cast<unsigned>(kMaxAds7952Devices - 1));
+            ads_error = ManagerError::BindFailed;
+            continue;
+        }
+        ads_needed[dev_idx] = true;
 
-        // Create handler for this device if not already created
-        if (dev_idx < kMaxAds7952Devices && !ads7952_handlers_[dev_idx]) {
+        // Create the handler for this device once (first channel that names it)
+        if (!ads_attempted[dev_idx]) {
+            ads_attempted[dev_idx] = true;
             // Map device index to SPI device ID
             auto spi_dev_id = static_cast<SpiDeviceId>(
                 static_cast<uint8_t>(SpiDeviceId::ADS7952_ADC_0) + dev_idx);
@@ -141,24 +187,23 @@ bool AdcManager::Initialize() noexcept {
                 Ads7952HandlerConfig cfg = GetDefaultAds7952Config();
                 cfg.device_index = dev_idx;
 
-                ads7952_handlers_[dev_idx] = hf::utils::make_unique_nothrow<Ads7952Handler>(*spi, cfg);
-                if (ads7952_handlers_[dev_idx]) {
-                    if (ads7952_handlers_[dev_idx]->EnsureInitialized()) {
-                        ++ads7952_device_count_;
-                        Logger::GetInstance().Info(TAG, "  [ADS7952] Dev%u handler initialized", dev_idx);
-                    } else {
-                        Logger::GetInstance().Error(TAG, "  [ADS7952] Dev%u initialization failed", dev_idx);
-                        ads7952_handlers_[dev_idx].reset();
-                    }
+                auto& handler = ads7952_handlers_[dev_idx].emplace(*spi, cfg);
+                if (handler.EnsureInitialized()) {
+                    ++ads7952_device_count_;
+                    Logger::GetInstance().Info(TAG, "  [ADS7952] Dev%u handler initialized", dev_idx);
+                } else {
+                    Logger::GetInstance().Error(TAG, "  [ADS7952] Dev%u initialization failed", dev_idx);
+                    ads7952_handlers_[dev_idx].reset();
+                    if (ads_error == ManagerError::None) ads_error = ManagerError::HardwareFault;
                 }
             } else {
-                Logger::GetInstance().Warn(TAG, "  [ADS7952] Dev%u: SPI device not available", dev_idx);
+                Logger::GetInstance().Error(TAG, "  [ADS7952] Dev%u: SPI device not available", dev_idx);
+                ads_error = ManagerError::BindFailed;
             }
         }
 
         // Register this ADS7952 channel in the entries table
-        if (dev_idx < kMaxAds7952Devices && ads7952_handlers_[dev_idx] &&
-            registered_count_ < kMaxChannels) {
+        if (ads7952_handlers_[dev_idx].has_value() && registered_count_ < kMaxChannels) {
             const auto fc = static_cast<HfFunctionalAdcChannel>(mapping.functional_channel);
             auto& entry = entries_[registered_count_];
             entry.functional_channel = fc;
@@ -166,7 +211,7 @@ bool AdcManager::Initialize() noexcept {
             entry.adc_unit = mapping.adc_unit;
             entry.hw_channel = mapping.physical_channel;
             entry.voltage_divider = mapping.voltage_divider;
-            entry.driver = ads7952_handlers_[dev_idx].get();  // BaseAdc* from Ads7952Handler
+            entry.driver = &*ads7952_handlers_[dev_idx];  // BaseAdc* from Ads7952Handler
             entry.registered = true;
             enum_to_index_[static_cast<size_t>(fc)] = registered_count_;
             ++registered_count_;
@@ -180,11 +225,37 @@ bool AdcManager::Initialize() noexcept {
                                       static_cast<double>(entry.voltage_divider));
         }
     }
-#endif // HARDFOC_ADS7952_SUPPORT
 
     logger_decor::Rule(TAG);
+
+    // ── Fail closed: the MCU ADC (if the pin map uses it) and every ADS7952 the pin map
+    //    names must be up. Otherwise the manager stays uninitialised and Get() returns nullptr.
+    ManagerError err = ManagerError::None;
+    if (internal_failed) {
+        err = ManagerError::BindFailed;
+    } else if (ads_error != ManagerError::None) {
+        err = ads_error;
+    } else if (registered_count_ == 0) {
+        err = ManagerError::BindFailed;  // nothing in the pin map at all
+    }
+    for (size_t d = 0; d < kMaxAds7952Devices && err == ManagerError::None; ++d) {
+        if (ads_needed[d] && !ads7952_handlers_[d].has_value()) {
+            err = ManagerError::HardwareFault;
+        }
+    }
+
+    if (err != ManagerError::None) {
+        manager_error_.store(err, std::memory_order_release);
+        Logger::GetInstance().Error(TAG,
+            "ADC manager NOT initialised (fail-closed, %s): internal ADC=%s, ADS7952 dev0=%s",
+            flux::hal::ToString(err),
+            internal_needed ? (internal_failed ? "FAIL" : "OK") : "unused",
+            ads_needed[0] ? (ads7952_handlers_[0].has_value() ? "OK" : "FAIL") : "unused");
+        return false;
+    }
+
     Logger::GetInstance().Info(TAG, "ADC manager initialized (%zu channels)", registered_count_);
-    return registered_count_ > 0;
+    return true;
 }
 
 //==============================================================================
@@ -244,6 +315,7 @@ hf_adc_err_t AdcManager::ReadVoltageByIndex(size_t idx, float& voltage, uint8_t 
         entry.access_count++;
     } else {
         entry.error_count++;
+        last_error_.store(err, std::memory_order_release);
     }
     return err;
 }
@@ -257,50 +329,67 @@ hf_adc_err_t AdcManager::ReadRawByIndex(size_t idx, uint32_t& raw_count, uint8_t
         entry.access_count++;
     } else {
         entry.error_count++;
+        last_error_.store(err, std::memory_order_release);
     }
     return err;
 }
 
 hf_adc_err_t AdcManager::ReadVoltage(std::string_view name, float& voltage, uint8_t samples, uint16_t timeBetweenSamples) noexcept {
-    if (!initialized_.load(std::memory_order_acquire))
+    if (!initialized_.load(std::memory_order_acquire)) {
+        last_error_.store(hf_adc_err_t::ADC_ERR_NOT_INITIALIZED, std::memory_order_release);
         return hf_adc_err_t::ADC_ERR_NOT_INITIALIZED;
+    }
 
     size_t idx = FindByName(name);
-    if (idx == kInvalidIndex)
+    if (idx == kInvalidIndex) {
+        last_error_.store(hf_adc_err_t::ADC_ERR_INVALID_CHANNEL, std::memory_order_release);
         return hf_adc_err_t::ADC_ERR_INVALID_CHANNEL;
+    }
 
     return ReadVoltageByIndex(idx, voltage, samples, timeBetweenSamples);
 }
 
 hf_adc_err_t AdcManager::ReadVoltage(HfFunctionalAdcChannel channel, float& voltage, uint8_t samples, uint16_t timeBetweenSamples) noexcept {
-    if (!initialized_.load(std::memory_order_acquire))
+    if (!initialized_.load(std::memory_order_acquire)) {
+        last_error_.store(hf_adc_err_t::ADC_ERR_NOT_INITIALIZED, std::memory_order_release);
         return hf_adc_err_t::ADC_ERR_NOT_INITIALIZED;
+    }
 
     size_t idx = FindByEnum(channel);
-    if (idx == kInvalidIndex)
+    if (idx == kInvalidIndex) {
+        last_error_.store(hf_adc_err_t::ADC_ERR_INVALID_CHANNEL, std::memory_order_release);
         return hf_adc_err_t::ADC_ERR_INVALID_CHANNEL;
+    }
 
     return ReadVoltageByIndex(idx, voltage, samples, timeBetweenSamples);
 }
 
 hf_adc_err_t AdcManager::ReadRaw(std::string_view name, uint32_t& raw_count, uint8_t samples, uint16_t timeBetweenSamples) noexcept {
-    if (!initialized_.load(std::memory_order_acquire))
+    if (!initialized_.load(std::memory_order_acquire)) {
+        last_error_.store(hf_adc_err_t::ADC_ERR_NOT_INITIALIZED, std::memory_order_release);
         return hf_adc_err_t::ADC_ERR_NOT_INITIALIZED;
+    }
 
     size_t idx = FindByName(name);
-    if (idx == kInvalidIndex)
+    if (idx == kInvalidIndex) {
+        last_error_.store(hf_adc_err_t::ADC_ERR_INVALID_CHANNEL, std::memory_order_release);
         return hf_adc_err_t::ADC_ERR_INVALID_CHANNEL;
+    }
 
     return ReadRawByIndex(idx, raw_count, samples, timeBetweenSamples);
 }
 
 hf_adc_err_t AdcManager::ReadRaw(HfFunctionalAdcChannel channel, uint32_t& raw_count, uint8_t samples, uint16_t timeBetweenSamples) noexcept {
-    if (!initialized_.load(std::memory_order_acquire))
+    if (!initialized_.load(std::memory_order_acquire)) {
+        last_error_.store(hf_adc_err_t::ADC_ERR_NOT_INITIALIZED, std::memory_order_release);
         return hf_adc_err_t::ADC_ERR_NOT_INITIALIZED;
+    }
 
     size_t idx = FindByEnum(channel);
-    if (idx == kInvalidIndex)
+    if (idx == kInvalidIndex) {
+        last_error_.store(hf_adc_err_t::ADC_ERR_INVALID_CHANNEL, std::memory_order_release);
         return hf_adc_err_t::ADC_ERR_INVALID_CHANNEL;
+    }
 
     return ReadRawByIndex(idx, raw_count, samples, timeBetweenSamples);
 }
@@ -328,7 +417,7 @@ hf_adc_err_t AdcManager::GetSystemDiagnostics(AdcSystemDiagnostics& diag) const 
     diag.total_operations = diag.successful_operations + diag.failed_operations;
     diag.last_error = last_error_.load(std::memory_order_acquire);
     diag.system_uptime_ms = (init_time_ms_ > 0) ? (os_get_elapsed_time_msec() - init_time_ms_) : 0;
-    diag.system_healthy = (diag.total_channels_registered > 0) && (diag.failed_operations == 0);
+    diag.system_healthy = initialized_.load(std::memory_order_acquire) && (diag.failed_operations == 0);
     return hf_adc_err_t::ADC_SUCCESS;
 }
 
@@ -354,34 +443,11 @@ void AdcManager::DumpStatistics() const noexcept {
 
 bool AdcManager::Deinitialize() noexcept {
     MutexLockGuard lock(mutex_);
-    if (!initialized_.load(std::memory_order_acquire)) return true;
-
-    Logger::GetInstance().Info(TAG, "Deinitializing Flux ADC manager");
-
-    // Clear all entries
-    for (size_t i = 0; i < registered_count_; ++i) {
-        entries_[i].driver = nullptr;
-        entries_[i].registered = false;
-        entries_[i].access_count = 0;
-        entries_[i].error_count = 0;
+    if (initialized_.load(std::memory_order_acquire)) {
+        Logger::GetInstance().Info(TAG, "Deinitializing Flux ADC manager");
     }
-    registered_count_ = 0;
-
-    // Release the MCU ADC unit
-    flux::bsp::DestroyInternalAdc();
-    internal_adc_ = nullptr;
-
-    // Release ADS7952 handlers
-#ifdef HARDFOC_ADS7952_SUPPORT
-    for (auto& handler : ads7952_handlers_) {
-        if (handler) {
-            handler->Deinitialize();
-            handler.reset();
-        }
-    }
-    ads7952_device_count_ = 0;
-#endif
-
+    ReleaseLocked();
     initialized_.store(false, std::memory_order_release);
+    manager_error_.store(ManagerError::NotInitialized, std::memory_order_release);
     return true;
 }

@@ -8,18 +8,35 @@ error types, where to read the last error, and the system-level diagnostics.
 1. **Check the return value.** Most methods are `[[nodiscard]]`; the compiler warns if you drop a result.
 2. A method that returns `bool` returns `false` on failure; a method that returns a pointer returns `nullptr` when
    the manager is not initialised or the thing you asked for does not exist.
-3. Every manager has `GetLastError()`, but it is only as good as the manager's bookkeeping (see the table): prefer
-   the value a call returns.
+3. Every manager has two error lanes, as in pw-hal ([ADR 0005](../adr/0005-no-heap-fail-closed.md)):
+   `GetManagerError()` says why bring-up failed, in the shared `flux::hal::ManagerError` catalog
+   ([`flux_hal_types.hpp`](../../lib/api/flux_hal/flux_hal_types.hpp)); `GetLastError()` holds the last failed
+   operation in the manager's own enum. Facades return `flux::hal::HalResult`.
 
-## Error types by manager
+## Bring-up errors (shared catalog)
+
+| `ManagerError` | Meaning |
+| --- | --- |
+| `None` | The manager is up |
+| `NotInitialized` | Not attempted yet, or shut down |
+| `BindFailed` | A bus, pin or platform object could not be created (missing in the pin map, or the binding refused it) |
+| `HardwareFault` | A fitted chip did not answer or reported a fault during bring-up |
+| `DependencyNotReady` | A manager this one needs is down |
+| `InvalidArgument`, `Busy`, `Unsupported` | Reserved for facade calls |
+
+Managers fail closed: `IsInitialized()` is `true` only when `GetManagerError()` is `None`. The one exception is
+`TemperatureManager`, whose sensors are independent monitors with a fallback chain: it runs degraded with any
+sensor that came up, keeps the reason in `GetManagerError()` and reports `IsDegraded()`.
+
+## Operation errors by manager
 
 | Manager | Error type | To text | `GetLastError()` updated |
 | --- | --- | --- | --- |
 | `NvsManager` | `hf_nvs_err_t` | `HfNvsErrToString()` | On initialisation failure |
 | `CommChannelsManager` | `CommError` | `CommErrorToString()` | Yes |
 | `GpioManager` | `hf_gpio_err_t` | `HfGpioErrToString()` | Yes |
-| `ValveManager` | `hf_valve_err_t` | `HfValveErrToString()`, `HfValveErrOk()` | **No**: always `VALVE_SUCCESS` today |
-| `AdcManager` | `hf_adc_err_t` | `HfAdcErrToString()` | **No**: always `ADC_SUCCESS` today |
+| `ValveManager` | `hf_valve_err_t` | `HfValveErrToString()`, `HfValveErrOk()` | Yes, on every failed call and on failed bring-up |
+| `AdcManager` | `hf_adc_err_t` | `HfAdcErrToString()` | Yes, on every failed read and on failed bring-up |
 | `LedManager` | `LedError` | `LedErrorToString()` | Yes |
 | `TemperatureManager` | `TemperatureError` | `TemperatureErrorToString()` | Yes |
 
@@ -29,7 +46,23 @@ SPI errors, 20-27 errors reported by a driver chip, 30-31 locking and dependency
 
 ## System diagnostics
 
-All of these are on the `Flux` object and need a successful `EnsureInitialized()` first.
+`Flux::CollectDiagnostics(FluxHalDiagnostics&)` works at any time, including after a failed
+`EnsureInitialized()`: every manager in init order with `required`, `initialized` and its `ManagerError`, the first
+error and which manager reported it, and the readiness of every fitted part (MAX22200, TLE92466ED, pressure bus,
+ADS7952, MCU ADC, CAN, die sensor, NTC, MCP9700, status LED). `Flux::GetLastError()` returns the error of the first
+required manager that failed.
+
+```cpp
+FluxHalDiagnostics d;
+Flux::GetInstance().CollectDiagnostics(d);
+if (!d.all_managers_up) {
+    ESP_LOGW("app", "first error: %s in %s; MAX22200=%d TLE92466ED=%d ADS7952=%d",
+             flux::hal::ToString(d.first_error), d.first_error_manager,
+             d.max22200_ready, d.tle92466_ready, d.ads7952_ready);
+}
+```
+
+The older calls below need a successful `EnsureInitialized()` first.
 
 | Call | Gives you |
 | --- | --- |
@@ -58,5 +91,5 @@ if (Flux::GetInstance().CollectManagerHealth(health) && !health.all_healthy) {
 !!! note "Known gaps"
     `GetSystemWarnings()` always returns 0 entries today: the facade has an internal warning list but nothing adds
     to it. Best-effort start-up failures are visible as `WARN` rows in the log and through `GetFailedComponents()`.
-    Because `ValveManager` and `AdcManager` do not record their last error, the health snapshot reports them as
-    healthy whenever they are initialised.
+    `CollectManagerHealth()` casts each manager's own operation enum to `uint8_t`, so its codes are not comparable
+    across managers; use `CollectDiagnostics()` for bring-up state.

@@ -10,7 +10,10 @@ Reads the board's three temperature sensors by name and keeps simple statistics.
 | `MCP9700_THERMISTOR` | MCP9700 analog sensor | `AdcManager` channel `ADS7952_0_CH8` (needs `HARDFOC_MCP9700_SUPPORT` and a working ADS7952) |
 
 The manager starts if at least one sensor works; the others are left out and reads of them return
-`SENSOR_NOT_FOUND`.
+`SENSOR_NOT_FOUND`. With a sensor missing it runs **degraded**: `IsDegraded()` is true, `GetManagerError()` says
+why, `IsSensorReady(type)` says which one, and `GetSystemDiagnostics()` never reports it healthy. It is the one
+manager that runs degraded rather than failing closed ([Initialisation](../architecture/initialization.md)), because
+its sensors back each other up.
 
 ## API
 
@@ -43,7 +46,7 @@ last readings. `DumpStatistics()` logs each sensor's last value and counters.
 ## Pitfalls
 
 - **Start-up order matters.** The thermistors depend on `AdcManager`; if the ADC failed, only `ESP32_INTERNAL`
-  registers.
+  registers and the manager reports `DependencyNotReady`.
 - **The internal sensor measures the chip**, not the valves or the board; it reads higher than ambient.
 - **NTC values are fixed in code** (B, series resistor, reference voltage). A different thermistor means changing
   `TemperatureManager.cpp`.

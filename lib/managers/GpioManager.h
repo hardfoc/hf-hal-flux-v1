@@ -25,6 +25,7 @@
 
 #include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/base/BaseGpio.h"
 #include "RtosMutex.h"
+#include "flux_hal/flux_hal_types.hpp"
 #include "core/hf-core-drivers/internal/hf-pincfg/src/hf_functional_pin_config_flux_v1.hpp"
 
 //==============================================================================
@@ -115,6 +116,15 @@ public:
      * @return Last hf_gpio_err_t set by any API call
      */
     [[nodiscard]] hf_gpio_err_t GetLastError() const noexcept { return last_error_; }
+
+    /**
+     * @brief Lifecycle / bind error of the last `EnsureInitialized()` (shared catalog).
+     * @details `BindFailed` when any GPIO-category pin of the pin map could not be created or
+     *          initialised (fail-closed: the manager then stays uninitialised).
+     */
+    [[nodiscard]] flux::hal::ManagerError GetManagerError() const noexcept {
+        return manager_error_.load(std::memory_order_acquire);
+    }
 
     //==========================================================================
     // GPIO ACCESS — by string name
@@ -265,6 +275,7 @@ private:
     ~GpioManager() = default;
 
     bool Initialize() noexcept;
+    void ReleaseLocked() noexcept;
 
     /** @brief Find entry index by string name. Returns kInvalidIndex if not found. */
     [[nodiscard]] size_t FindByName(std::string_view name) const noexcept;
@@ -283,6 +294,7 @@ private:
     hf_gpio_err_t last_error_{hf_gpio_err_t::GPIO_SUCCESS};
 
     std::atomic<bool> initialized_{false};
+    std::atomic<flux::hal::ManagerError> manager_error_{flux::hal::ManagerError::NotInitialized};
     mutable RtosMutex mutex_;
 };
 

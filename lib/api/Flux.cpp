@@ -103,6 +103,7 @@ bool Flux::EnsureInitialized() noexcept {
 
     if (success) {
         initialized_ = true;
+        last_error_.store(flux::hal::ManagerError::None, std::memory_order_release);
         UpdateSystemDiagnostics();
 
         uint64_t dt = GetInitializationTimeMs();
@@ -117,7 +118,12 @@ bool Flux::EnsureInitialized() noexcept {
             leds_initialized_   ? "OK" : "FAIL",
             temp_initialized_   ? "OK" : "FAIL");
     } else {
-        Logger::GetInstance().Error(TAG, "Flux API initialization failed");
+        FluxHalDiagnostics d{};
+        (void)CollectDiagnostics(d);
+        last_error_.store(d.first_error, std::memory_order_release);
+        Logger::GetInstance().Error(TAG, "Flux API initialization failed: %s (%s)",
+                                    d.first_error_manager != nullptr ? d.first_error_manager : "?",
+                                    flux::hal::ToString(d.first_error));
     }
 
     return success;
@@ -330,6 +336,52 @@ bool Flux::CollectManagerHealth(ManagerHealthSnapshot& snapshot) noexcept {
     return true;
 }
 
+bool Flux::CollectDiagnostics(FluxHalDiagnostics& out) const noexcept {
+    out = FluxHalDiagnostics{};
+    out.initialized = initialized_.load(std::memory_order_acquire);
+
+    // Same order as InitializeAllComponents(); the first three are required.
+    const ManagerDiagnostic rows[kFluxManagerCount] = {
+        {"NvsManager", true, nvs.IsInitialized(), nvs.GetManagerError()},
+        {"CommChannelsManager", true, comms.IsInitialized(), comms.GetManagerError()},
+        {"GpioManager", true, gpio.IsInitialized(), gpio.GetManagerError()},
+        {"ValveManager", false, valves.IsInitialized(), valves.GetManagerError()},
+        {"AdcManager", false, adc.IsInitialized(), adc.GetManagerError()},
+        {"LedManager", false, leds.IsInitialized(), leds.GetManagerError()},
+        {"TemperatureManager", false, temp.IsInitialized(), temp.GetManagerError()},
+    };
+    out.all_managers_up = true;
+    out.all_healthy = true;
+    for (size_t i = 0; i < kFluxManagerCount; ++i) {
+        out.managers[i] = rows[i];
+        if (!rows[i].initialized) {
+            out.all_managers_up = false;
+        }
+        if (rows[i].error != flux::hal::ManagerError::None) {
+            out.all_healthy = false;
+            if (out.first_error == flux::hal::ManagerError::None) {
+                // A manager never attempted reports NotInitialized; one that failed (or runs
+                // degraded) reports its own reason. The first in init order is the cause.
+                out.first_error = rows[i].error;
+                out.first_error_manager = rows[i].name;
+            }
+        }
+    }
+    out.all_healthy = out.all_healthy && out.all_managers_up;
+
+    out.max22200_ready = valves.IsBankReady(ValveDriverType::MAX22200);
+    out.tle92466_ready = valves.IsBankReady(ValveDriverType::TLE92466);
+    out.pressure_bus_ready = comms.IsPressureBusReady();
+    out.ads7952_ready = adc.IsAds7952Ready(0);
+    out.internal_adc_ready = adc.IsInternalAdcReady();
+    out.can_ready = comms.IsCanReady();
+    out.die_temp_ready = temp.IsSensorReady(FluxTempSensorType::ESP32_INTERNAL);
+    out.ntc_ready = temp.IsSensorReady(FluxTempSensorType::NTC_THERMISTOR);
+    out.mcp9700_ready = temp.IsSensorReady(FluxTempSensorType::MCP9700_THERMISTOR);
+    out.status_led_ready = leds.IsInitialized();
+    return true;
+}
+
 void Flux::DumpSystemStatistics() const noexcept {
     if (!initialized_) {
         Logger::GetInstance().Warn(TAG, "Not initialized — cannot dump stats");
@@ -422,11 +474,12 @@ bool Flux::Shutdown() noexcept {
 
     Logger::GetInstance().Info(TAG, "Shutting down Flux API");
 
-    // Reverse initialization order: Temp → LEDs → ADC → Valves → GPIO → Comms → NVS
+    // Reverse initialization order: Temp → LEDs → ADC → Valves → GPIO → Comms → NVS.
+    // Valves turn every channel off before their handlers are released.
     (void)temp.Deinitialize();
     (void)leds.Deinitialize();
     (void)adc.Deinitialize();
-    // ValveManager does not have Deinitialize yet — skip
+    (void)valves.Deinitialize();
     (void)gpio.Deinitialize();
     (void)comms.Deinitialize();
     (void)nvs.Deinitialize();

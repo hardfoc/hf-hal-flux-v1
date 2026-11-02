@@ -49,6 +49,7 @@
 #include <cstring>
 
 #include "FluxVersion.h"
+#include "flux_hal/flux_hal_types.hpp"
 #include "handlers/logger/Logger.h"
 
 // Forward declarations
@@ -144,6 +145,45 @@ struct ManagerHealthSnapshot {
 };
 
 //==============================================================================
+// AGGREGATED DIAGNOSTICS (shared ManagerError catalog)
+//==============================================================================
+
+/** @brief One manager's lifecycle state in @ref FluxHalDiagnostics. */
+struct ManagerDiagnostic {
+    const char* name{nullptr};                                     ///< Manager class name
+    bool required{false};                                          ///< Its failure fails Flux::EnsureInitialized()
+    bool initialized{false};                                       ///< IsInitialized()
+    flux::hal::ManagerError error{flux::hal::ManagerError::NotInitialized};  ///< GetManagerError()
+};
+
+/**
+ * @brief Board-level bring-up snapshot: every manager's state and every fitted part's readiness.
+ * @details Filled by @ref Flux::CollectDiagnostics. Managers fail closed, so a part that did not
+ *          come up shows here as not ready and its manager as not initialised with a reason; the
+ *          part flags are valid even when their manager failed (they say which part is missing).
+ */
+struct FluxHalDiagnostics {
+    bool initialized{false};       ///< Flux::EnsureInitialized() succeeded (every required manager up)
+    bool all_managers_up{false};   ///< Every manager, required and optional, is initialised
+    bool all_healthy{false};       ///< ... and none reports an error (none degraded)
+    flux::hal::ManagerError first_error{flux::hal::ManagerError::None};  ///< First error in init order
+    const char* first_error_manager{nullptr};                      ///< Manager that reported it
+
+    std::array<ManagerDiagnostic, kFluxManagerCount> managers{};   ///< In initialisation order
+
+    bool max22200_ready{false};      ///< MAX22200 solenoid driver came up
+    bool tle92466_ready{false};      ///< TLE92466ED proportional driver came up
+    bool pressure_bus_ready{false};  ///< ADS7952 SPI bus and chip select are up
+    bool ads7952_ready{false};       ///< ADS7952 device 0 came up
+    bool internal_adc_ready{false};  ///< MCU ADC (NTC, VBUS) came up
+    bool can_ready{false};           ///< CAN controller object exists
+    bool die_temp_ready{false};      ///< MCU die sensor came up
+    bool ntc_ready{false};           ///< Board NTC came up
+    bool mcp9700_ready{false};       ///< MCP9700 on the ADS7952 came up
+    bool status_led_ready{false};    ///< WS2812 status LED came up
+};
+
+//==============================================================================
 // FLUX API CLASS
 //==============================================================================
 
@@ -230,6 +270,24 @@ public:
      * @note Error codes are manager-specific uint8_t values (0 = success)
      */
     [[nodiscard]] bool CollectManagerHealth(ManagerHealthSnapshot& snapshot) noexcept;
+
+    /**
+     * @brief Fill the board-level bring-up snapshot (managers in init order, part readiness).
+     * @details Works before, during and after initialisation and never fails closed: it reports
+     *          what is up and why the rest is not. Uses the shared @ref flux::hal::ManagerError
+     *          catalog, so codes from different managers compare.
+     * @param[out] out Overwritten.
+     * @return true (always filled).
+     */
+    bool CollectDiagnostics(FluxHalDiagnostics& out) const noexcept;
+
+    /**
+     * @brief Why the last EnsureInitialized() failed: the error of the first required manager
+     *        that did not come up, or ManagerError::None.
+     */
+    [[nodiscard]] flux::hal::ManagerError GetLastError() const noexcept {
+        return last_error_.load(std::memory_order_acquire);
+    }
 
     //==========================================================================
     // COMPONENT ACCESS (public references to singletons)
@@ -335,6 +393,7 @@ private:
     //==========================================================================
 
     std::atomic<bool> initialized_{false};
+    std::atomic<flux::hal::ManagerError> last_error_{flux::hal::ManagerError::None};
     std::atomic<uint64_t> initialization_start_time_{0};
     std::atomic<uint64_t> initialization_end_time_{0};
 

@@ -20,17 +20,15 @@
 #include <array>
 #include <atomic>
 #include <cstdint>
-#include <memory>
+#include <optional>
 #include <string_view>
 
 #include "core/hf-core-drivers/internal/hf-internal-interface-wrap/inc/base/BaseAdc.h"
 #include "RtosMutex.h"
+#include "flux_hal/flux_hal_types.hpp"
+#include "handlers/ads7952/Ads7952Handler.h"
 #include "core/hf-core-drivers/internal/hf-pincfg/src/hf_functional_pin_config_flux_v1.hpp"
 
-// Forward declaration for ADS7952 handler (conditionally compiled)
-#ifdef HARDFOC_ADS7952_SUPPORT
-class Ads7952Handler;
-#endif
 
 //==============================================================================
 // ADC ENTRY — fixed-size registry; the MCU ADC object lives in the platform
@@ -110,6 +108,23 @@ public:
      *  @return true if initialised and ready for reads.
      */
     [[nodiscard]] bool IsInitialized() const noexcept { return initialized_.load(std::memory_order_acquire); }
+
+    /**
+     * @brief Lifecycle / bind error of the last `EnsureInitialized()` (shared catalog).
+     * @return `ManagerError::None` when initialised; otherwise why bring-up failed.
+     */
+    [[nodiscard]] flux::hal::ManagerError GetManagerError() const noexcept {
+        return manager_error_.load(std::memory_order_acquire);
+    }
+
+    /** @brief The MCU ADC unit came up during the last bring-up attempt. */
+    [[nodiscard]] bool IsInternalAdcReady() const noexcept { return internal_adc_ != nullptr; }
+
+    /**
+     * @brief ADS7952 device @p device_index came up during the last bring-up attempt.
+     * @details Valid for diagnosis even when the manager failed closed.
+     */
+    [[nodiscard]] bool IsAds7952Ready(uint8_t device_index) const noexcept;
 
     /**
      * @brief Release all ADC resources and reset to uninitialized state.
@@ -226,6 +241,9 @@ private:
 
     bool Initialize() noexcept;
 
+    /** @brief Release the MCU ADC, every ADS7952 handler and the registry (mutex held). */
+    void ReleaseLocked() noexcept;
+
     /** @brief Find entry index by string name. Returns kInvalidIndex if not found. O(N) linear scan. */
     [[nodiscard]] size_t FindByName(std::string_view name) const noexcept;
 
@@ -253,16 +271,16 @@ private:
     // MCU ADC unit (ADC1) — owned by the platform binding (bsp_bind), nullptr when down.
     BaseAdc* internal_adc_{nullptr};
 
-    // ADS7952 external ADC handler(s) — conditionally compiled
-    // Supports array of devices on same SPI bus with different CS pins.
-    // Currently 1 device on board, designed for expansion.
-#ifdef HARDFOC_ADS7952_SUPPORT
+    // ADS7952 external ADC handler(s) — members, constructed in place at bring-up
+    // (no heap). One slot per possible device on the pressure bus (one fitted on
+    // Flux V1, room for expansion). Unconditional, so every translation unit sees
+    // the same class layout whatever the HAL's private feature macros are.
     static constexpr size_t kMaxAds7952Devices = 4;
-    std::array<std::unique_ptr<Ads7952Handler>, kMaxAds7952Devices> ads7952_handlers_{};
+    std::array<std::optional<Ads7952Handler>, kMaxAds7952Devices> ads7952_handlers_{};
     size_t ads7952_device_count_{0};
-#endif
 
     std::atomic<bool> initialized_{false};
+    std::atomic<flux::hal::ManagerError> manager_error_{flux::hal::ManagerError::NotInitialized};
     std::atomic<hf_adc_err_t> last_error_{hf_adc_err_t::ADC_SUCCESS};
     mutable RtosMutex mutex_;
 };

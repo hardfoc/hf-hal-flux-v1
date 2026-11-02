@@ -45,20 +45,26 @@ bool NvsManager::EnsureInitialized() noexcept {
         return true;
     };
 
-    if (!openRegion(app_, "app")) {
+    // Fail closed: all three namespaces open, or none.
+    const auto fail = [this]() noexcept {
+        manager_error_.store(flux::hal::ManagerError::BindFailed, std::memory_order_release);
         return false;
+    };
+    if (!openRegion(app_, "app")) {
+        return fail();
     }
     if (!openRegion(calibration_, "calibration")) {
         (void)app_.EnsureDeinitialized();
-        return false;
+        return fail();
     }
     if (!openRegion(config_, "config")) {
         (void)calibration_.EnsureDeinitialized();
         (void)app_.EnsureDeinitialized();
-        return false;
+        return fail();
     }
 
     SetLastError(hf_nvs_err_t::NVS_SUCCESS);
+    manager_error_.store(flux::hal::ManagerError::None, std::memory_order_release);
     initialized_.store(true, std::memory_order_release);
     return true;
 }
@@ -75,6 +81,7 @@ bool NvsManager::Deinitialize() noexcept {
     (void)app_.EnsureDeinitialized();
 
     initialized_.store(false, std::memory_order_release);
+    manager_error_.store(flux::hal::ManagerError::NotInitialized, std::memory_order_release);
     return true;
 }
 

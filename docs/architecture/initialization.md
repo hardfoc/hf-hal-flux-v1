@@ -43,9 +43,24 @@ buses; then the GPIO pins the valve drivers need; then the managers that use the
 
 This lets a bench with only some chips fitted, or with the 24 V valve supply off, still come up and log.
 
-Inside a best-effort manager the same idea repeats. `ValveManager` tries the TLE92466ED and the MAX22200 separately
-and succeeds if either works; `TemperatureManager` succeeds if any one of its three sensors works; `AdcManager`
-succeeds if any channel registered. Each logs which parts are missing.
+Inside every manager the rule is the opposite: **a manager fails closed** ([ADR 0005](../adr/0005-no-heap-fail-closed.md)).
+Its `EnsureInitialized()` succeeds only when every part it is responsible for came up; otherwise it stays
+uninitialised, refuses its operations and records the reason in `GetManagerError()`.
+
+| Manager | Must all come up |
+| --- | --- |
+| `NvsManager` | The `flux`, `flux_cal` and `flux_cfg` namespaces |
+| `CommChannelsManager` | The valve SPI bus and both valve chip selects (the pressure bus and CAN are reported, not required) |
+| `GpioManager` | Every GPIO-category pin of the pin map |
+| `ValveManager` | Both driver ICs: TLE92466ED and MAX22200 |
+| `AdcManager` | The MCU ADC (if the pin map uses it) and every ADS7952 in the pin map |
+| `LedManager` | The WS2812 strip |
+| `TemperatureManager` | At least one sensor; runs **degraded** (initialised, error recorded, `IsDegraded()`) when one of the die sensor, NTC and MCP9700 is missing |
+
+Each manager still tries every part, so the log and `Flux::CollectDiagnostics()` name every missing one, and part
+readiness stays queryable after a failure (`valves.IsBankReady()`, `adc.IsAds7952Ready()`,
+`temp.IsSensorReady()`, `comms.IsPressureBusReady()`). A valve bank that came up while the other did not is
+reachable through its handler accessor for diagnosis, never through the channel calls.
 
 ## Calling a manager directly
 
@@ -72,8 +87,6 @@ Flux API initialized in ... ms
 
 ## Shutting down
 
-`Flux::Shutdown()` de-initialises the managers in reverse order (temperature, LEDs, ADC, GPIO, comms, NVS).
-
-!!! warning "Valves are not de-initialised by `Shutdown()`"
-    `Flux::Shutdown()` skips `ValveManager` (see the comment in [`Flux.cpp`](../../lib/api/Flux.cpp)). Disable the
-    valve channels yourself (`flux.valves.DisableAllChannels()`) before shutting down.
+`Flux::Shutdown()` de-initialises the managers in reverse order (temperature, LEDs, ADC, valves, GPIO, comms, NVS).
+`ValveManager::Deinitialize()` turns every channel off before it releases the driver handlers. A failed manager can
+be retried: its `EnsureInitialized()` releases whatever the failed attempt left up and starts again.

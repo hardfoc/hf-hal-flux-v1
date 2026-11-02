@@ -45,8 +45,9 @@ operation counters. Per-channel access and error counts are logged by `DumpStati
 
 ## Pitfalls
 
-- **Missing ADS7952 channels.** If the ADS7952 does not answer at start-up, its twelve channels are not registered
-  and `ReadVoltage("ADC_ADS7952_0_CH3", ...)` returns an error; the ESP32 channels still work. Check the log line
-  for the ADC SPI bus.
-- **`GetLastError()` is never updated** in this manager. Use the return values.
+- **Fail-closed start-up.** If the ADS7952 or the MCU ADC does not come up, the manager stays uninitialised
+  ([ADR 0005](../adr/0005-no-heap-fail-closed.md)): every read returns `ADC_ERR_NOT_INITIALIZED` and `Get()` returns
+  `nullptr`. `GetManagerError()` says why, and `IsAds7952Ready(0)` / `IsInternalAdcReady()` say which part is
+  missing. Check the log line for the ADC SPI bus.
+- **`GetLastError()`** holds the last failed read; it is not cleared by a later success.
 - **Names are strings.** In a fast loop use the enum overload, which indexes directly instead of searching.

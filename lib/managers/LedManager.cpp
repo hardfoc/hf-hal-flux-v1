@@ -56,6 +56,7 @@ bool LedManager::Shutdown() noexcept {
     flux::bsp::LedStripEnd();
     strip_ready_ = false;
     is_initialized_.store(false, std::memory_order_release);
+    manager_error_.store(flux::hal::ManagerError::NotInitialized, std::memory_order_release);
 
     Logger::GetInstance().Info(TAG, "LED manager shutdown");
     return true;
@@ -287,6 +288,8 @@ bool LedManager::Initialize() noexcept {
                                        static_cast<uint16_t>(kNumLeds)};
     if (!flux::bsp::LedStripBegin(spec)) {
         Logger::GetInstance().Error(TAG, "Failed to init the WS2812 strip on GPIO %d", static_cast<int>(led_gpio));
+        manager_error_.store(flux::hal::ManagerError::BindFailed, std::memory_order_release);
+        UpdateLastError(LedError::INITIALIZATION_FAILED);
         return false;
     }
     strip_ready_ = true;
@@ -296,6 +299,7 @@ bool LedManager::Initialize() noexcept {
     (void)flux::bsp::LedStripShow();
 
     system_start_time_ = GetSystemUptimeMs();
+    manager_error_.store(flux::hal::ManagerError::None, std::memory_order_release);
     is_initialized_.store(true, std::memory_order_release);
 
     Logger::GetInstance().Info(TAG, "LED manager initialized on GPIO %d", static_cast<int>(led_gpio));
