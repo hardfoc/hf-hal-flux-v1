@@ -11,7 +11,7 @@ cd examples/esp32
 ./scripts/flash_app.sh flash_monitor <app> Release
 ```
 
-`./scripts/build_app.sh list` prints the names. See [Get started](../getting-started.md) for the toolchain.
+`./scripts/build_app.sh list` prints the names. See [Get started](../quickstart.md) for the toolchain.
 
 !!! tip "Which one first"
     `flux_api_test` initialises everything and checks each manager, so it is the quickest way to see whether a board
@@ -66,4 +66,4 @@ and each source file's `@brief`; do not edit.
 1. Add the `.cpp` file under `examples/esp32/main/` with a Doxygen `@brief` on its first comment block (the
    catalogue reads it).
 2. Add an entry under `apps:` in `app_config.yml` (`source_file`, `category`, `ci_enabled`).
-3. Run `python3 tools/docs/gen.py` to refresh this page, and commit both.
+3. Run `hardfoc-docs gen` to refresh this page, and commit both.

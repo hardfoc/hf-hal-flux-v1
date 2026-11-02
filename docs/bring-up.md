@@ -1,6 +1,33 @@
-# Troubleshooting
+# Bring-up and troubleshooting
 
-Problems people hit in their first days with the board, what causes them and what to do.
+How to bring a new Flux V1 board up one function at a time, and what to do when a step fails.
+
+## Bring up a new board
+
+Work from the cheapest check to the most expensive, and do not connect valves until the steps before pass. Each app
+is built and flashed as in the [quickstart](quickstart.md)
+(`./scripts/flash_app.sh flash_monitor <app> Release` from `examples/esp32`).
+
+<div class="hf-steps" markdown>
+
+1. **USB only, no valve supply.** Flash `flux_api_test`. The start-up table must show `OK` for NVS, Comms and
+   GPIO: they are required, and `EnsureInitialized()` returns false without them. `WARN` on Valves is expected
+   here.
+2. **GPIO and analog inputs.** Flash `gpio_adc_test`; every test must pass. The ESP32 ADC channels (NTC, supply
+   voltage) answer even without the ADS7952; the `ADC_ADS7952_*` channels exist only when the ADS7952 answers on
+   its SPI bus.
+3. **LED and temperatures.** Flash `led_temp_test`; every test must pass. The LED shows the OK, warning and error
+   status colours, and the ESP32 internal sensor and the NTC read within range.
+4. **Valve supply, no valves.** Connect the 24 V valve supply and flash `flux_api_test` again. Valves must now be
+   `OK`; `flux.valves.GetSystemDiagnostics(...)` reports `max22200_initialized` and `tle92466_initialized`.
+5. **One valve.** Connect one solenoid to `SOL_CH0` and flash `valve_cycling_test`. Then the proportional
+   channels, one at a time.
+
+</div>
+
+!!! warning "Valve current"
+    A solenoid channel drives the current you configure (`ConfigureSolenoidCdr` hit and hold, in mA) as soon as it
+    is enabled. Check the valve's rating before step 5; the MAX22200 full scale on this board is 1000 mA.
 
 ## Build
 
@@ -19,7 +46,7 @@ Problems people hit in their first days with the board, what causes them and wha
 | `NVS ... FAIL`, `EnsureInitialized()` returns false | NVS partition full or written by another firmware | Erase flash once: `idf.py -p PORT erase-flash` (this erases everything) |
 | `Valves WARN` | Neither valve driver answered | Check the 24 V valve supply and the valve SPI wiring; the log says which chip failed |
 | Only one valve chip works | The other chip failed its own start-up | `flux.valves.GetSystemDiagnostics(...)` shows `max22200_initialized` / `tle92466_initialized`; the other chip's channels return `VALVE_ERR_DRIVER_NOT_AVAILABLE` |
-| `ADC WARN` or no `ADC_ADS7952_*` channels | The ADS7952 did not answer on the ADC SPI bus | Check the ADC SPI pins on the [pin map](../hardware/pin-map.md); the ESP32 ADC channels still work |
+| `ADC WARN` or no `ADC_ADS7952_*` channels | The ADS7952 did not answer on the ADC SPI bus | Check the ADC SPI pins on the [pin map](hardware/pin-map.md); the ESP32 ADC channels still work |
 | No `MCP9700_THERMISTOR` | Needs a working ADS7952 channel 8 | Fix the ADS7952 first |
 
 ## Valves
@@ -27,7 +54,7 @@ Problems people hit in their first days with the board, what causes them and wha
 | Symptom | Cause | Fix |
 | --- | --- | --- |
 | `EnableChannel()` succeeds but the valve does not move | Valve supply off, or the channel was never configured | Check 24 V; call `ConfigureSolenoidCdr/Vdr` or `SetProportionalCurrent` first |
-| `VALVE_ERR_CHANNEL_TYPE_MISMATCH` | A solenoid call on a `PROP_CH*` channel or the reverse | Use the call for the channel's chip (see [ValveManager](../managers/valves.md)) |
+| `VALVE_ERR_CHANNEL_TYPE_MISMATCH` | A solenoid call on a `PROP_CH*` channel or the reverse | Use the call for the channel's chip (see [ValveManager](managers/valves.md)) |
 | Proportional current reads 0 | Feedback frozen or supply under-voltage | Start-up clears the freeze; check `GetProportionalFaults()` for a supply fault |
 
 ## LED and GPIO
@@ -35,7 +62,7 @@ Problems people hit in their first days with the board, what causes them and wha
 | Symptom | Cause | Fix |
 | --- | --- | --- |
 | LED animation stuck on the first frame | Nobody calls `UpdateAnimation()` | Call it from a periodic task |
-| `GPIO_ERR_PIN_NOT_FOUND` | Typo, or the pin is not a GPIO-category pin | Use the exact name from the [pin map](../hardware/pin-map.md) |
+| `GPIO_ERR_PIN_NOT_FOUND` | Typo, or the pin is not a GPIO-category pin | Use the exact name from the [pin map](hardware/pin-map.md) |
 | A fault input always reads the same | The pin is still an output | `SetDirection(name, HF_GPIO_DIRECTION_INPUT)`; `ValveManager` does this for the two fault pins |
 
 ## Still stuck

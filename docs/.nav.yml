@@ -1,37 +1,34 @@
 ---
-# Site navigation (mkdocs-awesome-nav). Each entry is a top tab; inside a folder, index.md is the section's landing
-# page and the other pages follow in the order listed here.
+# Site navigation (mkdocs-awesome-nav): five tabs and their pages, in reading order.
 nav:
   - Home: index.md
-  - Get started: getting-started.md
-  - Learn: learn
-  - Hardware:
-      - hardware/index.md
+  - Get started:
+      - Quickstart: quickstart.md
+      - Hardware: hardware/index.md
       - Pin map: hardware/pin-map.md
-  - Architecture:
-      - architecture/index.md
+  - Concepts:
+      - Architecture: architecture/index.md
       - Initialisation: architecture/initialization.md
       - Ownership: architecture/ownership.md
       - Threading: architecture/threading.md
       - Errors and diagnostics: architecture/errors.md
-  - Managers:
-      - managers/index.md
-      - CommChannelsManager: managers/comms.md
-      - NvsManager: managers/nvs.md
-      - GpioManager: managers/gpio.md
-      - ValveManager: managers/valves.md
-      - AdcManager: managers/adc.md
-      - LedManager: managers/leds.md
-      - TemperatureManager: managers/temperature.md
-  - Examples: examples
+      - Decisions: adr
   - Guides:
-      - guides/index.md
-      - Testing and CI: guides/testing-and-ci.md
-      - Troubleshooting: guides/troubleshooting.md
-      - Writing these docs: guides/writing-docs.md
-  - Decisions: adr
-  - Roadmap: roadmap.md
+      - Managers:
+          - managers/index.md
+          - CommChannelsManager: managers/comms.md
+          - NvsManager: managers/nvs.md
+          - GpioManager: managers/gpio.md
+          - ValveManager: managers/valves.md
+          - AdcManager: managers/adc.md
+          - LedManager: managers/leds.md
+          - TemperatureManager: managers/temperature.md
+      - Examples: examples/index.md
+      - Bring-up and troubleshooting: bring-up.md
+      - Writing these docs: writing-docs.md
   - Reference:
-      - reference/index.md
-      - API reference: reference/api.md
+      - API reference: api-reference.md
+      - Testing and CI: testing.md
+      - Roadmap: roadmap.md
       - Figures: diagrams/index.md
+      - Changelog: changelog.md

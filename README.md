@@ -42,7 +42,7 @@ cd hf-hal-flux-v1/examples/esp32
 ```
 
 The log shows one row per manager (`OK`, `WARN` or `FAIL`). Step by step, with how to tell each step worked:
-[Get started](https://hardfoc.github.io/hf-hal-flux-v1/latest/getting-started/).
+[Get started](https://hardfoc.github.io/hf-hal-flux-v1/latest/quickstart/).
 
 ## Use it
 
@@ -81,8 +81,8 @@ extern "C" void app_main() {
 ## Contributing
 
 Pull requests run the example build, C++ lint and analysis, Markdown and YAML lint, and the docs checks; see
-[Testing and CI](https://hardfoc.github.io/hf-hal-flux-v1/latest/guides/testing-and-ci/). If you change a pin, an
-example or a manager's dependencies, run `python3 tools/docs/gen.py` and `python3 tools/figkit/build.py` and commit
+[Testing and CI](https://hardfoc.github.io/hf-hal-flux-v1/latest/testing/). If you change a pin, an
+example or a manager's dependencies, run `hardfoc-docs gen` and `hardfoc-docs figures` and commit
 the result.
 
 ## License

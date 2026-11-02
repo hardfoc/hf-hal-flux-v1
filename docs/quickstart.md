@@ -1,4 +1,4 @@
-# Getting started
+# Quickstart
 
 This page takes you from nothing to a Flux V1 board printing its start-up log. Each step says how to tell that it
 worked. Plan on half an hour, most of it the ESP-IDF download.
@@ -94,8 +94,8 @@ extern "C" void app_main() {
 }
 ```
 
-## Next steps
+## Next
 
-- [Learn](learn/index.md) walks through the rest of the site in order.
+- [Architecture](architecture/index.md) explains the layers under `Flux`.
 - [Examples](examples/index.md) lists every app and what it shows.
-- [Troubleshooting](guides/troubleshooting.md) covers the common first-day problems.
+- [Bring-up and troubleshooting](bring-up.md) covers a new board and the common first-day problems.

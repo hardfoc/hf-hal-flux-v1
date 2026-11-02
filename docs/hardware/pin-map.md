@@ -3,7 +3,7 @@
 Every pin and ADC channel the HAL knows about. The single source is the X-macro table in
 [`hf_functional_pin_config_flux_v1.hpp`](../../lib/core/hf-core-drivers/internal/hf-pincfg/src/hf_functional_pin_config_flux_v1.hpp)
 (in the `hf-pincfg` submodule); the managers register their pins from it at start-up and these tables are generated
-from it by `tools/docs/gen.py`, so the docs cannot drift from the firmware.
+from it by `hardfoc-docs gen`, so the docs cannot drift from the firmware.
 
 How to read the tables:
 
@@ -96,5 +96,5 @@ do not edit.
 ## Changing a pin
 
 1. Edit the row in the pincfg header (in the `hf-pincfg` repository, then advance the submodule here).
-2. Run `python3 tools/docs/gen.py` and `python3 tools/figkit/build.py` to refresh these tables and the board figure.
+2. Run `hardfoc-docs gen` and `hardfoc-docs figures` to refresh these tables and the board figure.
 3. Commit both. CI fails the pull request if the docs and the header disagree.
