@@ -10,6 +10,9 @@ What changed in the Flux V1 HAL, newest first. Releases are tagged `vX.Y.Z` and 
 - The documentation builds with the shared HardFOC theme (`hardfoc-mkdocs-theme`); the copied template, hooks and
   figure toolkit are gone. The Doxyfile moved to the repository root.
 - The documentation follows the HAL page set: board card, quickstart, bring-up and troubleshooting, changelog.
+- hf-core is bumped to main plus the hf-utils-rtos-wrap FreeRTOS fixes: `OsQueue` holds exactly N items, event-group
+  waits report timeouts and clear bits only on request, and tick conversions follow `configTICK_RATE_HZ`. The HAL
+  uses none of the changed APIs, so no manager changes.
 
 ### Added
 
