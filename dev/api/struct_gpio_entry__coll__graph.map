@@ -1,0 +1,5 @@
+<map id="GpioEntry" name="GpioEntry">
+<area shape="rect" id="Node000001" title="A single GPIO entry in the fixed&#45;size registry." alt="" coords="63,93,150,119"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,208,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="109,45,109,93,104,93,104,45"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="GetTemperatureManager" name="GetTemperatureManager">
+<area shape="rect" id="Node000001" title="Convenience accessor — equivalent to TemperatureManager::GetInstance()." alt="" coords="5,13,189,38"/>
+<area shape="rect" id="Node000002" href="$class_temperature_manager.html#a2a492e2c5c81056063077c976d0a3c83" title="Return the singleton TemperatureManager instance." alt="" coords="237,5,399,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="190,23,224,23,224,28,190,28"/>
+</map>

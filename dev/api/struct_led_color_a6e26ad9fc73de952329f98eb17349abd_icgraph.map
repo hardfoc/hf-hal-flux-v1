@@ -1,0 +1,5 @@
+<map id="LedColor::FromRgb" name="LedColor::FromRgb">
+<area shape="rect" id="Node000001" title="Unpack from a 24&#45;bit 0xRRGGBB integer." alt="" coords="219,5,364,31"/>
+<area shape="rect" id="Node000002" href="$class_led_manager.html#a194780a095eedfc8a9708b777c1b7bd9" title="Set LED colour from a packed 0xRRGGBB integer." alt="" coords="5,5,171,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="205,21,171,21,171,15,205,15"/>
+</map>

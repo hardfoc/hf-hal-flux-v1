@@ -1,0 +1,15 @@
+<map id="LedManager::IndicateReady" name="LedManager::IndicateReady">
+<area shape="rect" id="Node000001" title="Show the ready indicator (solid green)." alt="" coords="5,104,208,129"/>
+<area shape="rect" id="Node000002" href="$class_led_manager.html#a6e36bf7b11956c56582ce34da47d08ba" title="Start a named animation with an optional base colour." alt="" coords="256,104,464,129"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="208,114,242,114,242,119,208,119"/>
+<area shape="rect" id="Node000003" href="$namespace_led_colors.html#ae2a97d61b4ffac876640780401177e7f" title="Pure blue." alt="" coords="521,5,649,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="384,101,441,72,511,40,529,33,531,38,513,44,443,76,386,106"/>
+<area shape="rect" id="Node000004" href="$namespace_led_colors.html#a10b798abecc127d3529e0fa597426e6a" title="Pure green." alt="" coords="516,55,655,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="418,101,513,80,514,86,419,107"/>
+<area shape="rect" id="Node000005" href="$namespace_led_colors.html#a967d5a1dfb0d78523c126b564050f55c" title="Purple." alt="" coords="513,104,657,129"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="464,114,499,114,499,119,464,119"/>
+<area shape="rect" id="Node000006" href="$namespace_led_colors.html#af4d56375fdebf6240c7690d7f8e8f1fe" title="Pure red." alt="" coords="525,153,646,179"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="419,127,514,148,513,153,418,132"/>
+<area shape="rect" id="Node000007" href="$namespace_led_colors.html#a884ae4aac5589990c381e97c734283d8" title="Yellow." alt="" coords="512,203,659,228"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="387,127,513,188,533,195,531,200,511,192,384,132"/>
+</map>
