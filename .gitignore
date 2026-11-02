@@ -143,6 +143,5 @@ CHANGELOG.md
 examples/manifold_valves_pressure_control.cpp
 examples/esp32/main/manifold_valves_pressure_control/manifold_valves_pressure_control.cpp
 
-# Documentation site (mkdocs build) and the Doxygen output
+# Documentation site (mkdocs build)
 site/
-docs/_doxygen/

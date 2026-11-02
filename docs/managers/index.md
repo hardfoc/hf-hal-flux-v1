@@ -18,4 +18,4 @@ A manager owns one function of the board. You reach each one through the `Flux` 
 Which handler each manager owns is on the [ownership](../architecture/ownership.md) page.
 
 Each page has the same sections: what the manager is for, its API, an example, its diagnostics, and its pitfalls.
-The full signatures are in the [API reference](../reference/api.md).
+The full signatures are in the [API reference](../api-reference.md).

@@ -27,7 +27,7 @@ Option 2:
   `AdcManager` a channel for each ADC row, `CommChannelsManager` and `LedManager` look up their pins with
   `GetGpioMapping()`. No manager writes a GPIO number.
 - The [pin map](../hardware/pin-map.md) page and the [board figure](../hardware/index.md) are generated from the same
-  rows (`tools/docs/gen.py`, `tools/figkit/build.py`), and CI fails if they are stale.
+  rows (`hardfoc-docs gen`, `hardfoc-docs figures`), and CI fails if they are stale.
 
 ## Consequences
 

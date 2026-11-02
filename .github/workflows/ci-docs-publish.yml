@@ -23,14 +23,11 @@ concurrency:
 
 jobs:
   docs:
-    # Pinned to the branch that adds the workflow until it is merged; then switch to @main.
-    uses: hardfoc/hf-general-ci-tools/.github/workflows/ru-mkdocs-publish.yml@main
+    uses: hardfoc/hf-general-ci-tools/.github/workflows/ru-mkdocs-publish.yml@v1
     permissions:
       contents: write  # the publish job pushes gh-pages; the build job only reads
     with:
-      # The pin-map tables and figures read the pincfg header and the hf-core handlers; Doxygen needs the theme.
-      submodule_paths: >-
-        lib/core/hf-core-drivers/internal/hf-pincfg
-        _config/doxygen-extensions/doxygen-awesome-css
-      doxygen_config: _config/Doxyfile
+      # The pin-map tables and figures read the pincfg header and the hf-core handlers.
+      submodule_paths: lib/core/hf-core-drivers/internal/hf-pincfg
+      doxygen_config: Doxyfile
       deploy: ${{ vars.ENABLE_GITHUB_PAGES_DEPLOY == 'true' }}

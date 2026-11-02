@@ -6,7 +6,7 @@ nothing here is a promise of a date.
 ## Now
 
 - One `Flux` facade and seven managers covering every chip on the board ([Managers](managers/index.md)).
-- Pin map, examples catalogue and figures generated from the code, checked in CI ([Testing and CI](guides/testing-and-ci.md)).
+- Pin map, examples catalogue and figures generated from the code, checked in CI ([Testing and CI](testing.md)).
 - Builds for the ESP32-S3 with ESP-IDF release/v5.5.
 
 ## Next: close the known gaps
