@@ -1,0 +1,20 @@
+<map id="ValveManager::ReleaseDriversLocked" name="ValveManager::ReleaseDriversLocked">
+<area shape="rect" id="Node000001" title="Destroy both handlers and clear the bank flags (mutex held by the caller)." alt="" coords="1291,49,1513,89"/>
+<area shape="rect" id="Node000002" href="$class_valve_manager.html#a68ea3302ca55e55a494099f3a52d67f1" title="Turn every channel off, release both driver handlers and reset to uninitialised." alt="" coords="1045,31,1243,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1277,59,1243,56,1243,50,1277,54"/>
+<area shape="rect" id="Node000005" href="$class_valve_manager.html#a8351cec1ba13df5f82b88c59b5ed5fd1" title=" " alt="" coords="1055,80,1233,105"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="1277,83,1234,87,1233,82,1277,78"/>
+<area shape="rect" id="Node000003" href="$class_valve_manager.html#aa540e9da7618c57ecbc8ce6e7a7d9f25" title="Leave SafeHold: full re&#45;bring&#45;up of both banks, which raises the enable pins again." alt="" coords="481,5,719,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="1070,31,997,21,853,14,719,15,719,10,853,9,998,15,1071,26"/>
+<area shape="rect" id="Node000004" href="$class_flux.html#a381c21e10f3556ecc16df4b4f2ead006" title="Shut down all subsystems in reverse initialisation order." alt="" coords="821,31,943,56"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="1031,46,944,46,944,41,1031,41"/>
+<area shape="rect" id="Node000006" href="$class_valve_manager.html#a7a708a5ebc126913968db54b7629aff9" title="Ensure the valve manager system is initialized." alt="" coords="767,80,997,105"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="1041,95,997,95,997,90,1041,90"/>
+<area shape="poly" id="edge9_Node000006_Node000003" title=" " alt="" coords="801,80,766,71,639,33,641,28,767,66,803,74"/>
+<area shape="rect" id="Node000007" href="$class_flux.html#af36707264a8180cfeb4f7a31247ad66b" title=" " alt="" coords="521,80,679,105"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="753,95,679,95,679,90,753,90"/>
+<area shape="rect" id="Node000008" href="$class_flux.html#a0d67fb153ddebb59c51eb20ad311cb32" title=" " alt="" coords="220,80,433,105"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="507,95,434,95,434,90,507,90"/>
+<area shape="rect" id="Node000009" href="$class_flux.html#a6c011c136a43dd2d9859dcf7d56571e8" title="Ensure all Flux subsystems are properly initialized." alt="" coords="5,80,172,105"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="206,95,172,95,172,90,206,90"/>
+</map>

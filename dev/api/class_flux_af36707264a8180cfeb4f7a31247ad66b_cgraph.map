@@ -1,0 +1,29 @@
+<map id="Flux::InitializeValves" name="Flux::InitializeValves">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,163,56"/>
+<area shape="rect" id="Node000002" href="$class_valve_manager.html#a7a708a5ebc126913968db54b7629aff9" title="Ensure the valve manager system is initialized." alt="" coords="211,31,441,56"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="163,41,197,41,197,46,163,46"/>
+<area shape="rect" id="Node000003" href="$_valve_manager_8h.html#ae6cff86821790a19053b6f8423493fe7" title="Check if a valve error code indicates success." alt="" coords="1029,5,1139,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="425,28,489,22,636,15,783,12,1016,13,1015,19,783,17,636,20,490,27,426,33"/>
+<area shape="rect" id="Node000004" href="$class_valve_manager.html#a8351cec1ba13df5f82b88c59b5ed5fd1" title=" " alt="" coords="489,171,668,196"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="351,54,544,161,541,166,349,58"/>
+<area shape="rect" id="Node000009" href="$class_valve_manager.html#adcb9667cc3d68ec7b3c97f307aeacef4" title="Remember a failed operation result for GetLastError(); pass the result through." alt="" coords="743,31,911,56"/>
+<area shape="poly" id="edge16_Node000002_Node000009" title=" " alt="" coords="442,41,730,41,730,46,442,46"/>
+<area shape="rect" id="Node000005" href="$class_comm_channels_manager.html#ad1249df1c4ece9e2468d4b4536d237ae" title="Return the singleton CommChannelsManager instance." alt="" coords="993,131,1175,171"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="598,168,650,140,682,127,715,117,788,107,862,108,932,115,994,126,993,131,931,120,862,113,788,112,717,122,684,132,652,145,601,173"/>
+<area shape="rect" id="Node000006" href="$class_gpio_manager.html#af18a40c292b97c42dace2eb42c511053" title="Access the singleton instance (Meyers singleton, thread&#45;safe)." alt="" coords="987,203,1181,228"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="601,194,652,221,684,235,717,245,757,252,799,255,883,252,960,242,1024,229,1025,234,961,247,883,257,799,260,757,257,715,250,682,240,650,226,598,198"/>
+<area shape="rect" id="Node000007" href="$class_valve_manager.html#a563f7172432715cde807a82d0e060000" title=" " alt="" coords="738,131,917,171"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="668,169,724,162,725,167,668,175"/>
+<area shape="rect" id="Node000008" href="$class_valve_manager.html#ab34849a597597a6885a88607314b4b66" title=" " alt="" coords="738,195,917,235"/>
+<area shape="poly" id="edge9_Node000004_Node000008" title=" " alt="" coords="668,192,725,199,724,205,668,197"/>
+<area shape="poly" id="edge12_Node000004_Node000009" title=" " alt="" coords="591,168,642,122,677,96,715,73,753,57,755,62,717,78,680,100,646,126,594,172"/>
+<area shape="rect" id="Node000010" href="$class_valve_manager.html#a6d0713b0cfd798920031c4b817508aab" title="Destroy both handlers and clear the bank flags (mutex held by the caller)." alt="" coords="716,310,939,350"/>
+<area shape="poly" id="edge14_Node000004_Node000010" title=" " alt="" coords="595,194,646,240,681,266,717,289,746,303,744,307,715,294,678,270,643,244,591,198"/>
+<area shape="rect" id="Node000011" href="$namespaceflux_1_1hal.html#ab4504a1b2b5bf4af2617ffe9dc591813" title="Short name of a ManagerError, for logs and diagnostics." alt="" coords="760,375,895,400"/>
+<area shape="poly" id="edge15_Node000004_Node000011" title=" " alt="" coords="588,195,606,229,634,274,671,321,717,360,748,374,745,378,715,364,668,324,629,277,601,231,583,197"/>
+<area shape="poly" id="edge7_Node000007_Node000005" title=" " alt="" coords="917,149,979,149,979,154,917,154"/>
+<area shape="poly" id="edge8_Node000007_Node000006" title=" " alt="" coords="909,169,1019,197,1018,202,908,174"/>
+<area shape="poly" id="edge10_Node000008_Node000005" title=" " alt="" coords="908,193,990,172,991,177,909,198"/>
+<area shape="poly" id="edge11_Node000008_Node000006" title=" " alt="" coords="917,213,973,213,973,218,917,218"/>
+<area shape="poly" id="edge13_Node000009_Node000003" title=" " alt="" coords="911,32,1015,22,1016,27,912,38"/>
+</map>

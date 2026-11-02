@@ -1,0 +1,11 @@
+<map id="FluxVersionManifest.cpp" name="FluxVersionManifest.cpp">
+<area shape="rect" id="Node000001" title="Static manifest of every component the Flux HAL links against." alt="" coords="160,5,343,31"/>
+<area shape="rect" id="Node000002" href="$_flux_version_manifest_8h.html" title="HAL&#45;side inventory of every component the Flux HAL pulls in." alt="" coords="5,79,172,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="226,33,129,75,127,71,224,28"/>
+<area shape="rect" id="Node000004" href="$_flux_version_8h.html" title="Version information for the HardFOC Flux V1 HAL." alt="" coords="196,79,307,104"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="254,31,254,65,249,65,249,31"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="331,79,505,104"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="279,28,379,71,377,76,277,33"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="53,152,124,177"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="91,104,91,138,86,138,86,104"/>
+</map>
