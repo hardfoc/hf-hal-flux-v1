@@ -1,7 +1,7 @@
 ---
 # HAL boundary: ESP-IDF, FreeRTOS and Esp* code only under lib/managers/bsp_bind/<family>/ (ADR 0004); no heap or
 # heap-backed type in the HAL library (ADR 0005); and the MCU-free part of the HAL (facade, managers, board
-# binding) builds on a host against bsp_bind/host.
+# binding) builds on a host against bsp_bind/host and passes the manager tests in tests/host (GCC, Clang, UBSan).
 name: "\U0001F9F1 HAL Boundary CI"
 
 on:
@@ -38,13 +38,25 @@ jobs:
       - name: lint_hal_alloc.sh
         run: bash tools/lint/lint_hal_alloc.sh
 
-  host-build:
-    name: Host build (${{ matrix.compiler }})
+  host-tests:
+    name: Host build and tests (${{ matrix.name }})
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
-        compiler: [gcc, clang]
+        include:
+          - name: gcc
+            cc: gcc
+            cxx: g++
+            sanitizers: ""
+          - name: clang
+            cc: clang
+            cxx: clang++
+            sanitizers: ""
+          - name: clang-ubsan
+            cc: clang
+            cxx: clang++
+            sanitizers: undefined
     steps:
       - uses: actions/checkout@v4
         with:
@@ -54,16 +66,16 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq ninja-build
-          if [ "${{ matrix.compiler }}" = "clang" ]; then
-            echo "CC=clang" >> "$GITHUB_ENV"
-            echo "CXX=clang++" >> "$GITHUB_ENV"
-          else
-            echo "CC=gcc" >> "$GITHUB_ENV"
-            echo "CXX=g++" >> "$GITHUB_ENV"
-          fi
+          echo "CC=${{ matrix.cc }}" >> "$GITHUB_ENV"
+          echo "CXX=${{ matrix.cxx }}" >> "$GITHUB_ENV"
 
       - name: Configure
-        run: cmake -S tests/host -B build/host -G Ninja -DCMAKE_BUILD_TYPE=Debug
+        run: >-
+          cmake -S tests/host -B build/host -G Ninja -DCMAKE_BUILD_TYPE=Debug
+          -DHF_HAL_SANITIZERS="${{ matrix.sanitizers }}"
 
       - name: Build
         run: cmake --build build/host
+
+      - name: Test
+        run: ctest --test-dir build/host --output-on-failure
