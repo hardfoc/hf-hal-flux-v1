@@ -1,7 +1,0 @@
-<map id="LedManager::SetColor" name="LedManager::SetColor">
-<area shape="rect" id="Node000001" title="Set LED colour from an LedColor struct." alt="" coords="5,31,171,56"/>
-<area shape="rect" id="Node000002" href="$namespaceflux_1_1bsp.html#a6b08718df1ad5fee11813553a43116eb" title="Stage a 0xRRGGBB colour for LED index (sent on LedStripShow)." alt="" coords="219,5,409,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="171,31,205,28,205,33,172,37"/>
-<area shape="rect" id="Node000003" href="$namespaceflux_1_1bsp.html#a82cb93630ae5f29d095a51ded4237fe2" title="Send the staged colours." alt="" coords="227,55,401,80"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="172,49,214,54,213,59,171,55"/>
-</map>

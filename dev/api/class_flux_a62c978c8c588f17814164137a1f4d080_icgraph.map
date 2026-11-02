@@ -1,5 +1,0 @@
-<map id="Flux::CollectManagerHealth" name="Flux::CollectManagerHealth">
-<area shape="rect" id="Node000001" title="Collect per&#45;manager error health into a unified snapshot." alt="" coords="247,5,449,31"/>
-<area shape="rect" id="Node000002" href="$class_flux.html#a8bc933480bbfc965fbac8733b60183c1" title="Run a quick health check across all managers." alt="" coords="5,5,199,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="233,21,199,21,199,15,233,15"/>
-</map>

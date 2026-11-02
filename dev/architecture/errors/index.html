@@ -863,6 +863,8 @@
       
         
       
+        
+      
     
     
     
@@ -1049,6 +1051,34 @@
     
   
     ADR 0005: No heap in the HAL; managers fail closed and report through one error catalog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adr/0006-enable-pin-hard-stop/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ADR 0006: A hardware enable path for both valve banks, with the hold policy left to the product
   
 
     
@@ -1348,7 +1378,7 @@ error types, where to read the last error, and the system-level diagnostics.</p>
    the manager is not initialised or the thing you asked for does not exist.</li>
 <li>Every manager has two error lanes, as in pw-hal (<a href="../../adr/0005-no-heap-fail-closed/">ADR 0005</a>):
    <code>GetManagerError()</code> says why bring-up failed, in the shared <code>flux::hal::ManagerError</code> catalog
-   (<a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/dc6e25edc17feac2eb68bbf23acfc1fecbbc8774/lib/api/flux_hal/flux_hal_types.hpp"><code>flux_hal_types.hpp</code></a>); <code>GetLastError()</code> holds the last failed
+   (<a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/e0b4dac0072ebc85e0b743e67b46fb0412b40501/lib/api/flux_hal/flux_hal_types.hpp"><code>flux_hal_types.hpp</code></a>); <code>GetLastError()</code> holds the last failed
    operation in the manager's own enum. Facades return <code>flux::hal::HalResult</code>.</li>
 </ol>
 <h2 id="bring-up-errors-shared-catalog">Bring-up errors (shared catalog)<a class="headerlink" href="#bring-up-errors-shared-catalog" title="Permanent link">&para;</a></h2>

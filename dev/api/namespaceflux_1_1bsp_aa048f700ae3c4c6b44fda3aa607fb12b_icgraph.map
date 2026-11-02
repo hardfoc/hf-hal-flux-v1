@@ -1,5 +1,0 @@
-<map id="flux::bsp::CreateUart" name="flux::bsp::CreateUart">
-<area shape="rect" id="Node000001" title="Create and initialise a UART. When spec.rts &gt;= 0 the port is switched to RS&#45;485 half duplex." alt="" coords="236,13,392,38"/>
-<area shape="rect" id="Node000002" href="$class_comm_channels_manager.html#a50fc128433217cbea94202bffedeaf9c" title="Acquire (lazy&#45;create + cache) a UART on the given hardware port." alt="" coords="5,5,188,45"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="222,28,188,28,188,23,222,23"/>
-</map>

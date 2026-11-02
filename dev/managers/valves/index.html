@@ -955,6 +955,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#hardware-enable-path-safehold" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hardware enable path (SafeHold)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#diagnostics" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1280,6 +1291,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#hardware-enable-path-safehold" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hardware enable path (SafeHold)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#diagnostics" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1329,7 +1351,7 @@
 <h1 id="valvemanager">ValveManager<a class="headerlink" href="#valvemanager" title="Permanent link">&para;</a></h1>
 <p>The reason the board exists. One API for fourteen valve channels on two different driver chips: eight on/off
 solenoid channels on the MAX22200 and six proportional channels on the TLE92466ED. Source:
-<a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/dc6e25edc17feac2eb68bbf23acfc1fecbbc8774/lib/managers/ValveManager.h"><code>ValveManager.h</code></a>.</p>
+<a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/e0b4dac0072ebc85e0b743e67b46fb0412b40501/lib/managers/ValveManager.h"><code>ValveManager.h</code></a>.</p>
 <h2 id="channels">Channels<a class="headerlink" href="#channels" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -1478,6 +1500,43 @@ chip:</p>
 says <code>HardwareFault</code> (a chip did not answer) or <code>BindFailed</code> (its SPI device or control pins are missing).
 <code>IsBankReady(ValveDriverType::MAX22200 / TLE92466)</code> says which chip came up; that chip's handler accessor stays
 non-null for diagnosis. Both handlers are members of the manager, constructed in place: no heap.</p>
+<h2 id="hardware-enable-path-safehold">Hardware enable path (SafeHold)<a class="headerlink" href="#hardware-enable-path-safehold" title="Permanent link">&para;</a></h2>
+<p>Both banks have an enable input that gates every output of the chip in hardware: MAX22200 <code>ENABLE</code> and TLE92466ED
+<code>EN</code>. <a href="../../adr/0006-enable-pin-hard-stop/">ADR 0006</a> records the decision.</p>
+<table>
+<thead>
+<tr>
+<th>Call</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>DropEnablePins()</code></td>
+<td>Drives both enables low through their GPIOs: no SPI, no mutex, no logging, works even if the manager failed to start. Latches until re-armed: <code>EnableChannel()</code> and <code>EnableChannelsMask()</code> then return <code>VALVE_ERR_WRONG_MODE</code>; disabling still works</td>
+</tr>
+<tr>
+<td><code>RearmEnablePins()</code></td>
+<td>Re-runs the valve bring-up (<code>Deinitialize()</code> then <code>EnsureInitialized()</code>), which raises both enables again. Uses SPI and the mutex</td>
+</tr>
+<tr>
+<td><code>IsOutputInhibited()</code>, <code>GetEnablePinStates(max, tle)</code></td>
+<td>Whether a drop is in force; whether each enable is driven high</td>
+</tr>
+<tr>
+<td><code>flux::hal::ValveBank::EnablePins(bool)</code></td>
+<td>The facade the product's safety thread calls (<a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/e0b4dac0072ebc85e0b743e67b46fb0412b40501/lib/api/flux_hal/flux_hal_valve.hpp"><code>flux_hal_valve.hpp</code></a>); returns <code>HalResult</code></td>
+</tr>
+</tbody>
+</table>
+<p>The pins start low: <code>GpioManager</code> creates both enables driven low, and the <code>FAULT_N</code> lines of both chips as inputs,
+before any valve code runs. The drivers' bring-up raises the enables. <code>Deinitialize()</code> (and <code>Flux::Shutdown()</code>) ends
+with every channel off and both enables low. Nothing else in the HAL drops them: when to hold, and whether to vent a
+side first, is the product's decision.</p>
+<div class="language-cpp highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1">// Safety thread, on a Stop-class latch: hardware first, then the SPI-level stop as today.</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="n">flux</span><span class="o">::</span><span class="n">hal</span><span class="o">::</span><span class="n">ValveBank</span><span class="o">::</span><span class="n">EnablePins</span><span class="p">(</span><span class="nb">false</span><span class="p">);</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="n">Flux</span><span class="o">::</span><span class="n">GetInstance</span><span class="p">().</span><span class="n">valves</span><span class="p">.</span><span class="n">DisableAllChannels</span><span class="p">();</span>
+</span></code></pre></div>
 <h2 id="diagnostics">Diagnostics<a class="headerlink" href="#diagnostics" title="Permanent link">&para;</a></h2>
 <p><code>GetSystemDiagnostics(ValveSystemDiagnostics&amp;)</code>: which chips are up, configured and active channels, total
 activations and errors. <code>GetChannelState(ch)</code> gives per-channel counters. <code>DumpStatistics()</code> logs both.</p>
@@ -1487,6 +1546,8 @@ activations and errors. <code>GetChannelState(ch)</code> gives per-channel count
   channel registers hold.</li>
 <li><strong>Currents are limited by the chip setup.</strong> The MAX22200 full scale is 1000 mA with this board's reference
   resistor; a set-point above it cannot be reached.</li>
+<li><strong>A dropped enable pin stays dropped.</strong> Re-arm with <code>RearmEnablePins()</code> (or <code>ValveBank::EnablePins(true)</code>); an
+  <code>EnsureInitialized()</code> on a running manager does not re-arm.</li>
 <li><strong>One chip missing means no valve manager.</strong> A bench with only one driver fitted gets the other bank only through
   its handler, for diagnosis.</li>
 <li><strong><code>GetLastError()</code></strong> holds the last failed call; it is not cleared by a later success.</li>

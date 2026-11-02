@@ -1,5 +1,0 @@
-<map id="flux::bsp::FreeHeapBytes" name="flux::bsp::FreeHeapBytes">
-<area shape="rect" id="Node000001" title="Free bytes in the default heap (0 when unknown)." alt="" coords="233,5,417,31"/>
-<area shape="rect" id="Node000002" href="$class_flux.html#abc4b28f0d362b54e7844f0476a8a672f" title="Free bytes available in the default heap." alt="" coords="5,5,185,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="219,21,186,21,186,15,219,15"/>
-</map>
