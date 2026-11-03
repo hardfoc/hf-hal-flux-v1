@@ -105,6 +105,47 @@
   <meta property="og:description" content="Hardware abstraction layer for the HardFOC Flux V1 valve control board (ESP32-S3, MAX22200, TLE92466ED): one Flux object, one manager per board function, every chip on the board.">
   <meta property="og:url" content="https://hardfoc.github.io/hf-hal-flux-v1/latest/managers/gpio/">
   <meta name="twitter:card" content="summary">
+  <script>
+(function () {
+  if (typeof mermaid != "undefined" && !(mermaid instanceof Element)) return;
+  var SRC = "https://unpkg.com/mermaid@11/dist/mermaid.min.js", config = {}, real, loading, waiting = [];
+  var stub = {
+    initialize: function (c) { config = c || {}; if (real) real.initialize(config); },
+    render: function (id, text) {
+      var el = null, pres = document.querySelectorAll("pre.mermaid:not([data-hf-mermaid])");
+      for (var i = 0; i < pres.length && !el; i++) if (pres[i].textContent === text) el = pres[i];
+      if (el) el.setAttribute("data-hf-mermaid", "");
+      return near(el).then(load).then(function (m) { return m.render(id, text); });
+    }
+  };
+  function load() {
+    return loading || (loading = new Promise(function (resolve, reject) {
+      var s = document.createElement("script");
+      s.src = SRC;
+      s.onload = function () {
+        real = window.mermaid;
+        window.mermaid = stub;
+        real.initialize(config);
+        resolve(real);
+      };
+      s.onerror = function () { loading = null; reject(new Error("Mermaid did not load")); };
+      document.head.appendChild(s);
+    }));
+  }
+  function near(el) {
+    if (real || !el || !("IntersectionObserver" in window)) return Promise.resolve();
+    return new Promise(function (resolve) {
+      var io = new IntersectionObserver(function (entries) {
+        if (entries.some(function (e) { return e.isIntersecting; })) { io.disconnect(); resolve(); }
+      }, { rootMargin: "100% 0px" });
+      io.observe(el);
+      waiting.push(function () { io.disconnect(); resolve(); });
+    });
+  }
+  window.addEventListener("beforeprint", function () { waiting.splice(0).forEach(function (go) { go(); }); });
+  window.mermaid = stub;
+})();
+</script>
 
   </head>
   
@@ -1307,7 +1348,7 @@
 <h1 id="gpiomanager">GpioManager<a class="headerlink" href="#gpiomanager" title="Permanent link">&para;</a></h1>
 <p>Creates one ESP32 GPIO object for every <em>GPIO</em>-category pin of the pin map and lets you drive or read it by name or
 by enum. On Flux V1 those are the control and fault lines of the two valve drivers. Source:
-<a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/e0b4dac0072ebc85e0b743e67b46fb0412b40501/lib/managers/GpioManager.h"><code>GpioManager.h</code></a>.</p>
+<a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/008c41bcd7588cedd2a1f8a64a6456321329d289/lib/managers/GpioManager.h"><code>GpioManager.h</code></a>.</p>
 <h2 id="which-pins-it-owns">Which pins it owns<a class="headerlink" href="#which-pins-it-owns" title="Permanent link">&para;</a></h2>
 <p>At start-up it walks the pin map and registers each pin whose category is GPIO (or user) and whose chip is the
 ESP32. Core pins (boot, USB) and comm pins (SPI, CAN, UART, LED data) are skipped; their owners configure them. The
@@ -1374,7 +1415,7 @@ counts. <code>DumpStatistics()</code> logs the same and the per-pin access and e
 <ul>
 <li><strong>Directions come from the board config, not the pin map.</strong> The pin map has no direction field. The two
   <code>_FAULT_N</code> lines are created as inputs (<code>kInputPins</code> in
-  <a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/e0b4dac0072ebc85e0b743e67b46fb0412b40501/lib/managers/bsp_bind/board/flux_v1/FluxBoardConfig.h"><code>FluxBoardConfig.h</code></a>) and never driven; every other
+  <a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/008c41bcd7588cedd2a1f8a64a6456321329d289/lib/managers/bsp_bind/board/flux_v1/FluxBoardConfig.h"><code>FluxBoardConfig.h</code></a>) and never driven; every other
   pin is an output. The two valve enables (<code>kValveEnablePins</code>) start driven low, so both banks are off until
   <code>ValveManager</code> brings the drivers up. A new input pin needs a line in <code>kInputPins</code>.</li>
 <li><strong>The valve drivers own their control pins.</strong> Changing <code>GPIO_TLE92466_EN</code> or <code>GPIO_MAX22200_ENABLE</code> behind

@@ -1,5 +1,0 @@
-<map id="GetValveManager" name="GetValveManager">
-<area shape="rect" id="Node000001" title="Convenience accessor — equivalent to ValveManager::GetInstance()." alt="" coords="5,5,144,31"/>
-<area shape="rect" id="Node000002" href="$class_valve_manager.html#a365395c793edae3fa9b13e5939cf9297" title="Return the singleton ValveManager instance." alt="" coords="192,5,393,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="144,15,178,15,178,21,144,21"/>
-</map>

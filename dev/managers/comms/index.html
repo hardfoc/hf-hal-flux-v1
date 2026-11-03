@@ -105,6 +105,47 @@
   <meta property="og:description" content="Hardware abstraction layer for the HardFOC Flux V1 valve control board (ESP32-S3, MAX22200, TLE92466ED): one Flux object, one manager per board function, every chip on the board.">
   <meta property="og:url" content="https://hardfoc.github.io/hf-hal-flux-v1/latest/managers/comms/">
   <meta name="twitter:card" content="summary">
+  <script>
+(function () {
+  if (typeof mermaid != "undefined" && !(mermaid instanceof Element)) return;
+  var SRC = "https://unpkg.com/mermaid@11/dist/mermaid.min.js", config = {}, real, loading, waiting = [];
+  var stub = {
+    initialize: function (c) { config = c || {}; if (real) real.initialize(config); },
+    render: function (id, text) {
+      var el = null, pres = document.querySelectorAll("pre.mermaid:not([data-hf-mermaid])");
+      for (var i = 0; i < pres.length && !el; i++) if (pres[i].textContent === text) el = pres[i];
+      if (el) el.setAttribute("data-hf-mermaid", "");
+      return near(el).then(load).then(function (m) { return m.render(id, text); });
+    }
+  };
+  function load() {
+    return loading || (loading = new Promise(function (resolve, reject) {
+      var s = document.createElement("script");
+      s.src = SRC;
+      s.onload = function () {
+        real = window.mermaid;
+        window.mermaid = stub;
+        real.initialize(config);
+        resolve(real);
+      };
+      s.onerror = function () { loading = null; reject(new Error("Mermaid did not load")); };
+      document.head.appendChild(s);
+    }));
+  }
+  function near(el) {
+    if (real || !el || !("IntersectionObserver" in window)) return Promise.resolve();
+    return new Promise(function (resolve) {
+      var io = new IntersectionObserver(function (entries) {
+        if (entries.some(function (e) { return e.isIntersecting; })) { io.disconnect(); resolve(); }
+      }, { rootMargin: "100% 0px" });
+      io.observe(el);
+      waiting.push(function () { io.disconnect(); resolve(); });
+    });
+  }
+  window.addEventListener("beforeprint", function () { waiting.splice(0).forEach(function (go) { go(); }); });
+  window.mermaid = stub;
+})();
+</script>
 
   </head>
   
@@ -1307,7 +1348,7 @@
 <h1 id="commchannelsmanager">CommChannelsManager<a class="headerlink" href="#commchannelsmanager" title="Permanent link">&para;</a></h1>
 <p>Owns the board's buses: the valve SPI bus (MAX22200 and TLE92466ED), the ADC SPI bus (ADS7952), the CAN controller,
 and up to three UARTs created on demand. Other managers borrow devices from it; application code rarely needs it
-except for CAN and UARTs. Source: <a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/e0b4dac0072ebc85e0b743e67b46fb0412b40501/lib/managers/CommChannelsManager.h"><code>CommChannelsManager.h</code></a>.</p>
+except for CAN and UARTs. Source: <a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/008c41bcd7588cedd2a1f8a64a6456321329d289/lib/managers/CommChannelsManager.h"><code>CommChannelsManager.h</code></a>.</p>
 <h2 id="what-it-sets-up">What it sets up<a class="headerlink" href="#what-it-sets-up" title="Permanent link">&para;</a></h2>
 <table>
 <thead>

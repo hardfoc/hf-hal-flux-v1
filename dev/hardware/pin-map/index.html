@@ -105,6 +105,47 @@
   <meta property="og:description" content="Hardware abstraction layer for the HardFOC Flux V1 valve control board (ESP32-S3, MAX22200, TLE92466ED): one Flux object, one manager per board function, every chip on the board.">
   <meta property="og:url" content="https://hardfoc.github.io/hf-hal-flux-v1/latest/hardware/pin-map/">
   <meta name="twitter:card" content="summary">
+  <script>
+(function () {
+  if (typeof mermaid != "undefined" && !(mermaid instanceof Element)) return;
+  var SRC = "https://unpkg.com/mermaid@11/dist/mermaid.min.js", config = {}, real, loading, waiting = [];
+  var stub = {
+    initialize: function (c) { config = c || {}; if (real) real.initialize(config); },
+    render: function (id, text) {
+      var el = null, pres = document.querySelectorAll("pre.mermaid:not([data-hf-mermaid])");
+      for (var i = 0; i < pres.length && !el; i++) if (pres[i].textContent === text) el = pres[i];
+      if (el) el.setAttribute("data-hf-mermaid", "");
+      return near(el).then(load).then(function (m) { return m.render(id, text); });
+    }
+  };
+  function load() {
+    return loading || (loading = new Promise(function (resolve, reject) {
+      var s = document.createElement("script");
+      s.src = SRC;
+      s.onload = function () {
+        real = window.mermaid;
+        window.mermaid = stub;
+        real.initialize(config);
+        resolve(real);
+      };
+      s.onerror = function () { loading = null; reject(new Error("Mermaid did not load")); };
+      document.head.appendChild(s);
+    }));
+  }
+  function near(el) {
+    if (real || !el || !("IntersectionObserver" in window)) return Promise.resolve();
+    return new Promise(function (resolve) {
+      var io = new IntersectionObserver(function (entries) {
+        if (entries.some(function (e) { return e.isIntersecting; })) { io.disconnect(); resolve(); }
+      }, { rootMargin: "100% 0px" });
+      io.observe(el);
+      waiting.push(function () { io.disconnect(); resolve(); });
+    });
+  }
+  window.addEventListener("beforeprint", function () { waiting.splice(0).forEach(function (go) { go(); }); });
+  window.mermaid = stub;
+})();
+</script>
 
   </head>
   
@@ -996,7 +1037,7 @@
 
 <h1 id="pin-map">Pin map<a class="headerlink" href="#pin-map" title="Permanent link">&para;</a></h1>
 <p>Every pin and ADC channel the HAL knows about. The single source is the X-macro table in
-<a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/e0b4dac0072ebc85e0b743e67b46fb0412b40501/lib/core/hf-core-drivers/internal/hf-pincfg/src/hf_functional_pin_config_flux_v1.hpp"><code>hf_functional_pin_config_flux_v1.hpp</code></a>
+<a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/008c41bcd7588cedd2a1f8a64a6456321329d289/lib/core/hf-core-drivers/internal/hf-pincfg/src/hf_functional_pin_config_flux_v1.hpp"><code>hf_functional_pin_config_flux_v1.hpp</code></a>
 (in the <code>hf-pincfg</code> submodule); the managers register their pins from it at start-up and the tables below are
 filled from it, so they cannot drift from the firmware.</p>
 <details class="note">
@@ -1012,7 +1053,7 @@ filled from it, so they cannot drift from the firmware.</p>
 <h2 id="summary">Summary<a class="headerlink" href="#summary" title="Permanent link">&para;</a></h2>
 <!-- generated: pins-summary -->
 <p>From
-<a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/e0b4dac0072ebc85e0b743e67b46fb0412b40501/lib/core/hf-core-drivers/internal/hf-pincfg/src/hf_functional_pin_config_flux_v1.hpp"><code>hf_functional_pin_config_flux_v1.hpp</code></a>;
+<a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/008c41bcd7588cedd2a1f8a64a6456321329d289/lib/core/hf-core-drivers/internal/hf-pincfg/src/hf_functional_pin_config_flux_v1.hpp"><code>hf_functional_pin_config_flux_v1.hpp</code></a>;
 do not edit.</p>
 <table>
 <thead>
@@ -1046,7 +1087,7 @@ do not edit.</p>
 <h2 id="esp32-s3-gpio">ESP32-S3 GPIO<a class="headerlink" href="#esp32-s3-gpio" title="Permanent link">&para;</a></h2>
 <!-- generated: pins-esp32 -->
 <p>From
-<a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/e0b4dac0072ebc85e0b743e67b46fb0412b40501/lib/core/hf-core-drivers/internal/hf-pincfg/src/hf_functional_pin_config_flux_v1.hpp"><code>hf_functional_pin_config_flux_v1.hpp</code></a>;
+<a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/008c41bcd7588cedd2a1f8a64a6456321329d289/lib/core/hf-core-drivers/internal/hf-pincfg/src/hf_functional_pin_config_flux_v1.hpp"><code>hf_functional_pin_config_flux_v1.hpp</code></a>;
 do not edit.</p>
 <table>
 <thead>
@@ -1314,7 +1355,7 @@ divider before <code>AdcManager</code> returns it. The ADS7952 channels are only
 <code>HARDFOC_ADS7952_SUPPORT</code> (the HAL's <code>CMakeLists.txt</code> does).</p>
 <!-- generated: pins-adc -->
 <p>From
-<a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/e0b4dac0072ebc85e0b743e67b46fb0412b40501/lib/core/hf-core-drivers/internal/hf-pincfg/src/hf_functional_pin_config_flux_v1.hpp"><code>hf_functional_pin_config_flux_v1.hpp</code></a>;
+<a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/008c41bcd7588cedd2a1f8a64a6456321329d289/lib/core/hf-core-drivers/internal/hf-pincfg/src/hf_functional_pin_config_flux_v1.hpp"><code>hf_functional_pin_config_flux_v1.hpp</code></a>;
 do not edit.</p>
 <table>
 <thead>

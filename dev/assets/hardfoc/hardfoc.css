@@ -950,7 +950,14 @@
   max-width: 100%;
 }
 
-/* On a phone a wide figure keeps a readable size and scrolls sideways instead of shrinking below its text size. */
+.md-typeset figure.hf-figure img {
+  width: 100%;
+  height: auto;
+  border-radius: var(--hf-radius-lg);
+}
+
+/* On a phone a wide figure keeps a readable size and scrolls sideways instead of shrinking below its text size.
+   It must come after the rule above, which has the same specificity. */
 @media screen and (max-width: 44.9375em) {
   .md-typeset figure.hf-figure {
     overflow-x: auto;
@@ -962,12 +969,6 @@
     max-width: none;
     height: auto;
   }
-}
-
-.md-typeset figure.hf-figure img {
-  width: 100%;
-  height: auto;
-  border-radius: var(--hf-radius-lg);
 }
 
 .md-typeset figure figcaption,

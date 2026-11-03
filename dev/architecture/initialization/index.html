@@ -105,6 +105,47 @@
   <meta property="og:description" content="Hardware abstraction layer for the HardFOC Flux V1 valve control board (ESP32-S3, MAX22200, TLE92466ED): one Flux object, one manager per board function, every chip on the board.">
   <meta property="og:url" content="https://hardfoc.github.io/hf-hal-flux-v1/latest/architecture/initialization/">
   <meta name="twitter:card" content="summary">
+  <script>
+(function () {
+  if (typeof mermaid != "undefined" && !(mermaid instanceof Element)) return;
+  var SRC = "https://unpkg.com/mermaid@11/dist/mermaid.min.js", config = {}, real, loading, waiting = [];
+  var stub = {
+    initialize: function (c) { config = c || {}; if (real) real.initialize(config); },
+    render: function (id, text) {
+      var el = null, pres = document.querySelectorAll("pre.mermaid:not([data-hf-mermaid])");
+      for (var i = 0; i < pres.length && !el; i++) if (pres[i].textContent === text) el = pres[i];
+      if (el) el.setAttribute("data-hf-mermaid", "");
+      return near(el).then(load).then(function (m) { return m.render(id, text); });
+    }
+  };
+  function load() {
+    return loading || (loading = new Promise(function (resolve, reject) {
+      var s = document.createElement("script");
+      s.src = SRC;
+      s.onload = function () {
+        real = window.mermaid;
+        window.mermaid = stub;
+        real.initialize(config);
+        resolve(real);
+      };
+      s.onerror = function () { loading = null; reject(new Error("Mermaid did not load")); };
+      document.head.appendChild(s);
+    }));
+  }
+  function near(el) {
+    if (real || !el || !("IntersectionObserver" in window)) return Promise.resolve();
+    return new Promise(function (resolve) {
+      var io = new IntersectionObserver(function (entries) {
+        if (entries.some(function (e) { return e.isIntersecting; })) { io.disconnect(); resolve(); }
+      }, { rootMargin: "100% 0px" });
+      io.observe(el);
+      waiting.push(function () { io.disconnect(); resolve(); });
+    });
+  }
+  window.addEventListener("beforeprint", function () { waiting.splice(0).forEach(function (go) { go(); }); });
+  window.mermaid = stub;
+})();
+</script>
 
   </head>
   
@@ -1394,18 +1435,18 @@
 <p><code>Flux::EnsureInitialized()</code> brings every manager up, one at a time, in a fixed order. Call it once, early in
 <code>app_main()</code>, before you touch any manager.</p>
 <figure class="hf-figure">
-<img src="../../diagrams/init-order.svg#only-light" alt="Initialisation order: NvsManager, CommChannelsManager, GpioManager are required; then ValveManager, AdcManager, LedManager, TemperatureManager are best effort and only produce warnings if they fail." width="1200" loading="lazy"><img src="../../diagrams/init-order.dark.svg#only-dark" alt="Initialisation order: NvsManager, CommChannelsManager, GpioManager are required; then ValveManager, AdcManager, LedManager, TemperatureManager are best effort and only produce warnings if they fail." width="1200" loading="lazy">
+<img src="../../diagrams/init-order.svg#only-light" alt="Initialisation order: NvsManager, CommChannelsManager, GpioManager are required; then ValveManager, AdcManager, LedManager, TemperatureManager are best effort and only produce warnings if they fail." width="1200" height="555"><img src="../../diagrams/init-order.dark.svg#only-dark" alt="Initialisation order: NvsManager, CommChannelsManager, GpioManager are required; then ValveManager, AdcManager, LedManager, TemperatureManager are best effort and only produce warnings if they fail." width="1200" height="555">
 <figcaption>Flux::EnsureInitialized()</figcaption>
 </figure>
 
 <details class="hf-figure-desc">
 <summary>Figure description and sources</summary>
 <p>Left to right, then the second row. The facade initialises the managers one at a time, in the order of the calls in its init function. The first group is required: if any of them fails, EnsureInitialized() returns false and the application should not continue. The second group is best effort: a failure there is logged as a warning, the manager stays unavailable and the system reports itself as degraded, so a bench with only some chips fitted still comes up. The order and the required / best-effort split are read from the init function, which returns false only in the required branches.</p>
-<p>Drawn from: <a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/e0b4dac0072ebc85e0b743e67b46fb0412b40501/lib/api/Flux.cpp"><code>lib/api/Flux.cpp</code></a> <code>Flux::InitializeAllComponents</code>; figure module <a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/e0b4dac0072ebc85e0b743e67b46fb0412b40501/docs/diagrams/figures/init-order.py"><code>docs/diagrams/figures/init-order.py</code></a>.</p>
+<p>Drawn from: <a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/008c41bcd7588cedd2a1f8a64a6456321329d289/lib/api/Flux.cpp"><code>lib/api/Flux.cpp</code></a> <code>Flux::InitializeAllComponents</code>; figure module <a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/008c41bcd7588cedd2a1f8a64a6456321329d289/docs/diagrams/figures/init-order.py"><code>docs/diagrams/figures/init-order.py</code></a>.</p>
 </details>
 <h2 id="the-order">The order<a class="headerlink" href="#the-order" title="Permanent link">&para;</a></h2>
 <!-- generated: init-order -->
-<p>From <a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/e0b4dac0072ebc85e0b743e67b46fb0412b40501/lib/api/Flux.cpp"><code>Flux.cpp</code></a>
+<p>From <a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/008c41bcd7588cedd2a1f8a64a6456321329d289/lib/api/Flux.cpp"><code>Flux.cpp</code></a>
 (<code>Flux::InitializeAllComponents</code>); do not edit.</p>
 <table>
 <thead>

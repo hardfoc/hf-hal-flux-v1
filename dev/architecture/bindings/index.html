@@ -105,6 +105,47 @@
   <meta property="og:description" content="Hardware abstraction layer for the HardFOC Flux V1 valve control board (ESP32-S3, MAX22200, TLE92466ED): one Flux object, one manager per board function, every chip on the board.">
   <meta property="og:url" content="https://hardfoc.github.io/hf-hal-flux-v1/latest/architecture/bindings/">
   <meta name="twitter:card" content="summary">
+  <script>
+(function () {
+  if (typeof mermaid != "undefined" && !(mermaid instanceof Element)) return;
+  var SRC = "https://unpkg.com/mermaid@11/dist/mermaid.min.js", config = {}, real, loading, waiting = [];
+  var stub = {
+    initialize: function (c) { config = c || {}; if (real) real.initialize(config); },
+    render: function (id, text) {
+      var el = null, pres = document.querySelectorAll("pre.mermaid:not([data-hf-mermaid])");
+      for (var i = 0; i < pres.length && !el; i++) if (pres[i].textContent === text) el = pres[i];
+      if (el) el.setAttribute("data-hf-mermaid", "");
+      return near(el).then(load).then(function (m) { return m.render(id, text); });
+    }
+  };
+  function load() {
+    return loading || (loading = new Promise(function (resolve, reject) {
+      var s = document.createElement("script");
+      s.src = SRC;
+      s.onload = function () {
+        real = window.mermaid;
+        window.mermaid = stub;
+        real.initialize(config);
+        resolve(real);
+      };
+      s.onerror = function () { loading = null; reject(new Error("Mermaid did not load")); };
+      document.head.appendChild(s);
+    }));
+  }
+  function near(el) {
+    if (real || !el || !("IntersectionObserver" in window)) return Promise.resolve();
+    return new Promise(function (resolve) {
+      var io = new IntersectionObserver(function (entries) {
+        if (entries.some(function (e) { return e.isIntersecting; })) { io.disconnect(); resolve(); }
+      }, { rootMargin: "100% 0px" });
+      io.observe(el);
+      waiting.push(function () { io.disconnect(); resolve(); });
+    });
+  }
+  window.addEventListener("beforeprint", function () { waiting.splice(0).forEach(function (go) { go(); }); });
+  window.mermaid = stub;
+})();
+</script>
 
   </head>
   
@@ -1363,31 +1404,31 @@ ESP-IDF, which is what makes a host test build and a later STM32 port possible.<
 <tbody>
 <tr>
 <td>Facade</td>
-<td><a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/e0b4dac0072ebc85e0b743e67b46fb0412b40501/lib/api/Flux.h"><code>lib/api/Flux.h</code></a></td>
+<td><a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/008c41bcd7588cedd2a1f8a64a6456321329d289/lib/api/Flux.h"><code>lib/api/Flux.h</code></a></td>
 <td>The managers, init order, system diagnostics</td>
 <td>ESP-IDF, FreeRTOS, <code>Esp*</code></td>
 </tr>
 <tr>
 <td>Managers</td>
-<td><a href="https://github.com/hardfoc/hf-hal-flux-v1/tree/e0b4dac0072ebc85e0b743e67b46fb0412b40501/lib/managers"><code>lib/managers</code></a> (<code>*Manager.*</code>)</td>
+<td><a href="https://github.com/hardfoc/hf-hal-flux-v1/tree/008c41bcd7588cedd2a1f8a64a6456321329d289/lib/managers"><code>lib/managers</code></a> (<code>*Manager.*</code>)</td>
 <td>The board: pins, buses, chips, what a failure means</td>
 <td>ESP-IDF, FreeRTOS, <code>Esp*</code></td>
 </tr>
 <tr>
 <td>Board binding</td>
-<td><a href="https://github.com/hardfoc/hf-hal-flux-v1/tree/e0b4dac0072ebc85e0b743e67b46fb0412b40501/lib/managers/bsp_bind/board/flux_v1"><code>lib/managers/bsp_bind/board/flux_v1</code></a></td>
+<td><a href="https://github.com/hardfoc/hf-hal-flux-v1/tree/008c41bcd7588cedd2a1f8a64a6456321329d289/lib/managers/bsp_bind/board/flux_v1"><code>lib/managers/bsp_bind/board/flux_v1</code></a></td>
 <td>Bus controllers, clocks, SPI modes, CAN bit rate, LED channel</td>
 <td>ESP-IDF, FreeRTOS, <code>Esp*</code></td>
 </tr>
 <tr>
 <td>Binding interface</td>
-<td><a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/e0b4dac0072ebc85e0b743e67b46fb0412b40501/lib/managers/bsp_bind/FluxPlatformBind.h"><code>lib/managers/bsp_bind/FluxPlatformBind.h</code></a></td>
+<td><a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/008c41bcd7588cedd2a1f8a64a6456321329d289/lib/managers/bsp_bind/FluxPlatformBind.h"><code>lib/managers/bsp_bind/FluxPlatformBind.h</code></a></td>
 <td>Plain-data specs in, <code>Base*</code> out</td>
 <td>ESP-IDF, FreeRTOS, <code>Esp*</code></td>
 </tr>
 <tr>
 <td>Family binding</td>
-<td><a href="https://github.com/hardfoc/hf-hal-flux-v1/tree/e0b4dac0072ebc85e0b743e67b46fb0412b40501/lib/managers/bsp_bind/esp32s3"><code>lib/managers/bsp_bind/esp32s3</code></a></td>
+<td><a href="https://github.com/hardfoc/hf-hal-flux-v1/tree/008c41bcd7588cedd2a1f8a64a6456321329d289/lib/managers/bsp_bind/esp32s3"><code>lib/managers/bsp_bind/esp32s3</code></a></td>
 <td><code>EspGpio</code>, <code>EspSpiBus</code>, <code>EspAdc</code>, <code>EspCan</code>, <code>EspUart</code>, <code>EspNvs</code>, <code>EspTemperature</code>, the WS2812 RMT driver, <code>esp_restart()</code></td>
 <td>-</td>
 </tr>
@@ -1403,7 +1444,7 @@ ESP-IDF, which is what makes a host test build and a later STM32 port possible.<
 <code>CanSpec</code>, <code>UartSpec</code>, <code>LedStripSpec</code>) and calls the binding, for example <code>flux::bsp::CreateSpiDevice(bus, spec)</code>.
 The binding returns a <code>BaseSpi*</code>, and from then on the manager and the handlers it owns see only the interface.</p>
 <h2 id="families">Families<a class="headerlink" href="#families" title="Permanent link">&para;</a></h2>
-<p>Exactly one family is linked into an image; <a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/e0b4dac0072ebc85e0b743e67b46fb0412b40501/CMakeLists.txt"><code>CMakeLists.txt</code></a> picks it from <code>HF_CORE_MCU</code>.</p>
+<p>Exactly one family is linked into an image; <a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/008c41bcd7588cedd2a1f8a64a6456321329d289/CMakeLists.txt"><code>CMakeLists.txt</code></a> picks it from <code>HF_CORE_MCU</code>.</p>
 <table>
 <thead>
 <tr>
@@ -1434,7 +1475,7 @@ TWAI, UART, RMT) allocate them inside the <code>Create*</code> call, which runs 
 <code>EnsureInitialized()</code>. A new MCU family is a new directory implementing every function in <code>FluxPlatformBind.h</code>;
 no manager changes.</p>
 <h2 id="the-boundary-lint">The boundary lint<a class="headerlink" href="#the-boundary-lint" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/e0b4dac0072ebc85e0b743e67b46fb0412b40501/tools/lint/lint_hal_boundary.sh"><code>tools/lint/lint_hal_boundary.sh</code></a> runs in CI (<code>ci-hal-boundary.yml</code>) and
+<p><a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/008c41bcd7588cedd2a1f8a64a6456321329d289/tools/lint/lint_hal_boundary.sh"><code>tools/lint/lint_hal_boundary.sh</code></a> runs in CI (<code>ci-hal-boundary.yml</code>) and
 fails the pull request when a file in <code>lib/api</code> or <code>lib/managers</code> outside a family directory:</p>
 <ul>
 <li>includes an ESP-IDF header (<code>esp_*</code>, <code>driver/</code>, <code>soc/</code>, <code>hal/</code>, <code>freertos/</code>, <code>FreeRTOS.h</code>, <code>sdkconfig.h</code>, ...),
@@ -1443,7 +1484,7 @@ fails the pull request when a file in <code>lib/api</code> or <code>lib/managers
 <li>names a family type in a header (<code>Esp*</code>, <code>gpio_num_t</code>, <code>esp_err_t</code>, <code>TaskHandle_t</code>, ...), even in a forward
   declaration.</li>
 </ul>
-<p>Known debt goes in <a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/e0b4dac0072ebc85e0b743e67b46fb0412b40501/tools/lint/hal_boundary_allowlist.txt"><code>tools/lint/hal_boundary_allowlist.txt</code></a>, and the
+<p>Known debt goes in <a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/008c41bcd7588cedd2a1f8a64a6456321329d289/tools/lint/hal_boundary_allowlist.txt"><code>tools/lint/hal_boundary_allowlist.txt</code></a>, and the
 list may only shrink: a listed file that no longer violates fails the lint until its line is removed, and on a
 pull request a line that is not on the base branch fails it too. The list is empty.</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>tools/lint/lint_hal_boundary.sh<span class="w">                 </span><span class="c1"># what a developer runs</span>

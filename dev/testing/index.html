@@ -105,6 +105,47 @@
   <meta property="og:description" content="Hardware abstraction layer for the HardFOC Flux V1 valve control board (ESP32-S3, MAX22200, TLE92466ED): one Flux object, one manager per board function, every chip on the board.">
   <meta property="og:url" content="https://hardfoc.github.io/hf-hal-flux-v1/latest/testing/">
   <meta name="twitter:card" content="summary">
+  <script>
+(function () {
+  if (typeof mermaid != "undefined" && !(mermaid instanceof Element)) return;
+  var SRC = "https://unpkg.com/mermaid@11/dist/mermaid.min.js", config = {}, real, loading, waiting = [];
+  var stub = {
+    initialize: function (c) { config = c || {}; if (real) real.initialize(config); },
+    render: function (id, text) {
+      var el = null, pres = document.querySelectorAll("pre.mermaid:not([data-hf-mermaid])");
+      for (var i = 0; i < pres.length && !el; i++) if (pres[i].textContent === text) el = pres[i];
+      if (el) el.setAttribute("data-hf-mermaid", "");
+      return near(el).then(load).then(function (m) { return m.render(id, text); });
+    }
+  };
+  function load() {
+    return loading || (loading = new Promise(function (resolve, reject) {
+      var s = document.createElement("script");
+      s.src = SRC;
+      s.onload = function () {
+        real = window.mermaid;
+        window.mermaid = stub;
+        real.initialize(config);
+        resolve(real);
+      };
+      s.onerror = function () { loading = null; reject(new Error("Mermaid did not load")); };
+      document.head.appendChild(s);
+    }));
+  }
+  function near(el) {
+    if (real || !el || !("IntersectionObserver" in window)) return Promise.resolve();
+    return new Promise(function (resolve) {
+      var io = new IntersectionObserver(function (entries) {
+        if (entries.some(function (e) { return e.isIntersecting; })) { io.disconnect(); resolve(); }
+      }, { rootMargin: "100% 0px" });
+      io.observe(el);
+      waiting.push(function () { io.disconnect(); resolve(); });
+    });
+  }
+  window.addEventListener("beforeprint", function () { waiting.splice(0).forEach(function (go) { go(); }); });
+  window.mermaid = stub;
+})();
+</script>
 
   </head>
   
@@ -1052,7 +1093,7 @@
 
 <h1 id="testing-and-ci">Testing and CI<a class="headerlink" href="#testing-and-ci" title="Permanent link">&para;</a></h1>
 <p>What runs on a pull request, what each check means, and how to run it on your machine first. All workflows are in
-<a href="https://github.com/hardfoc/hf-hal-flux-v1/tree/e0b4dac0072ebc85e0b743e67b46fb0412b40501/.github/workflows"><code>.github/workflows</code></a>; most call reusable workflows in
+<a href="https://github.com/hardfoc/hf-hal-flux-v1/tree/008c41bcd7588cedd2a1f8a64a6456321329d289/.github/workflows"><code>.github/workflows</code></a>; most call reusable workflows in
 <a href="https://github.com/hardfoc/hf-general-ci-tools">hf-general-ci-tools</a> or
 <a href="https://github.com/hardfoc/hf-espidf-ci-tools">hf-espidf-ci-tools</a>.</p>
 <h2 id="workflows">Workflows<a class="headerlink" href="#workflows" title="Permanent link">&para;</a></h2>
@@ -1125,9 +1166,9 @@
 <p>The examples are integration tests: they run on a board, not in CI. CI proves they compile; a person flashes them.
 The manager logic is unit-tested on a host, below.</p>
 <h2 id="host-tests">Host tests<a class="headerlink" href="#host-tests" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/hardfoc/hf-hal-flux-v1/tree/e0b4dac0072ebc85e0b743e67b46fb0412b40501/tests/host"><code>tests/host</code></a> builds the facade and the managers against the host family of the platform binding
-(<a href="https://github.com/hardfoc/hf-hal-flux-v1/tree/e0b4dac0072ebc85e0b743e67b46fb0412b40501/lib/managers/bsp_bind/host"><code>bsp_bind/host</code></a>, over hf-core's <code>hf_core_host_mocks</code>) and runs one executable per
-manager. The chips are register-level SPI models in <a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/e0b4dac0072ebc85e0b743e67b46fb0412b40501/tests/host/FluxChipModels.h"><code>FluxChipModels.h</code></a>, so the real
+<p><a href="https://github.com/hardfoc/hf-hal-flux-v1/tree/008c41bcd7588cedd2a1f8a64a6456321329d289/tests/host"><code>tests/host</code></a> builds the facade and the managers against the host family of the platform binding
+(<a href="https://github.com/hardfoc/hf-hal-flux-v1/tree/008c41bcd7588cedd2a1f8a64a6456321329d289/lib/managers/bsp_bind/host"><code>bsp_bind/host</code></a>, over hf-core's <code>hf_core_host_mocks</code>) and runs one executable per
+manager. The chips are register-level SPI models in <a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/008c41bcd7588cedd2a1f8a64a6456321329d289/tests/host/FluxChipModels.h"><code>FluxChipModels.h</code></a>, so the real
 hf-core handlers and chip drivers run their unmodified bring-up and channel code:</p>
 <table>
 <thead>

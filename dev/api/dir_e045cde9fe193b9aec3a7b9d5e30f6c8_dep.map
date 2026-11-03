@@ -1,7 +1,0 @@
-<map id="bsp_bind" name="bsp_bind">
-<area shape="rect" id="node2" href="dir_160e0fb4a1100882e527977afd8a4547.html" title="board" alt="" coords="213,63,272,88"/>
-<area shape="rect" id="node3" href="dir_5748c3e6c1eba1dbf2ef536a21b87ed9.html" title="esp32s3" alt="" coords="113,63,189,88"/>
-<area shape="rect" id="node4" href="dir_2b9559b4c6fcd7a4403d5fa597ed2d97.html" title="host" alt="" coords="37,63,88,88"/>
-<area shape="rect" id="clust2" href="dir_e045cde9fe193b9aec3a7b9d5e30f6c8.html" alt="" coords="27,52,387,99"/>
-<area shape="rect" id="clust1" href="dir_3568a07a1e5bfd0644c885a21e97553b.html" title="managers" alt="" coords="16,16,397,109"/>
-</map>

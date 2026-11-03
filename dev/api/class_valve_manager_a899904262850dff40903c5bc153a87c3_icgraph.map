@@ -1,9 +1,0 @@
-<map id="ValveManager::DropEnablePins" name="ValveManager::DropEnablePins">
-<area shape="rect" id="Node000001" title="Drive MAX22200 ENABLE and TLE92466ED EN low: both banks de&#45;energised in hardware." alt="" coords="536,31,761,56"/>
-<area shape="rect" id="Node000002" href="$class_valve_manager.html#a68ea3302ca55e55a494099f3a52d67f1" title="Turn every channel off, release both driver handlers and reset to uninitialised." alt="" coords="291,31,488,56"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="522,46,488,46,488,41,522,41"/>
-<area shape="rect" id="Node000003" href="$class_valve_manager.html#aa540e9da7618c57ecbc8ce6e7a7d9f25" title="Leave SafeHold: full re&#45;bring&#45;up of both banks, which raises the enable pins again." alt="" coords="5,5,243,31"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="277,35,243,32,243,27,277,30"/>
-<area shape="rect" id="Node000004" href="$class_flux.html#a381c21e10f3556ecc16df4b4f2ead006" title="Shut down all subsystems in reverse initialisation order." alt="" coords="63,55,185,80"/>
-<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="277,56,186,64,185,59,277,51"/>
-</map>

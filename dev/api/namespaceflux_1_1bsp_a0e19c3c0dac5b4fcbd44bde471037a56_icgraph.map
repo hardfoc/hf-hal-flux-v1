@@ -1,5 +1,0 @@
-<map id="flux::bsp::CreateSpiBus" name="flux::bsp::CreateSpiBus">
-<area shape="rect" id="Node000001" title="Create and initialise SPI bus bus." alt="" coords="269,20,441,45"/>
-<area shape="rect" id="Node000002" href="$namespaceanonymous__namespace_02_comm_channels_manager_8cpp_03.html#a912632f131b5881de2faf8a76c19f193" title="Bring up one SPI controller from its pin&#45;map pins." alt="" coords="5,5,221,60"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="256,35,221,35,221,30,256,30"/>
-</map>

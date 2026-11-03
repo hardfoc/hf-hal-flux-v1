@@ -1,9 +1,0 @@
-<map id="LedManager::StopAnimation" name="LedManager::StopAnimation">
-<area shape="rect" id="Node000001" title="Stop the current animation and turn the LED off." alt="" coords="5,55,212,80"/>
-<area shape="rect" id="Node000002" href="$namespace_led_colors.html#ac73d9c4d71b45c9f83cf04a51e6dbb3c" title="Off / black." alt="" coords="286,5,425,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="172,52,277,31,278,36,173,57"/>
-<area shape="rect" id="Node000003" href="$namespaceflux_1_1bsp.html#a6b08718df1ad5fee11813553a43116eb" title="Stage a 0xRRGGBB colour for LED index (sent on LedStripShow)." alt="" coords="260,55,451,80"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="212,65,246,65,246,70,212,70"/>
-<area shape="rect" id="Node000004" href="$namespaceflux_1_1bsp.html#a82cb93630ae5f29d095a51ded4237fe2" title="Send the staged colours." alt="" coords="269,104,442,129"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="173,77,278,99,277,104,172,83"/>
-</map>
