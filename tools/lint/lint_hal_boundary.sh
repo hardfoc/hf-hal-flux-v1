@@ -11,7 +11,14 @@
 #   2. no #include of a family directory (bsp_bind/esp32s3/, bsp_bind/host/)
 #      from outside bsp_bind/;
 #   3. no ESP-IDF or Esp* type names in public headers (comments stripped), so
-#      a forward declaration cannot smuggle a family type into an API.
+#      a forward declaration cannot smuggle a family type into an API;
+#   4. lock discipline (ported from hf-hal-vortex-v1): lib/api and lib/managers
+#      reach a chip driver only through its handler's locked API or
+#      WithDriver() / visitDriver() (which hold the handler mutex), never through
+#      the raw accessors that bypass it (GetDriver(), GetSensor(),
+#      driverViaSpi(), driverViaUart(), GetStrip(), GetAnimator()), and hand out
+#      no handler pointer (GetMax22200Handler(), GetTle92466Handler()) through
+#      which a caller could. Comments are stripped before this check.
 #
 # Known debt is listed in tools/lint/hal_boundary_allowlist.txt, one path per
 # line. The list may only shrink:
@@ -33,7 +40,7 @@ BASE_REF=""
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --base) BASE_REF="${2:-}"; shift 2 ;;
-    -h|--help) sed -n '2,24p' "$0"; exit 0 ;;
+    -h|--help) sed -n '2,31p' "$0"; exit 0 ;;
     *) echo "unknown argument: $1" >&2; exit 2 ;;
   esac
 done
@@ -60,6 +67,10 @@ INCLUDE_PATTERNS=(
   "${INC}(ws2812_(cpp|control|effects)|led_strip)" # (ws2812_version.h is a plain version macro)
   "${INC}[^\">]*bsp_bind/(esp32s3|host|stm32[a-z0-9]*)/"
 )
+
+# Rule 4: raw driver accessors that bypass the handler mutex, and handler getters that would hand
+# them out (checked with comments stripped).
+RAW_DRIVER_PATTERN='(->|\.)[[:space:]]*(GetSensor|driverViaSpi|driverViaUart|GetDriver|GetStrip|GetAnimator)[[:space:]]*\(|\b(GetMax22200Handler|GetTle92466Handler)[[:space:]]*\('
 
 # Type names that belong to a family (checked in headers only, comments stripped).
 TYPE_PATTERN='\b(Esp[A-Z][A-Za-z0-9_]*|esp_err_t|gpio_num_t|spi_host_device_t|adc_unit_t|adc_channel_t|uart_port_t|twai_[a-z_]+_t|rmt_[a-z_]+_t|nvs_handle_t|TaskHandle_t|QueueHandle_t|SemaphoreHandle_t|TickType_t|BaseType_t|WS2812[A-Za-z]*)\b'
@@ -98,6 +109,11 @@ file_violates() {
       found=0
     fi
   done
+  if hits="$(strip_comments "${f}" | grep -En "${RAW_DRIVER_PATTERN}")"; then
+    echo "  ${f} (raw driver access: use the handler's locked API or WithDriver()):"
+    echo "${hits}" | sed 's/^/    /'
+    found=0
+  fi
   case "${f}" in
     *.h|*.hpp)
       if hits="$(strip_comments "${f}" | grep -En "${TYPE_PATTERN}")"; then
@@ -153,6 +169,8 @@ if [[ ${violations} -gt 0 ]]; then
   echo "FAIL: ${violations} HAL boundary problem(s)."
   echo "      ESP-IDF, FreeRTOS, Esp* and WS2812-RMT code belongs in lib/managers/bsp_bind/<family>/,"
   echo "      behind lib/managers/bsp_bind/FluxPlatformBind.h. See docs/architecture/bindings.md."
+  echo "      Chip drivers are reached through the handler's locked API or WithDriver(), never"
+  echo "      through GetDriver() and the other raw accessors."
   exit 1
 fi
 
