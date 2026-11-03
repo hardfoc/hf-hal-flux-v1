@@ -29,7 +29,7 @@ The table is `kValveChannelMap` in the header; `FindChannel("SOL_CH3")` turns a 
 | `HasFault()`, `HasSolenoidFault()`, `HasProportionalFault()`, `ClearAllFaults()` | | |
 | `GetSolenoidFaults(max22200::FaultStatus&)`, `GetProportionalFaults(tle92466ed::FaultReport&)` | | Chip-level fault detail |
 | `GetChannelState(ch)` | all | `ValveChannelState`: enabled, configured, current, duty, PWM, dither, counters |
-| `GetMax22200Handler()`, `GetTle92466Handler()` | | The handlers, for chip features not wrapped here (`nullptr` if that chip failed) |
+| `Max22200()`, `Tle92466()` | | Locked access to each chip, for features not wrapped here: `false` if that chip failed; the handler's locked calls and `WithDriver(fn)`, which runs `fn(driver)` under the handler mutex. There is no raw driver pointer |
 
 All of them return `hf_valve_err_t` (or `bool`); calling a solenoid-only call on a proportional channel returns
 `VALVE_ERR_CHANNEL_TYPE_MISMATCH`.

@@ -5,6 +5,29 @@ What changed in the Flux V1 HAL, newest first. Releases are tagged `vX.Y.Z` and 
 
 ## Unreleased
 
+### Breaking
+
+- `ValveManager::GetMax22200Handler()` and `GetTle92466Handler()` are removed. They handed out the handlers, whose
+  `GetDriver()` returns the chip driver without the handler mutex, so a caller could interleave SPI frames with the
+  manager's own (the MAX22200's two-phase CMD protocol and the TLE92466ED's pipelined replies both break). They are
+  replaced by `ValveManager::Max22200()` and `ValveManager::Tle92466()`, which return access objects: `false` when the
+  bank is not up, the handlers' locked calls (`GetStatus()`, `ConfigureChannel()`, and for the TLE92466ED
+  `EnterConfigMode()`, `EnterMissionMode()`, `GetChannelDiagnostics()`, `GetIcVersion()`), and `WithDriver(fn)` for
+  any other driver call, run with the handler mutex held. No raw driver pointer. Migration:
+  `if (auto* h = mgr.GetMax22200Handler()) h->GetStatus(st);` becomes
+  `if (auto max = mgr.Max22200()) max.GetStatus(st);`, and `h->GetDriver()->X()` becomes
+  `max.WithDriver([&](auto& d) { return d.X(); })`.
+
+### Fixed
+
+- `ValveManager` reached the drivers through the handlers' unlocked `GetDriver()` in four places: the MAX22200
+  presence check, the TLE92466ED VBAT thresholds at bring-up, `ConfigureProportionalPwm()` and
+  `ConfigureProportionalDither()`. They now run inside the handlers' `WithDriver()`, under the handler mutex.
+- The HAL boundary lint (`tools/lint/lint_hal_boundary.sh`) has the lock-discipline rule of hf-hal-vortex-v1: a raw
+  driver accessor (`GetDriver()`, `GetSensor()`, `driverViaSpi()`, `driverViaUart()`, `GetStrip()`, `GetAnimator()`)
+  or a handler getter in `lib/` fails CI. `tools/lint/test_lint_hal_boundary.sh` checks every rule on fixtures and
+  runs in the same workflow.
+
 ### Changed
 
 - The documentation builds with the shared HardFOC theme (`hardfoc-mkdocs-theme`); the copied template, hooks and

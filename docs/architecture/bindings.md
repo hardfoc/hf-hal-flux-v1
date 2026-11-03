@@ -43,7 +43,14 @@ fails the pull request when a file in `lib/api` or `lib/managers` outside a fami
   an hf-core `Esp*` wrapper or the WS2812 RMT driver;
 - includes a family directory (`bsp_bind/esp32s3/`, `bsp_bind/host/`) from outside `bsp_bind/`;
 - names a family type in a header (`Esp*`, `gpio_num_t`, `esp_err_t`, `TaskHandle_t`, ...), even in a forward
-  declaration.
+  declaration;
+- reaches a chip driver past its handler's mutex: a raw accessor (`GetDriver()`, `GetSensor()`, `driverViaSpi()`,
+  `driverViaUart()`, `GetStrip()`, `GetAnimator()`), or a getter that hands out a handler
+  (`GetMax22200Handler()`, `GetTle92466Handler()`). Use the handler's locked API or its `WithDriver()` (comments
+  are not checked). This is the lock-discipline rule of hf-hal-vortex-v1.
+
+[`tools/lint/test_lint_hal_boundary.sh`](../../tools/lint/test_lint_hal_boundary.sh) runs the lint on small fixture
+trees in the same workflow and fails when a rule stops firing.
 
 Known debt goes in [`tools/lint/hal_boundary_allowlist.txt`](../../tools/lint/hal_boundary_allowlist.txt), and the
 list may only shrink: a listed file that no longer violates fails the lint until its line is removed, and on a
