@@ -7,9 +7,11 @@
  *          unmodified bring-up and channel code against them:
  *
  *          - @ref Max22200Model: two-phase protocol (8-bit command with CMD high, then 8- or
- *            32-bit data with CMD low), STATUS/CFG/FAULT register file, fault flags on SDO.
+ *            32-bit data with CMD low), STATUS/CFG/FAULT register file, fault flags on SDO, and
+ *            the CFG_CHx fields as the chip reads them (VDR duty in percent).
  *          - @ref Tle92466Model: 32-bit frames with SAE J1850 CRC, one-frame reply pipeline,
- *            16-/22-bit reply widths per register, register file with ICVID.
+ *            16-/22-bit reply widths per register, register file with ICVID, and critical-fault
+ *            replies (reply mode 10B, no CRC).
  *          - @ref Ads7952Model: 16-bit frames, manual channel select, channel id in the reply.
  *
  *          They model what the HAL relies on, not the whole datasheet.
@@ -95,6 +97,22 @@ public:
     /** @brief ONCH bits (channels switched on). */
     uint8_t ChannelsOn() const { return static_cast<uint8_t>(regs[max22200::RegBank::STATUS] >> 24); }
 
+    /** @brief CFG_CHx of channel @p ch (0-7). */
+    uint32_t Cfg(uint8_t ch) const { return regs[max22200::RegBank::CFG_CH0 + ch]; }
+    /** @brief VDRnCDR of channel @p ch: true in voltage drive. */
+    bool IsVdr(uint8_t ch) const { return (Cfg(ch) & max22200::CfgChReg::VDRNCDR_BIT) != 0u; }
+    /**
+     * @brief HIT[6:0] / HOLD[6:0] as the chip reads them. In VDR the field is the duty in percent
+     *        (datasheet Table 3: 40 % is 40, 100 and above run at 100 %); in CDR it is the current
+     *        in 1/127 of IFS.
+     */
+    uint8_t HitField(uint8_t ch) const {
+        return static_cast<uint8_t>((Cfg(ch) & max22200::CfgChReg::HIT_MASK) >> max22200::CfgChReg::HIT_SHIFT);
+    }
+    uint8_t HoldField(uint8_t ch) const {
+        return static_cast<uint8_t>((Cfg(ch) & max22200::CfgChReg::HOLD_MASK) >> max22200::CfgChReg::HOLD_SHIFT);
+    }
+
     void Install() {
         flux::bsp::host::SetSpiResponder(Pin(HfFunctionalGpioPin::SPI2_CS_MAX22200),
                                          [this](const uint8_t* tx, uint8_t* rx, uint16_t len) { Respond(tx, rx, len); });
@@ -133,6 +151,11 @@ public:
     std::map<uint16_t, uint16_t> regs;  ///< Register file (write address == read address below 0x80)
     bool absent{false};                 ///< MISO idle (all zero)
     uint16_t icvid{0xC102};             ///< ICVID value (0xC1xx = TLE92466ED)
+    /// Answer every frame with a critical-fault reply (datasheet 5.2.3.5): reply mode 10B, the cause in
+    /// bits 7:0, and bits 31:24 don't care, not a CRC. The part sends it while a supply or its clock is
+    /// out of range and cannot serve the access.
+    bool critical_fault{false};
+    uint8_t critical_fault_flags{0x01};
 
     Tle92466Model() { regs[tle92466ed::CentralReg::ICVID] = icvid; }
 
@@ -175,6 +198,12 @@ public:
             }
         }
         reply.rx_common.crc = tle92466ed::CalculateFrameCrc(reply);
+        if (critical_fault) {
+            reply.word = 0;
+            reply.rx_fault.fault_flags = critical_fault_flags;
+            reply.rx_fault.reply_mode = 0x2;
+            reply.rx_fault._dont_care = 0x5A;  // deliberately not the frame's CRC
+        }
         pending_ = reply.word;
     }
 

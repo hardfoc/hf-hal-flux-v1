@@ -458,3 +458,50 @@ HF_TEST(ValveBank_FacadeDropsAndReArms) {
     CHECK(!bad.ok);
     CHECK_EQ(bad.code, ManagerError::HardwareFault);
 }
+
+//==============================================================================
+// MAX22200 drive modes (driver datasheet-conformance changes)
+//==============================================================================
+
+HF_TEST(ValveManager_VdrDutyIsWrittenInPercent) {
+    // Datasheet Table 3: in VDR, HIT[6:0] / HOLD[6:0] are the duty in percent (40 % is 40, not
+    // round(40 * 127 / 100) = 51 as the 1.0.0 driver wrote).
+    Board b;
+    REQUIRE(VM().EnsureInitialized());
+    REQUIRE(VM().ConfigureSolenoidVdr(ValveChannel::SOL_CH1, 40.0f, 30.0f, 10.0f) == hf_valve_err_t::VALVE_SUCCESS);
+    CHECK(b.max.IsVdr(1));
+    CHECK_EQ(b.max.HitField(1), 40u);
+    CHECK_EQ(b.max.HoldField(1), 30u);
+}
+
+HF_TEST(ValveManager_SolenoidConfigSwitchesTheDriveMode) {
+    // The driver's current / duty setters no longer flip VDRnCDR; the handler's Setup helpers select
+    // the mode first, so a channel can be reconfigured from CDR to VDR and back.
+    Board b;
+    REQUIRE(VM().EnsureInitialized());
+    REQUIRE(VM().ConfigureSolenoidCdr(ValveChannel::SOL_CH2, 500, 200, 10.0f) == hf_valve_err_t::VALVE_SUCCESS);
+    CHECK(!b.max.IsVdr(2));
+    CHECK(b.max.HitField(2) > b.max.HoldField(2));
+    REQUIRE(VM().ConfigureSolenoidVdr(ValveChannel::SOL_CH2, 60.0f, 25.0f, 10.0f) == hf_valve_err_t::VALVE_SUCCESS);
+    CHECK(b.max.IsVdr(2));
+    CHECK_EQ(b.max.HitField(2), 60u);
+    CHECK_EQ(b.max.HoldField(2), 25u);
+    REQUIRE(VM().ConfigureSolenoidCdr(ValveChannel::SOL_CH2, 500, 200, 10.0f) == hf_valve_err_t::VALVE_SUCCESS);
+    CHECK(!b.max.IsVdr(2));
+}
+
+//==============================================================================
+// TLE92466ED critical-fault replies (datasheet 5.2.3.5)
+//==============================================================================
+
+HF_TEST(ValveManager_FailsClosedOnTleCriticalFaultReplies) {
+    // A critical-fault frame has reply mode 10B and no CRC in bits 31:24; the driver now recognises
+    // it before the CRC check. Bring-up must fail closed, as with an absent part.
+    Board b;
+    b.tle.critical_fault = true;
+    CHECK(!VM().EnsureInitialized());
+    CHECK_EQ(VM().GetManagerError(), ManagerError::HardwareFault);
+    CHECK(!VM().IsBankReady(ValveDriverType::TLE92466));
+    CHECK(VM().IsBankReady(ValveDriverType::MAX22200));
+    CHECK_EQ(TleChCtrl(b) & tle92466ed::CH_CTRL::ALL_CH_MASK, 0u);
+}
