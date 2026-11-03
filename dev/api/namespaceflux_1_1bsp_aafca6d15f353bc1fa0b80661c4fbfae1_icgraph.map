@@ -1,0 +1,5 @@
+<map id="flux::bsp::SystemRestart" name="flux::bsp::SystemRestart">
+<area shape="rect" id="Node000001" title="Software reset of the MCU. Does not return." alt="" coords="208,5,389,31"/>
+<area shape="rect" id="Node000002" href="$class_flux.html#a356fab68d51214ef1f6ee8536e753b23" title="Trigger a software reset of the MCU. Does not return on success." alt="" coords="5,5,160,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="194,21,160,21,160,15,194,15"/>
+</map>

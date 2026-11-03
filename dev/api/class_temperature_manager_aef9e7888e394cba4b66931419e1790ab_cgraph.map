@@ -1,0 +1,5 @@
+<map id="TemperatureManager::InitializeMcp9700Thermistor" name="TemperatureManager::InitializeMcp9700Thermistor">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,221,45"/>
+<area shape="rect" id="Node000002" href="$class_adc_manager.html#ae3d2137cd97edce8f97092d5b4a6d1d1" title="Return the singleton AdcManager instance." alt="" coords="269,13,459,38"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="222,23,256,23,256,28,222,28"/>
+</map>

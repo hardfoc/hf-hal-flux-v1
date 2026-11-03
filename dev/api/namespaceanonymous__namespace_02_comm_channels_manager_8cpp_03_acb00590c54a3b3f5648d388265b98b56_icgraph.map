@@ -1,0 +1,5 @@
+<map id="anonymous_namespace{CommChannelsManager::cpp}::FormatSpiSpeed" name="anonymous_namespace{CommChannelsManager::cpp}::FormatSpiSpeed">
+<area shape="rect" id="Node000001" title=" " alt="" coords="244,5,435,60"/>
+<area shape="rect" id="Node000002" href="$namespaceanonymous__namespace_02_comm_channels_manager_8cpp_03.html#a7ed4e86793422ec10fefbe41516448de" title="Add one chip select to an initialised bus and log it. nullptr if the CS pin is unmapped." alt="" coords="5,5,196,60"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="230,35,196,35,196,30,230,30"/>
+</map>

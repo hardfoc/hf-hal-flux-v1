@@ -1,0 +1,5 @@
+<map id="AdcManager::ReleaseLocked" name="AdcManager::ReleaseLocked">
+<area shape="rect" id="Node000001" title="Release the MCU ADC, every ADS7952 handler and the registry (mutex held)." alt="" coords="5,5,213,31"/>
+<area shape="rect" id="Node000002" href="$namespaceflux_1_1bsp.html#a743db59ccea2534e5382c2eb14d9c2eb" title="Destroy the MCU ADC unit." alt="" coords="261,5,472,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="214,15,248,15,248,21,214,21"/>
+</map>

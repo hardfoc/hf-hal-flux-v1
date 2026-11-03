@@ -1,0 +1,7 @@
+<map id="FluxTempSensorTypeToString" name="FluxTempSensorTypeToString">
+<area shape="rect" id="Node000001" title="Convert FluxTempSensorType to a human&#45;readable string." alt="" coords="469,13,680,38"/>
+<area shape="rect" id="Node000002" href="$class_temperature_manager.html#aa2cd5fe3024a7f387106edb5678ba68f" title="Log temperature sensor statistics and health info to the console." alt="" coords="260,5,421,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="456,28,422,28,422,23,456,23"/>
+<area shape="rect" id="Node000003" href="$class_flux.html#ac85a6ad26883360e0c3ea2c702b6fc11" title="Log a comprehensive system summary to the console." alt="" coords="5,13,212,38"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="246,28,212,28,212,23,246,23"/>
+</map>
