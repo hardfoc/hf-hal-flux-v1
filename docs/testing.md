@@ -31,13 +31,13 @@ hf-core handlers and chip drivers run their unmodified bring-up and channel code
 
 | Model | What it answers |
 | --- | --- |
-| `Max22200Model` | Two-phase protocol (command byte with CMD high, then 8- or 32-bit data), STATUS / CFG / FAULT registers, fault flags on SDO, an absent part (MISO high) |
-| `Tle92466Model` | 32-bit frames with the SAE J1850 CRC, the one-frame reply pipeline, 16- and 22-bit reply widths, write-1-to-clear diagnosis registers, ICVID, an absent part |
+| `Max22200Model` | Two-phase protocol (command byte with CMD high, then 8- or 32-bit data), STATUS / CFG / FAULT registers, fault flags on SDO, the CFG_CHx fields as the chip reads them (VDR duty in percent), an absent part (MISO high) |
+| `Tle92466Model` | 32-bit frames with the SAE J1850 CRC, the one-frame reply pipeline, 16- and 22-bit reply widths, write-1-to-clear diagnosis registers, ICVID, critical-fault replies (reply mode 10B, no CRC), an absent part |
 | `Ads7952Model` | 16-bit frames, manual channel select, channel id in the reply, an absent part |
 
 | Test | Proves |
 | --- | --- |
-| `test_valve_manager` | `kValveChannelMap` is a bijection onto MAX22200 OUT0-7 and TLE92466ED OUT0-5; each channel switches only its own output on the wire; currents land on the mapped TLE channel; the bank mask splits; the board's SPI modes and clocks; fault pins are inputs and enables start low before any valve code runs; the enable path drops both banks without SPI, latches, refuses energising and re-arms; shutdown ends in SafeHold; fail-closed bring-up with either chip absent or the bus down, retry; MAX22200 and TLE92466ED fault reporting; shutdown turns every channel off |
+| `test_valve_manager` | `kValveChannelMap` is a bijection onto MAX22200 OUT0-7 and TLE92466ED OUT0-5; each channel switches only its own output on the wire; currents land on the mapped TLE channel; the bank mask splits; the board's SPI modes and clocks; fault pins are inputs and enables start low before any valve code runs; the enable path drops both banks without SPI, latches, refuses energising and re-arms; shutdown ends in SafeHold; fail-closed bring-up with either chip absent, the bus down or TLE92466ED critical-fault replies, retry; MAX22200 VDR duty in percent and CDR / VDR reconfiguration of one channel; MAX22200 and TLE92466ED fault reporting; shutdown turns every channel off |
 | `test_adc_manager` | Every pin-map channel registers; each ADS7952 channel reads its own input; the VBUS divider; name and enum lookups agree; failed reads are recorded; fail-closed with the ADS7952 absent, the pressure bus down or the MCU ADC down |
 | `test_temperature_manager` | All three sensors; the NTC through its pin-map channel; the MCP9700 through the ADS7952; degraded mode without the ADC or the die sensor; failure with no sensor |
 | `test_nvs_manager` | The three namespaces and their binding slots; isolation; the 15-character key limit; fail-closed opening |
