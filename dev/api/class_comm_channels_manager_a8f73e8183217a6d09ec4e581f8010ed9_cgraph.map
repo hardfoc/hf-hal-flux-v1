@@ -1,9 +1,0 @@
-<map id="CommChannelsManager::Deinitialize" name="CommChannelsManager::Deinitialize">
-<area shape="rect" id="Node000001" title="Release all bus resources and reset to uninitialized state." alt="" coords="5,23,188,63"/>
-<area shape="rect" id="Node000002" href="$class_comm_channels_manager.html#ac26134b220ce180e441ad956e8b2c77a" title=" " alt="" coords="236,23,419,63"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="188,41,222,41,222,46,188,46"/>
-<area shape="rect" id="Node000003" href="$namespaceflux_1_1bsp.html#a5d5827fa54cd130b7e8ba5c419a0fa95" title="Destroy the CAN controller." alt="" coords="476,5,637,31"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="419,31,462,26,462,31,419,36"/>
-<area shape="rect" id="Node000004" href="$namespaceflux_1_1bsp.html#a6867571cbe5798e8ed5e5cd954f9c4db" title="Destroy SPI bus bus and every device on it." alt="" coords="467,55,647,80"/>
-<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="419,50,453,54,453,59,419,56"/>
-</map>

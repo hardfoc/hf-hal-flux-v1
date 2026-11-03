@@ -1,7 +1,0 @@
-<map id="NvsManager.h" name="NvsManager.h">
-<area shape="rect" id="Node000001" title="Non&#45;volatile storage for Flux V1 — three namespaces behind BaseNvs." alt="" coords="51,5,165,31"/>
-<area shape="rect" id="Node000002" href="$_flux_8cpp.html" title="Implementation of the unified Flux API singleton." alt="" coords="5,79,83,104"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="90,43,56,80,52,77,86,39"/>
-<area shape="rect" id="Node000003" href="$_nvs_manager_8cpp.html" title="Flux NVS manager — three BaseNvs namespaces from the platform binding." alt="" coords="107,79,237,104"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="130,39,164,77,160,80,126,43"/>
-</map>

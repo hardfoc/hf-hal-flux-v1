@@ -1093,7 +1093,7 @@
 
 <h1 id="testing-and-ci">Testing and CI<a class="headerlink" href="#testing-and-ci" title="Permanent link">&para;</a></h1>
 <p>What runs on a pull request, what each check means, and how to run it on your machine first. All workflows are in
-<a href="https://github.com/hardfoc/hf-hal-flux-v1/tree/008c41bcd7588cedd2a1f8a64a6456321329d289/.github/workflows"><code>.github/workflows</code></a>; most call reusable workflows in
+<a href="https://github.com/hardfoc/hf-hal-flux-v1/tree/16b48be20a9f65443e9deb754c54c6e39be60906/.github/workflows"><code>.github/workflows</code></a>; most call reusable workflows in
 <a href="https://github.com/hardfoc/hf-general-ci-tools">hf-general-ci-tools</a> or
 <a href="https://github.com/hardfoc/hf-espidf-ci-tools">hf-espidf-ci-tools</a>.</p>
 <h2 id="workflows">Workflows<a class="headerlink" href="#workflows" title="Permanent link">&para;</a></h2>
@@ -1166,9 +1166,9 @@
 <p>The examples are integration tests: they run on a board, not in CI. CI proves they compile; a person flashes them.
 The manager logic is unit-tested on a host, below.</p>
 <h2 id="host-tests">Host tests<a class="headerlink" href="#host-tests" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/hardfoc/hf-hal-flux-v1/tree/008c41bcd7588cedd2a1f8a64a6456321329d289/tests/host"><code>tests/host</code></a> builds the facade and the managers against the host family of the platform binding
-(<a href="https://github.com/hardfoc/hf-hal-flux-v1/tree/008c41bcd7588cedd2a1f8a64a6456321329d289/lib/managers/bsp_bind/host"><code>bsp_bind/host</code></a>, over hf-core's <code>hf_core_host_mocks</code>) and runs one executable per
-manager. The chips are register-level SPI models in <a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/008c41bcd7588cedd2a1f8a64a6456321329d289/tests/host/FluxChipModels.h"><code>FluxChipModels.h</code></a>, so the real
+<p><a href="https://github.com/hardfoc/hf-hal-flux-v1/tree/16b48be20a9f65443e9deb754c54c6e39be60906/tests/host"><code>tests/host</code></a> builds the facade and the managers against the host family of the platform binding
+(<a href="https://github.com/hardfoc/hf-hal-flux-v1/tree/16b48be20a9f65443e9deb754c54c6e39be60906/lib/managers/bsp_bind/host"><code>bsp_bind/host</code></a>, over hf-core's <code>hf_core_host_mocks</code>) and runs one executable per
+manager. The chips are register-level SPI models in <a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/16b48be20a9f65443e9deb754c54c6e39be60906/tests/host/FluxChipModels.h"><code>FluxChipModels.h</code></a>, so the real
 hf-core handlers and chip drivers run their unmodified bring-up and channel code:</p>
 <table>
 <thead>
@@ -1180,11 +1180,11 @@ hf-core handlers and chip drivers run their unmodified bring-up and channel code
 <tbody>
 <tr>
 <td><code>Max22200Model</code></td>
-<td>Two-phase protocol (command byte with CMD high, then 8- or 32-bit data), STATUS / CFG / FAULT registers, fault flags on SDO, an absent part (MISO high)</td>
+<td>Two-phase protocol (command byte with CMD high, then 8- or 32-bit data), STATUS / CFG / FAULT registers, fault flags on SDO, the CFG_CHx fields as the chip reads them (VDR duty in percent), an absent part (MISO high)</td>
 </tr>
 <tr>
 <td><code>Tle92466Model</code></td>
-<td>32-bit frames with the SAE J1850 CRC, the one-frame reply pipeline, 16- and 22-bit reply widths, write-1-to-clear diagnosis registers, ICVID, an absent part</td>
+<td>32-bit frames with the SAE J1850 CRC, the one-frame reply pipeline, 16- and 22-bit reply widths, write-1-to-clear diagnosis registers, ICVID, critical-fault replies (reply mode 10B, no CRC), an absent part</td>
 </tr>
 <tr>
 <td><code>Ads7952Model</code></td>
@@ -1202,7 +1202,7 @@ hf-core handlers and chip drivers run their unmodified bring-up and channel code
 <tbody>
 <tr>
 <td><code>test_valve_manager</code></td>
-<td><code>kValveChannelMap</code> is a bijection onto MAX22200 OUT0-7 and TLE92466ED OUT0-5; each channel switches only its own output on the wire; currents land on the mapped TLE channel; the bank mask splits; the board's SPI modes and clocks; fault pins are inputs and enables start low before any valve code runs; the enable path drops both banks without SPI, latches, refuses energising and re-arms; shutdown ends in SafeHold; fail-closed bring-up with either chip absent or the bus down, retry; MAX22200 and TLE92466ED fault reporting; shutdown turns every channel off</td>
+<td><code>kValveChannelMap</code> is a bijection onto MAX22200 OUT0-7 and TLE92466ED OUT0-5; each channel switches only its own output on the wire; currents land on the mapped TLE channel; the bank mask splits; the board's SPI modes and clocks; fault pins are inputs and enables start low before any valve code runs; the enable path drops both banks without SPI, latches, refuses energising and re-arms; shutdown ends in SafeHold; fail-closed bring-up with either chip absent, the bus down or TLE92466ED critical-fault replies, retry; MAX22200 VDR duty in percent and CDR / VDR reconfiguration of one channel; MAX22200 and TLE92466ED fault reporting; shutdown turns every channel off</td>
 </tr>
 <tr>
 <td><code>test_adc_manager</code></td>

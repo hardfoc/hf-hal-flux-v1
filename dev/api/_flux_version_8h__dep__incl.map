@@ -1,9 +1,0 @@
-<map id="FluxVersion.h" name="FluxVersion.h">
-<area shape="rect" id="Node000001" title="Version information for the HardFOC Flux V1 HAL." alt="" coords="62,5,173,31"/>
-<area shape="rect" id="Node000002" href="$_flux_8h.html" title="Unified API singleton for the HardFOC Flux V1 platform." alt="" coords="13,79,75,104"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="97,42,58,80,54,77,94,38"/>
-<area shape="rect" id="Node000004" href="$_flux_version_manifest_8cpp.html" title="Static manifest of every component the Flux HAL links against." alt="" coords="99,79,282,104"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="141,38,181,77,177,80,137,42"/>
-<area shape="rect" id="Node000003" href="$_flux_8cpp.html" title="Implementation of the unified Flux API singleton." alt="" coords="5,152,83,177"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="47,118,47,152,41,152,41,118"/>
-</map>

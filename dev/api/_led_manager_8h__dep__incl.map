@@ -1,7 +1,0 @@
-<map id="LedManager.h" name="LedManager.h">
-<area shape="rect" id="Node000001" title="LED management for the HardFOC Flux V1 platform (single WS2812)." alt="" coords="50,5,163,31"/>
-<area shape="rect" id="Node000002" href="$_flux_8cpp.html" title="Implementation of the unified Flux API singleton." alt="" coords="5,79,83,104"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="89,43,56,80,52,77,85,39"/>
-<area shape="rect" id="Node000003" href="$_led_manager_8cpp.html" title="Implementation of the Flux V1 LED manager (single WS2812 LED)." alt="" coords="107,79,235,104"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="128,39,162,77,158,80,124,43"/>
-</map>
