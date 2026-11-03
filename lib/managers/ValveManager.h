@@ -42,6 +42,8 @@
 #include <cstdint>
 #include <optional>
 #include <string_view>
+#include <type_traits>
+#include <utility>
 
 #include "RtosMutex.h"
 #include "flux_hal/flux_hal_types.hpp"
@@ -574,20 +576,140 @@ public:
     [[nodiscard]] ValveChannel FindChannel(std::string_view name) const noexcept;
 
     //==========================================================================
-    // DIRECT DRIVER ACCESS (for advanced use)
+    // CHIP ACCESS (for features not wrapped above)
     //==========================================================================
 
     /**
-     * @brief Get the MAX22200 handler for advanced solenoid operations.
-     * @return Pointer to Max22200Handler, or nullptr if not initialised.
+     * @brief Locked access to the MAX22200 for features this manager does not wrap.
+     *
+     * Every call takes the handler's mutex, so it cannot interleave with the manager's own
+     * accesses or another thread's (the MAX22200's two-phase CMD-pin protocol breaks when a
+     * peer transaction lands between the phases). There is no raw driver pointer: driver calls
+     * the handler does not wrap run inside WithDriver(), under that mutex. An empty access
+     * (bank not up) refuses every call.
      */
-    [[nodiscard]] Max22200Handler* GetMax22200Handler() noexcept;
+    class Max22200Access {
+    public:
+        /// True when the MAX22200 bank is up.
+        explicit operator bool() const noexcept { return handler_ != nullptr; }
+
+        /// Handler::GetStatus(), locked. INITIALIZATION_ERROR on an empty access.
+        max22200::DriverStatus GetStatus(max22200::StatusConfig& status) noexcept {
+            return handler_ ? handler_->GetStatus(status)
+                            : max22200::DriverStatus::INITIALIZATION_ERROR;
+        }
+
+        /// Handler::ConfigureChannel(), locked. INITIALIZATION_ERROR on an empty access.
+        max22200::DriverStatus ConfigureChannel(uint8_t channel,
+                                                const max22200::ChannelConfig& config) noexcept {
+            return handler_ ? handler_->ConfigureChannel(channel, config)
+                            : max22200::DriverStatus::INITIALIZATION_ERROR;
+        }
+
+        /**
+         * @brief Run @p fn(driver) with the handler mutex held (Max22200Handler::WithDriver).
+         * @return fn's result; on an empty access INITIALIZATION_ERROR (or a value-initialised
+         *         result, or false for a void fn).
+         */
+        template <typename Fn>
+        auto WithDriver(Fn&& fn) noexcept {
+            using R = std::invoke_result_t<Fn, Max22200Handler::DriverType&>;
+            if (handler_ == nullptr) {
+                if constexpr (std::is_void_v<R>) {
+                    return false;
+                } else if constexpr (std::is_same_v<R, max22200::DriverStatus>) {
+                    return max22200::DriverStatus::INITIALIZATION_ERROR;
+                } else {
+                    return R{};
+                }
+            }
+            return handler_->WithDriver(std::forward<Fn>(fn));
+        }
+
+    private:
+        friend class ValveManager;
+        explicit Max22200Access(Max22200Handler* handler) noexcept : handler_(handler) {}
+        Max22200Handler* handler_;
+    };
 
     /**
-     * @brief Get the TLE92466ED handler for advanced proportional operations.
-     * @return Pointer to Tle92466edHandler, or nullptr if not initialised.
+     * @brief Locked access to the TLE92466ED for features this manager does not wrap.
+     *
+     * Every call takes the handler's mutex: the TLE92466ED answers a read on the next chip
+     * select, so interleaved accesses from two threads consume each other's replies. No raw
+     * driver pointer: driver calls run inside WithDriver(), under that mutex. An empty access
+     * (bank not up) refuses every call with `DriverError::NotInitialized`.
      */
-    [[nodiscard]] Tle92466edHandler* GetTle92466Handler() noexcept;
+    class Tle92466Access {
+    public:
+        /// True when the TLE92466ED bank is up.
+        explicit operator bool() const noexcept { return handler_ != nullptr; }
+
+        tle92466ed::DriverResult<void> ConfigureChannel(uint8_t channel,
+                                                        const tle92466ed::ChannelConfig& config) noexcept {
+            return handler_ ? handler_->ConfigureChannel(channel, config) : NotUp();
+        }
+        tle92466ed::DriverResult<void> EnterConfigMode() noexcept {
+            return handler_ ? handler_->EnterConfigMode() : NotUp();
+        }
+        tle92466ed::DriverResult<void> EnterMissionMode() noexcept {
+            return handler_ ? handler_->EnterMissionMode() : NotUp();
+        }
+        tle92466ed::DriverResult<void> GetStatus(tle92466ed::DeviceStatus& status) noexcept {
+            return handler_ ? handler_->GetStatus(status) : NotUp();
+        }
+        tle92466ed::DriverResult<void> GetChannelDiagnostics(uint8_t channel,
+                                                             tle92466ed::ChannelDiagnostics& diag) noexcept {
+            return handler_ ? handler_->GetChannelDiagnostics(channel, diag) : NotUp();
+        }
+        /// Handler::GetIcVersion(), locked; 0 on an empty access.
+        uint32_t GetIcVersion() noexcept { return handler_ ? handler_->GetIcVersion() : 0u; }
+
+        /**
+         * @brief Run @p fn(driver) with the handler mutex held (Tle92466edHandler::WithDriver).
+         * @return fn's result; on an empty access a `NotInitialized` DriverResult (or a
+         *         value-initialised result, or false for a void fn).
+         */
+        template <typename Fn>
+        auto WithDriver(Fn&& fn) noexcept {
+            using R = std::invoke_result_t<Fn, Tle92466edHandler::DriverType&>;
+            if (handler_ == nullptr) {
+                if constexpr (std::is_void_v<R>) {
+                    return false;
+                } else if constexpr (IsDriverResult<R>::value) {
+                    return R{tle::unexpected(tle92466ed::DriverError::NotInitialized)};
+                } else {
+                    return R{};
+                }
+            }
+            return handler_->WithDriver(std::forward<Fn>(fn));
+        }
+
+    private:
+        friend class ValveManager;
+        template <typename T>
+        struct IsDriverResult : std::false_type {};
+        template <typename T>
+        struct IsDriverResult<tle92466ed::DriverResult<T>> : std::true_type {};
+        static tle92466ed::DriverResult<void> NotUp() noexcept {
+            return tle::unexpected(tle92466ed::DriverError::NotInitialized);
+        }
+        explicit Tle92466Access(Tle92466edHandler* handler) noexcept : handler_(handler) {}
+        Tle92466edHandler* handler_;
+    };
+
+    /**
+     * @brief Locked MAX22200 access; empty (false) when the bank is not up.
+     * @note Replaces GetMax22200Handler(): the handler's GetDriver() returns the driver without
+     *       its mutex, so the manager no longer hands out the handler.
+     */
+    [[nodiscard]] Max22200Access Max22200() noexcept;
+
+    /**
+     * @brief Locked TLE92466ED access; empty (false) when the bank is not up.
+     * @note Replaces GetTle92466Handler(), for the same reason as Max22200().
+     */
+    [[nodiscard]] Tle92466Access Tle92466() noexcept;
 
     //==========================================================================
     // DIAGNOSTICS
