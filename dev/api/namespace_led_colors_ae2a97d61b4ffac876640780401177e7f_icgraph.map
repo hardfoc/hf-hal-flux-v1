@@ -1,0 +1,17 @@
+<map id="LedColors::BLUE" name="LedColors::BLUE">
+<area shape="rect" id="Node000001" title="Pure blue." alt="" coords="543,129,671,155"/>
+<area shape="rect" id="Node000002" href="$class_led_manager.html#a6e36bf7b11956c56582ce34da47d08ba" title="Start a named animation with an optional base colour." alt="" coords="287,129,495,155"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="529,145,495,145,495,139,529,139"/>
+<area shape="rect" id="Node000003" href="$class_led_manager.html#a0074bb5a6f6716a81883c5bc203395d8" title="Show the boot indicator (blue blink)." alt="" coords="26,5,218,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="362,123,307,82,273,62,238,44,204,33,205,28,240,40,276,57,310,78,365,118"/>
+<area shape="rect" id="Node000004" href="$class_led_manager.html#a90ec5a92910796fc8363e7856c69fbde" title="Show the calibration indicator (cyan breathe)." alt="" coords="5,55,239,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="341,127,238,94,191,83,192,77,239,89,343,122"/>
+<area shape="rect" id="Node000005" href="$class_led_manager.html#af46ab23e1a353388301492d2adc8b3f9" title="Show the error indicator (red fast&#45;blink)." alt="" coords="25,104,219,129"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="273,134,219,128,219,123,273,128"/>
+<area shape="rect" id="Node000006" href="$class_led_manager.html#affec58190169272750a9d4ee848c16cf" title="Show the ready indicator (solid green)." alt="" coords="21,153,223,179"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="273,155,224,160,223,154,273,150"/>
+<area shape="rect" id="Node000007" href="$class_led_manager.html#a061915628bc3ff65c80e5885efbffeea" title="Show the warning indicator (yellow blink)." alt="" coords="15,203,229,228"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="340,162,239,193,187,205,186,200,238,187,339,157"/>
+<area shape="rect" id="Node000008" href="$class_led_manager.html#aff9777de2285eb69cc6c64570e5c9b60" title="Set a status animation by enum (generic variant)." alt="" coords="36,252,208,277"/>
+<area shape="poly" id="edge7_Node000002_Node000008" title=" " alt="" coords="364,165,309,205,240,242,200,255,199,249,238,237,306,200,361,161"/>
+</map>

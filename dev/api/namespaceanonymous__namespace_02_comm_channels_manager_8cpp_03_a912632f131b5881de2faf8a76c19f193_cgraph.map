@@ -1,0 +1,5 @@
+<map id="anonymous_namespace{CommChannelsManager::cpp}::CreateSpiBusFromPins" name="anonymous_namespace{CommChannelsManager::cpp}::CreateSpiBusFromPins">
+<area shape="rect" id="Node000001" title="Bring up one SPI controller from its pin&#45;map pins." alt="" coords="5,5,221,60"/>
+<area shape="rect" id="Node000002" href="$namespaceflux_1_1bsp.html#a0e19c3c0dac5b4fcbd44bde471037a56" title="Create and initialise SPI bus bus." alt="" coords="269,20,441,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="221,30,255,30,255,35,221,35"/>
+</map>

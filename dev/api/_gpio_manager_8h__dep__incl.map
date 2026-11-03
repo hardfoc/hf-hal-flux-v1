@@ -1,0 +1,11 @@
+<map id="GpioManager.h" name="GpioManager.h">
+<area shape="rect" id="Node000001" title="GPIO management for the HardFOC Flux V1 platform." alt="" coords="196,5,316,31"/>
+<area shape="rect" id="Node000002" href="$_flux_8cpp.html" title="Implementation of the unified Flux API singleton." alt="" coords="5,79,83,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="210,37,79,81,77,76,208,32"/>
+<area shape="rect" id="Node000003" href="$_gpio_manager_8cpp.html" title="Implementation of the Flux V1 GPIO manager." alt="" coords="107,79,242,104"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="234,42,190,80,186,76,231,38"/>
+<area shape="rect" id="Node000004" href="$_valve_manager_8cpp.html" title="Implementation of the unified Flux V1 valve manager." alt="" coords="267,79,408,104"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="281,38,326,76,322,80,278,42"/>
+<area shape="rect" id="Node000005" href="$flux__hal__valve_8cpp.html" title="ValveBank facade over ValveManager&#39;s hardware enable path." alt="" coords="433,79,575,104"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="310,32,465,76,463,81,308,37"/>
+</map>

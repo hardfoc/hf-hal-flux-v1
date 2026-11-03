@@ -1,0 +1,5 @@
+<map id="ValveManager::GetEnablePinStates" name="ValveManager::GetEnablePinStates">
+<area shape="rect" id="Node000001" title="Read back the two enable outputs." alt="" coords="204,5,415,45"/>
+<area shape="rect" id="Node000002" href="$structflux_1_1hal_1_1_valve_bank.html#a7e0fd9b395781c8ddc68eee00a40db99" title="Both enable pins are driven high (banks may be energised by channel commands)." alt="" coords="5,5,156,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="190,28,156,28,156,23,190,23"/>
+</map>

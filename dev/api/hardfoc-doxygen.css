@@ -1,0 +1,175 @@
+/* HardFOC look for the Doxygen API reference (Doxygen >= 1.9.5 with HTML_COLORSTYLE = AUTO_LIGHT).
+ *
+ * ru-mkdocs-publish.yml passes this file as HTML_EXTRA_STYLESHEET when the repository's Doxyfile sets none, so the
+ * API under api/ matches the site: same fonts, same brand colours, light or dark with the system. Doxygen's own
+ * colour variables are overridden; the layout stays Doxygen's.
+ */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap");
+
+html {
+  --font-family-normal: Inter, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-family-monospace: "JetBrains Mono", SFMono-Regular, Menlo, Consolas, monospace;
+  --font-family-title: Inter, "Segoe UI", Roboto, Arial, sans-serif;
+  --font-family-nav: Inter, "Segoe UI", Roboto, Arial, sans-serif;
+  --font-family-search: Inter, "Segoe UI", Roboto, Arial, sans-serif;
+  --page-background-color: #ffffff;
+  --page-foreground-color: #17202c;
+  --page-link-color: #2d2a9e;
+  --page-visited-link-color: #4b3a9e;
+  --title-background-color: #3b38c4;
+  --title-separator-color: #2d2a9e;
+  --nav-background-color: #f5f7fa;
+  --nav-foreground-color: #2b3442;
+  --nav-text-normal-color: #17202c;
+  --nav-text-hover-color: #0b7a72;
+  --nav-text-active-color: #2d2a9e;
+  --nav-menu-background-color: #ffffff;
+  --header-background-color: #f5f7fa;
+  --header-separator-color: #e2e7ee;
+  --group-header-color: #2d2a9e;
+  --memdef-title-background-color: #eef0ff;
+  --memdef-proto-background-color: #f5f7fa;
+  --memdef-border-color: #c9d1db;
+  --memdef-doc-background-color: #ffffff;
+  --memdef-table-header-background-color: #eef0ff;
+  --fragment-background-color: #f5f7fa;
+  --fragment-foreground-color: #24292f;
+  --fragment-border-color: #e2e7ee;
+  --fragment-keyword: #3b38c4;
+  --fragment-keywordtype: #8a3ab9;
+  --fragment-keywordflow: #3b38c4;
+  --fragment-token: #0b6b4f;
+  --fragment-comment: #5f6b7a;
+  --fragment-link: #1f5fa8;
+  --fragment-preprocessor: #a1490b;
+  --code-link-color: #2d2a9e;
+  --side-nav-background: #f5f7fa;
+  --side-nav-foreground: #17202c;
+  --toc-background-color: #f5f7fa;
+  --toc-border-color: #e2e7ee;
+  --search-background-color: #ffffff;
+  --search-foreground-color: #566070;
+}
+
+@media (prefers-color-scheme: dark) {
+  html:not(.light-mode) {
+    --page-background-color: #0d1220;
+    --page-foreground-color: #e6ebf2;
+    --page-link-color: #a5a9ff;
+    --page-visited-link-color: #c4b5fd;
+    --title-background-color: #181e38;
+    --title-separator-color: #263044;
+    --nav-background-color: #151c2b;
+    --nav-foreground-color: #d2dae4;
+    --nav-text-normal-color: #e6ebf2;
+    --nav-text-hover-color: #5eead4;
+    --nav-text-active-color: #a5a9ff;
+    --nav-menu-background-color: #0d1220;
+    --header-background-color: #151c2b;
+    --header-separator-color: #263044;
+    --group-header-color: #a5a9ff;
+    --memdef-title-background-color: #1c1f3d;
+    --memdef-proto-background-color: #151c2b;
+    --memdef-border-color: #34405a;
+    --memdef-doc-background-color: #0d1220;
+    --memdef-table-header-background-color: #1c1f3d;
+    --fragment-background-color: #151c2b;
+    --fragment-foreground-color: #dbe2ec;
+    --fragment-border-color: #263044;
+    --fragment-keyword: #a5a9ff;
+    --fragment-keywordtype: #d8b4fe;
+    --fragment-keywordflow: #a5a9ff;
+    --fragment-token: #86efac;
+    --fragment-comment: #8f9bab;
+    --fragment-link: #93c5fd;
+    --fragment-preprocessor: #fdba74;
+    --code-link-color: #a5a9ff;
+    --side-nav-background: #151c2b;
+    --side-nav-foreground: #e6ebf2;
+    --toc-background-color: #151c2b;
+    --toc-border-color: #263044;
+    --search-background-color: #151c2b;
+    --search-foreground-color: #a2adbb;
+  }
+}
+
+body,
+table,
+div,
+p,
+dl {
+  font-family: var(--font-family-normal);
+}
+
+#titlearea {
+  border-bottom: 0;
+  background: var(--title-background-color);
+  padding: 0.4rem 0.6rem;
+}
+
+#projectname,
+#projectbrief,
+#projectnumber {
+  color: #ffffff !important;
+  font-family: var(--font-family-title);
+}
+
+#projectname {
+  font-weight: 700;
+  font-size: 1.4rem;
+}
+
+#projectbrief {
+  opacity: 0.85;
+}
+
+.title {
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+h2.groupheader {
+  color: var(--group-header-color);
+  border-bottom: 1px solid var(--header-separator-color);
+  font-weight: 650;
+}
+
+div.fragment,
+pre.fragment {
+  border-radius: 0.5rem;
+  padding: 0.6rem 0.8rem;
+}
+
+.memitem {
+  border-radius: 0.6rem;
+  overflow: hidden;
+  box-shadow: none;
+}
+
+.memproto,
+.memdoc {
+  box-shadow: none !important;
+  background-image: none !important;
+}
+
+.memname {
+  font-family: var(--font-family-monospace);
+  font-weight: 600;
+}
+
+a:focus-visible {
+  outline: 2px solid #0b7a72;
+  outline-offset: 2px;
+}
+
+@media (max-width: 767px) {
+  #side-nav {
+    display: none;
+  }
+  #doc-content {
+    margin-left: 0 !important;
+  }
+  div.contents {
+    margin: 0 0.6rem;
+  }
+}
