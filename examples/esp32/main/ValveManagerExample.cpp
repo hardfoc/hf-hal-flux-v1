@@ -284,24 +284,27 @@ static void example_fault_management() {
 }
 
 // ---------------------------------------------------------------------------
-// Example 8: Direct driver access (advanced)
+// Example 8: Locked chip access (advanced)
 // ---------------------------------------------------------------------------
 static void example_direct_driver_access() {
-    ESP_LOGI(TAG, "=== Example 8: Direct Driver Access ===");
+    ESP_LOGI(TAG, "=== Example 8: Locked Chip Access ===");
 
     auto& valves = FLUX_API.valves;
 
-    // For operations not exposed through the unified API,
-    // access the raw handler objects directly.
-
-    Max22200Handler* max_handler = valves.GetMax22200Handler();
-    if (max_handler != nullptr) {
-        ESP_LOGI(TAG, "MAX22200 handler: available for direct register access");
+    // For operations not exposed through the unified API, use the locked access objects: each
+    // call takes the chip handler's mutex, and WithDriver() runs driver calls under it. There is
+    // no raw driver pointer (it would skip the mutex).
+    if (auto max = valves.Max22200()) {
+        uint32_t status = 0;
+        const auto rs = max.WithDriver([&status](auto& drv) {
+            return drv.ReadRegister32(max22200::RegBank::STATUS, status);
+        });
+        ESP_LOGI(TAG, "MAX22200 STATUS: 0x%08lX (%s)", static_cast<unsigned long>(status),
+                 rs == max22200::DriverStatus::OK ? "ok" : "read failed");
     }
 
-    Tle92466edHandler* tle_handler = valves.GetTle92466Handler();
-    if (tle_handler != nullptr) {
-        ESP_LOGI(TAG, "TLE92466ED handler: available for direct register access");
+    if (auto tle = valves.Tle92466()) {
+        ESP_LOGI(TAG, "TLE92466ED ICVID: 0x%04lX", static_cast<unsigned long>(tle.GetIcVersion()));
     }
 }
 
