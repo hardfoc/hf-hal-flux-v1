@@ -947,10 +947,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#breaking" class="md-nav__link">
+  <a href="#fixed" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Breaking
+        Fixed
       
     </span>
   </a>
@@ -958,10 +958,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#fixed" class="md-nav__link">
+  <a href="#breaking" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Fixed
+        Breaking
       
     </span>
   </a>
@@ -1050,10 +1050,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#breaking" class="md-nav__link">
+  <a href="#fixed" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Breaking
+        Fixed
       
     </span>
   </a>
@@ -1061,10 +1061,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#fixed" class="md-nav__link">
+  <a href="#breaking" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Fixed
+        Breaking
       
     </span>
   </a>
@@ -1127,6 +1127,15 @@
 <p>What changed in the Flux V1 HAL, newest first. Releases are tagged <code>vX.Y.Z</code> and listed on
 <a href="https://github.com/hardfoc/hf-hal-flux-v1/releases">GitHub releases</a>; no release has been tagged yet.</p>
 <h2 id="unreleased">Unreleased<a class="headerlink" href="#unreleased" title="Permanent link">&para;</a></h2>
+<h3 id="fixed">Fixed<a class="headerlink" href="#fixed" title="Permanent link">&para;</a></h3>
+<ul>
+<li>hf-core is bumped to the bus-error adapters (hf-core <code>fix/bus-error-status</code>): the MAX22200 adapter's <code>GpioSet()</code>
+  returns the GPIO result and the driver reports a CMD or ENABLE pin it could not drive. A valve call whose CMD pin
+  is stuck now fails (<code>GPIO_ERROR</code>) instead of reporting success after sending the Command Register byte as a data
+  frame. The Alicat BASIS-2 and FDO2 UART adapters report a failed write as <code>SerialError</code>. The host chip models
+  needed no change: they model the chips at the SPI and GPIO level, below the adapters.</li>
+<li>New host test <code>test_valve_bus_errors</code>.</li>
+</ul>
 <h3 id="breaking">Breaking<a class="headerlink" href="#breaking" title="Permanent link">&para;</a></h3>
 <ul>
 <li><code>ValveManager::GetMax22200Handler()</code> and <code>GetTle92466Handler()</code> are removed. They handed out the handlers, whose
@@ -1139,9 +1148,6 @@
   <code>if (auto* h = mgr.GetMax22200Handler()) h-&gt;GetStatus(st);</code> becomes
   <code>if (auto max = mgr.Max22200()) max.GetStatus(st);</code>, and <code>h-&gt;GetDriver()-&gt;X()</code> becomes
   <code>max.WithDriver([&amp;](auto&amp; d) { return d.X(); })</code>.</li>
-</ul>
-<h3 id="fixed">Fixed<a class="headerlink" href="#fixed" title="Permanent link">&para;</a></h3>
-<ul>
 <li><code>ValveManager</code> reached the drivers through the handlers' unlocked <code>GetDriver()</code> in four places: the MAX22200
   presence check, the TLE92466ED VBAT thresholds at bring-up, <code>ConfigureProportionalPwm()</code> and
   <code>ConfigureProportionalDither()</code>. They now run inside the handlers' <code>WithDriver()</code>, under the handler mutex.</li>

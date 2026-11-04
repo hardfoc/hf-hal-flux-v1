@@ -1,9 +1,0 @@
-<map id="ValveManager.h" name="ValveManager.h">
-<area shape="rect" id="Node000001" title="Unified valve management system for the HardFOC Flux V1 platform." alt="" coords="114,5,241,31"/>
-<area shape="rect" id="Node000002" href="$_flux_8cpp.html" title="Implementation of the unified Flux API singleton." alt="" coords="5,79,83,104"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="145,39,67,81,65,76,143,35"/>
-<area shape="rect" id="Node000003" href="$_valve_manager_8cpp.html" title="Implementation of the unified Flux V1 valve manager." alt="" coords="107,79,248,104"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="180,44,180,79,175,79,175,44"/>
-<area shape="rect" id="Node000004" href="$flux__hal__valve_8cpp.html" title="ValveBank facade over ValveManager&#39;s hardware enable path." alt="" coords="273,79,415,104"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="218,34,318,76,316,81,216,38"/>
-</map>

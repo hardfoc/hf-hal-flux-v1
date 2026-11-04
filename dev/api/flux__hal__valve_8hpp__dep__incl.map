@@ -1,5 +1,0 @@
-<map id="flux_hal_valve.hpp" name="flux_hal_valve.hpp">
-<area shape="rect" id="Node000001" title="ValveBank facade, first slice: the hardware enable path of both valve banks." alt="" coords="5,5,149,31"/>
-<area shape="rect" id="Node000002" href="$flux__hal__valve_8cpp.html" title="ValveBank facade over ValveManager&#39;s hardware enable path." alt="" coords="6,79,149,104"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="80,44,80,79,75,79,75,44"/>
-</map>

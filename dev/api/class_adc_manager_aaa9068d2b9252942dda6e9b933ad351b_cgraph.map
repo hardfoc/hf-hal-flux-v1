@@ -1,7 +1,0 @@
-<map id="AdcManager::Deinitialize" name="AdcManager::Deinitialize">
-<area shape="rect" id="Node000001" title="Release all ADC resources and reset to uninitialized state." alt="" coords="5,5,191,31"/>
-<area shape="rect" id="Node000002" href="$class_adc_manager.html#ac6163df91b7372cc9d89152f7da3df02" title="Release the MCU ADC, every ADS7952 handler and the registry (mutex held)." alt="" coords="239,5,447,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="191,15,225,15,225,21,191,21"/>
-<area shape="rect" id="Node000003" href="$namespaceflux_1_1bsp.html#a743db59ccea2534e5382c2eb14d9c2eb" title="Destroy the MCU ADC unit." alt="" coords="495,5,705,31"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="447,15,481,15,481,21,447,21"/>
-</map>

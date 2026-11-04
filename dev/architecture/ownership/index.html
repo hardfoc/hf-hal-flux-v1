@@ -1421,12 +1421,12 @@ during its own initialisation.</p>
 <details class="hf-figure-desc">
 <summary>Figure description and sources</summary>
 <p>Managers on the left, hf-core handlers in the middle, chip drivers on the right. An arrow means "includes and uses": a manager owns the handler it points at, and each handler wraps exactly one driver. ValveManager owns both valve drivers (MAX22200 for the solenoid channels, TLE92466ED for the proportional channels), AdcManager owns the ADS7952 external ADC, and TemperatureManager owns the NTC and MCP9700 sensor handlers. Managers with no arrow (communication buses, GPIO, NVS, the status LED) get their objects from the platform binding and talk to them through the interface classes only.</p>
-<p>Drawn from: <a href="https://github.com/hardfoc/hf-hal-flux-v1/tree/4d767089d08d197048e475e1a04b23abd10b1a2e/lib/managers"><code>lib/managers</code></a> <code>#includes</code>; <a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/4d767089d08d197048e475e1a04b23abd10b1a2e/lib/core/handlers"><code>lib/core/handlers</code></a> <code>#includes</code>; figure module <a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/4d767089d08d197048e475e1a04b23abd10b1a2e/docs/diagrams/figures/manager-dependencies.py"><code>docs/diagrams/figures/manager-dependencies.py</code></a>.</p>
+<p>Drawn from: <a href="https://github.com/hardfoc/hf-hal-flux-v1/tree/9028146189a596f994ecb11d4de16c156a391693/lib/managers"><code>lib/managers</code></a> <code>#includes</code>; <a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/9028146189a596f994ecb11d4de16c156a391693/lib/core/handlers"><code>lib/core/handlers</code></a> <code>#includes</code>; figure module <a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/9028146189a596f994ecb11d4de16c156a391693/docs/diagrams/figures/manager-dependencies.py"><code>docs/diagrams/figures/manager-dependencies.py</code></a>.</p>
 </details>
 <h2 id="manager-map">Manager map<a class="headerlink" href="#manager-map" title="Permanent link">&para;</a></h2>
 <!-- generated: manager-map -->
 <p>From the <code>#include</code> lines of
-<a href="https://github.com/hardfoc/hf-hal-flux-v1/tree/4d767089d08d197048e475e1a04b23abd10b1a2e/lib/managers"><code>lib/managers</code></a> and the hf-core handlers; do not edit.</p>
+<a href="https://github.com/hardfoc/hf-hal-flux-v1/tree/9028146189a596f994ecb11d4de16c156a391693/lib/managers"><code>lib/managers</code></a> and the hf-core handlers; do not edit.</p>
 <table>
 <thead>
 <tr>
@@ -1439,49 +1439,49 @@ during its own initialisation.</p>
 </thead>
 <tbody>
 <tr>
-<td><a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/4d767089d08d197048e475e1a04b23abd10b1a2e/lib/managers/AdcManager.h"><code>AdcManager</code></a></td>
+<td><a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/9028146189a596f994ecb11d4de16c156a391693/lib/managers/AdcManager.h"><code>AdcManager</code></a></td>
 <td><code>CommChannelsManager</code></td>
 <td><code>ads7952</code> (hf-ads7952)</td>
 <td>-</td>
 <td><code>BaseAdc</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/4d767089d08d197048e475e1a04b23abd10b1a2e/lib/managers/CommChannelsManager.h"><code>CommChannelsManager</code></a></td>
+<td><a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/9028146189a596f994ecb11d4de16c156a391693/lib/managers/CommChannelsManager.h"><code>CommChannelsManager</code></a></td>
 <td>-</td>
 <td>-</td>
 <td>-</td>
 <td><code>BaseCan</code>, <code>BaseSpi</code>, <code>BaseUart</code>, <code>BaseUsbSerialJtag</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/4d767089d08d197048e475e1a04b23abd10b1a2e/lib/managers/GpioManager.h"><code>GpioManager</code></a></td>
+<td><a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/9028146189a596f994ecb11d4de16c156a391693/lib/managers/GpioManager.h"><code>GpioManager</code></a></td>
 <td>-</td>
 <td>-</td>
 <td>-</td>
 <td><code>BaseGpio</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/4d767089d08d197048e475e1a04b23abd10b1a2e/lib/managers/LedManager.h"><code>LedManager</code></a></td>
+<td><a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/9028146189a596f994ecb11d4de16c156a391693/lib/managers/LedManager.h"><code>LedManager</code></a></td>
 <td>-</td>
 <td>-</td>
 <td>-</td>
 <td>-</td>
 </tr>
 <tr>
-<td><a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/4d767089d08d197048e475e1a04b23abd10b1a2e/lib/managers/NvsManager.h"><code>NvsManager</code></a></td>
+<td><a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/9028146189a596f994ecb11d4de16c156a391693/lib/managers/NvsManager.h"><code>NvsManager</code></a></td>
 <td>-</td>
 <td>-</td>
 <td>-</td>
 <td><code>BaseNvs</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/4d767089d08d197048e475e1a04b23abd10b1a2e/lib/managers/TemperatureManager.h"><code>TemperatureManager</code></a></td>
+<td><a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/9028146189a596f994ecb11d4de16c156a391693/lib/managers/TemperatureManager.h"><code>TemperatureManager</code></a></td>
 <td><code>AdcManager</code></td>
 <td><code>mcp9700</code> (hf-mcp9700), <code>ntc</code> (hf-ntc-thermistor)</td>
 <td>-</td>
 <td><code>BaseTemperature</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/4d767089d08d197048e475e1a04b23abd10b1a2e/lib/managers/ValveManager.h"><code>ValveManager</code></a></td>
+<td><a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/9028146189a596f994ecb11d4de16c156a391693/lib/managers/ValveManager.h"><code>ValveManager</code></a></td>
 <td><code>CommChannelsManager</code>, <code>GpioManager</code></td>
 <td><code>max22200</code> (hf-max22200), <code>tle92466ed</code> (hf-tle92466ed)</td>
 <td>-</td>

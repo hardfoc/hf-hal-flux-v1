@@ -1093,7 +1093,7 @@
 
 <h1 id="testing-and-ci">Testing and CI<a class="headerlink" href="#testing-and-ci" title="Permanent link">&para;</a></h1>
 <p>What runs on a pull request, what each check means, and how to run it on your machine first. All workflows are in
-<a href="https://github.com/hardfoc/hf-hal-flux-v1/tree/4d767089d08d197048e475e1a04b23abd10b1a2e/.github/workflows"><code>.github/workflows</code></a>; most call reusable workflows in
+<a href="https://github.com/hardfoc/hf-hal-flux-v1/tree/9028146189a596f994ecb11d4de16c156a391693/.github/workflows"><code>.github/workflows</code></a>; most call reusable workflows in
 <a href="https://github.com/hardfoc/hf-general-ci-tools">hf-general-ci-tools</a> or
 <a href="https://github.com/hardfoc/hf-espidf-ci-tools">hf-espidf-ci-tools</a>.</p>
 <h2 id="workflows">Workflows<a class="headerlink" href="#workflows" title="Permanent link">&para;</a></h2>
@@ -1166,9 +1166,9 @@
 <p>The examples are integration tests: they run on a board, not in CI. CI proves they compile; a person flashes them.
 The manager logic is unit-tested on a host, below.</p>
 <h2 id="host-tests">Host tests<a class="headerlink" href="#host-tests" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/hardfoc/hf-hal-flux-v1/tree/4d767089d08d197048e475e1a04b23abd10b1a2e/tests/host"><code>tests/host</code></a> builds the facade and the managers against the host family of the platform binding
-(<a href="https://github.com/hardfoc/hf-hal-flux-v1/tree/4d767089d08d197048e475e1a04b23abd10b1a2e/lib/managers/bsp_bind/host"><code>bsp_bind/host</code></a>, over hf-core's <code>hf_core_host_mocks</code>) and runs one executable per
-manager. The chips are register-level SPI models in <a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/4d767089d08d197048e475e1a04b23abd10b1a2e/tests/host/FluxChipModels.h"><code>FluxChipModels.h</code></a>, so the real
+<p><a href="https://github.com/hardfoc/hf-hal-flux-v1/tree/9028146189a596f994ecb11d4de16c156a391693/tests/host"><code>tests/host</code></a> builds the facade and the managers against the host family of the platform binding
+(<a href="https://github.com/hardfoc/hf-hal-flux-v1/tree/9028146189a596f994ecb11d4de16c156a391693/lib/managers/bsp_bind/host"><code>bsp_bind/host</code></a>, over hf-core's <code>hf_core_host_mocks</code>) and runs one executable per
+manager. The chips are register-level SPI models in <a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/9028146189a596f994ecb11d4de16c156a391693/tests/host/FluxChipModels.h"><code>FluxChipModels.h</code></a>, so the real
 hf-core handlers and chip drivers run their unmodified bring-up and channel code:</p>
 <table>
 <thead>
