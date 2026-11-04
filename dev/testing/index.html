@@ -1093,7 +1093,7 @@
 
 <h1 id="testing-and-ci">Testing and CI<a class="headerlink" href="#testing-and-ci" title="Permanent link">&para;</a></h1>
 <p>What runs on a pull request, what each check means, and how to run it on your machine first. All workflows are in
-<a href="https://github.com/hardfoc/hf-hal-flux-v1/tree/16b48be20a9f65443e9deb754c54c6e39be60906/.github/workflows"><code>.github/workflows</code></a>; most call reusable workflows in
+<a href="https://github.com/hardfoc/hf-hal-flux-v1/tree/4d767089d08d197048e475e1a04b23abd10b1a2e/.github/workflows"><code>.github/workflows</code></a>; most call reusable workflows in
 <a href="https://github.com/hardfoc/hf-general-ci-tools">hf-general-ci-tools</a> or
 <a href="https://github.com/hardfoc/hf-espidf-ci-tools">hf-espidf-ci-tools</a>.</p>
 <h2 id="workflows">Workflows<a class="headerlink" href="#workflows" title="Permanent link">&para;</a></h2>
@@ -1153,7 +1153,7 @@
 <td>HAL Boundary CI</td>
 <td><code>ci-hal-boundary.yml</code></td>
 <td>push, pull request</td>
-<td><code>tools/lint/lint_hal_boundary.sh</code> (no ESP-IDF, FreeRTOS or <code>Esp*</code> code outside <code>lib/managers/bsp_bind/&lt;family&gt;/</code>; shrink-only allowlist checked against the PR base); <code>tools/lint/lint_hal_alloc.sh</code> (no heap or heap-backed type in the HAL library); host build of the managers against <code>bsp_bind/host</code> and the manager tests in <code>tests/host</code> (GCC, Clang, Clang with UBSan)</td>
+<td><code>tools/lint/lint_hal_boundary.sh</code> (no ESP-IDF, FreeRTOS or <code>Esp*</code> code outside <code>lib/managers/bsp_bind/&lt;family&gt;/</code>; no raw driver accessor or handler getter in <code>lib/</code>; shrink-only allowlist checked against the PR base) and its self-test <code>tools/lint/test_lint_hal_boundary.sh</code>; <code>tools/lint/lint_hal_alloc.sh</code> (no heap or heap-backed type in the HAL library); host build of the managers against <code>bsp_bind/host</code> and the manager tests in <code>tests/host</code> (GCC, Clang, Clang with UBSan)</td>
 </tr>
 <tr>
 <td>Release</td>
@@ -1166,9 +1166,9 @@
 <p>The examples are integration tests: they run on a board, not in CI. CI proves they compile; a person flashes them.
 The manager logic is unit-tested on a host, below.</p>
 <h2 id="host-tests">Host tests<a class="headerlink" href="#host-tests" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/hardfoc/hf-hal-flux-v1/tree/16b48be20a9f65443e9deb754c54c6e39be60906/tests/host"><code>tests/host</code></a> builds the facade and the managers against the host family of the platform binding
-(<a href="https://github.com/hardfoc/hf-hal-flux-v1/tree/16b48be20a9f65443e9deb754c54c6e39be60906/lib/managers/bsp_bind/host"><code>bsp_bind/host</code></a>, over hf-core's <code>hf_core_host_mocks</code>) and runs one executable per
-manager. The chips are register-level SPI models in <a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/16b48be20a9f65443e9deb754c54c6e39be60906/tests/host/FluxChipModels.h"><code>FluxChipModels.h</code></a>, so the real
+<p><a href="https://github.com/hardfoc/hf-hal-flux-v1/tree/4d767089d08d197048e475e1a04b23abd10b1a2e/tests/host"><code>tests/host</code></a> builds the facade and the managers against the host family of the platform binding
+(<a href="https://github.com/hardfoc/hf-hal-flux-v1/tree/4d767089d08d197048e475e1a04b23abd10b1a2e/lib/managers/bsp_bind/host"><code>bsp_bind/host</code></a>, over hf-core's <code>hf_core_host_mocks</code>) and runs one executable per
+manager. The chips are register-level SPI models in <a href="https://github.com/hardfoc/hf-hal-flux-v1/blob/4d767089d08d197048e475e1a04b23abd10b1a2e/tests/host/FluxChipModels.h"><code>FluxChipModels.h</code></a>, so the real
 hf-core handlers and chip drivers run their unmodified bring-up and channel code:</p>
 <table>
 <thead>
@@ -1236,21 +1236,22 @@ the bytes around them (see hf-core's <code>docs/host-build.md</code>).</p>
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
 </span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1"># HAL boundary lint and the host build of the managers (no ESP-IDF needed)</span>
 </span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>tools/lint/lint_hal_boundary.sh
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>tools/lint/lint_hal_alloc.sh
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>cmake<span class="w"> </span>-S<span class="w"> </span>tests/host<span class="w"> </span>-B<span class="w"> </span>build/host<span class="w"> </span>-G<span class="w"> </span>Ninja<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>cmake<span class="w"> </span>--build<span class="w"> </span>build/host
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>
-</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="c1"># Format check</span>
-</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>clang-format<span class="w"> </span>--style<span class="o">=</span>file:_config/.clang-format<span class="w"> </span>--dry-run<span class="w"> </span>--Werror<span class="w"> </span>lib/managers/*.cpp<span class="w"> </span>lib/managers/*.h
-</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>
-</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="c1"># Docs: drift checks, then the strict site build (the pin map needs lib/core and hf-pincfg)</span>
-</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>python3<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"git+https://github.com/hardfoc/hf-general-ci-tools@v1#subdirectory=packages/hardfoc-mkdocs-theme"</span>
-</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>hardfoc-docs<span class="w"> </span>gen<span class="w"> </span>--check
-</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>hardfoc-docs<span class="w"> </span>figures<span class="w"> </span>--check
-</span><span id="__span-1-16"><a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>mkdocs<span class="w"> </span>build<span class="w"> </span>--strict
-</span><span id="__span-1-17"><a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a>
-</span><span id="__span-1-18"><a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a><span class="c1"># Markdown and YAML lint</span>
-</span><span id="__span-1-19"><a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a>npx<span class="w"> </span>markdownlint-cli2<span class="w"> </span>--config<span class="w"> </span>_config/.markdownlint.json<span class="w"> </span><span class="s2">"docs/**/*.md"</span><span class="w"> </span>README.md
-</span><span id="__span-1-20"><a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a>yamllint<span class="w"> </span>-c<span class="w"> </span>_config/.yamllint<span class="w"> </span>.github/workflows<span class="w"> </span>mkdocs.yml
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>tools/lint/test_lint_hal_boundary.sh
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>tools/lint/lint_hal_alloc.sh
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>cmake<span class="w"> </span>-S<span class="w"> </span>tests/host<span class="w"> </span>-B<span class="w"> </span>build/host<span class="w"> </span>-G<span class="w"> </span>Ninja<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>cmake<span class="w"> </span>--build<span class="w"> </span>build/host
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="c1"># Format check</span>
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>clang-format<span class="w"> </span>--style<span class="o">=</span>file:_config/.clang-format<span class="w"> </span>--dry-run<span class="w"> </span>--Werror<span class="w"> </span>lib/managers/*.cpp<span class="w"> </span>lib/managers/*.h
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>
+</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="c1"># Docs: drift checks, then the strict site build (the pin map needs lib/core and hf-pincfg)</span>
+</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>python3<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"git+https://github.com/hardfoc/hf-general-ci-tools@v1#subdirectory=packages/hardfoc-mkdocs-theme"</span>
+</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>hardfoc-docs<span class="w"> </span>gen<span class="w"> </span>--check
+</span><span id="__span-1-16"><a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>hardfoc-docs<span class="w"> </span>figures<span class="w"> </span>--check
+</span><span id="__span-1-17"><a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a>mkdocs<span class="w"> </span>build<span class="w"> </span>--strict
+</span><span id="__span-1-18"><a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a>
+</span><span id="__span-1-19"><a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a><span class="c1"># Markdown and YAML lint</span>
+</span><span id="__span-1-20"><a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a>npx<span class="w"> </span>markdownlint-cli2<span class="w"> </span>--config<span class="w"> </span>_config/.markdownlint.json<span class="w"> </span><span class="s2">"docs/**/*.md"</span><span class="w"> </span>README.md
+</span><span id="__span-1-21"><a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a>yamllint<span class="w"> </span>-c<span class="w"> </span>_config/.yamllint<span class="w"> </span>.github/workflows<span class="w"> </span>mkdocs.yml
 </span></code></pre></div>
 <h2 id="when-the-docs-checks-fail">When the docs checks fail<a class="headerlink" href="#when-the-docs-checks-fail" title="Permanent link">&para;</a></h2>
 <table>

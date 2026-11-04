@@ -947,6 +947,28 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#breaking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Breaking
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fixed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fixed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#changed" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1028,6 +1050,28 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#breaking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Breaking
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fixed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fixed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#changed" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1083,6 +1127,29 @@
 <p>What changed in the Flux V1 HAL, newest first. Releases are tagged <code>vX.Y.Z</code> and listed on
 <a href="https://github.com/hardfoc/hf-hal-flux-v1/releases">GitHub releases</a>; no release has been tagged yet.</p>
 <h2 id="unreleased">Unreleased<a class="headerlink" href="#unreleased" title="Permanent link">&para;</a></h2>
+<h3 id="breaking">Breaking<a class="headerlink" href="#breaking" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>ValveManager::GetMax22200Handler()</code> and <code>GetTle92466Handler()</code> are removed. They handed out the handlers, whose
+  <code>GetDriver()</code> returns the chip driver without the handler mutex, so a caller could interleave SPI frames with the
+  manager's own (the MAX22200's two-phase CMD protocol and the TLE92466ED's pipelined replies both break). They are
+  replaced by <code>ValveManager::Max22200()</code> and <code>ValveManager::Tle92466()</code>, which return access objects: <code>false</code> when the
+  bank is not up, the handlers' locked calls (<code>GetStatus()</code>, <code>ConfigureChannel()</code>, and for the TLE92466ED
+  <code>EnterConfigMode()</code>, <code>EnterMissionMode()</code>, <code>GetChannelDiagnostics()</code>, <code>GetIcVersion()</code>), and <code>WithDriver(fn)</code> for
+  any other driver call, run with the handler mutex held. No raw driver pointer. Migration:
+  <code>if (auto* h = mgr.GetMax22200Handler()) h-&gt;GetStatus(st);</code> becomes
+  <code>if (auto max = mgr.Max22200()) max.GetStatus(st);</code>, and <code>h-&gt;GetDriver()-&gt;X()</code> becomes
+  <code>max.WithDriver([&amp;](auto&amp; d) { return d.X(); })</code>.</li>
+</ul>
+<h3 id="fixed">Fixed<a class="headerlink" href="#fixed" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>ValveManager</code> reached the drivers through the handlers' unlocked <code>GetDriver()</code> in four places: the MAX22200
+  presence check, the TLE92466ED VBAT thresholds at bring-up, <code>ConfigureProportionalPwm()</code> and
+  <code>ConfigureProportionalDither()</code>. They now run inside the handlers' <code>WithDriver()</code>, under the handler mutex.</li>
+<li>The HAL boundary lint (<code>tools/lint/lint_hal_boundary.sh</code>) has the lock-discipline rule of hf-hal-vortex-v1: a raw
+  driver accessor (<code>GetDriver()</code>, <code>GetSensor()</code>, <code>driverViaSpi()</code>, <code>driverViaUart()</code>, <code>GetStrip()</code>, <code>GetAnimator()</code>)
+  or a handler getter in <code>lib/</code> fails CI. <code>tools/lint/test_lint_hal_boundary.sh</code> checks every rule on fixtures and
+  runs in the same workflow.</li>
+</ul>
 <h3 id="changed">Changed<a class="headerlink" href="#changed" title="Permanent link">&para;</a></h3>
 <ul>
 <li>The documentation builds with the shared HardFOC theme (<code>hardfoc-mkdocs-theme</code>); the copied template, hooks and

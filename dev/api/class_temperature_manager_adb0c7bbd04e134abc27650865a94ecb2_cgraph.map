@@ -1,7 +1,0 @@
-<map id="TemperatureManager::IsDegraded" name="TemperatureManager::IsDegraded">
-<area shape="rect" id="Node000001" title="Initialised with at least one fitted sensor missing." alt="" coords="5,37,167,77"/>
-<area shape="rect" id="Node000002" href="$class_temperature_manager.html#a31dffe4161afca28454c26001c455511" title="Lifecycle / bind error of the last EnsureInitialized() (shared catalog)." alt="" coords="215,5,376,45"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="167,42,201,37,202,42,168,48"/>
-<area shape="rect" id="Node000003" href="$class_temperature_manager.html#a735b5ba8a695dfdf13ed86bcea1e2f85" title="Check whether the temperature subsystem has been initialised." alt="" coords="215,69,376,109"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="168,67,202,72,201,78,167,72"/>
-</map>
