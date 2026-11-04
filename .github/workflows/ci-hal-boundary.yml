@@ -38,6 +38,9 @@ jobs:
       - name: lint_hal_alloc.sh
         run: bash tools/lint/lint_hal_alloc.sh
 
+      - name: Lint self-tests (each boundary rule fires on a fixture)
+        run: bash tools/lint/test_lint_hal_boundary.sh
+
   host-tests:
     name: Host build and tests (${{ matrix.name }})
     runs-on: ubuntu-24.04

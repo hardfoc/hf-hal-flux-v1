@@ -203,9 +203,10 @@ ManagerError ValveManager::InitializeMax22200() noexcept {
     // floating bus, not a MAX22200.
     {
         uint32_t raw = 0;
-        auto* drv = max22200_->GetDriver();
-        const bool read_ok = drv != nullptr &&
-                             drv->ReadRegister32(max22200::RegBank::STATUS, raw) == max22200::DriverStatus::OK;
+        // Through the handler's WithDriver(): the read runs with the handler mutex held.
+        const bool read_ok = max22200_->WithDriver([&raw](auto& drv) {
+                                 return drv.ReadRegister32(max22200::RegBank::STATUS, raw);
+                             }) == max22200::DriverStatus::OK;
         if (!read_ok || raw == 0xFFFFFFFFu || (raw & max22200::StatusReg::ACTIVE_BIT) == 0u ||
             (raw & max22200::StatusReg::ONCH_MASK) != 0u) {
             Logger::GetInstance().Error(TAG,
@@ -305,9 +306,10 @@ ManagerError ValveManager::InitializeTle92466() noexcept {
     constexpr float kVbatUvV = 19.0F;  ///< UV trip: 24 V − 21 % (flag true supply loss)
     constexpr float kVbatOvV = 29.0F;  ///< OV trip: 24 V + 21 % (flag regulator runaway)
     {
-        auto* drv = tle92466_->GetDriver();
-        auto result = drv ? drv->SetVbatThresholds(kVbatUvV, kVbatOvV)
-                          : tle92466ed::DriverResult<void>{tle::unexpected(tle92466ed::DriverError::NotInitialized)};
+        // Through the handler's WithDriver(): the write runs with the handler mutex held, and
+        // an unavailable driver comes back as DriverError::NotInitialized.
+        auto result = tle92466_->WithDriver(
+            [&](auto& drv) { return drv.SetVbatThresholds(kVbatUvV, kVbatOvV); });
         if (!result) {
             Logger::GetInstance().Warn(TAG,
                 "TLE92466ED SetVbatThresholds(UV=%.1f V, OV=%.1f V) failed — "
@@ -592,12 +594,12 @@ hf_valve_err_t ValveManager::ConfigureProportionalPwm(ValveChannel channel,
     // the mantissa/exponent register encoding internally.
     const float period_us = 1'000'000.0f / frequency_hz;
 
-    auto* driver = tle92466_->GetDriver();
-    if (!driver) return Record(hf_valve_err_t::VALVE_ERR_DRIVER_NOT_AVAILABLE);
-
     MutexLockGuard lock(mutex_);
-    auto result = driver->ConfigurePwmPeriod(
-        static_cast<tle92466ed::Channel>(hw_ch), period_us);
+    // Through the handler's WithDriver(): the register sequence runs with the handler mutex held,
+    // so no other TLE user's frame lands in the middle of it.
+    auto result = tle92466_->WithDriver([&](auto& drv) {
+        return drv.ConfigurePwmPeriod(static_cast<tle92466ed::Channel>(hw_ch), period_us);
+    });
     if (result.has_value()) {
         channel_states_[static_cast<uint8_t>(channel)].pwm_frequency_hz = frequency_hz;
         return hf_valve_err_t::VALVE_SUCCESS;
@@ -632,12 +634,12 @@ hf_valve_err_t ValveManager::ConfigureProportionalDither(ValveChannel channel,
 
     // Use the driver's high-level ConfigureDither which handles the
     // step_size / num_steps / flat_steps computation internally.
-    auto* driver = tle92466_->GetDriver();
-    if (!driver) return Record(hf_valve_err_t::VALVE_ERR_DRIVER_NOT_AVAILABLE);
-
     MutexLockGuard lock(mutex_);
-    auto result = driver->ConfigureDither(
-        static_cast<tle92466ed::Channel>(hw_ch), amplitude_ma, frequency_hz);
+    // Through the handler's WithDriver(), as ConfigureProportionalPwm().
+    auto result = tle92466_->WithDriver([&](auto& drv) {
+        return drv.ConfigureDither(static_cast<tle92466ed::Channel>(hw_ch), amplitude_ma,
+                                   frequency_hz);
+    });
     if (result.has_value()) {
         auto& state = channel_states_[static_cast<uint8_t>(channel)];
         state.dither_amplitude_ma = amplitude_ma;
@@ -731,12 +733,12 @@ ValveChannel ValveManager::FindChannel(std::string_view name) const noexcept {
 // DIRECT DRIVER ACCESS
 //==============================================================================
 
-Max22200Handler* ValveManager::GetMax22200Handler() noexcept {
-    return max22200_valid_ ? &*max22200_ : nullptr;
+ValveManager::Max22200Access ValveManager::Max22200() noexcept {
+    return Max22200Access(max22200_valid_ ? &*max22200_ : nullptr);
 }
 
-Tle92466edHandler* ValveManager::GetTle92466Handler() noexcept {
-    return tle92466_valid_ ? &*tle92466_ : nullptr;
+ValveManager::Tle92466Access ValveManager::Tle92466() noexcept {
+    return Tle92466Access(tle92466_valid_ ? &*tle92466_ : nullptr);
 }
 
 //==============================================================================

@@ -82,8 +82,8 @@ HF_TEST(ValveManager_BringsUpBothBanksAndConfiguresThePins) {
     CHECK(VM().IsBankReady(ValveDriverType::MAX22200));
     CHECK(VM().IsBankReady(ValveDriverType::TLE92466));
     CHECK_EQ(VM().GetManagerError(), ManagerError::None);
-    CHECK(VM().GetMax22200Handler() != nullptr);
-    CHECK(VM().GetTle92466Handler() != nullptr);
+    CHECK(static_cast<bool>(VM().Max22200()));
+    CHECK(static_cast<bool>(VM().Tle92466()));
 
     // MAX22200 left ACTIVE with every channel off; TLE92466ED in mission mode, every channel off.
     CHECK((b.max.regs[max22200::RegBank::STATUS] & max22200::StatusReg::ACTIVE_BIT) != 0u);
@@ -205,8 +205,8 @@ HF_TEST(ValveManager_FailsClosedWhenTheTleIsAbsent) {
     CHECK_EQ(VM().GetManagerError(), ManagerError::HardwareFault);
     CHECK(VM().IsBankReady(ValveDriverType::MAX22200));   // diagnosis: which part answered
     CHECK(!VM().IsBankReady(ValveDriverType::TLE92466));
-    CHECK(VM().GetMax22200Handler() != nullptr);
-    CHECK(VM().GetTle92466Handler() == nullptr);
+    CHECK(static_cast<bool>(VM().Max22200()));
+    CHECK(!VM().Tle92466());
 
     // Every channel operation is refused, on both banks, and recorded.
     CHECK(VM().EnableChannel(ValveChannel::SOL_CH0) == hf_valve_err_t::VALVE_ERR_NOT_INITIALIZED);
@@ -306,7 +306,7 @@ HF_TEST(ValveManager_DeinitializeTurnsEveryChannelOffFirst) {
     CHECK_EQ(TleChCtrl(b) & tle92466ed::CH_CTRL::ALL_CH_MASK, 0u);
     CHECK(!VM().IsInitialized());
     CHECK_EQ(VM().GetManagerError(), ManagerError::NotInitialized);
-    CHECK(VM().GetMax22200Handler() == nullptr);
+    CHECK(!VM().Max22200());
 }
 
 HF_TEST(Flux_ShutdownIncludesTheValves) {
