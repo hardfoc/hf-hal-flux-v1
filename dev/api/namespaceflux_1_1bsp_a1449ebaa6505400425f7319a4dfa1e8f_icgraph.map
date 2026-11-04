@@ -1,0 +1,5 @@
+<map id="flux::bsp::LastResetReason" name="flux::bsp::LastResetReason">
+<area shape="rect" id="Node000001" title="Opaque reset cause of the previous boot (family&#45;specific numbering; 0 when unknown)." alt="" coords="247,5,444,31"/>
+<area shape="rect" id="Node000002" href="$class_flux.html#ad2a0c5cc4f93cefed1f6939c26b255c5" title="Reset reason of the previous boot, opaque to callers." alt="" coords="5,5,199,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="233,21,199,21,199,15,233,15"/>
+</map>

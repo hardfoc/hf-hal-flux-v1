@@ -1,0 +1,17 @@
+<map id="AdcManager::ReleaseLocked" name="AdcManager::ReleaseLocked">
+<area shape="rect" id="Node000001" title="Release the MCU ADC, every ADS7952 handler and the registry (mutex held)." alt="" coords="1168,31,1376,56"/>
+<area shape="rect" id="Node000002" href="$class_adc_manager.html#aaa9068d2b9252942dda6e9b933ad351b" title="Release all ADC resources and reset to uninitialized state." alt="" coords="935,5,1120,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1154,34,1120,30,1120,25,1155,28"/>
+<area shape="rect" id="Node000004" href="$class_adc_manager.html#a3561cebd5b27e351c066236543a0bc59" title=" " alt="" coords="944,55,1111,80"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="1154,58,1111,62,1110,57,1154,52"/>
+<area shape="rect" id="Node000003" href="$class_flux.html#a381c21e10f3556ecc16df4b4f2ead006" title="Shut down all subsystems in reverse initialisation order." alt="" coords="716,5,839,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="921,21,839,21,839,15,921,15"/>
+<area shape="rect" id="Node000005" href="$class_adc_manager.html#a93d9add5dfe70a4605297be247318c71" title="Initialise the ADC subsystem if not already initialised." alt="" coords="668,55,887,80"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="930,70,887,70,887,65,930,65"/>
+<area shape="rect" id="Node000006" href="$class_flux.html#a99371decae4e60cd6db9c40ec38c76d5" title=" " alt="" coords="481,55,620,80"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="654,70,621,70,621,65,654,65"/>
+<area shape="rect" id="Node000007" href="$class_flux.html#a0d67fb153ddebb59c51eb20ad311cb32" title=" " alt="" coords="220,55,433,80"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="468,70,433,70,433,65,468,65"/>
+<area shape="rect" id="Node000008" href="$class_flux.html#a6c011c136a43dd2d9859dcf7d56571e8" title="Ensure all Flux subsystems are properly initialized." alt="" coords="5,55,172,80"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="206,70,172,70,172,65,206,65"/>
+</map>

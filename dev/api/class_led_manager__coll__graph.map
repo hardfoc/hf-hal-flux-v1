@@ -1,0 +1,15 @@
+<map id="LedManager" name="LedManager">
+<area shape="rect" id="Node000001" title="Singleton that drives the on&#45;board WS2812 status LED." alt="" coords="559,185,661,210"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="199,17,353,42"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="367,17,409,18,453,24,496,36,536,57,566,86,587,121,601,156,609,184,603,185,596,158,582,124,562,89,533,61,494,41,452,29,408,23,366,22"/>
+<area shape="rect" id="Node000003" href="$struct_led_color.html" title="Simple RGB colour triplet." alt="" coords="237,66,315,91"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="329,71,375,70,429,74,484,85,536,106,559,123,579,144,604,183,600,186,574,147,556,127,533,110,482,90,428,79,375,76,329,76"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="187,182,365,207"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="379,193,389,193,559,194,559,200,389,199,379,199"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="187,231,365,257"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="379,235,455,227,534,215,566,207,567,213,535,220,456,232,379,240"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="199,281,353,321"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="366,294,449,281,492,269,533,254,568,232,595,208,598,212,571,236,536,258,494,274,450,286,367,299"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="5,289,116,314"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="130,299,199,299,199,304,130,304"/>
+</map>

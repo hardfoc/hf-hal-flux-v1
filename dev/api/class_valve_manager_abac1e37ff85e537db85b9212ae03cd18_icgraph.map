@@ -1,0 +1,11 @@
+<map id="ValveManager::DisableAllLocked" name="ValveManager::DisableAllLocked">
+<area shape="rect" id="Node000001" title="Disable every channel on every bank that is up (mutex held by the caller)." alt="" coords="536,51,725,91"/>
+<area shape="rect" id="Node000002" href="$class_valve_manager.html#a68ea3302ca55e55a494099f3a52d67f1" title="Turn every channel off, release both driver handlers and reset to uninitialised." alt="" coords="291,29,488,55"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="522,61,488,57,489,51,522,56"/>
+<area shape="rect" id="Node000005" href="$class_valve_manager.html#adf0a124b524aeaff77fd8ae6104a12b0" title="Disable all channels on both drivers." alt="" coords="295,79,484,119"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="523,87,484,91,484,86,522,81"/>
+<area shape="rect" id="Node000003" href="$class_valve_manager.html#aa540e9da7618c57ecbc8ce6e7a7d9f25" title="Leave SafeHold: full re&#45;bring&#45;up of both banks, which raises the enable pins again." alt="" coords="5,5,243,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="277,35,243,31,243,26,277,29"/>
+<area shape="rect" id="Node000004" href="$class_flux.html#a381c21e10f3556ecc16df4b4f2ead006" title="Shut down all subsystems in reverse initialisation order." alt="" coords="63,55,185,80"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="277,55,186,64,185,59,277,50"/>
+</map>

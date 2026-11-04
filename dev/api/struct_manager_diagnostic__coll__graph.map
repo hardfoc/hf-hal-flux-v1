@@ -1,0 +1,5 @@
+<map id="ManagerDiagnostic" name="ManagerDiagnostic">
+<area shape="rect" id="Node000001" title="One manager&#39;s lifecycle state in FluxHalDiagnostics." alt="" coords="5,93,153,119"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="24,5,135,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="82,45,82,93,77,93,77,45"/>
+</map>
