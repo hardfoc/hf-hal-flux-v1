@@ -1,0 +1,29 @@
+<map id="AdcManager::Initialize" name="AdcManager::Initialize">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,161,172,187"/>
+<area shape="rect" id="Node000002" href="$namespaceflux_1_1bsp.html#a11292ce06a39e8ddd8dba609b1005662" title="Create and initialise the MCU ADC unit with the given channels enabled." alt="" coords="225,8,427,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="97,159,145,103,179,71,219,44,236,35,239,40,221,48,183,75,148,107,101,163"/>
+<area shape="rect" id="Node000003" href="$class_comm_channels_manager.html#af67cc44d654cf6c433e4d7ef4d3927d8" title="Initialise all communication buses if not already initialised." alt="" coords="235,58,417,98"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="112,159,160,134,219,108,239,100,241,105,221,112,163,139,114,164"/>
+<area shape="rect" id="Node000010" href="$class_comm_channels_manager.html#ad1249df1c4ece9e2468d4b4536d237ae" title="Return the singleton CommChannelsManager instance." alt="" coords="235,122,417,162"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="172,160,221,153,221,159,172,165"/>
+<area shape="rect" id="Node000011" href="$namespaceflux_1_1bsp.html#a4fb331ad765d4f63a94c7d132c0257c8" title="Number of channels per unit of the MCU ADC (0 when the family has none)." alt="" coords="220,186,432,226"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="172,183,207,187,206,193,172,188"/>
+<area shape="rect" id="Node000012" href="$class_adc_manager.html#ac6163df91b7372cc9d89152f7da3df02" title="Release the MCU ADC, every ADS7952 handler and the registry (mutex held)." alt="" coords="222,251,430,276"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="114,185,162,210,221,236,250,245,248,250,219,240,160,215,111,189"/>
+<area shape="rect" id="Node000014" href="$namespaceflux_1_1hal.html#ab4504a1b2b5bf4af2617ffe9dc591813" title="Short name of a ManagerError, for logs and diagnostics." alt="" coords="259,300,393,325"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="103,185,151,235,184,263,221,286,246,296,244,301,219,291,181,267,147,239,99,189"/>
+<area shape="rect" id="Node000004" href="$class_comm_channels_manager.html#a868bd4abe1ce3b5497983c2d8ec70914" title=" " alt="" coords="494,26,677,66"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="417,64,480,56,480,62,418,69"/>
+<area shape="rect" id="Node000009" href="$class_comm_channels_manager.html#a959f694cd6fbcd173aa0c16fc9b0cf67" title=" " alt="" coords="494,90,677,130"/>
+<area shape="poly" id="edge8_Node000003_Node000009" title=" " alt="" coords="418,87,480,94,480,100,417,92"/>
+<area shape="rect" id="Node000005" href="$namespaceflux_1_1bsp.html#a84c467cf6b9bd7fb8a9f7441ad5537ec" title="Create the CAN controller (configured, not started). nullptr on failure." alt="" coords="753,5,907,31"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="676,33,740,26,740,31,677,38"/>
+<area shape="rect" id="Node000006" href="$class_comm_channels_manager.html#ac26134b220ce180e441ad956e8b2c77a" title=" " alt="" coords="739,55,921,95"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="677,54,725,60,725,65,676,60"/>
+<area shape="rect" id="Node000007" href="$namespaceflux_1_1bsp.html#a5d5827fa54cd130b7e8ba5c419a0fa95" title="Destroy the CAN controller." alt="" coords="979,37,1140,63"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="921,63,965,58,965,63,922,68"/>
+<area shape="rect" id="Node000008" href="$namespaceflux_1_1bsp.html#a6867571cbe5798e8ed5e5cd954f9c4db" title="Destroy SPI bus bus and every device on it." alt="" coords="969,87,1149,112"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="922,82,956,86,956,91,921,88"/>
+<area shape="rect" id="Node000013" href="$namespaceflux_1_1bsp.html#a743db59ccea2534e5382c2eb14d9c2eb" title="Destroy the MCU ADC unit." alt="" coords="480,251,691,276"/>
+<area shape="poly" id="edge12_Node000012_Node000013" title=" " alt="" coords="430,261,466,261,466,266,430,266"/>
+</map>

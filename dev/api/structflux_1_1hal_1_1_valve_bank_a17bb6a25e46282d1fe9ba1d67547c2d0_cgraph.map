@@ -1,0 +1,7 @@
+<map id="flux::hal::ValveBank::IsHeldOff" name="flux::hal::ValveBank::IsHeldOff">
+<area shape="rect" id="Node000001" title="The pins were dropped and not re&#45;armed since." alt="" coords="5,23,156,63"/>
+<area shape="rect" id="Node000002" href="$class_valve_manager.html#a365395c793edae3fa9b13e5939cf9297" title="Return the singleton ValveManager instance." alt="" coords="221,5,422,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="156,33,206,27,207,33,156,38"/>
+<area shape="rect" id="Node000003" href="$class_valve_manager.html#a26f98ae17ae2d117a9503482bf34cdcd" title="The enable pins were dropped and not re&#45;armed since." alt="" coords="204,55,439,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="156,48,191,52,190,57,156,53"/>
+</map>

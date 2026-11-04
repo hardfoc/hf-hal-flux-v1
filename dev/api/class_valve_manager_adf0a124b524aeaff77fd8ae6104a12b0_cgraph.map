@@ -1,0 +1,15 @@
+<map id="ValveManager::DisableAllChannels" name="ValveManager::DisableAllChannels">
+<area shape="rect" id="Node000001" title="Disable all channels on both drivers." alt="" coords="5,97,195,137"/>
+<area shape="rect" id="Node000002" href="$class_valve_manager.html#abac1e37ff85e537db85b9212ae03cd18" title="Disable every channel on every bank that is up (mutex held by the caller)." alt="" coords="243,68,432,108"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="194,103,229,98,229,104,195,108"/>
+<area shape="rect" id="Node000005" href="$class_valve_manager.html#adcb9667cc3d68ec7b3c97f307aeacef4" title="Remember a failed operation result for GetLastError(); pass the result through." alt="" coords="502,132,670,158"/>
+<area shape="poly" id="edge7_Node000001_Node000005" title=" " alt="" coords="195,120,488,137,488,142,195,125"/>
+<area shape="rect" id="Node000003" href="$_valve_manager_8h.html#ae6cff86821790a19053b6f8423493fe7" title="Check if a valve error code indicates success." alt="" coords="740,58,849,83"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="370,65,420,39,479,18,539,7,586,3,633,7,693,18,730,31,763,48,761,53,728,36,691,24,633,12,586,8,539,12,481,24,422,44,372,70"/>
+<area shape="rect" id="Node000004" href="$_valve_manager_8h.html#a1029903401a6b8ed1b70aaff9b2c6acc" title="Map MAX22200 DriverStatus to the unified hf_valve_err_t domain." alt="" coords="480,34,692,59"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="432,69,495,59,496,64,432,75"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="424,105,481,118,516,127,515,132,479,124,422,110"/>
+<area shape="rect" id="Node000006" href="$_valve_manager_8h.html#a07104dd82857d7cb8af8bf459645484c" title="Map TLE92466ED DriverError to the unified hf_valve_err_t domain." alt="" coords="489,83,683,108"/>
+<area shape="poly" id="edge6_Node000002_Node000006" title=" " alt="" coords="432,88,475,89,475,95,432,93"/>
+<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="653,130,691,119,759,87,761,92,693,124,655,135"/>
+</map>

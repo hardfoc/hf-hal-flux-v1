@@ -1,0 +1,13 @@
+<map id="flux::hal::ValveBank::EnablePins" name="flux::hal::ValveBank::EnablePins">
+<area shape="rect" id="Node000001" title="Drop (false) or re&#45;arm (true) both valve&#45;bank enable pins." alt="" coords="5,97,156,137"/>
+<area shape="rect" id="Node000002" href="$structflux_1_1hal_1_1_hal_result.html#ab10925859e909fcfbcd180349eea4942" title="A failure result." alt="" coords="219,5,390,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="108,94,151,66,203,40,224,32,226,37,205,44,154,71,111,99"/>
+<area shape="rect" id="Node000003" href="$class_gpio_manager.html#ad57a4135f150ff0d33bad3047c4cde61" title="Get the BaseGpio driver for a named pin. Returns nullptr if not found." alt="" coords="235,55,375,80"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="156,97,233,80,234,86,157,103"/>
+<area shape="rect" id="Node000004" href="$class_gpio_manager.html#af18a40c292b97c42dace2eb42c511053" title="Access the singleton instance (Meyers singleton, thread&#45;safe)." alt="" coords="207,104,402,129"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="156,114,194,114,194,119,156,119"/>
+<area shape="rect" id="Node000005" href="$class_valve_manager.html#a365395c793edae3fa9b13e5939cf9297" title="Return the singleton ValveManager instance." alt="" coords="204,153,405,179"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="157,131,234,148,233,153,156,136"/>
+<area shape="rect" id="Node000006" href="$structflux_1_1hal_1_1_hal_result.html#ad8784cc336476796913303da9089a642" title="A success result." alt="" coords="219,203,390,228"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="112,135,155,162,205,188,229,196,227,201,203,192,152,167,109,139"/>
+</map>

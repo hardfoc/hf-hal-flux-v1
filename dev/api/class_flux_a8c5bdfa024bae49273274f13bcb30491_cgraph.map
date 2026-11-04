@@ -1,0 +1,17 @@
+<map id="Flux::InitializeComms" name="Flux::InitializeComms">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,65,169,91"/>
+<area shape="rect" id="Node000002" href="$class_comm_channels_manager.html#af67cc44d654cf6c433e4d7ef4d3927d8" title="Initialise all communication buses if not already initialised." alt="" coords="217,58,400,98"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="169,75,204,75,204,81,169,81"/>
+<area shape="rect" id="Node000003" href="$class_comm_channels_manager.html#a868bd4abe1ce3b5497983c2d8ec70914" title=" " alt="" coords="448,26,631,66"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="400,63,434,58,435,63,400,68"/>
+<area shape="rect" id="Node000008" href="$class_comm_channels_manager.html#a959f694cd6fbcd173aa0c16fc9b0cf67" title=" " alt="" coords="448,90,631,130"/>
+<area shape="poly" id="edge7_Node000002_Node000008" title=" " alt="" coords="400,88,435,93,434,98,400,93"/>
+<area shape="rect" id="Node000004" href="$namespaceflux_1_1bsp.html#a84c467cf6b9bd7fb8a9f7441ad5537ec" title="Create the CAN controller (configured, not started). nullptr on failure." alt="" coords="693,5,847,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="630,32,680,26,680,32,631,38"/>
+<area shape="rect" id="Node000005" href="$class_comm_channels_manager.html#ac26134b220ce180e441ad956e8b2c77a" title=" " alt="" coords="679,55,861,95"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="631,55,665,59,665,65,630,60"/>
+<area shape="rect" id="Node000006" href="$namespaceflux_1_1bsp.html#a5d5827fa54cd130b7e8ba5c419a0fa95" title="Destroy the CAN controller." alt="" coords="919,37,1080,63"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="861,63,905,58,905,63,862,68"/>
+<area shape="rect" id="Node000007" href="$namespaceflux_1_1bsp.html#a6867571cbe5798e8ed5e5cd954f9c4db" title="Destroy SPI bus bus and every device on it." alt="" coords="909,87,1089,112"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="862,82,896,86,896,91,861,88"/>
+</map>
