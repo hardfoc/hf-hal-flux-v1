@@ -5,8 +5,15 @@ What changed in the Flux V1 HAL, newest first. Releases are tagged `vX.Y.Z` and 
 
 ## Unreleased
 
-### Breaking
+### Fixed
 
+- hf-core is bumped to the bus-error adapters (hf-core `fix/bus-error-status`): the MAX22200 adapter's `GpioSet()`
+  returns the GPIO result and the driver reports a CMD or ENABLE pin it could not drive. A valve call whose CMD pin
+  is stuck now fails (`GPIO_ERROR`) instead of reporting success after sending the Command Register byte as a data
+  frame. The Alicat BASIS-2 and FDO2 UART adapters report a failed write as `SerialError`. The host chip models
+  needed no change: they model the chips at the SPI and GPIO level, below the adapters.
+- New host test `test_valve_bus_errors`.
+### Breaking
 - `ValveManager::GetMax22200Handler()` and `GetTle92466Handler()` are removed. They handed out the handlers, whose
   `GetDriver()` returns the chip driver without the handler mutex, so a caller could interleave SPI frames with the
   manager's own (the MAX22200's two-phase CMD protocol and the TLE92466ED's pipelined replies both break). They are
@@ -17,9 +24,6 @@ What changed in the Flux V1 HAL, newest first. Releases are tagged `vX.Y.Z` and 
   `if (auto* h = mgr.GetMax22200Handler()) h->GetStatus(st);` becomes
   `if (auto max = mgr.Max22200()) max.GetStatus(st);`, and `h->GetDriver()->X()` becomes
   `max.WithDriver([&](auto& d) { return d.X(); })`.
-
-### Fixed
-
 - `ValveManager` reached the drivers through the handlers' unlocked `GetDriver()` in four places: the MAX22200
   presence check, the TLE92466ED VBAT thresholds at bring-up, `ConfigureProportionalPwm()` and
   `ConfigureProportionalDither()`. They now run inside the handlers' `WithDriver()`, under the handler mutex.
